@@ -34,9 +34,7 @@
 						<include>**/When*.java</include>
 					</includes>
 					<excludes>
-						<exclude>**/*.it/*Test.java</exclude>
-						<exclude>**/*.it/Test*.java</exclude>
-						<exclude>**/*.it/When*.java</exclude>
+						<exclude>%regex[.*it.*]</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -59,9 +57,7 @@
 								<exclude>**/When*.java</exclude>
 							</excludes>
 							<includes>
-								<include>**/*.it/*Test.java</include>
-								<include>**/*.it/Test*.java</include>
-								<include>**/*.it/When*.java</include>
+								<include>%regex[.*it.*When.*]</include>
 							</includes>
 						</configuration>
 					</execution>
