@@ -3,8 +3,8 @@ import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mo
 
 public class InMemoryMongoDbConfigurationBuilder {
 
-	private static final String MOCK_HOST = "0.0.0.0";
-	private static final int MOCK_PORT = 2307;
+	protected static final String MOCK_HOST = "0.0.0.0";
+	protected static final int MOCK_PORT = 2307;
 	
 	private MongoDbConfigurationBuilder mongoDbConfigurationBuilder;
 	

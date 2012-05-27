@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -9,12 +10,14 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.mongodb.BasicDBObject;
@@ -25,15 +28,20 @@ import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
-public class WhenRemoteMongoDbRuleIsRegistered {
+public class WhenMongoDbRuleIsRegistered {
 
+	@ClassRule
+	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo")
+			.build();
+	
+	
 	@Test(expected=NoSqlAssertionError.class)
 	public void should_fail_if_expected_data_is_non_strict_equal() throws Throwable {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
 		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenRemoteMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -45,7 +53,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		
 		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
 		ExpectedDataSetTest expectedDataSetTest = new ExpectedDataSetTest(new String[]{"json3.test"});
-		Description description = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest, expectedDataSetTest);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest, expectedDataSetTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -58,7 +66,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
 		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenRemoteMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -70,7 +78,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		
 		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
 		ExpectedDataSetTest expectedDataSetTest = new ExpectedDataSetTest(new String[]{"json.test"});
-		Description description = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest, expectedDataSetTest);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest, expectedDataSetTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -83,7 +91,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
 		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenRemoteMongoDbRuleIsRegistered.class, mongoDbConfiguration);
+				WhenMongoDbRuleIsRegistered.class, mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -94,13 +102,13 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		};
 		
 		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
 		
 		DataSetTest refreshedDataSetTest = new DataSetTest(new String[]{"json3.test"}, LoadStrategyEnum.REFRESH);
-		Description refreshedDescription = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", refreshedDataSetTest);
+		Description refreshedDescription = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", refreshedDataSetTest);
 		
 		Statement refreshMongodbStatement = remoteMongoDbRule.apply(noStatement, refreshedDescription);
 		refreshMongodbStatement.evaluate();
@@ -120,7 +128,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
 		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenRemoteMongoDbRuleIsRegistered.class, mongoDbConfiguration);
+				WhenMongoDbRuleIsRegistered.class, mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -131,7 +139,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		};
 		
 		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.DELETE_ALL);
-		Description description = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -147,7 +155,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
 		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenRemoteMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -158,7 +166,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		};
 		
 		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.INSERT);
-		Description description = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -168,7 +176,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		assertThat((String)currentData.get("code"), is("JSON dataset"));
 		
 		DataSetTest dataSetTest2 = new DataSetTest(new String[]{"json2.test"}, LoadStrategyEnum.INSERT);
-		Description description2 = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest2);
+		Description description2 = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest2);
 		
 		Statement mongodbStatement2 = remoteMongoDbRule.apply(noStatement, description2);
 		mongodbStatement2.evaluate();
@@ -188,7 +196,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
 		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenRemoteMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -199,7 +207,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		};
 		
 		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -209,7 +217,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		assertThat((String)currentData.get("code"), is("JSON dataset"));
 		
 		DataSetTest dataSetTest2 = new DataSetTest(new String[]{"json2.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description2 = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest2);
+		Description description2 = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest2);
 		
 		Statement mongodbStatement2 = remoteMongoDbRule.apply(noStatement, description2);
 		mongodbStatement2.evaluate();
@@ -229,7 +237,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
 		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenRemoteMongoDbRuleIsRegistered.class, mongoDbConfiguration);
+				WhenMongoDbRuleIsRegistered.class, mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -240,7 +248,7 @@ public class WhenRemoteMongoDbRuleIsRegistered {
 		};
 		
 		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description = Description.createTestDescription(WhenRemoteMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();

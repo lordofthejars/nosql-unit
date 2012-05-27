@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.lordofthejars</groupId>
 	<artifactId>nosqlunit</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>nosqlunit</name>
 	<description>NoSQL is a JUnit extension targeted to nosql-driven projects.</description>
@@ -38,6 +38,8 @@
 		<junit.version>4.10</junit.version>
 		<hamcrest.version>1.3.RC2</hamcrest.version>
 		<mockito.version>1.9.0</mockito.version>
+		<slf4j.version>1.6.4</slf4j.version>
+		<logback.version>0.9.24</logback.version>
 	</properties>
 
 	<dependencyManagement>
@@ -100,6 +102,18 @@
             </exclusions>
         </dependency>
 
+		<dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+		<dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+        </dependency>
 
 	</dependencies>
 
