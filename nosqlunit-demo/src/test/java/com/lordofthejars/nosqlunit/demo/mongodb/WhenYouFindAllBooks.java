@@ -2,7 +2,7 @@ package com.lordofthejars.nosqlunit.demo.mongodb;
 
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsCollectionContaining.hasItem;
+import static org.hamcrest.collection.IsIn.isIn;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 
 public class WhenYouFindAllBooks {
 
-	
+
 	@Rule
 	public MongoDbRule remoteMongoDbRule = new MongoDbRule(WhenYouFindAllBooks.class,  mongoDb()
 			.databaseName("test").build());
@@ -32,7 +32,7 @@ public class WhenYouFindAllBooks {
 		Book expectedBook = new Book("The Hobbit", 293);
 		
 		assertThat(books, hasSize(1));
-		assertThat(books, hasItem(expectedBook));
+		assertThat(expectedBook, isIn(books));
 		
 	}
 	
