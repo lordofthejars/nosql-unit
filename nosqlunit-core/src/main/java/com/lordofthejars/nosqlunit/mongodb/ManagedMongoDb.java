@@ -42,6 +42,7 @@ public class ManagedMongoDb extends ExternalResource {
 	private String logRelativePath = DEFAULT_MONGO_LOGPATH;
 
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
+	private List<String> singleCommandArguments = new ArrayList<String>();
 
 	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
@@ -93,6 +94,11 @@ public class ManagedMongoDb extends ExternalResource {
 			return this;
 		}
 
+		public MongoServerRuleBuilder appendSingleCommandLineArguments(String argument) {
+			this.managedMongoDb.addSingleCommandLineArgument(argument);
+			return this;
+		}
+		
 		public ManagedMongoDb build() {
 			if (this.managedMongoDb.getMongodPath() == null) {
 				throw new IllegalArgumentException(
@@ -180,6 +186,10 @@ public class ManagedMongoDb extends ExternalResource {
 		programAndArguments.add(LOGPATH_ARGUMENT_NAME);
 		programAndArguments.add(logRelativePath);
 
+		for (String argument : this.singleCommandArguments) {
+			programAndArguments.add(argument);
+		}
+		
 		for (String argumentName : this.extraCommandArguments.keySet()) {
 			programAndArguments.add(argumentName);
 			programAndArguments.add(this.extraCommandArguments
@@ -239,6 +249,10 @@ public class ManagedMongoDb extends ExternalResource {
 		this.extraCommandArguments.put(argumentName, argumentValue);
 	}
 
+	private void addSingleCommandLineArgument(String argument) {
+		this.singleCommandArguments.add(argument);
+	}
+	
 	private String getMongodPath() {
 		return mongodPath;
 	}
