@@ -1,7 +1,12 @@
 package com.lordofthejars.nosqlunit.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(CleanInsertLoadStrategyOperation.class);
+	
 	private DatabaseOperation databaseOperation;
 
 	public CleanInsertLoadStrategyOperation(DatabaseOperation databaseOperation) {
@@ -10,6 +15,9 @@ public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 
 	@Override
 	public void executeScripts(String[] contentDataset) {
+		
+		LOGGER.debug("Calling Clean and Insert Load Strategy.");
+		
 		executeClean();
 		executeInsert(contentDataset);
 	}
