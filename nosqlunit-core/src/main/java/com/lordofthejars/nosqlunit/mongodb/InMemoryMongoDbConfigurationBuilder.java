@@ -1,10 +1,11 @@
 package com.lordofthejars.nosqlunit.mongodb;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import jmockmongo.MockMongo;
 
 public class InMemoryMongoDbConfigurationBuilder {
 
 	protected static final String MOCK_HOST = "0.0.0.0";
-	protected static final int MOCK_PORT = 2307;
+	protected static final int MOCK_PORT = MockMongo.DEFAULT_PORT;
 	
 	private MongoDbConfigurationBuilder mongoDbConfigurationBuilder;
 	
