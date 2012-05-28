@@ -10,7 +10,7 @@
 	<artifactId>nosqlunit-core</artifactId>
 
 	<properties>
-		<neo4j.version>1.7</neo4j.version>
+		
 	</properties>
 
 	<dependencies>
@@ -22,7 +22,6 @@
 		<dependency>
    			<groupId>org.neo4j</groupId>
    			<artifactId>neo4j</artifactId>
-   			<version>${neo4j.version}</version>
   		</dependency>
 		
 		<dependency>
