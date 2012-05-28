@@ -107,8 +107,8 @@ public class WhenMongoDbOperationsAreRequired {
 		MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost", "test"));
 		mongoOperation.deleteAll();
 		
-		verify(collection1, times(1)).remove(any(BasicDBObject.class));
-		verify(collection2, times(1)).remove(any(BasicDBObject.class));
+		verify(collection1, times(1)).drop();
+		verify(collection2, times(1)).drop();
 		
 	}
 	
