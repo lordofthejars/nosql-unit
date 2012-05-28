@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.mongodb.BasicDBList;
@@ -12,10 +15,13 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoOptions;
 import com.mongodb.util.JSON;
 
 public final class MongoOperation implements DatabaseOperation {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
+	
 	private Mongo mongo;
 	private MongoDbConfiguration mongoDbConfiguration;
 
@@ -52,6 +58,9 @@ public final class MongoOperation implements DatabaseOperation {
 			DBCollection dbCollection = mongoDb.getCollection(collectionName);
 
 			for (Object dataObject : dataObjects) {
+				
+				LOGGER.debug("Inserting {} To {}.", dataObject, dbCollection.getName());
+				
 				dbCollection.insert((DBObject) dataObject);
 			}
 
@@ -68,10 +77,19 @@ public final class MongoOperation implements DatabaseOperation {
 		Set<String> collectionaNames = mongoDb.getCollectionNames();
 
 		for (String collectionName : collectionaNames) {
-
-			DBCollection dbCollection = mongoDb.getCollection(collectionName);
-			dbCollection.remove(new BasicDBObject());
+			
+			if(isNotASystemCollection(collectionName)) {
+				
+				LOGGER.debug("Dropping Collection {}.", collectionName);
+				
+				DBCollection dbCollection = mongoDb.getCollection(collectionName);
+				dbCollection.drop();
+			}
 		}
+	}
+
+	private boolean isNotASystemCollection(String collectionName) {
+		return !collectionName.startsWith("system");
 	}
 
 	@Override
@@ -119,6 +137,9 @@ public final class MongoOperation implements DatabaseOperation {
 				DBObject dbObject = dbCollection.findOne((DBObject) dataObject);
 				
 				if(wasDbObjectNotInserted(dbObject)) {
+					
+					LOGGER.debug("Inserting Unique Object {} To {}.", dataObject, dbCollection.getName());
+					
 					dbCollection.insert((DBObject)dataObject);
 				}
 				
