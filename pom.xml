@@ -125,7 +125,6 @@
 
 	<modules>
 		<module>nosqlunit-core</module>
-		<module>nosql-mongodb-simple-example</module>
 		<module>nosqlunit-demo</module>
 		<module>nosqlunit-mongodb</module>
 	</modules>
