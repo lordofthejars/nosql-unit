@@ -44,6 +44,8 @@ public class WhenManagedMongoDbRuleIsRegistered {
 				+ File.separatorChar + "mongo-temp"+ File.separatorChar + "mongo-dbpath");
 		assertThat(dbPath.exists(), is(false));
 		
+		System.clearProperty("MONGO_HOME");
+		
 	}
 	
 	@Test

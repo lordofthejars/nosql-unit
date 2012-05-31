@@ -33,7 +33,7 @@
 	<dependencies>
 
 		<dependency>
-			<artifactId>nosqlunit-core</artifactId>
+			<artifactId>nosqlunit-mongodb</artifactId>
 			<groupId>com.lordofthejars</groupId>
 			<version>${project.version}</version>
 		</dependency>

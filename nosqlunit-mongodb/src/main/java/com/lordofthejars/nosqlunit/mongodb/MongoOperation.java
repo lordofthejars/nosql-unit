@@ -1,16 +1,13 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
-import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
