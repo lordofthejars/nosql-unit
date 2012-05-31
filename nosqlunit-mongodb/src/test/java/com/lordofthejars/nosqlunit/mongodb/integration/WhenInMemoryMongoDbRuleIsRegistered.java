@@ -2,6 +2,9 @@ package com.lordofthejars.nosqlunit.mongodb.integration;
 
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+
+import java.util.concurrent.TimeUnit;
+
 import jmockmongo.MockMongo;
 
 import org.junit.Test;
@@ -27,6 +30,8 @@ public class WhenInMemoryMongoDbRuleIsRegistered {
 				Mongo mongo = new Mongo("0.0.0.0", MockMongo.DEFAULT_PORT);
 				mongo.getDB("test").getCollection("test").insert(new BasicDBObject("name", "Alex"));
 				mongo.close();
+				
+				TimeUnit.SECONDS.sleep(3);
 				
 				Mongo mongoQuery = new Mongo("0.0.0.0", MockMongo.DEFAULT_PORT);
 				DBObject nameDbObject = mongoQuery.getDB("test").getCollection("test").findOne(new BasicDBObject("name", "Alex"));
