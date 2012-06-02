@@ -5,11 +5,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public class LoadStrategyFactory {
 
-	private LoadStrategyFactory() {
+	public LoadStrategyFactory() {
 		super();
 	}
 	
-	public static final LoadStrategyOperation getLoadStrategyInstance(LoadStrategyEnum loadStrategyEnum, DatabaseOperation databaseOperation) {
+	public LoadStrategyOperation getLoadStrategyInstance(LoadStrategyEnum loadStrategyEnum, DatabaseOperation databaseOperation) {
 		
 		try {
 			Constructor<? extends LoadStrategyOperation> constructor = loadStrategyEnum.loadStrategy().getConstructor(DatabaseOperation.class);

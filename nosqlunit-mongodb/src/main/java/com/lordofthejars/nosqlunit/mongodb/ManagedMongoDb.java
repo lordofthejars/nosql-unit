@@ -44,6 +44,7 @@ public class ManagedMongoDb extends ExternalResource {
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
 	private List<String> singleCommandArguments = new ArrayList<String>();
 
+	/*TODO Guice*/
 	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
 	private MongoDbLowLevelOps mongoDbLowLevelOps = new MongoDbLowLevelOps();

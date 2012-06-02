@@ -24,7 +24,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	}
 
 	@Override
-	protected DatabaseOperation getDatabaseOperation() {
+	public DatabaseOperation getDatabaseOperation() {
 		return this.databaseOperation;
 	}
 	

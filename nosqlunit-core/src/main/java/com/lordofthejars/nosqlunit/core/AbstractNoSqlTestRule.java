@@ -1,24 +1,26 @@
 package com.lordofthejars.nosqlunit.core;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 
 public abstract class AbstractNoSqlTestRule implements TestRule {
 
 	private Class<?> resourceBase;
 	
+	/*TODO Guice*/
+	private LoadStrategyFactory loadStrategyFactory = new LoadStrategyFactory();
+	
 	public AbstractNoSqlTestRule(Class<?> resourceBase) {
 			this.resourceBase = resourceBase;
 	}
 	
-	protected abstract DatabaseOperation getDatabaseOperation();
+	public abstract DatabaseOperation getDatabaseOperation();
 	
 	@Override
 	public Statement apply(final Statement base, final Description description) {
@@ -87,7 +89,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				String[] scriptContent = IOUtils.readAllStreamsFromClasspathBaseResource(resourceBase, locations);
 				
 				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
-				LoadStrategyOperation loadStrategyOperation = LoadStrategyFactory.getLoadStrategyInstance(loadStrategyEnum, getDatabaseOperation());
+				LoadStrategyOperation loadStrategyOperation = loadStrategyFactory.getLoadStrategyInstance(loadStrategyEnum, getDatabaseOperation());
 				loadStrategyOperation.executeScripts(scriptContent);
 			}
 
@@ -100,6 +102,14 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				return usingDataSet != null;
 			}
 		};
+	}
+	
+	public void setLoadStrategyFactory(LoadStrategyFactory loadStrategyFactory) {
+		this.loadStrategyFactory = loadStrategyFactory;
+	}
+	
+	public void setResourceBase(Class<?> resourceBase) {
+		this.resourceBase = resourceBase;
 	}
 	
 }
