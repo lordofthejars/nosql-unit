@@ -15,6 +15,8 @@ import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import com.lordofthejars.nosqlunit.core.UsingDataSetAnnotationTest;
+import com.lordofthejars.nosqlunit.core.ShouldMatchDataSetAnnotationTest;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
@@ -51,9 +53,9 @@ public class WhenMongoDbRuleIsRegistered {
 			}
 		};
 		
-		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		ExpectedDataSetTest expectedDataSetTest = new ExpectedDataSetTest(new String[]{"json3.test"});
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest, expectedDataSetTest);
+		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
+		ShouldMatchDataSetAnnotationTest shouldMatchDataSetAnnotationTest = new ShouldMatchDataSetAnnotationTest(new String[]{"json3.test"});
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest, shouldMatchDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -76,9 +78,9 @@ public class WhenMongoDbRuleIsRegistered {
 			}
 		};
 		
-		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		ExpectedDataSetTest expectedDataSetTest = new ExpectedDataSetTest(new String[]{"json.test"});
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest, expectedDataSetTest);
+		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
+		ShouldMatchDataSetAnnotationTest shouldMatchDataSetAnnotationTest = new ShouldMatchDataSetAnnotationTest(new String[]{"json.test"});
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest, shouldMatchDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -101,13 +103,13 @@ public class WhenMongoDbRuleIsRegistered {
 			}
 		};
 		
-		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
 		
-		DataSetTest refreshedDataSetTest = new DataSetTest(new String[]{"json3.test"}, LoadStrategyEnum.REFRESH);
+		UsingDataSetAnnotationTest refreshedDataSetTest = new UsingDataSetAnnotationTest(new String[]{"json3.test"}, LoadStrategyEnum.REFRESH);
 		Description refreshedDescription = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", refreshedDataSetTest);
 		
 		Statement refreshMongodbStatement = remoteMongoDbRule.apply(noStatement, refreshedDescription);
@@ -138,8 +140,8 @@ public class WhenMongoDbRuleIsRegistered {
 			}
 		};
 		
-		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.DELETE_ALL);
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.DELETE_ALL);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -165,8 +167,8 @@ public class WhenMongoDbRuleIsRegistered {
 			}
 		};
 		
-		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.INSERT);
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.INSERT);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -175,7 +177,7 @@ public class WhenMongoDbRuleIsRegistered {
 				"id", 1);	
 		assertThat((String)currentData.get("code"), is("JSON dataset"));
 		
-		DataSetTest dataSetTest2 = new DataSetTest(new String[]{"json2.test"}, LoadStrategyEnum.INSERT);
+		UsingDataSetAnnotationTest dataSetTest2 = new UsingDataSetAnnotationTest(new String[]{"json2.test"}, LoadStrategyEnum.INSERT);
 		Description description2 = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest2);
 		
 		Statement mongodbStatement2 = remoteMongoDbRule.apply(noStatement, description2);
@@ -206,8 +208,8 @@ public class WhenMongoDbRuleIsRegistered {
 			}
 		};
 		
-		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();
@@ -216,7 +218,7 @@ public class WhenMongoDbRuleIsRegistered {
 				"id", 1);	
 		assertThat((String)currentData.get("code"), is("JSON dataset"));
 		
-		DataSetTest dataSetTest2 = new DataSetTest(new String[]{"json2.test"}, LoadStrategyEnum.CLEAN_INSERT);
+		UsingDataSetAnnotationTest dataSetTest2 = new UsingDataSetAnnotationTest(new String[]{"json2.test"}, LoadStrategyEnum.CLEAN_INSERT);
 		Description description2 = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest2);
 		
 		Statement mongodbStatement2 = remoteMongoDbRule.apply(noStatement, description2);
@@ -247,8 +249,8 @@ public class WhenMongoDbRuleIsRegistered {
 			}
 		};
 		
-		DataSetTest dataSetTest = new DataSetTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", dataSetTest);
+		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
+		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
 		mongodbStatement.evaluate();

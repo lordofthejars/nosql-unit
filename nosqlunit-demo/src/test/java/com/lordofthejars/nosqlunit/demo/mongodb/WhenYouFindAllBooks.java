@@ -10,11 +10,12 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.annotation.DataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.demo.model.Book;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 
+@UsingDataSet
 public class WhenYouFindAllBooks {
 
 
@@ -23,7 +24,7 @@ public class WhenYouFindAllBooks {
 			.databaseName("test").build());
 	
 	@Test
-	@DataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 	public void manager_should_return_all_inserted_books() {
 		
 		BookManager bookManager = new BookManager(MongoDbUtil.getCollection(Book.class.getSimpleName()));
@@ -37,7 +38,7 @@ public class WhenYouFindAllBooks {
 	}
 	
 	@Test
-	@DataSet(loadStrategy=LoadStrategyEnum.DELETE_ALL)
+	@UsingDataSet(loadStrategy=LoadStrategyEnum.DELETE_ALL)
 	public void manager_should_return_empty_list_when_no_books() {
 		
 		BookManager bookManager = new BookManager(MongoDbUtil.getCollection(Book.class.getSimpleName()));

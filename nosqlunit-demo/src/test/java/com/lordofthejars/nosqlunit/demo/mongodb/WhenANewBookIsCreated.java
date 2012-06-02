@@ -5,8 +5,8 @@ import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mo
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.annotation.DataSet;
-import com.lordofthejars.nosqlunit.annotation.ExpectedDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.demo.model.Book;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
@@ -18,8 +18,8 @@ public class WhenANewBookIsCreated {
 			.databaseName("test").build());
 	
 	@Test
-	@DataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	@ExpectedDataSet(values="expectedData.json")
+	@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	@ShouldMatchDataSet(values="expectedData.json")
 	public void book_should_be_inserted_into_repository() {
 		
 		BookManager bookManager = new BookManager(MongoDbUtil.getCollection(Book.class.getSimpleName()));
