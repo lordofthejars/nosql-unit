@@ -1,13 +1,14 @@
 package com.lordofthejars.nosqlunit.core;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import com.lordofthejars.nosqlunit.annotation.DataSet;
-import com.lordofthejars.nosqlunit.annotation.ExpectedDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 
 public abstract class AbstractNoSqlTestRule implements TestRule {
 
@@ -25,27 +26,55 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			
 			@Override
 			public void evaluate() throws Throwable {
-				
 
-				DataSet dataSet = description.getAnnotation(DataSet.class);
+				UsingDataSet usingDataSet = getUsingDataSetAnnotation();
 				
-				if(isTestMethodAnnotatedWithDataSet(dataSet)) {
-					loadDataSet(dataSet);
+				if(isTestAnnotatedWithDataSet(usingDataSet)) {
+					loadDataSet(usingDataSet);
 				}
 				
 				base.evaluate();
 				
-				ExpectedDataSet expectedDataSet = description.getAnnotation(ExpectedDataSet.class);
+				ShouldMatchDataSet shouldMatchDataSet = getShouldMatchDataSetAnnotation();
 				
-				if(isTestMethodAnnotatedWithExpectedDataSet(expectedDataSet)) {
-					assertExpectation(expectedDataSet);
+				if(isTestAnnotatedWithExpectedDataSet(shouldMatchDataSet)) {
+					assertExpectation(shouldMatchDataSet);
 				}
 				
 			}
 
-			private void assertExpectation(ExpectedDataSet expectedDataSet)
+			private ShouldMatchDataSet getShouldMatchDataSetAnnotation() {
+				
+				ShouldMatchDataSet shouldMatchDataSet = description.getAnnotation(ShouldMatchDataSet.class);
+				
+				if(!isTestAnnotatedWithExpectedDataSet(shouldMatchDataSet)) {
+					
+					Class<?> testClass = description.getTestClass();
+					shouldMatchDataSet = testClass.getAnnotation(ShouldMatchDataSet.class);
+					
+				}
+				
+				return shouldMatchDataSet;
+			}
+			
+			private UsingDataSet getUsingDataSetAnnotation() {
+				
+				
+				UsingDataSet usingDataSet = description.getAnnotation(UsingDataSet.class);
+				
+				if(!isTestAnnotatedWithDataSet(usingDataSet)) {
+
+					Class<?> testClass = description.getTestClass();
+					usingDataSet = testClass.getAnnotation(UsingDataSet.class);
+				
+				}
+				
+				return usingDataSet;
+			}
+			
+			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet)
 					throws IOException {
-				String[] locations = expectedDataSet.values();
+				String[] locations = shouldMatchDataSet.values();
 				String[] scriptContents = IOUtils.readAllStreamsFromClasspathBaseResource(resourceBase, locations);
 				
 				for (String jsonContent : scriptContents) {
@@ -53,22 +82,22 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				}
 			}
 
-			private void loadDataSet(DataSet dataSet) throws IOException {
-				String[] locations = dataSet.locations();
+			private void loadDataSet(UsingDataSet usingDataSet) throws IOException {
+				String[] locations = usingDataSet.locations();
 				String[] scriptContent = IOUtils.readAllStreamsFromClasspathBaseResource(resourceBase, locations);
 				
-				LoadStrategyEnum loadStrategyEnum = dataSet.loadStrategy();
+				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
 				LoadStrategyOperation loadStrategyOperation = LoadStrategyFactory.getLoadStrategyInstance(loadStrategyEnum, getDatabaseOperation());
 				loadStrategyOperation.executeScripts(scriptContent);
 			}
 
-			private boolean isTestMethodAnnotatedWithExpectedDataSet(
-					ExpectedDataSet expectedDataSet) {
-				return expectedDataSet != null;
+			private boolean isTestAnnotatedWithExpectedDataSet(
+					ShouldMatchDataSet shouldMatchDataSet) {
+				return shouldMatchDataSet != null;
 			}
 
-			private boolean isTestMethodAnnotatedWithDataSet(DataSet dataSet) {
-				return dataSet != null;
+			private boolean isTestAnnotatedWithDataSet(UsingDataSet usingDataSet) {
+				return usingDataSet != null;
 			}
 		};
 	}
