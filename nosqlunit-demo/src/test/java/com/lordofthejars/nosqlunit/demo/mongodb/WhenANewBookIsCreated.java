@@ -14,7 +14,7 @@ import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 public class WhenANewBookIsCreated {
 
 	@Rule
-	public MongoDbRule remoteMongoDbRule = new MongoDbRule(WhenYouFindAllBooks.class,  mongoDb()
+	public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb()
 			.databaseName("test").build());
 	
 	@Test

@@ -42,8 +42,7 @@ public class WhenMongoDbRuleIsRegistered {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -67,8 +66,7 @@ public class WhenMongoDbRuleIsRegistered {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -92,8 +90,7 @@ public class WhenMongoDbRuleIsRegistered {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenMongoDbRuleIsRegistered.class, mongoDbConfiguration);
+		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -129,8 +126,7 @@ public class WhenMongoDbRuleIsRegistered {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenMongoDbRuleIsRegistered.class, mongoDbConfiguration);
+		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -156,8 +152,7 @@ public class WhenMongoDbRuleIsRegistered {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -197,8 +192,7 @@ public class WhenMongoDbRuleIsRegistered {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenMongoDbRuleIsRegistered.class,  mongoDbConfiguration);
+		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			
@@ -238,8 +232,7 @@ public class WhenMongoDbRuleIsRegistered {
 
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(
-				WhenMongoDbRuleIsRegistered.class, mongoDbConfiguration);
+		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
 		
 		Statement noStatement = new Statement() {
 			

@@ -26,8 +26,7 @@ import com.lordofthejars.nosqlunit.core.ShouldMatchDataSetAnnotationTest;
 import com.lordofthejars.nosqlunit.core.UsingDataSetAnnotationTest;
 
 
-@UsingDataSet(locations="test2", loadStrategy=LoadStrategyEnum.REFRESH)
-@ShouldMatchDataSet(values="test2")
+
 public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 	@Mock
@@ -47,13 +46,109 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		MockitoAnnotations.initMocks(this);
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public void annotated_class_without_locations_should_throw_exception_if_no_files_match() throws Throwable {
+		
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(MyUknownClass.class, "my_unknown_test", new UsingDataSetAnnotationTest(LoadStrategyEnum.INSERT), new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+
+	}
+	
+	@Test
+	public void annotated_class_without_locations_should_use_class_name_approach() throws Throwable {
+		
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.REFRESH, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(MyTestClass.class, "my_unknown_test",  new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		verify(loadStrategyOperation, times(1)).executeScripts(new String[]{"Default Class Name Strategy 2"});
+		verify(databaseOperation, times(1)).nonStrictAssertEquals("Method Annotation");
+		
+	}
+	
+	
+	@Test
+	public void annotated_methods_without_locations_should_use_class_name_approach_if_method_file_not_found() throws Throwable {
+		
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class, "my_unknown_test", new UsingDataSetAnnotationTest(LoadStrategyEnum.INSERT), new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		verify(loadStrategyOperation, times(1)).executeScripts(new String[]{"Default Class Name Strategy"});
+		verify(databaseOperation, times(1)).nonStrictAssertEquals("Method Annotation");
+		
+	}
+	
+	@Test
+	public void annotated_methods_without_locations_should_use_method_name_approach() throws Throwable {
+		
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class, "my_first_test", new UsingDataSetAnnotationTest(LoadStrategyEnum.INSERT), new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		verify(loadStrategyOperation, times(1)).executeScripts(new String[]{"Default Method Name Strategy"});
+		verify(databaseOperation, times(1)).nonStrictAssertEquals("Method Annotation");
+		
+	}
+	
+	
 	@Test
 	public void annotated_methods_should_have_precedence_over_annotated_class() throws Throwable {
 		
 		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(loadStrategyOperation);
 		
 		
-		Description description = Description.createTestDescription(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class, "WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations", new UsingDataSetAnnotationTest(new String[]{"test"}, LoadStrategyEnum.INSERT), new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
+		Description description = Description.createTestDescription(DefaultClass.class, "WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations", new UsingDataSetAnnotationTest(new String[]{"test"}, LoadStrategyEnum.INSERT), new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
 		
 		
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -62,7 +157,6 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setResourceBase(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -78,7 +172,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.REFRESH, databaseOperation)).thenReturn(loadStrategyOperation);
 		
 		
-		Description description = Description.createTestDescription(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class, "WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations",  new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
+		Description description = Description.createTestDescription(DefaultClass.class, "WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations",  new ShouldMatchDataSetAnnotationTest(new String[]{"test"}));
 		
 		
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -87,7 +181,6 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setResourceBase(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -102,7 +195,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.REFRESH, databaseOperation)).thenReturn(loadStrategyOperation);
 		
 		
-		Description description = Description.createTestDescription(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class, "WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations");
+		Description description = Description.createTestDescription(DefaultClass.class, "WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations");
 		
 		
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -111,7 +204,6 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setResourceBase(WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -119,5 +211,21 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		verify(databaseOperation, times(1)).nonStrictAssertEquals("Class Annotation");
 		
 	}
+	
+}
+
+@UsingDataSet(loadStrategy=LoadStrategyEnum.REFRESH)
+class MyTestClass {
+	
+}
+
+@UsingDataSet(loadStrategy=LoadStrategyEnum.REFRESH)
+class MyUknownClass {
+	
+}
+
+@UsingDataSet(locations="test2", loadStrategy=LoadStrategyEnum.REFRESH)
+@ShouldMatchDataSet(values="test2")
+class DefaultClass {
 	
 }

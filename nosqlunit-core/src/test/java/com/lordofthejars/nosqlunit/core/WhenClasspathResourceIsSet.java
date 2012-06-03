@@ -4,6 +4,7 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -14,9 +15,9 @@ public class WhenClasspathResourceIsSet {
 		
 		String[] locations = new String[]{"classpathContent.txt"};
 		
-		String[] content = IOUtils.readAllStreamsFromClasspathBaseResource(WhenClasspathResourceIsSet.class, locations);
+		List<String> content = IOUtils.readAllStreamsFromClasspathBaseResource(WhenClasspathResourceIsSet.class, locations);
 		
-		assertThat(content[0], is("Hello My Name is Jimmy Pop"));
+		assertThat(content.get(0), is("Hello My Name is Jimmy Pop"));
 		
 	}
 	

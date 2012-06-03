@@ -10,10 +10,12 @@ import com.mongodb.MongoException;
 
 public class MongoDbRule extends AbstractNoSqlTestRule {
 
+	private static final String EXTENSION = "json";
+	
 	private DatabaseOperation databaseOperation;
 	
-	public MongoDbRule(Class<?> resourceBase, MongoDbConfiguration mongoDbConfiguration) {
-		super(resourceBase);
+	public MongoDbRule(MongoDbConfiguration mongoDbConfiguration) {
+		super();
 		try {
 			databaseOperation = new MongoOperation(new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort()), mongoDbConfiguration);
 		} catch (UnknownHostException e) {
@@ -26,6 +28,11 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	@Override
 	public DatabaseOperation getDatabaseOperation() {
 		return this.databaseOperation;
+	}
+
+	@Override
+	public String getWorkingExtension() {
+		return EXTENSION;
 	}
 	
 }

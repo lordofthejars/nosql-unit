@@ -10,6 +10,10 @@ public class UsingDataSetAnnotationTest implements Annotation, com.lordofthejars
 	private String[] locations;
 	private LoadStrategyEnum loadStrategyEnum;
 	
+	public UsingDataSetAnnotationTest(LoadStrategyEnum loadStrategyEnum) {
+		this.loadStrategyEnum = loadStrategyEnum;
+	}
+	
 	public UsingDataSetAnnotationTest(String[] locations, LoadStrategyEnum loadStrategyEnum) {
 		this.loadStrategyEnum = loadStrategyEnum;
 		this.locations = locations;

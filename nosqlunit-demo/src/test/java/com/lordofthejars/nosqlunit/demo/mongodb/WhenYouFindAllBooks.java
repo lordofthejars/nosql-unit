@@ -20,7 +20,7 @@ public class WhenYouFindAllBooks {
 
 
 	@Rule
-	public MongoDbRule remoteMongoDbRule = new MongoDbRule(WhenYouFindAllBooks.class,  mongoDb()
+	public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb()
 			.databaseName("test").build());
 	
 	@Test
