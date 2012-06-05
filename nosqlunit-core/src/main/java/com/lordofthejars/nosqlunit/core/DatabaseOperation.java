@@ -5,6 +5,6 @@ public interface DatabaseOperation {
 
 	void insert(String dataScript);
 	void deleteAll();
-	void nonStrictAssertEquals(String expectedData);
+	boolean databaseIs(String expectedData);
 	void insertNotPresent(String dataScript);
 }

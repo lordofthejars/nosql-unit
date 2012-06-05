@@ -6,11 +6,14 @@ import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 
 public class ShouldMatchDataSetAnnotationTest implements Annotation, com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet {
 
-	private String[] locations;
+	private String location;
 	
+	public ShouldMatchDataSetAnnotationTest() {
+		
+	}
 	
-	public ShouldMatchDataSetAnnotationTest(String[] locations) {
-		this.locations = locations;
+	public ShouldMatchDataSetAnnotationTest(String location) {
+		this.location = location;
 	}
 	
 	@Override
@@ -19,8 +22,8 @@ public class ShouldMatchDataSetAnnotationTest implements Annotation, com.lordoft
 	}
 
 	@Override
-	public String[] values() {
-		return locations;
+	public String location() {
+		return location;
 	}
 
 }

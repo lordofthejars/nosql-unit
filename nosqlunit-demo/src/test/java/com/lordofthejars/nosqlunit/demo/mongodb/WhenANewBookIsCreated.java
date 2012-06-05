@@ -19,7 +19,7 @@ public class WhenANewBookIsCreated {
 	
 	@Test
 	@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	@ShouldMatchDataSet(values="expectedData.json")
+	@ShouldMatchDataSet(location="expectedData.json")
 	public void book_should_be_inserted_into_repository() {
 		
 		BookManager bookManager = new BookManager(MongoDbUtil.getCollection(Book.class.getSimpleName()));

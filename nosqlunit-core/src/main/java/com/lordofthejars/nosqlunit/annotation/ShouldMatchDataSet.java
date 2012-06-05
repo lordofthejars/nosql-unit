@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.TYPE })
 public @interface ShouldMatchDataSet {
 
-	String[] values() default "";
+	String location() default "";
 	
 }

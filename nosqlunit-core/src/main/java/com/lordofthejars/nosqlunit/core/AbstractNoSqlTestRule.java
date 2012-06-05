@@ -1,7 +1,5 @@
 package com.lordofthejars.nosqlunit.core;
 
-import static com.lordofthejars.nosqlunit.core.IOUtils.isFileAvailableOnClasspath;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +13,9 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 
 public abstract class AbstractNoSqlTestRule implements TestRule {
 
-	private static final String METHOD_SEPARATOR = "#";
+	private static final String EXPECTED_RESERVED_WORD = "-expected";
 
-	private Class<?> resourceBase;
+	private DefaultDataSetLocationResolver defaultDataSetLocationResolver;
 
 	/* TODO Guice */
 	private LoadStrategyFactory loadStrategyFactory = new LoadStrategyFactory();
@@ -36,7 +34,8 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			@Override
 			public void evaluate() throws Throwable {
 
-				resourceBase = description.getTestClass();
+				defaultDataSetLocationResolver = new DefaultDataSetLocationResolver(
+						description.getTestClass());
 
 				UsingDataSet usingDataSet = getUsingDataSetAnnotation();
 
@@ -88,14 +87,36 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet)
 					throws IOException {
 
-				String[] locations = shouldMatchDataSet.values();
-				List<String> scriptContents = IOUtils
-						.readAllStreamsFromClasspathBaseResource(resourceBase,
-								locations);
+				String location = shouldMatchDataSet.location();
+				String scriptContent = "";
 
-				for (String jsonContent : scriptContents) {
-					getDatabaseOperation().nonStrictAssertEquals(jsonContent);
+				if (isNotEmptyString(location)) {
+					scriptContent = IOUtils
+							.readAllStreamFromClasspathBaseResource(
+									defaultDataSetLocationResolver
+											.getResourceBase(), location);
+				} else {
+					location = defaultDataSetLocationResolver
+							.resolveDefaultDataSetLocation(shouldMatchDataSet,
+									description, EXPECTED_RESERVED_WORD + "."
+											+ getWorkingExtension());
+
+					if (location != null) {
+						scriptContent = IOUtils
+								.readAllStreamFromClasspathBaseResource(
+										defaultDataSetLocationResolver
+												.getResourceBase(), location);
+					}
+
 				}
+
+				if (isNotEmptyString(scriptContent)) {
+					getDatabaseOperation().databaseIs(scriptContent);
+				} else {
+					throw new IllegalArgumentException(
+							"File specified in location attribute is not present, or no files matching [] or [] are found.");
+				}
+
 			}
 
 			private void loadDataSet(UsingDataSet usingDataSet,
@@ -109,59 +130,22 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 					scriptContent.addAll(IOUtils
 							.readAllStreamsFromClasspathBaseResource(
-									resourceBase, locations));
+									defaultDataSetLocationResolver
+											.getResourceBase(), locations));
 
 				} else {
 
-					String testClassName = description.getClassName();
-					String defaultClassAnnotatedClasspath = "/"
-							+ testClassName.replace('.', '/');
+					String location = defaultDataSetLocationResolver
+							.resolveDefaultDataSetLocation(usingDataSet,
+									description, "." + getWorkingExtension());
 
-					if (isMethodAnnotated(description)) {
-
-						String defaultMethodAnnotatedClasspathFile = buildRequiredFilepathForMethodAnnotatation(
-								description, defaultClassAnnotatedClasspath);
-
-						if (isFileAvailableOnClasspath(resourceBase,
-								defaultMethodAnnotatedClasspathFile)) {
-
-							scriptContent
-									.add(IOUtils
-											.readAllStreamFromClasspathBaseResource(
-													resourceBase,
-													defaultMethodAnnotatedClasspathFile));
-
-						} else {
-
-							String defaultClassAnnotatedClasspathFile = defaultClassAnnotatedClasspath+"."+getWorkingExtension();
-							
-							if (isFileAvailableOnClasspath(resourceBase,
-									defaultClassAnnotatedClasspathFile)) {
-
-								scriptContent
-										.add(IOUtils
-												.readAllStreamFromClasspathBaseResource(
-														resourceBase,
-														defaultClassAnnotatedClasspathFile));
-							}
-
-						}
-
-					} else {
-
-						String defaultClassAnnotatedClasspathFile = defaultClassAnnotatedClasspath+"."+getWorkingExtension();
-						
-						if (isFileAvailableOnClasspath(resourceBase,
-								defaultClassAnnotatedClasspathFile)) {
-
-							scriptContent
-									.add(IOUtils
-											.readAllStreamFromClasspathBaseResource(
-													resourceBase,
-													defaultClassAnnotatedClasspathFile));
-						}
-						
+					if (location != null) {
+						scriptContent.add(IOUtils
+								.readAllStreamFromClasspathBaseResource(
+										defaultDataSetLocationResolver
+												.getResourceBase(), location));
 					}
+
 				}
 
 				if (scriptContent.size() > 0) {
@@ -175,26 +159,14 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 							.toArray(new String[scriptContent.size()]));
 
 				} else {
-					throw new IllegalArgumentException("File specified in locations attribute are not present, or no files matching [] or [] are found.");
+					throw new IllegalArgumentException(
+							"File specified in locations attribute are not present, or no files matching [] or [] are found.");
 				}
 
 			}
 
-			private String buildRequiredFilepathForMethodAnnotatation(
-					Description description,
-					String defaultClassAnnotatedClasspath) {
-				String testMethodName = description.getMethodName();
-
-				String defaultMethodAnnotatedClasspathFile = defaultClassAnnotatedClasspath
-						+ METHOD_SEPARATOR
-						+ testMethodName
-						+ "."
-						+ getWorkingExtension();
-				return defaultMethodAnnotatedClasspathFile;
-			}
-
-			private boolean isMethodAnnotated(Description description) {
-				return description.getAnnotation(UsingDataSet.class) != null;
+			private boolean isNotEmptyString(String location) {
+				return location != null && !"".equals(location.trim());
 			}
 
 			private boolean isLocationsAttributeSpecified(String[] locations) {
