@@ -1,0 +1,213 @@
+package com.lordofthejars.nosqlunit.mongodb.integration;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+
+import java.net.UnknownHostException;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
+import com.lordofthejars.nosqlunit.mongodb.MongoOperation;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+
+public class WhenExpectedDataShouldBeCompared {
+
+	@ClassRule
+	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo")
+			.build();
+	
+	private static Mongo mongo;
+	
+	@BeforeClass
+	public static void initialize() throws UnknownHostException, MongoException {
+		mongo = new Mongo("localhost");
+	}
+	
+	@Before
+	public void setUp() {
+		DB mongoDb = getMongoDB();
+		dropDatabase(mongoDb);
+	}
+	
+	@Test
+	public void empty_database_and_empty_expectation_should_be_equals() {
+		
+		MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		boolean isEquals = mongoOperation.databaseIs("{}");
+		
+		assertThat(isEquals, is(true));
+	}
+	
+	@Test
+	public void empty_expected_collection_and_database_collection_with_content_should_fail() {
+		try {
+		
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col1\":[]}");
+		
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection has 0 elements but insert collection has 1"));
+		}
+	}
+	
+	
+	@Test
+	public void empty_expected_collection_and_empty_database_collection_should_be_equal() {
+		
+		MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		createCollection(getMongoDB(), "col1");
+		
+		boolean isEquals = mongoOperation.databaseIs("{\"col1\":[]}");
+		assertThat(isEquals, is(true));
+	}
+	
+	@Test
+	public void empty_expected_collection_and_empty_database_should_fail() {
+		try {
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col1\":[]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection names are [col1] but insert collection names are []"));
+		}
+		
+	}
+	
+	@Test
+	public void empty_expectation_and_empty_database_collection_should_fail() {
+		try {
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+			createCollection(getMongoDB(), "col1");
+			mongoOperation.databaseIs("{}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection names are [] but insert collection names are [col1]"));
+		}
+		
+	}
+	
+	@Test
+	public void empty_expected_collection_and_empty_database_collection_with_different_names_should_fail() {
+		try {
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+			createCollection(getMongoDB(), "col1");
+		
+			mongoOperation.databaseIs("{\"col2\":[]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection names are [col2] but insert collection names are [col1]"));
+		}
+		
+	}
+	
+	@Test
+	public void expected_collection_and_database_collection_with_same_content_should_be_equals() {
+		
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			boolean isEquals = mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			assertThat(isEquals, is(true));
+		
+	}
+	
+	@Test
+	public void expected_collection_and_database_collection_with_different_content_should_fail() {
+		try {
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			boolean isEquals = mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Soto\"}]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Object # { \"name\" : \"Soto\"} # is not found into collection [col1]"));
+		}
+		
+	}
+	
+	@Test
+	public void expected_collection_with_content_and_database_collection_empty_should_fail() {
+		
+		try {
+			createCollection(getMongoDB(), "col1");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection has 1 elements but insert collection has 0"));
+		}
+			
+	}
+	
+	@Test
+	public void expected_collection_and_database_collection_with_different_names_should_fail() {
+		try {
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col2\":[{\"name\":\"Alex\"}]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection names are [col2] but insert collection names are [col1]"));
+		}
+		
+	}
+	
+	@Test
+	public void less_expected_collection_than_database_collection_should_fail() {
+		try {
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			addCollectionWithData(getMongoDB(), "col3", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection names are [col1] but insert collection names are [col1, col3]"));
+		}
+		
+	}
+	
+	@Test
+	public void more_expected_collection_than_database_collection_should_fail() {
+		try {
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}], \"col3\":[{\"name\":\"Alex\"}]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection names are [col1, col3] but insert collection names are [col1]"));
+		}
+		
+	}
+	
+	private void createCollection(DB mongoDb, String collectionName) {
+		BasicDBObject options = new BasicDBObject("max", 1);
+		mongoDb.createCollection(collectionName, options);
+	}
+	
+	private void addCollectionWithData(DB mongoDb, String collectionName, String field, String value) {
+		DBCollection collection = mongoDb.getCollection(collectionName);
+		DBObject dbObject = new BasicDBObject(field, value);
+		collection.insert(dbObject);
+	}
+	
+	private void dropDatabase(DB mongoDb) {
+		mongoDb.dropDatabase();
+	}
+	
+	private DB getMongoDB() {
+		return mongo.getDB("test");
+	}
+	
+}
