@@ -82,15 +82,50 @@ public class MongoDbAssertion {
 		}
 		
 		for (Object dataObject : dataObjects) {
-			DBObject foundObject = dbCollection.findOne((DBObject)dataObject);
+			
+			DBObject expectedDataObject = (DBObject)dataObject;
+			DBObject foundObject = dbCollection.findOne(expectedDataObject);
+			
+			
 			
 			if(!exists(foundObject)) {
-				throw FailureHandler.createFailure("Object # %s # is not found into collection %s", dataObject.toString(), collectionaNames);
+				throw FailureHandler.createFailure("Object # %s # is not found into collection %s", expectedDataObject.toString(), collectionaNames);
 			}
+
+			checkSameKeys(expectedDataObject,foundObject);
 			
 		}
 	}
 
+	private static void checkSameKeys(DBObject expectedDataObject,DBObject foundObject) {
+		
+		Set<String> expectedKeys = expectedDataObject.keySet();
+		Set<String> expectedNoneSystemKeys = noneSystemKeys(expectedKeys);
+		Set<String> foundKeys = foundObject.keySet();
+		Set<String> foundNoneSystemKeys = noneSystemKeys(foundKeys);
+
+		Set<String> allKeys = new HashSet<String>(expectedNoneSystemKeys);
+		allKeys.addAll(foundNoneSystemKeys);
+		
+		if(allKeys.size() != expectedNoneSystemKeys.size() || allKeys.size() != foundNoneSystemKeys.size()) {
+			throw FailureHandler.createFailure("Expected DbObject and insert DbObject have different keys: Expected: %s Inserted: %s", expectedNoneSystemKeys, foundNoneSystemKeys);
+		}
+		
+	}
+	
+	private static Set<String> noneSystemKeys(Set<String> keys) {
+		
+		Set<String> noneSystemKeys = new HashSet<String>();
+		
+		for (String key : keys) {
+			if(!key.startsWith("_")) {
+				noneSystemKeys.add(key);
+			}
+		}
+		
+		return noneSystemKeys;
+	}
+	
 	private static boolean exists(DBObject foundObject) {
 		return foundObject != null;
 	}
