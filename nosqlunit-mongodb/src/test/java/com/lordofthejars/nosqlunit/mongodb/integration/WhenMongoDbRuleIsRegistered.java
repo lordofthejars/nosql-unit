@@ -15,8 +15,8 @@ import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import com.lordofthejars.nosqlunit.core.UsingDataSetAnnotationTest;
-import com.lordofthejars.nosqlunit.core.ShouldMatchDataSetAnnotationTest;
+import com.lordofthejars.nosqlunit.mongodb.integration.UsingDataSetAnnotationTest;
+import com.lordofthejars.nosqlunit.mongodb.integration.ShouldMatchDataSetAnnotationTest;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
@@ -53,7 +53,7 @@ public class WhenMongoDbRuleIsRegistered {
 		};
 		
 		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		ShouldMatchDataSetAnnotationTest shouldMatchDataSetAnnotationTest = new ShouldMatchDataSetAnnotationTest(new String[]{"json3.test"});
+		ShouldMatchDataSetAnnotationTest shouldMatchDataSetAnnotationTest = new ShouldMatchDataSetAnnotationTest("json3.test");
 		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest, shouldMatchDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
@@ -62,7 +62,7 @@ public class WhenMongoDbRuleIsRegistered {
 	}
 	
 	@Test
-	public void should_assert_if_expected_data_is_non_strict_equal() throws Throwable {
+	public void should_assert_if_expected_data_is_strict_equal() throws Throwable {
 		
 		MongoDbConfiguration mongoDbConfiguration = mongoDb()
 				.databaseName("test").build();
@@ -77,7 +77,7 @@ public class WhenMongoDbRuleIsRegistered {
 		};
 		
 		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		ShouldMatchDataSetAnnotationTest shouldMatchDataSetAnnotationTest = new ShouldMatchDataSetAnnotationTest(new String[]{"json.test"});
+		ShouldMatchDataSetAnnotationTest shouldMatchDataSetAnnotationTest = new ShouldMatchDataSetAnnotationTest("json.test");
 		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest, shouldMatchDataSetAnnotationTest);
 		
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);

@@ -90,11 +90,13 @@ public final class MongoOperation implements DatabaseOperation {
 	}
 
 	@Override
-	public void nonStrictAssertEquals(String expectedJsonData) {
+	public boolean databaseIs(String expectedJsonData) {
 
 		try {
 			DBObject parsedData = parseData(expectedJsonData);
-			MongoDbAssertion.nonStrictAssertEquals(parsedData, getMongoDb());
+			MongoDbAssertion.strictAssertEquals(parsedData, getMongoDb());
+			
+			return true;
 		} catch (IOException e) {
 			throw new IllegalArgumentException(
 					"Unexpected error reading expected data set file.", e);
