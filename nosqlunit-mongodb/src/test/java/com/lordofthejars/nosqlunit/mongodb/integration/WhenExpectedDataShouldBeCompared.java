@@ -1,12 +1,16 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -59,7 +63,7 @@ public class WhenExpectedDataShouldBeCompared {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs("{\"col1\":[]}");
-		
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection has 0 elements but insert collection has 1"));
 		}
@@ -82,6 +86,7 @@ public class WhenExpectedDataShouldBeCompared {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs("{\"col1\":[]}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col1] but insert collection names are []"));
 		}
@@ -94,6 +99,7 @@ public class WhenExpectedDataShouldBeCompared {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 			createCollection(getMongoDB(), "col1");
 			mongoOperation.databaseIs("{}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [] but insert collection names are [col1]"));
 		}
@@ -107,6 +113,7 @@ public class WhenExpectedDataShouldBeCompared {
 			createCollection(getMongoDB(), "col1");
 		
 			mongoOperation.databaseIs("{\"col2\":[]}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col2] but insert collection names are [col1]"));
 		}
@@ -130,7 +137,8 @@ public class WhenExpectedDataShouldBeCompared {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			boolean isEquals = mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Soto\"}]}");
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Soto\"}]}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Object # { \"name\" : \"Soto\"} # is not found into collection [col1]"));
 		}
@@ -145,6 +153,7 @@ public class WhenExpectedDataShouldBeCompared {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection has 1 elements but insert collection has 0"));
 		}
@@ -158,6 +167,7 @@ public class WhenExpectedDataShouldBeCompared {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs("{\"col2\":[{\"name\":\"Alex\"}]}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col2] but insert collection names are [col1]"));
 		}
@@ -172,11 +182,89 @@ public class WhenExpectedDataShouldBeCompared {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col1] but insert collection names are [col1, col3]"));
 		}
 		
 	}
+	
+	@Test
+	public void expected_collection_has_some_items_different_than_database_collection_items_should_fail() {
+		try {
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}, {\"name\":\"Soto\"}]}");
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected collection has 2 elements but insert collection has 1"));
+		}
+		
+	}
+	
+	@Test
+	public void expected_collection_item_has_more_attributes_than_database_collection_item_attributes_should_fail() {
+		try {
+			//Inserted one element
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			//Expected with two elements
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}");
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Object # { \"name\" : \"Alex\" , \"surname\" : \"Soto\"} # is not found into collection [col1]"));
+		}
+		
+	}
+	
+	@Test
+	public void expected_collection_item_has_same_attributes_as_database_collection_item_attributes_but_different_values_should_fail() {
+		try {
+			//Inserted one element
+			addCollectionWithTwoData(getMongoDB(), "col1", "name", "Alex","surname", "Sot");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			//Expected with two elements
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}");
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Object # { \"name\" : \"Alex\" , \"surname\" : \"Soto\"} # is not found into collection [col1]"));
+		}
+		
+	}
+	
+	@Test
+	public void expected_collection_item_has_less_attributes_than_database_collection_item_attributes_should_fail() {
+		try {
+			//Inserted one element
+			addCollectionWithTwoData(getMongoDB(), "col1", "name", "Alex","surname", "Soto");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			//Expected with two elements
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected DbObject and insert DbObject have different keys: Expected: [name] Inserted: [name, surname]"));
+		}
+		
+	}
+	
+	
+	@Test
+	public void expected_collection_has_all_items_different_than_database_collection_items_should_fail() {
+		try {
+			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
+			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
+		
+			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Soto\"}]}");
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Object # { \"name\" : \"Soto\"} # is not found into collection [col1]"));
+		}
+		
+	}
+	
 	
 	@Test
 	public void more_expected_collection_than_database_collection_should_fail() {
@@ -185,6 +273,7 @@ public class WhenExpectedDataShouldBeCompared {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}], \"col3\":[{\"name\":\"Alex\"}]}");
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col1, col3] but insert collection names are [col1]"));
 		}
@@ -194,6 +283,15 @@ public class WhenExpectedDataShouldBeCompared {
 	private void createCollection(DB mongoDb, String collectionName) {
 		BasicDBObject options = new BasicDBObject("max", 1);
 		mongoDb.createCollection(collectionName, options);
+	}
+	
+	private void addCollectionWithTwoData(DB mongoDb, String collectionName, String field, String value, String field2, String value2) {
+		DBCollection collection = mongoDb.getCollection(collectionName);
+		Map<String, String> documentParams = new HashMap<String, String>();
+		documentParams.put(field, value);
+		documentParams.put(field2, value2);
+		DBObject dbObject = new BasicDBObject(documentParams);
+		collection.insert(dbObject);
 	}
 	
 	private void addCollectionWithData(DB mongoDb, String collectionName, String field, String value) {
