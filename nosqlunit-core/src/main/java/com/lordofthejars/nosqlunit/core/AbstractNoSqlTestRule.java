@@ -115,7 +115,9 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 					getDatabaseOperation().databaseIs(scriptContent);
 				} else {
 					throw new IllegalArgumentException(
-							"File specified in location attribute is not present, or no files matching [] or [] are found.");
+							"File specified in location attribute "
+									+ location
+									+ " of ShouldMatchDataSet is not present, or no files matching default location.");
 				}
 
 			}
@@ -149,20 +151,12 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 				}
 
-				if (scriptContent.size() > 0) {
-
-					LoadStrategyEnum loadStrategyEnum = usingDataSet
-							.loadStrategy();
-					LoadStrategyOperation loadStrategyOperation = loadStrategyFactory
-							.getLoadStrategyInstance(loadStrategyEnum,
-									getDatabaseOperation());
-					loadStrategyOperation.executeScripts(scriptContent
-							.toArray(new String[scriptContent.size()]));
-
-				} else {
-					throw new IllegalArgumentException(
-							"File specified in locations" +Arrays.toString(locations)+  "attribute are not present, or no files matching default namespace are found.");
-				}
+				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
+				LoadStrategyOperation loadStrategyOperation = loadStrategyFactory
+						.getLoadStrategyInstance(loadStrategyEnum,
+								getDatabaseOperation());
+				loadStrategyOperation.executeScripts(scriptContent
+						.toArray(new String[scriptContent.size()]));
 
 			}
 

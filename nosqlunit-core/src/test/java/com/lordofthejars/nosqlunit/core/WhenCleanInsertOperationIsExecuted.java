@@ -30,5 +30,13 @@ public class WhenCleanInsertOperationIsExecuted {
 		verify(databaseOperation, times(2)).insert(anyString());
 		
 	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void clean_and_insert_operation_should_throw_an_exception_is_no_data_available() {
+		
+		CleanInsertLoadStrategyOperation cleanInsertLoadStrategyOperation = new CleanInsertLoadStrategyOperation(databaseOperation);
+		String[] contents = new String[]{};
+		cleanInsertLoadStrategyOperation.executeScripts(contents);
+	}
 	
 }

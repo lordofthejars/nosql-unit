@@ -46,26 +46,6 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		MockitoAnnotations.initMocks(this);
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void annotated_class_without_locations_should_throw_exception_if_no_files_match() throws Throwable {
-		
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(loadStrategyOperation);
-		
-		
-		Description description = Description.createTestDescription(MyUknownClass.class, "my_unknown_test", new UsingDataSetAnnotationTest(LoadStrategyEnum.INSERT), new ShouldMatchDataSetAnnotationTest("test"));
-		
-		
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
-
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
-		
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		
-		abstractNoSqlTestRule.apply(base, description).evaluate();
-
-	}
 	
 	@Test
 	public void annotated_class_without_locations_should_use_class_name_approach() throws Throwable {

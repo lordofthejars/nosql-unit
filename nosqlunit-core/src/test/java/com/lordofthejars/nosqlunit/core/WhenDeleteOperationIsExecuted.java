@@ -18,10 +18,21 @@ public class WhenDeleteOperationIsExecuted {
 	}
 	
 	@Test
-	public void insert_operations_should_be_executed() {
+	public void delete_operations_should_be_executed() {
 		
 		DeleteAllLoadStrategyOperation insertLoadStrategyOperation = new DeleteAllLoadStrategyOperation(databaseOperation);
 		String[] contents = new String[]{"My name is","Jimmy Pop"};
+		
+		insertLoadStrategyOperation.executeScripts(contents);
+		verify(databaseOperation, times(1)).deleteAll();
+		
+	}
+
+	@Test
+	public void delete_operations_should_be_called_executed_if_no_data_is_provided() {
+		
+		DeleteAllLoadStrategyOperation insertLoadStrategyOperation = new DeleteAllLoadStrategyOperation(databaseOperation);
+		String[] contents = new String[]{};
 		
 		insertLoadStrategyOperation.executeScripts(contents);
 		verify(databaseOperation, times(1)).deleteAll();

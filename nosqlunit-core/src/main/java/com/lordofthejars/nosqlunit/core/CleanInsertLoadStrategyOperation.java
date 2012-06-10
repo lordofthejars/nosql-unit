@@ -5,8 +5,9 @@ import org.slf4j.LoggerFactory;
 
 public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanInsertLoadStrategyOperation.class);
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(CleanInsertLoadStrategyOperation.class);
+
 	private DatabaseOperation databaseOperation;
 
 	public CleanInsertLoadStrategyOperation(DatabaseOperation databaseOperation) {
@@ -15,11 +16,16 @@ public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 
 	@Override
 	public void executeScripts(String[] contentDataset) {
-		
+
 		LOGGER.debug("Calling Clean and Insert Load Strategy.");
-		
-		executeClean();
-		executeInsert(contentDataset);
+
+		if (contentDataset.length > 0) {
+			executeClean();
+			executeInsert(contentDataset);
+		} else {
+			throw new IllegalArgumentException(
+					"File specified in locations attribute are not present, or no files matching default name are found.");
+		}
 	}
 
 	private void executeInsert(String[] contentDataset) {

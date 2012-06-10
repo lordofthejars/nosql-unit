@@ -28,5 +28,13 @@ public class WhenRefreshOperationIsExecuted {
 		verify(databaseOperation, times(2)).insertNotPresent(anyString());
 		
 	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void refresh_operation_should_throw_an_exception_is_no_data_available() {
+		
+		RefreshLoadStrategyOperation refreshLoadStrategyOperation = new RefreshLoadStrategyOperation(databaseOperation);
+		String[] contents = new String[]{};
+		refreshLoadStrategyOperation.executeScripts(contents);
+	}
 	
 }

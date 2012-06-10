@@ -5,21 +5,25 @@ import org.slf4j.LoggerFactory;
 
 public class InsertLoadStrategyOperation implements LoadStrategyOperation {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(InsertLoadStrategyOperation.class);
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(InsertLoadStrategyOperation.class);
+
 	private DatabaseOperation databaseOperation;
-	
+
 	public InsertLoadStrategyOperation(DatabaseOperation databaseOperation) {
 		this.databaseOperation = databaseOperation;
 	}
 
-	
 	@Override
 	public void executeScripts(String[] contentDataset) {
-		
+
 		LOGGER.debug("Calling Insert Load Strategy.");
-		
-		executeInsert(contentDataset);
+		if (contentDataset.length > 0) {
+			executeInsert(contentDataset);
+		} else {
+			throw new IllegalArgumentException(
+					"File specified in locations attribute are not present, or no files matching default name are found.");
+		}
 	}
 
 	private void executeInsert(String[] contentDataset) {
@@ -27,5 +31,5 @@ public class InsertLoadStrategyOperation implements LoadStrategyOperation {
 			this.databaseOperation.insert(dataScript);
 		}
 	}
-	
+
 }
