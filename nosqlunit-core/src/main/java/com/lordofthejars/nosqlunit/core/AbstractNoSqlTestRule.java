@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.rules.TestRule;
@@ -160,7 +161,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 				} else {
 					throw new IllegalArgumentException(
-							"File specified in locations attribute are not present, or no files matching [] or [] are found.");
+							"File specified in locations" +Arrays.toString(locations)+  "attribute are not present, or no files matching default namespace are found.");
 				}
 
 			}
