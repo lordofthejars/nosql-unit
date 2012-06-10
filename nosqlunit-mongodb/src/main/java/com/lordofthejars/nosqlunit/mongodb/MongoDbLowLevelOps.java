@@ -11,20 +11,29 @@ import com.mongodb.MongoException;
 
 public class MongoDbLowLevelOps {
 
-	public void assertThatConnectionIsPossible() throws InterruptedException, UnknownHostException, MongoException {
+	public boolean assertThatConnectionIsPossible(int retries) throws InterruptedException, UnknownHostException, MongoException {
 	
+		int currentRetry = 0;
+		boolean connectionIsPossible = false;
+		
 		Mongo server = null;
 		try {
-			while (server == null) {
+			do { 
 				TimeUnit.SECONDS.sleep(3);
 				server = new Mongo();
 				DB db = server.getDB("admin");
-				db.getStats();
-			}
+				try {
+					db.getStats();
+					connectionIsPossible = true;
+				}catch(MongoException e) {
+					currentRetry++;					
+				}
+			}while(!connectionIsPossible && currentRetry <= retries);
 		} finally {
 			server.close();
 		}
 		
+		return connectionIsPossible;
 	}
 	
 	public void shutdown() {

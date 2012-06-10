@@ -13,14 +13,20 @@ import java.util.Map;
 import org.junit.rules.ExternalResource;
 
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
+import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
+import com.mongodb.DBPort;
 
 /**
  * Run a mongodb server before each test suite.
  */
 public class ManagedMongoDb extends ExternalResource {
+
+	private static final String LOCALHOST = "127.0.0.1";
+
+	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
 
 	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
 	protected static final String FORK_ARGUMENT_NAME = "--fork";
@@ -31,7 +37,7 @@ public class ManagedMongoDb extends ExternalResource {
 			+ File.separatorChar + "mongo-temp";
 
 	protected static final String MONGODB_BINARY_DIRECTORY = "bin";
-	
+
 	protected static final String MONGODB_EXECUTABLE_X = "mongod";
 	protected static final String MONGODB_EXECUTABLE_W = "mongod.exe";
 
@@ -44,11 +50,11 @@ public class ManagedMongoDb extends ExternalResource {
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
 	private List<String> singleCommandArguments = new ArrayList<String>();
 
-	/*TODO Guice*/
+	/* TODO Guice */
 	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
 	private MongoDbLowLevelOps mongoDbLowLevelOps = new MongoDbLowLevelOps();
-	
+
 	private ManagedMongoDb() {
 		super();
 	}
@@ -95,11 +101,12 @@ public class ManagedMongoDb extends ExternalResource {
 			return this;
 		}
 
-		public MongoServerRuleBuilder appendSingleCommandLineArguments(String argument) {
+		public MongoServerRuleBuilder appendSingleCommandLineArguments(
+				String argument) {
 			this.managedMongoDb.addSingleCommandLineArgument(argument);
 			return this;
 		}
-		
+
 		public ManagedMongoDb build() {
 			if (this.managedMongoDb.getMongodPath() == null) {
 				throw new IllegalArgumentException(
@@ -112,29 +119,53 @@ public class ManagedMongoDb extends ExternalResource {
 	@Override
 	protected void before() throws Throwable {
 
-		File dbPath = ensureDbPathDoesNotExitsAndReturnCompositePath();
+		if (isServerNotStartedYet()) {
 
-		if (dbPath.mkdirs()) {
-			startMongoDBAsADaemon();
-			assertThatConnectionToMongoDbIsPossible();
-		} else {
-			throw new IllegalStateException("Db Path " + dbPath
-					+ " could not be created.");
+			File dbPath = ensureDbPathDoesNotExitsAndReturnCompositePath();
+
+			if (dbPath.mkdirs()) {
+				startMongoDBAsADaemon();
+				boolean isServerUp = assertThatConnectionToMongoDbIsPossible(NUM_RETRIES_TO_CHECK_SERVER_UP);
+
+				if (!isServerUp) {
+					throw new IllegalStateException(
+							"Couldn't establish a connection with "
+									+ this.mongodPath
+									+ " server at /127.0.0.1:27017.");
+				}
+
+			} else {
+				throw new IllegalStateException("Db Path " + dbPath
+						+ " could not be created.");
+			}
 		}
+		ConnectionManagement.getInstance()
+				.addConnection(LOCALHOST, DBPort.PORT);
+	}
 
+	private boolean isServerNotStartedYet() {
+		return !ConnectionManagement.getInstance().isConnectionRegistered(
+				LOCALHOST, DBPort.PORT);
 	}
 
 	@Override
 	protected void after() {
-		try {
-			this.mongoDbLowLevelOps.shutdown();
-		}finally {
-			ensureDbPathDoesNotExitsAndReturnCompositePath();
+		int remainingConnections = ConnectionManagement.getInstance()
+				.removeConnection(LOCALHOST, DBPort.PORT);
+		if (noMoreConnectionsToManage(remainingConnections)) {
+			try {
+				this.mongoDbLowLevelOps.shutdown();
+			} finally {
+				ensureDbPathDoesNotExitsAndReturnCompositePath();
+			}
 		}
 	}
 
-	private List<String> startMongoDBAsADaemon() 
-			throws InterruptedException {
+	private boolean noMoreConnectionsToManage(int remainingConnections) {
+		return remainingConnections < 1;
+	}
+
+	private List<String> startMongoDBAsADaemon() throws InterruptedException {
 
 		Process pwd;
 		try {
@@ -169,7 +200,8 @@ public class ManagedMongoDb extends ExternalResource {
 	}
 
 	private Process startProcess() throws IOException {
-		return this.commandLineExecutor.startProcessInDirectoryAndArguments(targetPath, buildOperationSystemProgramAndArguments());
+		return this.commandLineExecutor.startProcessInDirectoryAndArguments(
+				targetPath, buildOperationSystemProgramAndArguments());
 	}
 
 	private List<String> getConsoleOutput(Process pwd) throws IOException {
@@ -190,7 +222,7 @@ public class ManagedMongoDb extends ExternalResource {
 		for (String argument : this.singleCommandArguments) {
 			programAndArguments.add(argument);
 		}
-		
+
 		for (String argumentName : this.extraCommandArguments.keySet()) {
 			programAndArguments.add(argumentName);
 			programAndArguments.add(this.extraCommandArguments
@@ -207,18 +239,21 @@ public class ManagedMongoDb extends ExternalResource {
 	}
 
 	private String mongoExecutable() {
-		OperatingSystem operatingSystem = this.operatingSystemResolver.currentOperatingSystem();
-		
-		switch(operatingSystem.getFamily()) {
-			case WINDOWS: return MONGODB_EXECUTABLE_W;
-			default: return MONGODB_EXECUTABLE_X;
+		OperatingSystem operatingSystem = this.operatingSystemResolver
+				.currentOperatingSystem();
+
+		switch (operatingSystem.getFamily()) {
+		case WINDOWS:
+			return MONGODB_EXECUTABLE_W;
+		default:
+			return MONGODB_EXECUTABLE_X;
 		}
-		
+
 	}
-	
-	private void assertThatConnectionToMongoDbIsPossible()
+
+	private boolean assertThatConnectionToMongoDbIsPossible(int retries)
 			throws InterruptedException, UnknownHostException {
-		this.mongoDbLowLevelOps.assertThatConnectionIsPossible();
+		return this.mongoDbLowLevelOps.assertThatConnectionIsPossible(retries);
 	}
 
 	private File ensureDbPathDoesNotExitsAndReturnCompositePath() {
@@ -253,20 +288,21 @@ public class ManagedMongoDb extends ExternalResource {
 	private void addSingleCommandLineArgument(String argument) {
 		this.singleCommandArguments.add(argument);
 	}
-	
+
 	private String getMongodPath() {
 		return mongodPath;
 	}
 
-	protected void setCommandLineExecutor(CommandLineExecutor commandLineExecutor) {
+	protected void setCommandLineExecutor(
+			CommandLineExecutor commandLineExecutor) {
 		this.commandLineExecutor = commandLineExecutor;
 	}
-	
+
 	protected void setOperatingSystemResolver(
 			OperatingSystemResolver operatingSystemResolver) {
 		this.operatingSystemResolver = operatingSystemResolver;
 	}
-	
+
 	protected void setMongoDbLowLevelOps(MongoDbLowLevelOps mongoDbLowLevelOps) {
 		this.mongoDbLowLevelOps = mongoDbLowLevelOps;
 	}
