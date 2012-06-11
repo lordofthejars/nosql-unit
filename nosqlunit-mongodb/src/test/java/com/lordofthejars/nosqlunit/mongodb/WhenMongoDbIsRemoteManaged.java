@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -36,8 +37,6 @@ public class WhenMongoDbIsRemoteManaged {
 	@Mock
 	private OperatingSystemResolver operatingSystemResolver;
 
-	@Mock
-	MongoDbLowLevelOps mongoDbChecker;
 
 	@Before
 	public void setUp() {
@@ -91,12 +90,13 @@ public class WhenMongoDbIsRemoteManaged {
 	@Test
 	public void mongodb_should_start_mongodb_instance_in_Windows() throws Throwable {
 
+		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyInt())).thenReturn(true);
+		
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.WINDOWS_7);
 		
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
-
-		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
 
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
@@ -131,6 +131,8 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
+		managedMongoDb.after();
+		
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
 				targetPath.toString(), expectedCommand);
 
@@ -139,12 +141,13 @@ public class WhenMongoDbIsRemoteManaged {
 	@Test
 	public void mongodb_should_start_mongodb_instance_in_Linux() throws Throwable {
 
+		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyInt())).thenReturn(true);
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.LINUX_OS);
 		
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
 
-		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
 
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
@@ -179,6 +182,8 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
+		managedMongoDb.after();
+		
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
 				targetPath.toString(), expectedCommand);
 
@@ -187,12 +192,13 @@ public class WhenMongoDbIsRemoteManaged {
 	@Test
 	public void mongodb_should_start_mongodb_instance_in_Mac() throws Throwable {
 		
+		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyInt())).thenReturn(true);
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.MAC_OSX);
 		
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
 
-		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
 
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
@@ -227,6 +233,8 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
+		managedMongoDb.after();
+		
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
 				targetPath.toString(), expectedCommand);
 

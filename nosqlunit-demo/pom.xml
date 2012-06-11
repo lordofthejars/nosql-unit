@@ -20,6 +20,7 @@
 						<exclude>**/*Test.java</exclude>
 						<exclude>**/Test*.java</exclude>
 						<exclude>**/When*.java</exclude>
+						<exclude>**/*.json</exclude>
 					</excludes>
 				<includes>
 					<include>**/*TestSuite.java</include>

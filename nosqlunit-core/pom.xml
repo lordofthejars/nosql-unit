@@ -49,6 +49,7 @@
 							<skip>false</skip>
 							<excludes>
 								<exclude>**/*Test.java</exclude>
+								<exclude>**/*.json</exclude>
 							</excludes>
 							<includes>
 								<include>%regex[.*integration.When.*]</include>
