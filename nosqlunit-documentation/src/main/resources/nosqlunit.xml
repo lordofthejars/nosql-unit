@@ -1140,16 +1140,11 @@ public class WhenANewBookIsCreated {
 		<title>Future releases</title>
 
 		<para>
-			In next project release 0.2.3, a new features and one improvement
+			In next project release 0.3.1, a new feature
 			will be implemented. As features
 			<emphasis> @Inject</emphasis>
 			will be able
-			to be used to have access to underlying connection into tests. And
-			finally
-			project will be refactored to use
-			<emphasis>Guice</emphasis>
-			as DI
-			framework.
+			to be used to have access to underlying connection into tests.
 		</para>
 
 		<para>
