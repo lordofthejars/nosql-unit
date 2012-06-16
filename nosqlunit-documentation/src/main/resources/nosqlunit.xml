@@ -7,7 +7,7 @@
 		<title>
 			NoSQLUnit
 		</title>
-		<subtitle><?eval Version ${project.version}?></subtitle>
+		<subtitle>Version <?eval ${documentation}?></subtitle>
 
 		<author>
 			<personname>
