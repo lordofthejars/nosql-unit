@@ -134,6 +134,7 @@
 		<module>nosqlunit-core</module>
 		<module>nosqlunit-demo</module>
 		<module>nosqlunit-mongodb</module>
+		<module>nosqlunit-documentation</module>
 	</modules>
 
 	<build>

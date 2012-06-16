@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>nosqlunit</artifactId>
+		<groupId>com.lordofthejars</groupId>
+		<version>0.2.2-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<artifactId>nosqlunit-documentation</artifactId>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.agilejava.docbkx</groupId>
+				<artifactId>docbkx-maven-plugin</artifactId>
+				<version>2.0.14</version>
+				<dependencies>
+					<dependency>
+						<groupId>net.sf.docbook</groupId>
+						<artifactId>docbook-xml</artifactId>
+						<version>5.0-all</version>
+						<classifier>resources</classifier>
+						<type>zip</type>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>net.sf.xslthl</groupId>
+						<artifactId>xslthl</artifactId>
+						<version>2.0.1</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>net.sf.offo</groupId>
+						<artifactId>fop-hyph</artifactId>
+						<version>1.2</version>
+						<scope>runtime</scope>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<sourceDirectory>${basedir}/src/main/resources</sourceDirectory>
+					<targetDirectory>${project.build.directory}/site</targetDirectory>
+					<htmlStylesheet>stylesheet.css</htmlStylesheet>
+					<foCustomization>src/main/resources/docbook-fo.xsl</foCustomization>
+					<htmlCustomization>src/main/resources/docbook-fo.xsl</htmlCustomization>
+					<highlightSource>1</highlightSource>
+					<postProcess>
+						<copy todir="target/site/fig/">
+							<fileset dir="src/main/resources/fig">
+							</fileset>
+						</copy>
+						<copy file="${basedir}/src/main/resources/stylesheet.css" tofile="${project.build.directory}/site/stylesheet.css"/>
+						<copy file="${basedir}/src/main/resources/highlight.css" tofile="${project.build.directory}/site/highlight.css"/>
+					</postProcess>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>generate-html</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
