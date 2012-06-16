@@ -2,7 +2,6 @@ package com.lordofthejars.nosqlunit.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.rules.TestRule;
@@ -19,7 +18,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 	private DefaultDataSetLocationResolver defaultDataSetLocationResolver;
 
 	/* TODO Guice */
-	private LoadStrategyFactory loadStrategyFactory = new LoadStrategyFactory();
+	private LoadStrategyFactory loadStrategyFactory = new ReflectionLoadStrategyFactory();
 
 	public AbstractNoSqlTestRule() {
 	}
