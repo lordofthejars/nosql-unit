@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="utf-8"?><fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format" font-family="serif,Symbol,ZapfDingbats" font-size="10pt" text-align="justify" line-height="normal" font-selection-strategy="character-by-character" line-height-shift-adjustment="disregard-shifts" writing-mode="lr-tb" language="en"><fo:layout-master-set><fo:simple-page-master master-name="blank" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body display-align="center" margin-bottom="0.5in" margin-top="0.5in" region-name="blank-body"/><fo:region-before region-name="xsl-region-before-blank" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-blank" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="titlepage-first" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-first" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-first" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="titlepage-odd" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-odd" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-odd" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="titlepage-even" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-even" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-even" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="lot-first" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-first" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-first" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="lot-odd" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-odd" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-odd" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="lot-even" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-even" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-even" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="front-first" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-first" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-first" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="front-odd" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-odd" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-odd" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="front-even" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-even" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-even" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="body-first" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-first" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-first" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="body-odd" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-odd" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-odd" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="body-even" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-even" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-even" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="back-first" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-first" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-first" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="back-odd" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-odd" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-odd" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="back-even" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="1"/><fo:region-before region-name="xsl-region-before-even" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-even" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="index-first" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="2"/><fo:region-before region-name="xsl-region-before-first" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-first" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="index-odd" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="2"/><fo:region-before region-name="xsl-region-before-odd" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-odd" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:simple-page-master master-name="index-even" page-width="8.5in" page-height="11in" margin-top="0.5in" margin-bottom="0.5in" margin-left="1in" margin-right="1in"><fo:region-body margin-bottom="0.5in" margin-top="0.5in" column-gap="12pt" column-count="2"/><fo:region-before region-name="xsl-region-before-even" extent="0.4in" display-align="before"/><fo:region-after region-name="xsl-region-after-even" extent="0.4in" display-align="after"/></fo:simple-page-master><fo:page-sequence-master master-name="titlepage"><fo:repeatable-page-master-alternatives><fo:conditional-page-master-reference master-reference="blank" blank-or-not-blank="blank"/><fo:conditional-page-master-reference master-reference="titlepage-first" page-position="first"/><fo:conditional-page-master-reference master-reference="titlepage-odd" odd-or-even="odd"/><fo:conditional-page-master-reference odd-or-even="even" master-reference="titlepage-odd"/></fo:repeatable-page-master-alternatives></fo:page-sequence-master><fo:page-sequence-master master-name="lot"><fo:repeatable-page-master-alternatives><fo:conditional-page-master-reference master-reference="blank" blank-or-not-blank="blank"/><fo:conditional-page-master-reference master-reference="lot-first" page-position="first"/><fo:conditional-page-master-reference master-reference="lot-odd" odd-or-even="odd"/><fo:conditional-page-master-reference odd-or-even="even" master-reference="lot-odd"/></fo:repeatable-page-master-alternatives></fo:page-sequence-master><fo:page-sequence-master master-name="front"><fo:repeatable-page-master-alternatives><fo:conditional-page-master-reference master-reference="blank" blank-or-not-blank="blank"/><fo:conditional-page-master-reference master-reference="front-first" page-position="first"/><fo:conditional-page-master-reference master-reference="front-odd" odd-or-even="odd"/><fo:conditional-page-master-reference odd-or-even="even" master-reference="front-odd"/></fo:repeatable-page-master-alternatives></fo:page-sequence-master><fo:page-sequence-master master-name="body"><fo:repeatable-page-master-alternatives><fo:conditional-page-master-reference master-reference="blank" blank-or-not-blank="blank"/><fo:conditional-page-master-reference master-reference="body-first" page-position="first"/><fo:conditional-page-master-reference master-reference="body-odd" odd-or-even="odd"/><fo:conditional-page-master-reference odd-or-even="even" master-reference="body-odd"/></fo:repeatable-page-master-alternatives></fo:page-sequence-master><fo:page-sequence-master master-name="back"><fo:repeatable-page-master-alternatives><fo:conditional-page-master-reference master-reference="blank" blank-or-not-blank="blank"/><fo:conditional-page-master-reference master-reference="back-first" page-position="first"/><fo:conditional-page-master-reference master-reference="back-odd" odd-or-even="odd"/><fo:conditional-page-master-reference odd-or-even="even" master-reference="back-odd"/></fo:repeatable-page-master-alternatives></fo:page-sequence-master><fo:page-sequence-master master-name="index"><fo:repeatable-page-master-alternatives><fo:conditional-page-master-reference master-reference="blank" blank-or-not-blank="blank"/><fo:conditional-page-master-reference master-reference="index-first" page-position="first"/><fo:conditional-page-master-reference master-reference="index-odd" odd-or-even="odd"/><fo:conditional-page-master-reference odd-or-even="even" master-reference="index-odd"/></fo:repeatable-page-master-alternatives></fo:page-sequence-master></fo:layout-master-set><fo:page-sequence xmlns:axf="http://www.antennahouse.com/names/XSL/Extensions" hyphenate="true" master-reference="body" language="en" format="1" initial-page-number="1" force-page-count="no-force" hyphenation-character="-" hyphenation-push-character-count="2" hyphenation-remain-character-count="2"><fo:static-content flow-name="xsl-region-before-first"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-bottom-width="0.5pt" border-bottom-style="solid" border-bottom-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="right" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:static-content flow-name="xsl-region-before-odd"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-bottom-width="0.5pt" border-bottom-style="solid" border-bottom-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="before" relative-align="baseline"><fo:block><fo:block>
+			NoSQLUnit
+		</fo:block></fo:block></fo:table-cell><fo:table-cell text-align="right" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:static-content flow-name="xsl-region-before-even"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-bottom-width="0.5pt" border-bottom-style="solid" border-bottom-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="before" relative-align="baseline"><fo:block><fo:block>
+			NoSQLUnit
+		</fo:block></fo:block></fo:table-cell><fo:table-cell text-align="right" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:static-content flow-name="xsl-region-before-blank"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-bottom-width="0.5pt" border-bottom-style="solid" border-bottom-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="right" display-align="before" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:static-content flow-name="xsl-footnote-separator"><fo:block><fo:leader color="black" leader-pattern="rule" leader-length="1in"/></fo:block></fo:static-content><fo:static-content flow-name="blank-body"><fo:block text-align="center"/></fo:static-content><fo:static-content flow-name="xsl-region-after-first"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-top-width="0.5pt" border-top-style="solid" border-top-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="after" relative-align="baseline"><fo:block><fo:block><fo:page-number/></fo:block></fo:block></fo:table-cell><fo:table-cell text-align="end" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:static-content flow-name="xsl-region-after-odd"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-top-width="0.5pt" border-top-style="solid" border-top-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="after" relative-align="baseline"><fo:block><fo:block><fo:page-number/></fo:block></fo:block></fo:table-cell><fo:table-cell text-align="end" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:static-content flow-name="xsl-region-after-even"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-top-width="0.5pt" border-top-style="solid" border-top-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="after" relative-align="baseline"><fo:block><fo:block><fo:page-number/></fo:block></fo:block></fo:table-cell><fo:table-cell text-align="end" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:static-content flow-name="xsl-region-after-blank"><fo:block font-family="serif,Symbol,ZapfDingbats" margin-left="0pt"><fo:table table-layout="fixed" width="100%" border-top-width="0.5pt" border-top-style="solid" border-top-color="black"><fo:table-column column-number="1" column-width="proportional-column-width(1)"/><fo:table-column column-number="2" column-width="proportional-column-width(1)"/><fo:table-column column-number="3" column-width="proportional-column-width(1)"/><fo:table-body><fo:table-row block-progression-dimension.minimum="14pt"><fo:table-cell text-align="start" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell><fo:table-cell text-align="center" display-align="after" relative-align="baseline"><fo:block><fo:block><fo:page-number/></fo:block></fo:block></fo:table-cell><fo:table-cell text-align="end" display-align="after" relative-align="baseline"><fo:block><fo:block/></fo:block></fo:table-cell></fo:table-row></fo:table-body></fo:table></fo:block></fo:static-content><fo:flow flow-name="xsl-region-body" start-indent="4pc" end-indent="0pt"><fo:block id="d0e1"><fo:block font-family="sans-serif,Symbol,ZapfDingbats"><fo:block start-indent="0pt" text-align="center"><fo:block keep-with-next.within-column="always" font-size="24.8832pt" font-weight="bold"><fo:block keep-with-next.within-column="always" space-before.optimum="10pt" space-before.minimum="10pt * 0.8" space-before.maximum="10pt * 1.2" hyphenate="false" text-align="center" start-indent="0pt" hyphenation-character="-" hyphenation-push-character-count="2" hyphenation-remain-character-count="2">
+			NoSQLUnit
+		</fo:block></fo:block><fo:block>Version 0.3.1-SNAPSHOT</fo:block><fo:block space-before="0.5em" font-size="14.4pt"><fo:block>Alex Soto, www.lordofthejars.com</fo:block></fo:block><fo:block space-before="0.5em">Copyright <fo:inline font-family="serif">©</fo:inline> 2012 Alex Soto Bueno. Licensed under the Apache License, Version 2.0 (the "License");</fo:block><fo:block space-before="0.5em">2012</fo:block></fo:block></fo:block></fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" id="toc...d0e1"><fo:block><fo:block><fo:block space-before.minimum="1em" space-before.optimum="1.5em" space-before.maximum="2em" space-after="0.5em" margin-left="0pt" start-indent="0pt" font-size="17.28pt" font-weight="bold" font-family="sans-serif,Symbol,ZapfDingbats">Table of Contents</fo:block></fo:block></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e26">Overview</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e26"><fo:page-number-citation ref-id="d0e26"/></fo:basic-link></fo:inline></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e102">Requirements</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e102"><fo:page-number-citation ref-id="d0e102"/></fo:basic-link></fo:inline></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e127">NoSQLUnit</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e127"><fo:page-number-citation ref-id="d0e127"/></fo:basic-link></fo:inline></fo:block><fo:block id="toc.d0e1.d0e127" margin-left="24pt"><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e186">Seeding Database</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e186"><fo:page-number-citation ref-id="d0e186"/></fo:basic-link></fo:inline></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e271">Verifying Database</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e271"><fo:page-number-citation ref-id="d0e271"/></fo:basic-link></fo:inline></fo:block></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e311">MongoDb</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e311"><fo:page-number-citation ref-id="d0e311"/></fo:basic-link></fo:inline></fo:block><fo:block id="toc.d0e1.d0e311" margin-left="24pt"><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e378">Maven Setup</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e378"><fo:page-number-citation ref-id="d0e378"/></fo:basic-link></fo:inline></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e450">Dataset Format</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e450"><fo:page-number-citation ref-id="d0e450"/></fo:basic-link></fo:inline></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e473">Getting Started</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e473"><fo:page-number-citation ref-id="d0e473"/></fo:basic-link></fo:inline></fo:block></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e838">Future releases</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e838"><fo:page-number-citation ref-id="d0e838"/></fo:basic-link></fo:inline></fo:block><fo:block text-align-last="justify" text-align="start" end-indent="24pt" last-line-end-indent="-24pt"><fo:inline keep-with-next.within-line="always"><fo:basic-link internal-destination="d0e862">Stay in Touch</fo:basic-link></fo:inline><fo:inline keep-together.within-line="always"> <fo:leader leader-pattern="dots" leader-pattern-width="3pt" leader-alignment="reference-area" keep-with-next.within-line="always"/> <fo:basic-link internal-destination="d0e862"><fo:page-number-citation ref-id="d0e862"/></fo:basic-link></fo:inline></fo:block></fo:block><fo:block id="d0e26"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Overview</fo:marker><fo:block font-size="20.735999999999997pt" border-top="0.5pt solid black" border-bottom="0.5pt solid black" padding-top="6pt" padding-bottom="3pt">Overview</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:external-graphic src="url(fig/nosqlunitlogo.png)" width="auto" height="auto" content-width="auto" content-height="auto"/><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Unit testing is a method by which the smallest testable part of an
+			application is validated. Unit tests must follow the
+			FIRST
+			Rules; these are Fast, Isolated, Repeatable,
+			Self-Validated and Timely.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			It is strange to think about a
+			JEE
+			application
+			without persistence layer (typical Relational databases or new
+			<fo:inline font-style="italic">NoSQL</fo:inline>
+			databases) so should be interesting to write
+			unit tests of persistence layer too. When we are writing unit tests of
+			persistence layer we should focus on to not break two main concepts
+			of
+			FIRST
+			rules, the fast and the isolated ones.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Our tests will be
+			<fo:inline font-style="italic">fast</fo:inline>
+			if they don't access
+			network nor filesystem, and in case of persistence systems network and
+			filesystem are the most used resources. In case of
+			RDBMS
+			(
+			<fo:inline font-style="italic">SQL</fo:inline>
+			), many Java in-memory
+			databases exist like
+			Apache Derby
+			,
+			H2
+			or
+			HSQLDB
+			. These
+			databases, as their name suggests are embedded into your program and data
+			are stored in memory, so your tests are still fast. The problem is with
+			<fo:inline font-style="italic">NoSQL</fo:inline>
+			systems, because of their heterogeneity. Some
+			systems work using Document approach (like
+			MongoDb
+			), other ones Column (like
+			Hbase
+			), or Graph (like
+			Neo4J
+			). For this reason the in-memory mode
+			should be provided by the vendor, there is no a generic solution.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Our tests must be isolated from themselves. It is not acceptable
+			that one test method modifies the result of another test method. In case
+			of persistence tests this scenario occurs when previous test method
+			insert
+			an entry to database and next test method execution finds the change.
+			So
+			before execution of each test, database should be found in a known state.
+			Note that if your test found database in a known state, test will be
+			repeatable, if test assertion depends on previous test execution, each
+			execution will be unique. For homogeneous systems like
+			RDBMS
+			,
+			<fo:inline font-style="italic">DBUnit</fo:inline>
+			exists to maintain
+			database in a known state before each execution. But there is no like
+			<fo:inline font-style="italic">DBUnit</fo:inline>
+			framework for heterogeneous
+			<fo:inline font-style="italic">NoSQL</fo:inline>
+			systems.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+			resolves this problem by
+			providing a
+			<fo:inline font-style="italic">JUnit</fo:inline>
+			extension which helps us to manage
+			lifecycle of NoSQL systems and also take care of maintaining databases
+			into known state.
+		</fo:block></fo:block><fo:block id="d0e102"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Requirements</fo:marker><fo:block font-size="20.735999999999997pt" border-top="0.5pt solid black" border-bottom="0.5pt solid black" padding-top="6pt" padding-bottom="3pt">Requirements</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			To run
+			<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+			,
+			<fo:inline font-style="italic">JUnit
+				4.10
+			</fo:inline>
+			or later must be provided. This is because of
+			<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+			is using
+			<fo:inline font-style="italic">Rules</fo:inline>
+			, and
+			they have changed from previous versions to 4.10.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Although it should work with
+			JDK 5
+			, jars are
+			compiled using
+			JDK 6
+			.
+		</fo:block></fo:block><fo:block id="d0e127"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">NoSQLUnit</fo:marker><fo:block font-size="20.735999999999997pt" border-top="0.5pt solid black" border-bottom="0.5pt solid black" padding-top="6pt" padding-bottom="3pt">NoSQLUnit</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+			is a
+			<fo:inline font-style="italic">JUnit</fo:inline>
+			extension to make writing unit and integration
+			tests of systems that use NoSQL backend easier and is composed by two sets
+			of
+			<fo:inline font-style="italic">Rules</fo:inline>
+			and a group of annotations.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			First set of
+			<fo:inline font-style="italic">Rules</fo:inline>
+			are those responsible of
+			managing database lifecycle; there are two for each supported
+			backend.
+		</fo:block><fo:list-block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" space-after.optimum="1em" space-after.minimum="0.8em" space-after.maximum="1.2em" provisional-label-separation="0.2em" provisional-distance-between-starts="1.0em" id="d0e146"><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e147"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+					The first one (in case it is possible) it is the
+					<fo:inline font-weight="bold">in-memory</fo:inline>
+					mode. This mode takes care of
+					starting and stopping database system in
+					"
+					<fo:inline font-style="italic">in-memory</fo:inline>
+					" mode. This mode will be typically
+					used during unit testing execution.
+				</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e156"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+					The second one is the
+					<fo:inline font-weight="bold">managed</fo:inline>
+					mode. This mode is in charge of starting
+					<fo:inline font-style="italic">NoSQL</fo:inline>
+					server but as remote process (in local machine) and stopping it.
+					This
+					will typically used during integration testing execution.
+				</fo:block></fo:block></fo:list-item-body></fo:list-item></fo:list-block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Second set of
+			<fo:inline font-style="italic">Rules</fo:inline>
+			are those responsible of
+			maintaining database into known state. Each supported backend will have
+			its own, and can be understood as a connection to defined database which
+			will be used to execute the required operations for maintaining the
+			stability of the system.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Note that because
+			<fo:inline font-style="italic">NoSQL</fo:inline>
+			databases are
+			heterogeneous, each system will require its own implementation.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			And finally two annotations are provided,
+			<fo:basic-link internal-destination="seeding_database"><fo:inline>@UsingDataSet</fo:inline></fo:basic-link>
+			and
+			<fo:basic-link internal-destination="verifying_database"><fo:inline>@ShouldMatchDataSet</fo:inline></fo:basic-link>
+			, (thank you so
+			much
+			<fo:inline font-style="italic">Arquillian</fo:inline>
+			people for the name).
+		</fo:block><fo:block id="d0e186"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Seeding Database</fo:marker><fo:block font-size="17.28pt">Seeding Database</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				@UsingDataSet is used to seed database with defined data set. In
+				brief data sets are files that contain all data to be inserted to
+				configured database. In order to seed your database, use
+				<fo:inline font-style="italic">@UsingDataSet</fo:inline>
+				annotation, you can define it either
+				on the test itself or on the class level. If there is definition on
+				both, test level annotation takes precedence. This annotation has
+				two
+				attributes
+				<fo:inline font-family="monospace">locations</fo:inline>
+				and
+				<fo:inline font-family="monospace">loadStrategy</fo:inline>
+				.
+			</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				With
+				<fo:inline font-family="monospace">locations</fo:inline>
+				attribute you can specify
+				<fo:inline font-weight="bold">classpath</fo:inline>
+				datasets location. Locations
+				are relative to test class location. Note that more than one dataset
+				can
+				be specified. If files are not specified explicitly, next strategy is
+				applied:
+			</fo:block><fo:list-block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" space-after.optimum="1em" space-after.minimum="0.8em" space-after.maximum="1.2em" provisional-label-separation="0.2em" provisional-distance-between-starts="1.0em" id="d0e208"><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e209"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+						First searches for a file on classpath in same package of test
+						class with next file name,
+						<fo:inline font-family="monospace">[test class name]#[test method
+							name].[format]
+						</fo:inline>
+						(only if annotation is present at test
+						method).
+					</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e215"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+						If first rule is not met or annotation is defined at class
+						scope, next file is searched on classpath in same package of test
+						class,
+						<fo:inline font-family="monospace">[test class name].[default format]</fo:inline>
+						.
+					</fo:block></fo:block></fo:list-item-body></fo:list-item></fo:list-block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" margin-left="0.25in" margin-right="0.25in" id="d0e221"><fo:block font-size="14pt" font-weight="bold" hyphenate="false" keep-with-next.within-column="always">Warning</fo:block><fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					datasets must reside into
+					<fo:inline font-style="italic">classpath</fo:inline>
+					and
+					format depends on
+					<fo:inline font-style="italic">NoSQL</fo:inline>
+					vendor.
+				</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">Second attribute provides strategies for inserting data.
+				Implemented strategies are:
+			</fo:block><fo:block xmlns:rx="http://www.renderx.com/XSL/Extensions" space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="auto" id="d0e232"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Table 1. Load Strategies</fo:block><fo:table border-before-width.conditionality="retain" border-collapse="collapse" width="auto" border-start-style="solid" border-end-style="solid" border-top-style="solid" border-bottom-style="solid" border-start-width="0.5pt" border-end-width="0.5pt" border-top-width="0.5pt" border-bottom-width="0.5pt" border-start-color="black" border-end-color="black" border-top-color="black" border-bottom-color="black"><fo:table-body start-indent="0pt" end-indent="0pt"><fo:table-row>
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>INSERT</fo:block></fo:table-cell>
+
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Insert defined datasets before executing any test method.</fo:block></fo:table-cell>
+				</fo:table-row><fo:table-row>
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>DELETE_ALL</fo:block></fo:table-cell>
+
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Deletes all elements of database before executing any test
+						method.
+					</fo:block></fo:table-cell>
+				</fo:table-row><fo:table-row>
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>CLEAN_INSERT</fo:block></fo:table-cell>
+
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>This is the most used strategy. It deletes all elements of
+						database and then insert defined datasets before executing any
+						test
+						method.
+					</fo:block></fo:table-cell>
+				</fo:table-row><fo:table-row>
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>REFRESH</fo:block></fo:table-cell>
+
+					<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Insert all data defined in datasets that are not present on
+						database.
+					</fo:block></fo:table-cell>
+				</fo:table-row></fo:table-body></fo:table></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">An example of usage:</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e269">@UsingDataSet(locations=<fo:inline font-weight="bold" font-style="italic">"my_data_set.json"</fo:inline>, loadStrategy=LoadStrategyEnum.REFRESH)</fo:block></fo:block><fo:block id="d0e271"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Verifying Database</fo:marker><fo:block font-size="17.28pt">Verifying Database</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				Sometimes it might imply a huge amount of work asserting database
+				state directly from testing code. By using
+				<fo:inline font-style="italic">@ShouldMatchDataSet</fo:inline>
+				on test method,
+				<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+				will check if database contains
+				expected entries after test execution. As with
+				<fo:inline font-style="italic">@ShouldMatchDataSet</fo:inline>
+				annotation you can define
+				classpath file location, or if it is not supplied next convention is
+				used:
+			</fo:block><fo:list-block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" space-after.optimum="1em" space-after.minimum="0.8em" space-after.maximum="1.2em" provisional-label-separation="0.2em" provisional-distance-between-starts="1.0em" id="d0e285"><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e286"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+						First searches for a file on classpath in same package of test
+						class with next file name,
+						<fo:inline font-family="monospace">[test class name]#[test method
+							name]-expected.[format]
+						</fo:inline>
+						(only if annotation is present at
+						test method).
+					</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e292"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+						If first rule is not met or annotation is defined at class
+						scope, file is searched on classpath in same package of test class,
+						<fo:inline font-family="monospace">[test class name]-expected.[default format]</fo:inline>
+						.
+					</fo:block></fo:block></fo:list-item-body></fo:list-item></fo:list-block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" margin-left="0.25in" margin-right="0.25in" id="d0e298"><fo:block font-size="14pt" font-weight="bold" hyphenate="false" keep-with-next.within-column="always">Warning</fo:block><fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					datasets must reside into
+					<fo:inline font-style="italic">classpath</fo:inline>
+					and
+					format depends on
+					<fo:inline font-style="italic">NoSQL</fo:inline>
+					vendor.
+				</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">An example of usage:</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e309">@ShouldMatchDataSet(location=<fo:inline font-weight="bold" font-style="italic">"my_expected_data_set.json"</fo:inline>)</fo:block></fo:block></fo:block><fo:block id="d0e311"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">MongoDb</fo:marker><fo:block font-size="20.735999999999997pt" border-top="0.5pt solid black" border-bottom="0.5pt solid black" padding-top="6pt" padding-bottom="3pt">MongoDb</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			MongoDb
+			is a
+			<fo:inline font-style="italic">NoSQL</fo:inline>
+			database that stores structured data as
+			<fo:inline font-style="italic">JSON-like</fo:inline>
+			documents with dynamic schemas.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+			supports
+			<fo:inline font-style="italic">MongoDb</fo:inline>
+			by using next classes:
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+		<fo:block xmlns:rx="http://www.renderx.com/XSL/Extensions" space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="auto" id="d0e335"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Table 2. Lifecycle Management Rules</fo:block><fo:table border-before-width.conditionality="retain" border-collapse="collapse" width="auto" border-start-style="solid" border-end-style="solid" border-top-style="solid" border-bottom-style="solid" border-start-width="0.5pt" border-end-width="0.5pt" border-top-width="0.5pt" border-bottom-width="0.5pt" border-start-color="black" border-end-color="black" border-top-color="black" border-bottom-color="black"><fo:table-body start-indent="0pt" end-indent="0pt"><fo:table-row>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>In Memory</fo:block></fo:table-cell>
+
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>
+					<fo:inline font-family="monospace">com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb
+					</fo:inline>
+				</fo:block></fo:table-cell>
+			</fo:table-row><fo:table-row>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Managed</fo:block></fo:table-cell>
+
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>
+					<fo:inline font-family="monospace">com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb
+					</fo:inline>
+				</fo:block></fo:table-cell>
+			</fo:table-row></fo:table-body></fo:table></fo:block>
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+		<fo:block xmlns:rx="http://www.renderx.com/XSL/Extensions" space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="auto" id="d0e363"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Table 3. Manager Rule</fo:block><fo:table border-before-width.conditionality="retain" border-collapse="collapse" width="auto" border-start-style="solid" border-end-style="solid" border-top-style="solid" border-bottom-style="solid" border-start-width="0.5pt" border-end-width="0.5pt" border-top-width="0.5pt" border-bottom-width="0.5pt" border-start-color="black" border-end-color="black" border-top-color="black" border-bottom-color="black"><fo:table-body start-indent="0pt" end-indent="0pt"><fo:table-row>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>NoSQLUnit Management</fo:block></fo:table-cell>
+
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>
+					<fo:inline font-family="monospace">com.lordofthejars.nosqlunit.mongodb.MongoDbRule
+					</fo:inline>
+				</fo:block></fo:table-cell>
+			</fo:table-row></fo:table-body></fo:table></fo:block>
+		</fo:block><fo:block id="d0e378"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Maven Setup</fo:marker><fo:block font-size="17.28pt">Maven Setup</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				To use
+				<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+				with
+				MongoDb
+				you only need to add next
+				dependency:
+			</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="conf.nosqlunit_dep"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 1. NoSqlUnit Maven Repository</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e392"><fo:inline font-weight="bold">&lt;dependency&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;groupId&gt;</fo:inline>com.lordofthejars<fo:inline font-weight="bold">&lt;/groupId&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;artifactId&gt;</fo:inline>nosqlunit-mongodb<fo:inline font-weight="bold">&lt;/artifactId&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;version&gt;</fo:inline>${version.nosqlunit}<fo:inline font-weight="bold">&lt;/version&gt;</fo:inline>
+<fo:inline font-weight="bold">&lt;/dependency&gt;</fo:inline></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				Note that if you are plannig to use
+				<fo:inline font-weight="bold">in-memory</fo:inline>
+				approach an extra dependency is
+				required.
+				<fo:inline font-weight="bold">In-memory</fo:inline>
+				mode is implemented
+				using
+				<fo:inline font-style="italic">jmockmongo</fo:inline>
+				.
+				<fo:inline font-style="italic">JMockmongo</fo:inline>
+				is a new project that help with unit testing Java-based
+				MongoDb
+				Applications by starting an
+				in-process
+				<fo:inline font-style="italic">Netty</fo:inline>
+				server that speaks the
+				<fo:inline font-style="italic">MongoDb</fo:inline>
+				protocol and maintains databases and
+				collections in
+				JVM
+				memory. It is not a true embedded
+				mode becuase it will starts a server, but in fact for now it is the best
+				way to write
+				MongoDb
+				unit tests. As his
+				author says it is an incomplete tool and will be improved every time a
+				new feature is required.
+			</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" margin-left="0.25in" margin-right="0.25in" id="d0e423"><fo:block font-size="14pt" font-weight="bold" hyphenate="false" keep-with-next.within-column="always">Warning</fo:block><fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					During development of this documentation, current
+					<fo:inline font-style="italic">jmockmongo</fo:inline>
+					version was 0.0.2-SNAPSHOT. Author is
+					imporoving version often so before using one specific version, take a
+					look at its
+					<fo:basic-link external-destination="url(https://github.com/thiloplanz/jmockmongo)"><fo:inline>website</fo:inline></fo:basic-link><fo:inline hyphenate="false"> [<fo:basic-link external-destination="url(https://github.com/thiloplanz/jmockmongo)">https://github.com/thiloplanz/jmockmongo</fo:basic-link>]</fo:inline>
+					.
+				</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				To install add next
+				<fo:basic-link internal-destination="conf.jmockmongo_repo"><fo:inline>
+					repository
+				</fo:inline></fo:basic-link>
+				and
+				<fo:basic-link internal-destination="conf.jmockmongo_dep"><fo:inline>
+					dependency
+				</fo:inline></fo:basic-link>
+				:
+			</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="conf.jmockmongo_repo"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 2. jmockmongo Maven Repository</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e443"><fo:inline font-weight="bold">&lt;repositories&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;repository&gt;</fo:inline>
+		<fo:inline font-weight="bold">&lt;id&gt;</fo:inline>thiloplanz-snapshot<fo:inline font-weight="bold">&lt;/id&gt;</fo:inline>
+		<fo:inline font-weight="bold">&lt;url&gt;</fo:inline>http://repository-thiloplanz.forge.cloudbees.com/snapshot/<fo:inline font-weight="bold">&lt;/url&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;/repository&gt;</fo:inline>
+<fo:inline font-weight="bold">&lt;/repositories&gt;</fo:inline></fo:block></fo:block></fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="conf.jmockmongo_dep"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 3. jmockmongo Maven Dependency</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e448"><fo:inline font-weight="bold">&lt;dependency&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;groupId&gt;</fo:inline>jmockmongo<fo:inline font-weight="bold">&lt;/groupId&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;artifactId&gt;</fo:inline>jmockmongo<fo:inline font-weight="bold">&lt;/artifactId&gt;</fo:inline>
+	<fo:inline font-weight="bold">&lt;version&gt;</fo:inline>${mongomock.version}<fo:inline font-weight="bold">&lt;/version&gt;</fo:inline>
+<fo:inline font-weight="bold">&lt;/dependency&gt;</fo:inline></fo:block></fo:block></fo:block></fo:block><fo:block id="d0e450"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Dataset Format</fo:marker><fo:block font-size="17.28pt">Dataset Format</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				Default dataset file format in
+				<fo:inline font-style="italic">MongoDb</fo:inline>
+				module
+				is
+				<fo:inline font-style="italic">json</fo:inline>
+				.
+			</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+				Datasets must have next
+				<fo:basic-link internal-destination="ex.mongodb_dataset"><fo:inline>
+					format
+				</fo:inline></fo:basic-link>
+				:
+			</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="ex.mongodb_dataset"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 4. Example of MongoDb Dataset</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e469">{
+	"name_collection1": [
+	{
+		"attribute_1":"value1",
+		"attribute_2":"value2"
+	},
+	{
+		"attribute_3":2,
+		"attribute_4":"value4"
+	}
+	],
+	"name_collection2": [
+		...
+	],
+	....
+}</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">Notice that if attributes value are integers, double quotes are
+				not required.
+			</fo:block></fo:block><fo:block id="d0e473"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Getting Started</fo:marker><fo:block font-size="17.28pt">Getting Started</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block id="d0e476"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:block font-size="14.399999999999999pt">Lifecycle Management Strategy</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					First step is defining which lifecycle management strategy is
+					required for your tests. Depending on kind of test you are
+					implementing (unit test, integration test, deployment test, ...)
+					you
+					will require an
+					<fo:inline font-weight="bold">in-memory</fo:inline>
+					approach,
+					<fo:inline font-weight="bold">managed</fo:inline>
+					approach or
+					<fo:inline font-weight="bold">remote</fo:inline>
+					approach.
+				</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					To configure
+					<fo:inline font-weight="bold">in-memory</fo:inline>
+					approach
+					you should only instantiate next
+					<fo:basic-link internal-destination="program.inmemory_conf"><fo:inline>rule</fo:inline></fo:basic-link>
+					:
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="program.inmemory_conf"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 5. In-memory MongoDb</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e501"><fo:inline color="gray">@ClassRule</fo:inline>
+InMemoryMongoDb inMemoryMongoDb = <fo:inline font-weight="bold">new</fo:inline> InMemoryMongoDb();</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					To configure the
+					<fo:inline font-weight="bold">managed</fo:inline>
+					way,
+					you should use
+					<fo:inline font-family="monospace">ManagedMongoDb</fo:inline>
+					rule and may
+					require some <fo:basic-link internal-destination="program.managed_conf"><fo:inline>configuration</fo:inline></fo:basic-link> parameters.
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="program.managed_conf"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 6. Managed MongoDb</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e517"><fo:inline font-weight="bold">import</fo:inline> <fo:inline font-weight="bold">static</fo:inline> com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+
+<fo:inline color="gray">@ClassRule</fo:inline>
+<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">static</fo:inline> ManagedMongoDb managedMongoDb = newManagedMongoDbRule().build();</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					By default managed
+					<fo:inline font-style="italic">MongoDb</fo:inline>
+					rule uses next
+					default values:
+				</fo:block><fo:list-block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" space-after.optimum="1em" space-after.minimum="0.8em" space-after.maximum="1.2em" provisional-label-separation="0.2em" provisional-distance-between-starts="1.0em" id="d0e524"><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e525"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+							<fo:inline font-style="italic">MongoDb</fo:inline>
+							installation directory is
+							retrieved from
+							<fo:inline font-family="monospace">MONGO_HOME</fo:inline>
+							system environment
+							variable.
+						</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e534"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+							Target path, that is the directory where
+							<fo:inline font-style="italic">MongoDb</fo:inline>
+							server is started, is
+							<fo:inline font-family="monospace">target/mongo-temp</fo:inline>
+							.
+						</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e543"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+							Database path is at
+							<fo:inline font-family="monospace" font-style="italic">{target
+								path}
+							</fo:inline>
+							<fo:inline font-family="monospace">/mongo-dbpath</fo:inline>
+							.
+						</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e552"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+							<fo:inline font-style="italic">Mongodb</fo:inline>
+							is started with
+							<fo:inline font-style="italic">fork</fo:inline>
+							option.
+						</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e561"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+							Because after execution of tests all generated data is
+							removed, in
+							<fo:inline font-family="monospace" font-style="italic">{target
+								path}
+							</fo:inline>
+							<fo:inline font-family="monospace">/logpath</fo:inline>
+							will remain log
+							file generated by the server.
+						</fo:block></fo:block></fo:list-item-body></fo:list-item><fo:list-item space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" id="d0e570"><fo:list-item-label end-indent="label-end()"><fo:block>•</fo:block></fo:list-item-label><fo:list-item-body start-indent="body-start()"><fo:block><fo:block>
+							In
+							<fo:inline font-style="italic">Windows</fo:inline> systems
+							executable should be found as
+							<fo:inline font-family="monospace">bin/mongod.exe</fo:inline>
+							meanwhile in
+							<fo:inline font-style="italic">MAC
+								OS
+							</fo:inline>
+							and
+							<fo:inline font-style="italic">*nix</fo:inline>
+							should be found as
+							<fo:inline font-family="monospace">bin/mongod</fo:inline>
+							.
+						</fo:block></fo:block></fo:list-item-body></fo:list-item></fo:list-block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					<fo:inline font-family="monospace">ManagedMongoDb</fo:inline>
+					can be created from
+					scratch, but for making life easier, a
+					<fo:inline font-style="italic">DSL</fo:inline>
+					is
+					provided using
+					<fo:inline font-family="monospace">MongoServerRuleBuilder</fo:inline>
+					class.
+					For
+					<fo:basic-link internal-destination="program.managed_specific_conf"><fo:inline>example</fo:inline></fo:basic-link>
+					:
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="program.managed_specific_conf"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 7. Specific Managed MongoDb Configuration</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e605"><fo:inline font-weight="bold">import</fo:inline> <fo:inline font-weight="bold">static</fo:inline> com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+
+<fo:inline color="gray">@ClassRule</fo:inline>
+<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">static</fo:inline> ManagedMongoDb managedMongoDb =
+newManagedMongoDbRule().mongodPath(<fo:inline font-weight="bold" font-style="italic">"/opt/mongo"</fo:inline>).appendSingleCommandLineArguments(<fo:inline font-weight="bold" font-style="italic">"-vvv"</fo:inline>).build();</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					In
+					<fo:basic-link internal-destination="program.managed_specific_conf"><fo:inline>example</fo:inline></fo:basic-link>
+					we are overriding
+					<fo:inline font-family="monospace">MONGO_HOME</fo:inline>
+					variable (in case has
+					been set) and set mongo home at
+					<fo:inline font-family="monospace">/opt/mongo</fo:inline>
+					.
+					Moreover we are appending a single argument to
+					<fo:inline font-style="italic">MongoDb</fo:inline>
+					executable, in this case setting log
+					level to number 3 (-vvv). Also you can append
+					<fo:inline font-style="italic">property=value</fo:inline>
+					arguments using
+					<fo:inline font-family="monospace">appendCommandLineArguments(String argumentName, String
+						argumentValue)
+					</fo:inline>
+					method.
+				</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" margin-left="0.25in" margin-right="0.25in" id="d0e627"><fo:block font-size="14pt" font-weight="bold" hyphenate="false" keep-with-next.within-column="always">Warning</fo:block><fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">when you are specifying command line arguments, remember to
+						add slash (-) and double slash (--) where is necessary.
+					</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					To stop
+					<fo:inline font-style="italic">MongoDb</fo:inline>
+					instance,
+					<fo:inline font-weight="bold">NoSQLUnit</fo:inline>
+					sends a
+					<fo:inline font-family="monospace">shutdown</fo:inline>
+					command to server using
+					<fo:inline font-style="italic">Java Mongo AP</fo:inline>
+					I. When this
+					command is sent, the server is stopped and because connection is lost,
+					<fo:inline font-style="italic">Java Mongo API</fo:inline>
+					logs automatically an exception
+					(read
+					<fo:basic-link external-destination="url(https://groups.google.com/group/mongodb-user/browse_thread/thread/ac9a4c9ea13f3e81)"><fo:inline>here</fo:inline></fo:basic-link><fo:inline hyphenate="false"> [<fo:basic-link external-destination="url(https://groups.google.com/group/mongodb-user/browse_thread/thread/ac9a4c9ea13f3e81)">https://groups.google.com/group/mongodb-user/browse_thread/thread/ac9a4c9ea13f3e81</fo:basic-link>]</fo:inline>
+					information about the problem and how to "resolve" it). Do not
+					confuse
+					with a testing failure. You will see something like:
+				</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e650">java.io.EOFException
+	at org.bson.io.Bits.readFully(Bits.java:37)
+	at org.bson.io.Bits.readFully(Bits.java:28)
+	at com.mongodb.Response.&lt;init&gt;;(Response.java:39)
+	at com.mongodb.DBPort.go(DBPort.java:128)
+	at com.mongodb.DBPort.call(DBPort.java:79)
+	at com.mongodb.DBTCPConnector.call(DBTCPConnector.java:218)
+	at com.mongodb.DBApiLayer$MyCollection.__find(DBApiLayer.java:305)
+	at com.mongodb.DB.command(DB.java:160)
+	at com.mongodb.DB.command(DB.java:183)
+	at com.mongodb.DB.command(DB.java:144)
+	at
+	com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps.shutdown(MongoDbLowLevelOps.java:44)
+	at
+	com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.after(ManagedMongoDb.java:157)
+	at
+	org.junit.rules.ExternalResource$1.evaluate(ExternalResource.java:48)
+	at org.junit.rules.RunRules.evaluate(RunRules.java:18)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
+	at
+	org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:236)
+	at
+	org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:134)
+	at
+	org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:113)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at
+	sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at
+	sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:616)
+	at
+	org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at
+	org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at
+	org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at
+	org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at
+	org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					Configuring
+					<fo:inline font-weight="bold">remote</fo:inline>
+					approach
+					does not require any special rule because you (or System like
+					Maven
+					) is the responsible of starting and
+					stopping the server. This mode is used in deployment tests where you
+					are testing your application on real environment.
+				</fo:block></fo:block><fo:block id="d0e660"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:block font-size="14.399999999999999pt">Configuring MongoDb Connection</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					Next step is configuring
+					<fo:inline font-style="italic">
+						<fo:inline font-weight="bold">Mongodb</fo:inline>
+					</fo:inline>
+					rule in charge of
+					maintaining
+					<fo:inline font-style="italic">MongoDb</fo:inline>
+					database into known state by
+					inserting and deleting defined datasets. You must register
+					<fo:inline font-family="monospace">MongoDbRule</fo:inline>
+					<fo:inline font-style="italic">JUnit</fo:inline>
+					rule
+					class, which requires a configuration parameter with information like
+					host, port or database name.
+				</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">To make developer's life easier and code more readable, a
+					fluent
+					interface can be used to create these configuration objects. Two
+					different kind of configuration builders exist.
+				</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					The first one is for configuring a connection to in-memory
+					<fo:inline font-style="italic">jmockmongo</fo:inline>
+					server. Default connection values
+					are:
+				</fo:block><fo:block xmlns:rx="http://www.renderx.com/XSL/Extensions" space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="auto" id="d0e687"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Table 4. Default In-Memory Configuration Values</fo:block><fo:table border-before-width.conditionality="retain" border-collapse="collapse" width="auto" border-start-style="solid" border-end-style="solid" border-top-style="solid" border-bottom-style="solid" border-start-width="0.5pt" border-end-width="0.5pt" border-top-width="0.5pt" border-bottom-width="0.5pt" border-start-color="black" border-end-color="black" border-top-color="black" border-bottom-color="black"><fo:table-body start-indent="0pt" end-indent="0pt"><fo:table-row>
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Host</fo:block></fo:table-cell>
+
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>0.0.0.0</fo:block></fo:table-cell>
+					</fo:table-row><fo:table-row>
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Port</fo:block></fo:table-cell>
+
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>2307</fo:block></fo:table-cell>
+					</fo:table-row></fo:table-body></fo:table></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					Notice that these values are the default ones of
+					<fo:inline font-style="italic">jmockmongo</fo:inline>
+					project, so if you are thinking to use
+					<fo:inline font-style="italic">jmockmongo</fo:inline>
+					, no modifications are required.
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="program.in_memory_connection_parameters"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 8. MongoDbRule with in-memory configuration</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e717"><fo:inline font-weight="bold">import</fo:inline> <fo:inline font-weight="bold">static</fo:inline> com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBuilder.inMemoryMongoDb;
+
+<fo:inline color="gray">@Rule</fo:inline>
+<fo:inline font-weight="bold">public</fo:inline> MongoDbRule remoteMongoDbRule = <fo:inline font-weight="bold">new</fo:inline> MongoDbRule(inMemoryMongoDb().databaseName(<fo:inline font-weight="bold" font-style="italic">"test"</fo:inline>).build());</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					The second one is for configuring a connection to remote
+					<fo:inline font-style="italic">MongoDb</fo:inline>
+					server. Default values are:
+				</fo:block><fo:block xmlns:rx="http://www.renderx.com/XSL/Extensions" space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="auto" id="d0e724"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Table 5. Default Managed Configuration Values</fo:block><fo:table border-before-width.conditionality="retain" border-collapse="collapse" width="auto" border-start-style="solid" border-end-style="solid" border-top-style="solid" border-bottom-style="solid" border-start-width="0.5pt" border-end-width="0.5pt" border-top-width="0.5pt" border-bottom-width="0.5pt" border-start-color="black" border-end-color="black" border-top-color="black" border-bottom-color="black"><fo:table-body start-indent="0pt" end-indent="0pt"><fo:table-row>
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Host</fo:block></fo:table-cell>
+
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>localhost</fo:block></fo:table-cell>
+					</fo:table-row><fo:table-row>
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Port</fo:block></fo:table-cell>
+
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>27017</fo:block></fo:table-cell>
+					</fo:table-row><fo:table-row>
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>Authentication</fo:block></fo:table-cell>
+
+						<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border="0.5pt solid black"><fo:block>No authentication parameters.</fo:block></fo:table-cell>
+					</fo:table-row></fo:table-body></fo:table></fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="program.managed_connection_parameters"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 9. MongoDbRule with managed configuration</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e754"><fo:inline font-weight="bold">import</fo:inline> <fo:inline font-weight="bold">static</fo:inline> com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+
+<fo:inline color="gray">@Rule</fo:inline>
+<fo:inline font-weight="bold">public</fo:inline> MongoDbRule remoteMongoDbRule = <fo:inline font-weight="bold">new</fo:inline> MongoDbRule(mongoDb().databaseName(<fo:inline font-weight="bold" font-style="italic">"test"</fo:inline>).build());</fo:block></fo:block></fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="program.remote_connection_parameters"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 10. MongoDbRule with remote configuration</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e759"><fo:inline font-weight="bold">import</fo:inline> <fo:inline font-weight="bold">static</fo:inline> com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+
+<fo:inline color="gray">@Rule</fo:inline>
+<fo:inline font-weight="bold">public</fo:inline> MongoDbRule remoteMongoDbRule = <fo:inline font-weight="bold">new</fo:inline> MongoDbRule(mongoDb().databaseName(<fo:inline font-weight="bold" font-style="italic">"test"</fo:inline>).host(<fo:inline font-weight="bold" font-style="italic">"my_remote_host"</fo:inline>).build());</fo:block></fo:block></fo:block></fo:block><fo:block id="d0e761"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:block font-size="14.399999999999999pt">Complete Example</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					Consider a library application, which apart from multiple
+					operations, it allow us to add new books to system. Our
+					<fo:basic-link internal-destination="example.book_model"><fo:inline>model</fo:inline></fo:basic-link>
+					is as simple as:
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="example.book_model"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 11. Book POJO</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e772"><fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">class</fo:inline> Book {
+
+	<fo:inline font-weight="bold">private</fo:inline> String title;
+
+	<fo:inline font-weight="bold">private</fo:inline> <fo:inline font-weight="bold">int</fo:inline> numberOfPages;
+
+	<fo:inline font-weight="bold">public</fo:inline> Book(String title, <fo:inline font-weight="bold">int</fo:inline> numberOfPages) {
+		<fo:inline font-weight="bold">super</fo:inline>();
+		<fo:inline font-weight="bold">this</fo:inline>.title = title;
+		<fo:inline font-weight="bold">this</fo:inline>.numberOfPages = numberOfPages;
+	}
+
+	<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">void</fo:inline> setTitle(String title) {
+		<fo:inline font-weight="bold">this</fo:inline>.title = title;
+	}
+
+	<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">void</fo:inline> setNumberOfPages(<fo:inline font-weight="bold">int</fo:inline> numberOfPages) {
+		<fo:inline font-weight="bold">this</fo:inline>.numberOfPages = numberOfPages;
+	}
+
+
+	<fo:inline font-weight="bold">public</fo:inline> String getTitle() {
+		<fo:inline font-weight="bold">return</fo:inline> title;
+	}
+
+	<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">int</fo:inline> getNumberOfPages() {
+		<fo:inline font-weight="bold">return</fo:inline> numberOfPages;
+	}
+}</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					Next business
+					<fo:basic-link internal-destination="example.book_manager"><fo:inline>class</fo:inline></fo:basic-link>
+					is the responsible of managing access to
+					<fo:inline font-style="italic">MongoDb</fo:inline>
+					server:
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="example.book_manager"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 12. Book POJO</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e785"><fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">class</fo:inline> BookManager {
+
+	<fo:inline font-weight="bold">private</fo:inline> <fo:inline font-weight="bold">static</fo:inline> <fo:inline font-weight="bold">final</fo:inline> Logger LOGGER = LoggerFactory.getLogger(BookManager.<fo:inline font-weight="bold">class</fo:inline>);
+
+	<fo:inline font-weight="bold">private</fo:inline> <fo:inline font-weight="bold">static</fo:inline> <fo:inline font-weight="bold">final</fo:inline> MongoDbBookConverter MONGO_DB_BOOK_CONVERTER = <fo:inline font-weight="bold">new</fo:inline>	MongoDbBookConverter();
+	<fo:inline font-weight="bold">private</fo:inline> <fo:inline font-weight="bold">static</fo:inline> <fo:inline font-weight="bold">final</fo:inline> DbObjectBookConverter DB_OBJECT_BOOK_CONVERTER = <fo:inline font-weight="bold">new</fo:inline> DbObjectBookConverter();
+
+			
+	<fo:inline font-weight="bold">private</fo:inline> DBCollection booksCollection;
+
+	<fo:inline font-weight="bold">public</fo:inline> BookManager(DBCollection booksCollection) {
+		<fo:inline font-weight="bold">this</fo:inline>.booksCollection = booksCollection;
+	}
+
+	<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">void</fo:inline> create(Book book) {
+		DBObject dbObject = MONGO_DB_BOOK_CONVERTER.convert(book);
+		booksCollection.insert(dbObject);
+	}
+}</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					And now it is time for testing. In next
+					<fo:basic-link internal-destination="example.test_insert_book"><fo:inline>test</fo:inline></fo:basic-link>
+					we are going to
+					validate that a book is inserted correctly into database.
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="example.test_insert_book"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 13. Test with Managed Connection</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e795"><fo:inline font-weight="bold">package</fo:inline> com.lordofthejars.nosqlunit.demo.mongodb;
+
+<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">class</fo:inline> WhenANewBookIsCreated {
+
+	<fo:inline color="gray">@ClassRule</fo:inline>
+	<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">static</fo:inline> ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath(<fo:inline font-weight="bold" font-style="italic">"/opt/mongo"</fo:inline>).build();
+
+	<fo:inline color="gray">@Rule</fo:inline>
+	<fo:inline font-weight="bold">public</fo:inline> MongoDbRule remoteMongoDbRule = <fo:inline font-weight="bold">new</fo:inline> MongoDbRule(mongoDb().databaseName(<fo:inline font-weight="bold" font-style="italic">"test"</fo:inline>).build());
+
+	<fo:inline color="gray">@Test</fo:inline>
+	<fo:inline color="gray">@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)</fo:inline>
+	<fo:inline color="gray">@ShouldMatchDataSet(location="expectedData.json")</fo:inline>
+	<fo:inline font-weight="bold">public</fo:inline> <fo:inline font-weight="bold">void</fo:inline> book_should_be_inserted_into_repository() {
+
+		BookManager bookManager = <fo:inline font-weight="bold">new</fo:inline> BookManager(MongoDbUtil.getCollection(Book.<fo:inline font-weight="bold">class</fo:inline>.getSimpleName()));
+
+		Book book = <fo:inline font-weight="bold">new</fo:inline> Book(<fo:inline font-weight="bold" font-style="italic">"The Lord Of The Rings"</fo:inline>, 1299);
+		bookManager.create(book);
+	}
+
+}</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					In
+					<fo:basic-link internal-destination="example.test_insert_book"><fo:inline>previous</fo:inline></fo:basic-link>
+					test
+					we have defined that
+					<fo:inline font-style="italic">MongoDb</fo:inline>
+					will be managed by
+					test by starting an instance of server located at
+					<fo:inline font-family="monospace">/opt/mongo</fo:inline>
+					. Moreover we are setting an
+					<fo:basic-link internal-destination="example.dataset_book"><fo:inline>initial</fo:inline></fo:basic-link>
+					dataset in file
+					<fo:inline font-family="monospace">initialData.json</fo:inline>
+					located at classpath
+					<fo:inline font-family="monospace">com/lordofthejars/nosqlunit/demo/mongodb/initialData.json
+					</fo:inline>
+					and
+					<fo:basic-link internal-destination="example.expected_dataset_book"><fo:inline>expected</fo:inline></fo:basic-link>
+					dataset called
+					<fo:inline font-family="monospace">expectedData.json</fo:inline>
+					.
+				</fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="example.dataset_book"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 14. Initial Dataset</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e826">{
+	"Book":
+	[
+		{"title":"The Hobbit","numberOfPages":293}
+	]
+}</fo:block></fo:block></fo:block><fo:block><fo:block space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="always" id="example.expected_dataset_book"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Example 15. Expected Dataset</fo:block><fo:block space-before.minimum="0.8em" space-before.optimum="1em" space-before.maximum="1.2em" space-after.minimum="0.8em" space-after.optimum="1em" space-after.maximum="1.2em" hyphenate="false" wrap-option="no-wrap" white-space-collapse="false" white-space-treatment="preserve" linefeed-treatment="preserve" text-align="start" font-family="monospace" id="d0e831">{
+	"Book":
+	[
+		{"title":"The Hobbit","numberOfPages":293},
+		{"title":"The Lord Of The Rings","numberOfPages":1299}
+	]
+}</fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+					You can watch full example at
+					<fo:basic-link external-destination="url(https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo)"><fo:inline>github</fo:inline></fo:basic-link><fo:inline hyphenate="false"> [<fo:basic-link external-destination="url(https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo)">https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo</fo:basic-link>]</fo:inline>
+					.
+				</fo:block></fo:block></fo:block></fo:block><fo:block id="d0e838"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Future releases</fo:marker><fo:block font-size="20.735999999999997pt" border-top="0.5pt solid black" border-bottom="0.5pt solid black" padding-top="6pt" padding-bottom="3pt">Future releases</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			In next project release 0.2.3, a new features and one improvement
+			will be implemented. As features
+			<fo:inline font-style="italic"> @Inject</fo:inline>
+			will be able
+			to be used to have access to underlying connection into tests. And
+			finally
+			project will be refactored to use
+			<fo:inline font-style="italic">Guice</fo:inline>
+			as DI
+			framework.
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Version 0.4.0 there will be support for
+			<fo:inline font-style="italic">Neo4J and
+				Cassandra.
+			</fo:inline>
+		</fo:block><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em">
+			Next versions will contain support for
+			<fo:inline font-style="italic">HBase</fo:inline>
+			and
+			<fo:inline font-style="italic">CouchDb</fo:inline>
+			.
+		</fo:block></fo:block><fo:block id="d0e862"><fo:block><fo:block><fo:block keep-together.within-column="always" margin-left="0pt" font-family="sans-serif,Symbol,ZapfDingbats"><fo:block keep-with-next.within-column="always"><fo:block font-family="sans-serif" font-weight="bold" keep-with-next.within-column="always" space-before.minimum="0.8em" space-before.optimum="1.0em" space-before.maximum="1.2em" text-align="start" start-indent="0pt"><fo:marker marker-class-name="section.head.marker">Stay in Touch</fo:marker><fo:block font-size="20.735999999999997pt" border-top="0.5pt solid black" border-bottom="0.5pt solid black" padding-top="6pt" padding-bottom="3pt">Stay in Touch</fo:block></fo:block></fo:block></fo:block></fo:block></fo:block><fo:block xmlns:rx="http://www.renderx.com/XSL/Extensions" space-before.minimum="0.5em" space-before.optimum="1em" space-before.maximum="2em" space-after.minimum="0.5em" space-after.optimum="1em" space-after.maximum="2em" keep-together.within-column="auto" id="d0e865"><fo:block space-before.optimum="1em" space-before.minimum="0.8em" space-before.maximum="1.2em" font-weight="bold" font-size="12pt" hyphenate="false" space-after.minimum="0.4em" space-after.optimum="0.6em" space-after.maximum="0.8em" keep-with-next.within-column="always">Table 6. </fo:block><fo:table border-before-width.conditionality="retain" border-collapse="collapse" width="auto" border-start-style="solid" border-end-style="solid" border-top-style="solid" border-bottom-style="solid" border-start-width="0.5pt" border-end-width="0.5pt" border-top-width="0.5pt" border-bottom-width="0.5pt" border-start-color="black" border-end-color="black" border-top-color="black" border-bottom-color="black"><fo:table-body start-indent="0pt" end-indent="0pt"><fo:table-row>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block>Email: </fo:block></fo:table-cell>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block>asotobu at gmail.com</fo:block></fo:table-cell>
+			</fo:table-row><fo:table-row>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block>Blog: </fo:block></fo:table-cell>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block><fo:basic-link external-destination="url(www.lordofthejars.com)"><fo:inline>Lord Of The Jars</fo:inline></fo:basic-link><fo:inline hyphenate="false"> [<fo:basic-link external-destination="url(www.lordofthejars.com)">www.lordofthejars.com</fo:basic-link>]</fo:inline></fo:block></fo:table-cell>
+			</fo:table-row><fo:table-row>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block>Twitter: </fo:block></fo:table-cell>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block>@alexsotob</fo:block></fo:table-cell>
+			</fo:table-row><fo:table-row>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block>Github: </fo:block></fo:table-cell>
+				<fo:table-cell padding-start="2pt" padding-end="2pt" padding-top="2pt" padding-bottom="2pt" border-start-style="none" border-end-style="none" border-top-style="none" border-bottom-style="none"><fo:block><fo:basic-link external-destination="url(https://github.com/lordofthejars/nosql-unit/)"><fo:inline>NoSQLUnit Github</fo:inline></fo:basic-link><fo:inline hyphenate="false"> [<fo:basic-link external-destination="url(https://github.com/lordofthejars/nosql-unit/)">https://github.com/lordofthejars/nosql-unit/</fo:basic-link>]</fo:inline></fo:block></fo:table-cell>
+			</fo:table-row></fo:table-body></fo:table></fo:block></fo:block></fo:flow></fo:page-sequence></fo:root>
