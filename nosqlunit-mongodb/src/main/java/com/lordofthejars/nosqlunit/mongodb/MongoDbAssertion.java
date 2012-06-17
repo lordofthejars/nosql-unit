@@ -9,9 +9,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-/*
- * TODO Guice
- */
+
 public class MongoDbAssertion {
 
 	private static final String SYSTEM_COLLECTIONS_PATTERN = "system."; 

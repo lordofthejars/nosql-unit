@@ -19,6 +19,7 @@ import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import com.lordofthejars.nosqlunit.core.InjectAnnotationProcessor;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.LoadStrategyFactory;
 import com.lordofthejars.nosqlunit.core.LoadStrategyOperation;
@@ -40,6 +41,9 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 	
 	@Mock
 	public LoadStrategyOperation loadStrategyOperation;
+	
+	@Mock
+	public InjectAnnotationProcessor injectAnnotationProcessor;
 	
 	@Before
 	public void setUp() {
@@ -64,6 +68,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -89,6 +94,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -113,6 +119,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -137,6 +144,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -161,6 +169,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		
@@ -184,6 +193,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 		
 		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 		

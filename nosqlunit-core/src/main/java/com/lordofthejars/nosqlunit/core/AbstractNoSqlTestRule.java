@@ -13,13 +13,20 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 
 public abstract class AbstractNoSqlTestRule implements TestRule {
 
+	
 	private static final String EXPECTED_RESERVED_WORD = "-expected";
+
+	/**
+	 * With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.
+	 */
+	private Object target;
 
 	private DefaultDataSetLocationResolver defaultDataSetLocationResolver;
 
-	/* TODO Guice */
 	private LoadStrategyFactory loadStrategyFactory = new ReflectionLoadStrategyFactory();
 
+	private InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor();
+	
 	public AbstractNoSqlTestRule() {
 	}
 
@@ -43,6 +50,8 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 					loadDataSet(usingDataSet, description);
 				}
 
+				injectAnnotationProcessor.processInjectAnnotation(description.getTestClass(), target, getDatabaseOperation().connectionManager());
+				
 				base.evaluate();
 
 				ShouldMatchDataSet shouldMatchDataSet = getShouldMatchDataSetAnnotation();
@@ -182,4 +191,14 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 		this.loadStrategyFactory = loadStrategyFactory;
 	}
 
+	public void setInjectAnnotationProcessor(
+			InjectAnnotationProcessor injectAnnotationProcessor) {
+		this.injectAnnotationProcessor = injectAnnotationProcessor;
+	}
+	
+	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/
+	protected void setTarget(Object target) {
+		this.target = target;
+	}
+	
 }

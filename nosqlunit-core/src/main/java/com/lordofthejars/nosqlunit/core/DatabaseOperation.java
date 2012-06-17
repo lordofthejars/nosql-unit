@@ -7,4 +7,6 @@ public interface DatabaseOperation {
 	void deleteAll();
 	boolean databaseIs(String expectedData);
 	void insertNotPresent(String dataScript);
+	
+	Object connectionManager();
 }

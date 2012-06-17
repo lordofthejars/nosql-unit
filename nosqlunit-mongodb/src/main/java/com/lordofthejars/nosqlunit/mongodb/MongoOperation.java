@@ -175,4 +175,9 @@ public final class MongoOperation implements DatabaseOperation {
 		return db;
 	}
 
+	@Override
+	public Object connectionManager() {
+		return mongo;
+	}
+
 }

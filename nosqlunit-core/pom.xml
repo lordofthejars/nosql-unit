@@ -8,6 +8,13 @@
 	</parent>
 	<artifactId>nosqlunit-core</artifactId>
 
+	<dependencies>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+		</dependency>
+	</dependencies>
+
 
 	<build>
 		<plugins>
