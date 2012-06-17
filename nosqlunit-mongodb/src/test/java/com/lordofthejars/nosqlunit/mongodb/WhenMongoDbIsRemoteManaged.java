@@ -91,7 +91,7 @@ public class WhenMongoDbIsRemoteManaged {
 	public void mongodb_should_start_mongodb_instance_in_Windows() throws Throwable {
 
 		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
-		when(mongoDbChecker.assertThatConnectionIsPossible(anyInt())).thenReturn(true);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt(), anyInt())).thenReturn(true);
 		
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.WINDOWS_7);
@@ -142,7 +142,7 @@ public class WhenMongoDbIsRemoteManaged {
 	public void mongodb_should_start_mongodb_instance_in_Linux() throws Throwable {
 
 		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
-		when(mongoDbChecker.assertThatConnectionIsPossible(anyInt())).thenReturn(true);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt(), anyInt())).thenReturn(true);
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.LINUX_OS);
 		
@@ -193,7 +193,7 @@ public class WhenMongoDbIsRemoteManaged {
 	public void mongodb_should_start_mongodb_instance_in_Mac() throws Throwable {
 		
 		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
-		when(mongoDbChecker.assertThatConnectionIsPossible(anyInt())).thenReturn(true);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt(), anyInt())).thenReturn(true);
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.MAC_OSX);
 		

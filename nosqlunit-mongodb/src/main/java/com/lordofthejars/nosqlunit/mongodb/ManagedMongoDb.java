@@ -31,6 +31,7 @@ public class ManagedMongoDb extends ExternalResource {
 	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
 	protected static final String FORK_ARGUMENT_NAME = "--fork";
 	protected static final String DBPATH_ARGUMENT_NAME = "--dbpath";
+	protected static final String PORT_ARGUMENT_NAME= "--port";
 	protected static final String DEFAULT_MONGO_LOGPATH = "logpath";
 	protected static final String DEFAULT_MONGO_DBPATH = "mongo-dbpath";
 	protected static final String DEFAULT_MONGO_TARGET_PATH = "target"
@@ -42,7 +43,8 @@ public class ManagedMongoDb extends ExternalResource {
 	protected static final String MONGODB_EXECUTABLE_W = "mongod.exe";
 
 	private String mongodPath = System.getProperty("MONGO_HOME");
-
+	private int port = DBPort.PORT;
+	
 	private String targetPath = DEFAULT_MONGO_TARGET_PATH;
 	private String dbRelativePath = DEFAULT_MONGO_DBPATH;
 	private String logRelativePath = DEFAULT_MONGO_LOGPATH;
@@ -78,6 +80,11 @@ public class ManagedMongoDb extends ExternalResource {
 			return this;
 		}
 
+		public MongoServerRuleBuilder port(int port) {
+			this.managedMongoDb.setPort(port);
+			return this;
+		}
+
 		public MongoServerRuleBuilder targetPath(String targetPath) {
 			this.managedMongoDb.setTargetPath(targetPath);
 			return this;
@@ -93,6 +100,7 @@ public class ManagedMongoDb extends ExternalResource {
 			return this;
 		}
 
+
 		public MongoServerRuleBuilder appendCommandLineArguments(
 				String argumentName, String argumentValue) {
 			this.managedMongoDb.addExtraCommandLineArgument(argumentName,
@@ -106,6 +114,7 @@ public class ManagedMongoDb extends ExternalResource {
 			return this;
 		}
 
+		
 		public ManagedMongoDb build() {
 			if (this.managedMongoDb.getMongodPath() == null) {
 				throw new IllegalArgumentException(
@@ -130,7 +139,7 @@ public class ManagedMongoDb extends ExternalResource {
 					throw new IllegalStateException(
 							"Couldn't establish a connection with "
 									+ this.mongodPath
-									+ " server at /127.0.0.1:27017.");
+									+ " server at /127.0.0.1:"+port);
 				}
 
 			} else {
@@ -139,21 +148,21 @@ public class ManagedMongoDb extends ExternalResource {
 			}
 		}
 		ConnectionManagement.getInstance()
-				.addConnection(LOCALHOST, DBPort.PORT);
+				.addConnection(LOCALHOST, port);
 	}
 
 	private boolean isServerNotStartedYet() {
 		return !ConnectionManagement.getInstance().isConnectionRegistered(
-				LOCALHOST, DBPort.PORT);
+				LOCALHOST, port);
 	}
 
 	@Override
 	protected void after() {
 		int remainingConnections = ConnectionManagement.getInstance()
-				.removeConnection(LOCALHOST, DBPort.PORT);
+				.removeConnection(LOCALHOST, port);
 		if (noMoreConnectionsToManage(remainingConnections)) {
 			try {
-				this.mongoDbLowLevelOps.shutdown();
+				this.mongoDbLowLevelOps.shutdown(LOCALHOST, port);
 			} finally {
 				ensureDbPathDoesNotExitsAndReturnCompositePath();
 			}
@@ -177,6 +186,8 @@ public class ManagedMongoDb extends ExternalResource {
 								+ mongodPath
 								+ DBPATH_ARGUMENT_NAME
 								+ dbRelativePath
+								+ PORT_ARGUMENT_NAME
+								+ port
 								+ FORK_ARGUMENT_NAME
 								+ LOGPATH_ARGUMENT_NAME
 								+ logRelativePath
@@ -190,6 +201,8 @@ public class ManagedMongoDb extends ExternalResource {
 							+ mongodPath
 							+ DBPATH_ARGUMENT_NAME
 							+ dbRelativePath
+							+ PORT_ARGUMENT_NAME
+							+ port
 							+ FORK_ARGUMENT_NAME
 							+ LOGPATH_ARGUMENT_NAME
 							+ logRelativePath
@@ -214,6 +227,8 @@ public class ManagedMongoDb extends ExternalResource {
 		programAndArguments.add(getExecutablePath());
 		programAndArguments.add(DBPATH_ARGUMENT_NAME);
 		programAndArguments.add(dbRelativePath);
+		programAndArguments.add(PORT_ARGUMENT_NAME);
+		programAndArguments.add(Integer.toString(port));
 		programAndArguments.add(FORK_ARGUMENT_NAME);
 		programAndArguments.add(LOGPATH_ARGUMENT_NAME);
 		programAndArguments.add(logRelativePath);
@@ -252,7 +267,7 @@ public class ManagedMongoDb extends ExternalResource {
 
 	private boolean assertThatConnectionToMongoDbIsPossible(int retries)
 			throws InterruptedException, UnknownHostException {
-		return this.mongoDbLowLevelOps.assertThatConnectionIsPossible(retries);
+		return this.mongoDbLowLevelOps.assertThatConnectionIsPossible(LOCALHOST, port, retries);
 	}
 
 	private File ensureDbPathDoesNotExitsAndReturnCompositePath() {
@@ -288,6 +303,10 @@ public class ManagedMongoDb extends ExternalResource {
 		this.singleCommandArguments.add(argument);
 	}
 
+	private void setPort(int port) {
+		this.port = port;
+	}
+	
 	private String getMongodPath() {
 		return mongodPath;
 	}

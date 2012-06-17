@@ -9,9 +9,9 @@ import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
-public class MongoDbLowLevelOps {
+public final class MongoDbLowLevelOps {
 
-	public boolean assertThatConnectionIsPossible(int retries) throws InterruptedException, UnknownHostException, MongoException {
+	public boolean assertThatConnectionIsPossible(String host, int port, int retries) throws InterruptedException, UnknownHostException, MongoException {
 	
 		int currentRetry = 0;
 		boolean connectionIsPossible = false;
@@ -20,7 +20,7 @@ public class MongoDbLowLevelOps {
 		try {
 			do { 
 				TimeUnit.SECONDS.sleep(3);
-				server = new Mongo();
+				server = new Mongo(host, port);
 				DB db = server.getDB("admin");
 				try {
 					db.getStats();
@@ -36,10 +36,10 @@ public class MongoDbLowLevelOps {
 		return connectionIsPossible;
 	}
 	
-	public void shutdown() {
+	public void shutdown(String host, int port) {
 		Mongo mongo = null;
 		try {
-			mongo = new Mongo();
+			mongo = new Mongo(host, port);
 			DB db = mongo.getDB("admin");
 			CommandResult shutdownResult = db.command(new BasicDBObject(
 					"shutdown", 1));
