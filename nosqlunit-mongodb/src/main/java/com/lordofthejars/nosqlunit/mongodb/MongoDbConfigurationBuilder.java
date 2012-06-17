@@ -42,4 +42,9 @@ public class MongoDbConfigurationBuilder {
 		return this;
 	}
 	
+	public MongoDbConfigurationBuilder connectionIdentifier(String identifier) {
+		mongoDbConfiguration.setConnectionIdentifier(identifier);
+		return this;
+	}
+	
 }

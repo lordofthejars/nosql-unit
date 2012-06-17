@@ -15,7 +15,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	private DatabaseOperation databaseOperation;
 	
 	public MongoDbRule(MongoDbConfiguration mongoDbConfiguration) {
-		super();
+		super(mongoDbConfiguration.getConnectionIdentifier());
 		try {
 			databaseOperation = new MongoOperation(new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort()), mongoDbConfiguration);
 		} catch (UnknownHostException e) {
@@ -27,7 +27,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	
 	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/
 	public MongoDbRule(MongoDbConfiguration mongoDbConfiguration, Object target) {
-		super();
+		super(mongoDbConfiguration.getConnectionIdentifier());
 		try {
 			setTarget(target);
 			databaseOperation = new MongoOperation(new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort()), mongoDbConfiguration);

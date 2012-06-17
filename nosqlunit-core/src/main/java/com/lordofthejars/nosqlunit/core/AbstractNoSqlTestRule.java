@@ -8,6 +8,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 
@@ -21,13 +22,17 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 	 */
 	private Object target;
 
+	private String identifier;
+	
 	private DefaultDataSetLocationResolver defaultDataSetLocationResolver;
 
 	private LoadStrategyFactory loadStrategyFactory = new ReflectionLoadStrategyFactory();
 
-	private InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor();
+	private InjectAnnotationProcessor injectAnnotationProcessor;
 	
-	public AbstractNoSqlTestRule() {
+	public AbstractNoSqlTestRule(String identifier) {
+		this.identifier = identifier;
+		this.injectAnnotationProcessor = new InjectAnnotationProcessor(this.identifier);
 	}
 
 	public abstract DatabaseOperation getDatabaseOperation();
@@ -137,6 +142,44 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 				List<String> scriptContent = new ArrayList<String>();
 
+				scriptContent.addAll(loadGlobalDataSets(usingDataSet, description, locations));
+				scriptContent.addAll(loadSelectiveDataSets(usingDataSet));
+				
+				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
+				LoadStrategyOperation loadStrategyOperation = loadStrategyFactory
+						.getLoadStrategyInstance(loadStrategyEnum,
+								getDatabaseOperation());
+				loadStrategyOperation.executeScripts(scriptContent
+						.toArray(new String[scriptContent.size()]));
+
+			}
+
+			private List<String> loadSelectiveDataSets(UsingDataSet usingDataSet) throws IOException {
+				
+				List<String> scriptContent = new ArrayList<String>();
+				
+				if(isSelectiveLocationsAttributeSpecified(usingDataSet)) {
+					Selective[] selectiveLocations = usingDataSet.withSelectiveLocations();
+					if(selectiveLocations != null && selectiveLocations.length > 0) {
+						for (Selective selective : selectiveLocations) {
+							if(identifier.equals(selective.identifier().trim()) && isLocationsAttributeSpecified(selective.locations())) {
+								scriptContent.addAll(IOUtils
+										.readAllStreamsFromClasspathBaseResource(
+												defaultDataSetLocationResolver
+														.getResourceBase(), selective.locations()));
+							}
+						}
+					}
+				}	
+				
+				return scriptContent;
+			}
+
+			private List<String> loadGlobalDataSets(UsingDataSet usingDataSet,
+					Description description, String[] locations) throws IOException {
+				
+				List<String> scriptContent = new ArrayList<String>();
+				
 				if (isLocationsAttributeSpecified(locations)) {
 
 					scriptContent.addAll(IOUtils
@@ -158,14 +201,21 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 					}
 
 				}
+				
+				return scriptContent;
+			}
 
-				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
-				LoadStrategyOperation loadStrategyOperation = loadStrategyFactory
-						.getLoadStrategyInstance(loadStrategyEnum,
-								getDatabaseOperation());
-				loadStrategyOperation.executeScripts(scriptContent
-						.toArray(new String[scriptContent.size()]));
-
+			private boolean isSelectiveLocationsAttributeSpecified(UsingDataSet usingDataSet) {
+				Selective[] selectiveLocations = usingDataSet.withSelectiveLocations();
+				if(selectiveLocations != null && selectiveLocations.length > 0) {
+					for (Selective selective : selectiveLocations) {
+						if(identifier.equals(selective.identifier().trim()) && isLocationsAttributeSpecified(selective.locations())) {
+							return true;
+						}
+					}
+				}
+				
+				return false;
 			}
 
 			private boolean isNotEmptyString(String location) {
@@ -194,6 +244,10 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 	public void setInjectAnnotationProcessor(
 			InjectAnnotationProcessor injectAnnotationProcessor) {
 		this.injectAnnotationProcessor = injectAnnotationProcessor;
+	}
+	
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 	
 	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/

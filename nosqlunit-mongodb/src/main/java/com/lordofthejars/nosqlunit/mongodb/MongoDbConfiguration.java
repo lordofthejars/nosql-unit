@@ -7,6 +7,8 @@ public final class MongoDbConfiguration implements Configuration {
 	
 	private static final String DEFAULT_HOST = "localhost";
 
+	private String connectionIdentifier = "";
+	
 	private String databaseName;
 	
 	private String username;
@@ -34,6 +36,10 @@ public final class MongoDbConfiguration implements Configuration {
 	}
 	
 
+	public String getConnectionIdentifier() {
+		return connectionIdentifier;
+	}
+	
 	public boolean isAuthenticateParametersSet() {
 		return this.username != null && this.password !=null; 
 	}
@@ -76,5 +82,9 @@ public final class MongoDbConfiguration implements Configuration {
 	
 	public void setHost(String host) {
 		this.host = host;
+	}
+	
+	public void setConnectionIdentifier(String connectionIdentifier) {
+		this.connectionIdentifier = connectionIdentifier;
 	}
 }

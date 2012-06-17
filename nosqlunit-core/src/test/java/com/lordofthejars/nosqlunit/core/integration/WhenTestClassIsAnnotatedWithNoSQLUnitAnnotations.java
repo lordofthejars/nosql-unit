@@ -15,6 +15,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import ch.qos.logback.core.db.dialect.MySQLDialect;
+
+import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
@@ -50,6 +53,103 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		MockitoAnnotations.initMocks(this);
 	}
 	
+	
+	@Test
+	public void selective_annotations_should_load_not_load_data_of_not_identified_rules_but_global() throws Throwable {
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.REFRESH, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(MyGlobalAndSelectiveClass.class, "my_unknown_test");
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		abstractNoSqlTestRule.setIdentifier("two");
+		
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		verify(loadStrategyOperation, times(1)).executeScripts(new String[]{"Class Annotation"});
+	}
+	
+	
+	@Test
+	public void selective_annotations_should_load_only_load_data_of_identified_rules_and_global_data() throws Throwable {
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.REFRESH, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(MyGlobalAndSelectiveClass.class, "my_unknown_test");
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		abstractNoSqlTestRule.setIdentifier("one");
+		
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		verify(loadStrategyOperation, times(1)).executeScripts(new String[]{"Class Annotation","Selective Annotation"});
+	}
+	
+	@Test
+	public void selective_annotations_should_load_not_load_data_of_not_identified_rules() throws Throwable {
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.REFRESH, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(MySelectiveClass.class, "my_unknown_test");
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		abstractNoSqlTestRule.setIdentifier("two");
+		
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		verify(loadStrategyOperation, times(0)).executeScripts(new String[]{"Selective Annotation"});
+	}
+	
+	@Test
+	public void selective_annotations_should_load_only_load_data_of_identified_rules() throws Throwable {
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.REFRESH, databaseOperation)).thenReturn(loadStrategyOperation);
+		
+		
+		Description description = Description.createTestDescription(MySelectiveClass.class, "my_unknown_test");
+		
+		
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		abstractNoSqlTestRule.setIdentifier("one");
+		
+		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+		
+		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		verify(loadStrategyOperation, times(1)).executeScripts(new String[]{"Selective Annotation"});
+	}
 	
 	@Test
 	public void annotated_class_without_locations_should_use_class_name_approach() throws Throwable {
@@ -201,6 +301,16 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		verify(databaseOperation, times(1)).databaseIs("Class Annotation");
 		
 	}
+	
+}
+
+@UsingDataSet(locations="test2", withSelectiveLocations={@Selective(identifier="one", locations="test3")}, loadStrategy=LoadStrategyEnum.REFRESH)
+class MyGlobalAndSelectiveClass {
+	
+}
+
+@UsingDataSet(withSelectiveLocations={@Selective(identifier="one", locations="test3")}, loadStrategy=LoadStrategyEnum.REFRESH)
+class MySelectiveClass {
 	
 }
 

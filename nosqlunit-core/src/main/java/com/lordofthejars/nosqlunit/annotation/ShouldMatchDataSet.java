@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface ShouldMatchDataSet {
 
 	String location() default "";
-	
+	SelectiveMatcher[] withSelectiveMatcher() default {};
 }

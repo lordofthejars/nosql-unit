@@ -5,15 +5,53 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.junit.Test;
 
 public class WhenFieldIsInjected {
 
 	@Test
+	public void named_object_should_Not_be_injected_if_is_named_with_not_current_identifier() {
+		
+		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor("two");
+		TestWithNamedFieldInjection testInstance = new TestWithNamedFieldInjection();
+
+		injectAnnotationProcessor.processInjectAnnotation(TestWithNamedFieldInjection.class, testInstance, "Hello");
+		
+		assertThat(testInstance.getMyInjection(), is("Hello"));
+		assertThat(testInstance.getMySecondInjection(), nullValue());
+		
+	}
+	
+	@Test
+	public void named_object_should_be_injected_if_is_named_without_identifier() {
+		
+		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor("one");
+		TestWithNamedFieldInjection testInstance = new TestWithNamedFieldInjection();
+
+		injectAnnotationProcessor.processInjectAnnotation(TestWithNamedFieldInjection.class, testInstance, "Hello");
+		
+		assertThat(testInstance.getMyInjection(), is("Hello"));
+		
+	}
+	
+	@Test
+	public void named_object_should_be_injected_if_is_named_with_current_identifier() {
+		
+		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor("one");
+		TestWithNamedFieldInjection testInstance = new TestWithNamedFieldInjection();
+
+		injectAnnotationProcessor.processInjectAnnotation(TestWithNamedFieldInjection.class, testInstance, "Hello");
+		
+		assertThat(testInstance.getMySecondInjection(), is("Hello"));
+		
+	}
+	
+	@Test
 	public void object_should_be_injected_as_field_instance() {
 		
-		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor();
+		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor("1");
 		TestWithFieldInjection testInstance = new TestWithFieldInjection();
 
 		injectAnnotationProcessor.processInjectAnnotation(TestWithFieldInjection.class, testInstance, "Hello");
@@ -24,12 +62,32 @@ public class WhenFieldIsInjected {
 	
 	@Test
 	public void not_instanciable_objects_should_not_be_injected() {
-		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor();
+		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor("1");
 		TestWithFieldInjection testInstance = new TestWithFieldInjection();
 
 		injectAnnotationProcessor.processInjectAnnotation(TestWithFieldInjection.class, testInstance, new Integer(0));
 		
 		assertThat(testInstance.getMyInjection(), nullValue());
+	}
+	
+}
+
+class TestWithNamedFieldInjection {
+	
+	@Named
+	@Inject
+	private String myInjection;
+	
+	@Named("one")
+	@Inject
+	private String mySecondInjection;
+	
+	public String getMySecondInjection() {
+		return mySecondInjection;
+	}
+	
+	public String getMyInjection() {
+		return myInjection;
 	}
 	
 }

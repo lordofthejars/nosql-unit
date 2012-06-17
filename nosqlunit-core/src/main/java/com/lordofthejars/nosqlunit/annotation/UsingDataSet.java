@@ -13,5 +13,6 @@ public @interface UsingDataSet {
 
 	String[] locations() default {};
 	LoadStrategyEnum loadStrategy() default LoadStrategyEnum.CLEAN_INSERT;
+	Selective[] withSelectiveLocations() default {};
 	
 }
