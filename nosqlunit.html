@@ -2,7 +2,7 @@
       <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
    <title>NoSQLUnit</title><link rel="stylesheet" type="text/css" href="stylesheet.css"><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" title="NoSQLUnit"><div class="titlepage"><div><div><h1 class="title"><a name="d0e1"></a>
 			NoSQLUnit
-		</h1></div><div><h3 class="subtitle"><i>Version 0.3.1-SNAPSHOT</i></h3></div><div><div class="author"><h3 class="author"><span class="firstname">Alex</span> <span class="surname">Soto</span></h3><div class="affiliation"><span class="orgname">www.lordofthejars.com<br></span></div></div></div><div><p class="copyright">Copyright &copy; 2012 Alex Soto Bueno. Licensed under the Apache License, Version 2.0 (the "License");</p></div><div><p class="pubdate">2012</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e26">Overview</a></span></dt><dt><span class="section"><a href="#d0e102">Requirements</a></span></dt><dt><span class="section"><a href="#d0e127">NoSQLUnit</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e186">Seeding Database</a></span></dt><dt><span class="section"><a href="#d0e271">Verifying Database</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e311">MongoDb</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e378">Maven Setup</a></span></dt><dt><span class="section"><a href="#d0e450">Dataset Format</a></span></dt><dt><span class="section"><a href="#d0e473">Getting Started</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e838">Future releases</a></span></dt><dt><span class="section"><a href="#d0e862">Stay in Touch</a></span></dt></dl></div><div class="section" title="Overview"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e26"></a>Overview</h2></div></div></div><span class="inlinemediaobject"><img src="fig/nosqlunitlogo.png"></span><p>
+		</h1></div><div><h3 class="subtitle"><i>Version 0.3.0</i></h3></div><div><div class="author"><h3 class="author"><span class="firstname">Alex</span> <span class="surname">Soto</span></h3><div class="affiliation"><span class="orgname">www.lordofthejars.com<br></span></div></div></div><div><p class="copyright">Copyright &copy; 2012 Alex Soto Bueno. Licensed under the Apache License, Version 2.0 (the "License");</p></div><div><p class="pubdate">2012</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#d0e26">Overview</a></span></dt><dt><span class="section"><a href="#d0e102">Requirements</a></span></dt><dt><span class="section"><a href="#d0e127">NoSQLUnit</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e186">Seeding Database</a></span></dt><dt><span class="section"><a href="#d0e271">Verifying Database</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e311">MongoDb</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e378">Maven Setup</a></span></dt><dt><span class="section"><a href="#d0e450">Dataset Format</a></span></dt><dt><span class="section"><a href="#d0e473">Getting Started</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e838">Future releases</a></span></dt><dt><span class="section"><a href="#d0e859">Stay in Touch</a></span></dt></dl></div><div class="section" title="Overview"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e26"></a>Overview</h2></div></div></div><span class="inlinemediaobject"><img src="fig/nosqlunitlogo.png"></span><p>
 			Unit testing is a method by which the smallest testable part of an
 			application is validated. Unit tests must follow the
 			<acronym class="acronym">FIRST</acronym>
@@ -758,16 +758,11 @@ newManagedMongoDbRule().mongodPath(<strong class="hl-string"><em style="color:re
 					<a class="link" href="https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo" target="_top">github</a>
 					.
 				</p></div></div></div><div class="section" title="Future releases"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e838"></a>Future releases</h2></div></div></div><p>
-			In next project release 0.2.3, a new features and one improvement
+			In next project release 0.3.1, a new feature
 			will be implemented. As features
 			<span class="emphasis"><em> @Inject</em></span>
 			will be able
-			to be used to have access to underlying connection into tests. And
-			finally
-			project will be refactored to use
-			<span class="emphasis"><em>Guice</em></span>
-			as DI
-			framework.
+			to be used to have access to underlying connection into tests.
 		</p><p>
 			Version 0.4.0 there will be support for
 			<span class="emphasis"><em>Neo4J and
@@ -779,7 +774,7 @@ newManagedMongoDbRule().mongodPath(<strong class="hl-string"><em style="color:re
 			and
 			<span class="emphasis"><em>CouchDb</em></span>
 			.
-		</p></div><div class="section" title="Stay in Touch"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e862"></a>Stay in Touch</h2></div></div></div><table id="d0e865"><tr>
+		</p></div><div class="section" title="Stay in Touch"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e859"></a>Stay in Touch</h2></div></div></div><table id="d0e862"><tr>
 				<td>Email: </td>
 				<td>asotobu at gmail.com</td>
 			</tr><tr>
