@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Qualifier;
 
 public class InjectAnnotationProcessor {
 

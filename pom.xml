@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -47,10 +48,22 @@
 		<slf4j.version>1.6.4</slf4j.version>
 		<logback.version>0.9.24</logback.version>
 		<neo4j.version>1.7</neo4j.version>
+		<lambdaj.version>2.3.3</lambdaj.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.googlecode.lambdaj</groupId>
+				<artifactId>lambdaj</artifactId>
+				<version>${lambdaj.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>hamcrest-all</artifactId>
+						<groupId>org.hamcrest</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 			<dependency>
 				<groupId>org.mongodb</groupId>
 				<artifactId>mongo-java-driver</artifactId>
@@ -71,7 +84,7 @@
 				<artifactId>javax.inject</artifactId>
 				<version>1</version>
 			</dependency>
-            
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -93,14 +106,12 @@
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
 			<version>${hamcrest.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-library</artifactId>
 			<version>${hamcrest.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 
@@ -111,12 +122,12 @@
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
-					<artifactId>org.hamcrest</artifactId>
-					<groupId>hamcrest-library</groupId>
+					<artifactId>hamcrest-library</artifactId>
+					<groupId>org.hamcrest</groupId>
 				</exclusion>
 				<exclusion>
-					<artifactId>org.hamcrest</artifactId>
-					<groupId>hamcrest-all</groupId>
+					<artifactId>hamcrest-all</artifactId>
+					<groupId>org.hamcrest</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>

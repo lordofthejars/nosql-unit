@@ -1,5 +1,11 @@
 package com.lordofthejars.nosqlunit.core;
 
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.Lambda.selectFirst;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,30 +15,33 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import com.lordofthejars.nosqlunit.annotation.Selective;
+import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 
 public abstract class AbstractNoSqlTestRule implements TestRule {
 
-	
 	private static final String EXPECTED_RESERVED_WORD = "-expected";
 
 	/**
-	 * With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.
+	 * With JUnit 10 is impossible to get target from a Rule, it seems that
+	 * future versions will support it. For now constructor is apporach is the
+	 * only way.
 	 */
 	private Object target;
 
 	private String identifier;
-	
+
 	private DefaultDataSetLocationResolver defaultDataSetLocationResolver;
 
 	private LoadStrategyFactory loadStrategyFactory = new ReflectionLoadStrategyFactory();
 
 	private InjectAnnotationProcessor injectAnnotationProcessor;
-	
+
 	public AbstractNoSqlTestRule(String identifier) {
 		this.identifier = identifier;
-		this.injectAnnotationProcessor = new InjectAnnotationProcessor(this.identifier);
+		this.injectAnnotationProcessor = new InjectAnnotationProcessor(
+				this.identifier);
 	}
 
 	public abstract DatabaseOperation getDatabaseOperation();
@@ -55,8 +64,10 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 					loadDataSet(usingDataSet, description);
 				}
 
-				injectAnnotationProcessor.processInjectAnnotation(description.getTestClass(), target, getDatabaseOperation().connectionManager());
-				
+				injectAnnotationProcessor.processInjectAnnotation(
+						description.getTestClass(), target,
+						getDatabaseOperation().connectionManager());
+
 				base.evaluate();
 
 				ShouldMatchDataSet shouldMatchDataSet = getShouldMatchDataSetAnnotation();
@@ -105,34 +116,68 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				String scriptContent = "";
 
 				if (isNotEmptyString(location)) {
-					scriptContent = IOUtils
-							.readAllStreamFromClasspathBaseResource(
-									defaultDataSetLocationResolver
-											.getResourceBase(), location);
+					scriptContent = loadExpectedResultFromLocationAttribute(location);
 				} else {
-					location = defaultDataSetLocationResolver
-							.resolveDefaultDataSetLocation(shouldMatchDataSet,
-									description, EXPECTED_RESERVED_WORD + "."
-											+ getWorkingExtension());
 
-					if (location != null) {
-						scriptContent = IOUtils
-								.readAllStreamFromClasspathBaseResource(
-										defaultDataSetLocationResolver
-												.getResourceBase(), location);
+					SelectiveMatcher[] selectiveMatchers = shouldMatchDataSet
+							.withSelectiveMatcher();
+
+					SelectiveMatcher requiredSelectiveMatcher = findSelectiveMatcherByConnectionIdentifier(selectiveMatchers);
+					
+					if (isSelectiveMatchersDefined(requiredSelectiveMatcher)) {
+
+						scriptContent = loadExpectedResultFromLocationAttribute(requiredSelectiveMatcher.location());
+						
+					} else {
+						scriptContent = loadExpectedResultFromDefaultLocation(
+								description, shouldMatchDataSet, scriptContent);
 					}
-
 				}
 
 				if (isNotEmptyString(scriptContent)) {
 					getDatabaseOperation().databaseIs(scriptContent);
 				} else {
 					throw new IllegalArgumentException(
-							"File specified in location attribute "
-									+ location
+							"File specified in location or selective matcher attribute "
 									+ " of ShouldMatchDataSet is not present, or no files matching default location.");
 				}
 
+			}
+
+			private boolean isSelectiveMatchersDefined(
+					SelectiveMatcher requiredSelectiveMatcher) {
+				return requiredSelectiveMatcher != null;
+			}
+
+			private SelectiveMatcher findSelectiveMatcherByConnectionIdentifier(SelectiveMatcher[] selectiveMatchers) {
+				return selectFirst(selectiveMatchers, 
+						having(on(SelectiveMatcher.class).identifier(), equalTo(identifier)).and(
+						having(on(SelectiveMatcher.class).location(), notNullValue())));
+			}
+			
+			private String loadExpectedResultFromDefaultLocation(
+					final Description description,
+					ShouldMatchDataSet shouldMatchDataSet, String scriptContent)
+					throws IOException {
+				String defaultLocation = defaultDataSetLocationResolver
+						.resolveDefaultDataSetLocation(
+								shouldMatchDataSet, description,
+								EXPECTED_RESERVED_WORD + "."
+										+ getWorkingExtension());
+
+				if (defaultLocation != null) {
+					scriptContent = loadExpectedResultFromLocationAttribute(defaultLocation);
+				}
+				return scriptContent;
+			}
+
+			private String loadExpectedResultFromLocationAttribute(
+					String location) throws IOException {
+				String scriptContent;
+				scriptContent = IOUtils.readAllStreamFromClasspathBaseResource(
+						defaultDataSetLocationResolver.getResourceBase(),
+						location);
+				return scriptContent;
 			}
 
 			private void loadDataSet(UsingDataSet usingDataSet,
@@ -142,9 +187,10 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 				List<String> scriptContent = new ArrayList<String>();
 
-				scriptContent.addAll(loadGlobalDataSets(usingDataSet, description, locations));
+				scriptContent.addAll(loadGlobalDataSets(usingDataSet,
+						description, locations));
 				scriptContent.addAll(loadSelectiveDataSets(usingDataSet));
-				
+
 				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
 				LoadStrategyOperation loadStrategyOperation = loadStrategyFactory
 						.getLoadStrategyInstance(loadStrategyEnum,
@@ -154,32 +200,41 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 			}
 
-			private List<String> loadSelectiveDataSets(UsingDataSet usingDataSet) throws IOException {
-				
+			private List<String> loadSelectiveDataSets(UsingDataSet usingDataSet)
+					throws IOException {
+
 				List<String> scriptContent = new ArrayList<String>();
-				
-				if(isSelectiveLocationsAttributeSpecified(usingDataSet)) {
-					Selective[] selectiveLocations = usingDataSet.withSelectiveLocations();
-					if(selectiveLocations != null && selectiveLocations.length > 0) {
+
+				if (isSelectiveLocationsAttributeSpecified(usingDataSet)) {
+					Selective[] selectiveLocations = usingDataSet
+							.withSelectiveLocations();
+					if (selectiveLocations != null
+							&& selectiveLocations.length > 0) {
 						for (Selective selective : selectiveLocations) {
-							if(identifier.equals(selective.identifier().trim()) && isLocationsAttributeSpecified(selective.locations())) {
-								scriptContent.addAll(IOUtils
-										.readAllStreamsFromClasspathBaseResource(
-												defaultDataSetLocationResolver
-														.getResourceBase(), selective.locations()));
+							if (identifier
+									.equals(selective.identifier().trim())
+									&& isLocationsAttributeSpecified(selective
+											.locations())) {
+								scriptContent
+										.addAll(IOUtils
+												.readAllStreamsFromClasspathBaseResource(
+														defaultDataSetLocationResolver
+																.getResourceBase(),
+														selective.locations()));
 							}
 						}
 					}
-				}	
-				
+				}
+
 				return scriptContent;
 			}
 
 			private List<String> loadGlobalDataSets(UsingDataSet usingDataSet,
-					Description description, String[] locations) throws IOException {
-				
+					Description description, String[] locations)
+					throws IOException {
+
 				List<String> scriptContent = new ArrayList<String>();
-				
+
 				if (isLocationsAttributeSpecified(locations)) {
 
 					scriptContent.addAll(IOUtils
@@ -201,20 +256,24 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 					}
 
 				}
-				
+
 				return scriptContent;
 			}
 
-			private boolean isSelectiveLocationsAttributeSpecified(UsingDataSet usingDataSet) {
-				Selective[] selectiveLocations = usingDataSet.withSelectiveLocations();
-				if(selectiveLocations != null && selectiveLocations.length > 0) {
+			private boolean isSelectiveLocationsAttributeSpecified(
+					UsingDataSet usingDataSet) {
+				Selective[] selectiveLocations = usingDataSet
+						.withSelectiveLocations();
+				if (selectiveLocations != null && selectiveLocations.length > 0) {
 					for (Selective selective : selectiveLocations) {
-						if(identifier.equals(selective.identifier().trim()) && isLocationsAttributeSpecified(selective.locations())) {
+						if (identifier.equals(selective.identifier().trim())
+								&& isLocationsAttributeSpecified(selective
+										.locations())) {
 							return true;
 						}
 					}
 				}
-				
+
 				return false;
 			}
 
@@ -245,14 +304,18 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			InjectAnnotationProcessor injectAnnotationProcessor) {
 		this.injectAnnotationProcessor = injectAnnotationProcessor;
 	}
-	
+
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
 	}
-	
-	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/
+
+	/*
+	 * With JUnit 10 is impossible to get target from a Rule, it seems that
+	 * future versions will support it. For now constructor is apporach is the
+	 * only way.
+	 */
 	protected void setTarget(Object target) {
 		this.target = target;
 	}
-	
+
 }
