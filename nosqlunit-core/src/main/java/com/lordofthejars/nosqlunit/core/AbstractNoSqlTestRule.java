@@ -319,7 +319,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 	/*
 	 * With JUnit 4.10 is impossible to get target from a Rule, it seems that
-	 * future versions will support it. For now constructor is apporach is the
+	 * future versions will support it. For now constructor is approach is the
 	 * only way.
 	 */
 	protected void setTarget(Object target) {
