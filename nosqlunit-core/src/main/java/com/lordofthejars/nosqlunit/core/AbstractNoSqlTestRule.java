@@ -112,6 +112,22 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet)
 					throws IOException {
 
+				String scriptContent = loadExpectedContentScript(description,
+						shouldMatchDataSet);
+
+				if (isNotEmptyString(scriptContent)) {
+					getDatabaseOperation().databaseIs(scriptContent);
+				} else {
+					throw new IllegalArgumentException(
+							"File specified in location or selective matcher attribute "
+									+ " of ShouldMatchDataSet is not present, or no files matching default location.");
+				}
+
+			}
+
+			private String loadExpectedContentScript(
+					final Description description,
+					ShouldMatchDataSet shouldMatchDataSet) throws IOException {
 				String location = shouldMatchDataSet.location();
 				String scriptContent = "";
 
@@ -133,15 +149,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 								description, shouldMatchDataSet, scriptContent);
 					}
 				}
-
-				if (isNotEmptyString(scriptContent)) {
-					getDatabaseOperation().databaseIs(scriptContent);
-				} else {
-					throw new IllegalArgumentException(
-							"File specified in location or selective matcher attribute "
-									+ " of ShouldMatchDataSet is not present, or no files matching default location.");
-				}
-
+				return scriptContent;
 			}
 
 			private boolean isSelectiveMatchersDefined(
