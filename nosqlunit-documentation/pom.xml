@@ -44,6 +44,7 @@
 					</dependency>
 				</dependencies>
 				<configuration>
+					<xincludeSupported>true</xincludeSupported>
 					<sourceDirectory>${basedir}/src/main/resources</sourceDirectory>
 					<targetDirectory>${project.build.directory}/site</targetDirectory>
 					<htmlStylesheet>stylesheet.css</htmlStylesheet>

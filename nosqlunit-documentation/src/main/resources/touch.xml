@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="touch" xmlns="http://docbook.org/ns/docbook"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook">
+    
+    <title>Stay In Touch</title>
+    
+    <section>
+		<title>Future releases</title>
+
+		<para>
+			Version 0.4.0 will have support for
+			<emphasis>Neo4J and
+				Cassandra.
+			</emphasis>
+		</para>
+
+		<para>
+			Next versions will contain support for
+			<emphasis>HBase</emphasis>
+			and
+			<emphasis>CouchDb</emphasis>
+			.
+		</para>
+	</section>
+	<section>
+		<title>Stay in Touch</title>
+		<table>
+			<tr>
+				<td>Email: </td>
+				<td>asotobu at gmail.com</td>
+			</tr>
+			<tr>
+				<td>Blog: </td>
+				<td><link xlink:href="www.lordofthejars.com">Lord Of The Jars</link></td>
+			</tr>
+			<tr>
+				<td>Twitter: </td>
+				<td>@alexsotob</td>
+			</tr>
+			<tr>
+				<td>Github: </td>
+				<td><link xlink:href="https://github.com/lordofthejars/nosql-unit/">NoSQLUnit Github</link></td>
+			</tr>
+		</table>
+	</section>
+    
+</chapter>

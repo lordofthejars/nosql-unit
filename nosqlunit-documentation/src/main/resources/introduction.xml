@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="introduction" xmlns="http://docbook.org/ns/docbook"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook">
+
+	<title>NoSQLUnit Core</title>
+
+	<section>
+		<inlinemediaobject>
+			<imageobject>
+				<imagedata fileref="fig/nosqlunitlogo.png" />
+			</imageobject>
+		</inlinemediaobject>
+
+		<title>Overview</title>
+
+		<para>
+			Unit testing is a method by which the smallest testable part of an
+			application is validated. Unit tests must follow the
+			<acronym>FIRST</acronym>
+			Rules; these are Fast, Isolated, Repeatable,
+			Self-Validated and
+			Timely.
+		</para>
+
+		<para>
+			It is strange to think about a
+			<acronym>JEE</acronym>
+			application
+			without persistence layer (typical Relational databases or
+			new
+			<emphasis>NoSQL</emphasis>
+			databases) so should be interesting to write
+			unit tests of persistence
+			layer too. When we are writing unit tests of
+			persistence layer we
+			should focus on to not break two main concepts
+			of
+			<acronym>FIRST</acronym>
+			rules, the fast and the isolated ones.
+		</para>
+
+		<para>
+			Our tests will be
+			<emphasis>fast</emphasis>
+			if they don't access
+			network nor filesystem, and in case of
+			persistence systems network and
+			filesystem are the most used
+			resources. In case of
+			<acronym>RDBMS</acronym>
+			(
+			<emphasis>SQL</emphasis>
+			), many Java in-memory
+			databases exist like
+			<application>Apache Derby</application>
+			,
+			<application>H2</application>
+			or
+			<application>HSQLDB</application>
+			. These
+			databases, as their name suggests are embedded into your
+			program and data
+			are stored in memory, so your tests are still fast.
+			The problem is with
+			<emphasis>NoSQL</emphasis>
+			systems, because of their heterogeneity. Some
+			systems work using
+			Document approach (like
+			<application>MongoDb</application>
+			), other ones Column (like
+			<application>Hbase</application>
+			), or Graph (like
+			<application>Neo4J</application>
+			). For this reason the in-memory mode
+			should be provided by the
+			vendor, there is no a generic solution.
+		</para>
+
+		<para>
+			Our tests must be isolated from themselves. It is not acceptable
+			that
+			one test method modifies the result of another test method. In case
+			of persistence tests this scenario occurs when previous test method
+			insert
+			an entry to database and next test method execution finds the
+			change.
+			So
+			before execution of each test, database should be found in a
+			known state.
+			Note that if your test found database in a known state,
+			test will be
+			repeatable, if test assertion depends on previous test
+			execution, each
+			execution will be unique. For homogeneous systems like
+			<acronym>RDBMS</acronym>
+			,
+			<emphasis>DBUnit</emphasis>
+			exists to maintain
+			database in a known state before each execution.
+			But there is no like
+			<emphasis>DBUnit</emphasis>
+			framework for heterogeneous
+			<emphasis>NoSQL</emphasis>
+			systems.
+		</para>
+
+		<para>
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			resolves this problem by
+			providing a
+			<emphasis>JUnit</emphasis>
+			extension which helps us to manage
+			lifecycle of NoSQL systems and also
+			take care of maintaining databases
+			into known state.
+		</para>
+	</section>
+
+	<section>
+		<title>Requirements</title>
+
+		<para>
+			To run
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			,
+			<emphasis>JUnit
+				4.10
+			</emphasis>
+			or later must be provided. This is because of
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			is using
+			<emphasis>Rules</emphasis>
+			, and
+			they have changed from previous versions to 4.10.
+		</para>
+
+		<para>
+			Although it should work with
+			<acronym>JDK 5</acronym>
+			, jars are
+			compiled using
+			<acronym>JDK 6</acronym>
+			.
+		</para>
+	</section>
+
+	<section>
+		<title>NoSQLUnit</title>
+
+		<para>
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			is a
+			<emphasis>JUnit</emphasis>
+			extension to make writing unit and integration
+			tests of systems that
+			use NoSQL backend easier and is composed by two sets
+			of
+			<emphasis>Rules</emphasis>
+			and a group of annotations.
+		</para>
+
+		<para>
+			First set of
+			<emphasis>Rules</emphasis>
+			are those responsible of
+			managing database lifecycle; there are two
+			for each supported
+			backend.
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					The first one (in case it is possible) it is the
+					<emphasis role="bold">in-memory</emphasis>
+					mode. This mode takes care of
+					starting and stopping database system
+					in
+					"
+					<emphasis>in-memory</emphasis>
+					" mode. This mode will be typically
+					used during unit testing
+					execution.
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+					The second one is the
+					<emphasis role="bold">managed</emphasis>
+					mode. This mode is in charge of starting
+					<emphasis>NoSQL</emphasis>
+					server but as remote process (in local machine) and stopping it.
+					This
+					will typically used during integration testing execution.
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			Second set of
+			<emphasis>Rules</emphasis>
+			are those responsible of
+			maintaining database into known state. Each
+			supported backend will have
+			its own, and can be understood as a
+			connection to defined database which
+			will be used to execute the
+			required operations for maintaining the
+			stability of the system.
+		</para>
+
+		<para>
+			Note that because
+			<emphasis>NoSQL</emphasis>
+			databases are
+			heterogeneous, each system will require its own
+			implementation.
+		</para>
+
+		<para>
+			And finally two annotations are provided,
+			<link linkend="seeding_database">@UsingDataSet</link>
+			and
+			<link linkend="verifying_database">@ShouldMatchDataSet</link>
+			, (thank you so
+			much
+			<emphasis>Arquillian</emphasis>
+			people for the name).
+		</para>
+
+		<section>
+			<title xml:id="seeding_database">Seeding Database</title>
+
+			<para>
+				@UsingDataSet is used to seed database with defined data set. In
+				brief data sets are files that contain all data to be inserted to
+				configured database. In order to seed your database, use
+				<emphasis>@UsingDataSet</emphasis>
+				annotation, you can define it either
+				on the test itself or on the
+				class level. If there is definition on
+				both, test level annotation
+				takes precedence. This annotation has
+				two
+				attributes
+				<methodname>locations</methodname>
+				and
+				<methodname>loadStrategy</methodname>
+				.
+			</para>
+
+			<para>
+				With
+				<methodname>locations</methodname>
+				attribute you can specify
+				<emphasis role="bold">classpath</emphasis>
+				datasets location. Locations
+				are relative to test class location.
+				Note that more than one dataset
+				can
+				be specified. If files are not
+				specified explicitly, next strategy is
+				applied:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						First searches for a file on classpath in same package of test
+						class with next file name,
+						<filename>[test class name]#[test method
+							name].[format]
+						</filename>
+						(only if annotation is present at test
+						method).
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						If first rule is not met or annotation is defined at class
+						scope,
+						next file is searched on classpath in same package of test
+						class,
+						<filename>[test class name].[default format]</filename>
+						.
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<warning>
+				<para>
+					datasets must reside into
+					<emphasis>classpath</emphasis>
+					and
+					format depends on
+					<emphasis>NoSQL</emphasis>
+					vendor.
+				</para>
+			</warning>
+
+			<para>Second attribute provides strategies for inserting data.
+				Implemented strategies are:
+			</para>
+
+			<table border="1">
+				<caption>Load Strategies</caption>
+
+				<tr>
+					<td>INSERT</td>
+
+					<td>Insert defined datasets before executing any test method.</td>
+				</tr>
+
+				<tr>
+					<td>DELETE_ALL</td>
+
+					<td>Deletes all elements of database before executing any test
+						method.
+					</td>
+				</tr>
+
+				<tr>
+					<td>CLEAN_INSERT</td>
+
+					<td>This is the most used strategy. It deletes all elements of
+						database and then insert defined datasets before executing any
+						test
+						method.
+					</td>
+				</tr>
+
+				<tr>
+					<td>REFRESH</td>
+
+					<td>Insert all data defined in datasets that are not present on
+						database.
+					</td>
+				</tr>
+			</table>
+
+			<para>An example of usage:</para>
+
+			<programlisting language="java"><![CDATA[@UsingDataSet(locations="my_data_set.json", loadStrategy=LoadStrategyEnum.REFRESH)]]></programlisting>
+		</section>
+
+		<section>
+			<title xml:id="verifying_database">Verifying Database</title>
+
+			<para>
+				Sometimes it might imply a huge amount of work asserting database
+				state directly from testing code. By using
+				<emphasis>@ShouldMatchDataSet</emphasis>
+				on test method,
+				<emphasis role="bold">NoSQLUnit</emphasis>
+				will check if database contains
+				expected entries after test
+				execution. As with
+				<emphasis>@ShouldMatchDataSet</emphasis>
+				annotation you can define
+				classpath file location, or if it is not
+				supplied next convention is
+				used:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						First searches for a file on classpath in same package of test
+						class with next file name,
+						<filename>[test class name]#[test method
+							name]-expected.[format]
+						</filename>
+						(only if annotation is present at
+						test method).
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						If first rule is not met or annotation is defined at class
+						scope,
+						file is searched on classpath in same package of test class,
+						<filename>[test class name]-expected.[default format]</filename>
+						.
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<warning>
+				<para>
+					datasets must reside into
+					<emphasis>classpath</emphasis>
+					and
+					format depends on
+					<emphasis>NoSQL</emphasis>
+					vendor.
+				</para>
+			</warning>
+
+			<para>An example of usage:</para>
+
+			<programlisting language="java"><![CDATA[@ShouldMatchDataSet(location="my_expected_data_set.json")]]></programlisting>
+		</section>
+	</section>
+
+</chapter>
