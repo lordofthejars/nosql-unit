@@ -11,7 +11,7 @@
 
 	<properties>
 		<github.global.server>github</github.global.server>
-		<documentation>0.3.0</documentation>
+		<documentation>0.3.1</documentation>
 	</properties>
 
 

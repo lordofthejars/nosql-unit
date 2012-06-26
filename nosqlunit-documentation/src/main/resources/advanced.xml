@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="whats-new" xmlns="http://docbook.org/ns/docbook"
+<chapter version="5.0" xml:id="advanced" xmlns="http://docbook.org/ns/docbook"
 	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
 	xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML"
 	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook">
 
-	<title>What's New?</title>
+	<title>Advanced Usage</title>
 
 	<section>
-		<title>Simultaneous engines</title>
+		<title xml:id="advanced.simultaneous-engine-title">Simultaneous engines</title>
 
 		<para>
 			Sometimes applications will contain more than one
@@ -39,7 +39,7 @@
 			method in configuration instance.
 		</para>
 		
-		<example xml:id="what-snew.name-database">
+		<example xml:id="advanced.name-database">
 				<title>Given a name database rule</title>
 
 				<programlisting language="java"><![CDATA[@Rule
@@ -50,38 +50,71 @@ public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
 		And also you need to provide an identified dataset for each engine, by using <function>withSelectiveLocations</function> attribute of <function>@UsingDataSet</function> annotation. You must set up the pair "named connection" / datasets.  
 		</para>
 		
-		<example xml:id="what-snew.dataset-selective">
+		<example xml:id="advanced.dataset-selective">
 				<title>Selective dataset example</title>
 
 				<programlisting language="java"><![CDATA[@UsingDataSet(withSelectiveLocations =												 
 				{ @Selective(identifier = "one", locations = "test3") }, 
 			loadStrategy = LoadStrategyEnum.REFRESH)]]></programlisting>
 		</example>
-		<para>In <link linkend="what-snew.dataset-selective">example</link> we are refreshing database declared on <link linkend="what-snew.name-database">previous example</link> with data located at <emphasis>test3</emphasis> file. 
+		<para>In <link linkend="advanced.dataset-selective">example</link> we are refreshing database declared on <link linkend="advanced.name-database">previous example</link> with data located at <emphasis>test3</emphasis> file. 
 		</para>
 		
 		<para>
 		Also works in expectations annotation:
 		</para>
 		
-		<example xml:id="what-snew.expected-dataset-selective">
+		<example xml:id="advanced.expected-dataset-selective">
 				<title>Selective expectation example</title>
 
 				<programlisting language="java"><![CDATA[@ShouldMatchDataSet(withSelectiveMatcher = 
 				{ @SelectiveMatcher(identifier = "one", location = "test3") 
 				})]]></programlisting>
 		</example>
-		<para>For more information see chapter about <link linkend="advanced.simultaneous-engine-title">advanced features</link>.</para>
-		
+		<para>
+		When you use more than one engine at a time you should take under consideration next rules:
+		</para>
+		<itemizedlist>
+			<listitem>
+				If location attribute is set, it will use it and will ignore <function>withSelectiveMatcher</function> attribute data. Location data is populated through all registered systems.
+			</listitem>
+			<listitem>
+				If location is not set, then system tries to insert data defined in <function>withSelectiveMatcher</function> attribute to each backend.
+			</listitem>
+			<listitem>
+				If <function>withSelectiveMatcher</function> attribute is not set, then default strategy (explained in <link linkend="seeding_database">section</link>) is taken. Note that default strategy will replicate all datasets to defined engines.
+			</listitem>
+		</itemizedlist>
+		<para>
+			You can also use the same approach for inserting data into same engine but in different databases. If you have one <application>MongoDb</application> instance with two databases, you can also write tests for both databases at one time. For example:
+		</para>
+				<example xml:id="advanced.multiple-mongodb">
+				<title>Multiple connections example</title>
+
+				<programlisting language="java"><![CDATA[@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+					.databaseName("test").connectionIdentifier("one").build() ,this);
+
+@Rule
+public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
+					.databaseName("test2").connectionIdentifier("two").build() ,this);
+
+@Test
+@UsingDataSet(withSelectiveLocations = {
+		@Selective(identifier = "one", locations = "json.test"),
+		@Selective(identifier = "two", locations = "json3.test") }, 
+	loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+public void my_test() {...}
+]]></programlisting>
+				</example>
 	</section>
-	
 	<section>
-		<title>Support for JSR-330</title>
+		<title xml:is="advanced.jsr330-title">Support for JSR-330</title>
 		
 		<para><emphasis role="bold">NoSQLUnit</emphasis> supports two annotations of <acronym>JSR-330</acronym> aka Dependency Injection for Java. Concretely <classname>@Inject</classname> and <classname>@Named</classname> annotations.</para>
 		<para>During test execution you may need to access underlying class used to load and assert data to execute extra operations to backend. <emphasis role="bold">NoSQLUnit</emphasis> will inspect <classname>@Inject</classname> annotations of test fields, and try to set own driver to attribute. For example in case of <application>MongoDb</application>, <classname>com.mongodb.Mongo</classname> instance will be injected.</para>
 		
-		<example xml:id="what-snew.injection">
+		<example xml:id="advanced.injection">
 				<title>Injection example</title>
 
 				<programlisting language="java"><![CDATA[@Rule
@@ -92,13 +125,13 @@ public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
 private Mongo mongo;]]></programlisting>
 		</example>
 		<warning>
-			<para>Note that in <link linkend="what-snew.injection">example</link> we are setting <varname>this</varname> as second parameter to the Rule.</para>
+			<para>Note that in <link linkend="advanced.injection">example</link> we are setting <varname>this</varname> as second parameter to the Rule.</para>
 		</warning>
 		
 		<para>
 		But if you are using more than one engine at same time (see <link linkend="advanced.simultaneous-engine-title">chapter</link>) you need a way to distinguish each connection. For fixing this problem, you must use <classname>@Named</classname> annotation by putting the identifier given in configuration instance. For example:
 		</para>
-		<example xml:id="what-snew.named-injection">
+		<example xml:id="advanced.named-injection">
 				<title>Named injection example</title>
 
 				<programlisting language="java"><![CDATA[@Rule
@@ -117,9 +150,6 @@ private Mongo mongo1;
 @Inject
 private Mongo mongo2;]]></programlisting>
 		</example>
-		<para>
-		For more information see <link linkend="advanced.jsr330-title">advanced features</link> chapter.
-		</para>
 	</section>
 	
 </chapter>

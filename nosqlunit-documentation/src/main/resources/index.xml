@@ -74,7 +74,7 @@
 				This chapter provides some examples of advanced features of <emphasis role="bold">NoSQLUnit</emphasis> not described in previous chapters.
 			</para>
 		</partintro>
-<!-- 		<xi:include href="./mongodb.xml"/> -->
+		<xi:include href="./advanced.xml"/>
 	</part>
 
 	<part id="stay-in-touch-part">

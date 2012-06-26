@@ -42,6 +42,13 @@ pre.programlisting {
   clear:         both;
 }
 
+div.warning {
+  margin-left:20px;
+  padding-left:4px;
+  border-left:#cccca0 4px solid;
+  font-style:italic
+}
+
 div.table {
   margin:        1em;
   padding:       0.5em;
