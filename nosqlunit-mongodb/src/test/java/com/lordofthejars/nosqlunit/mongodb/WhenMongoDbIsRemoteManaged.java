@@ -26,6 +26,7 @@ import org.mockito.MockitoAnnotations;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
+import com.mongodb.DBPort;
 
 public class WhenMongoDbIsRemoteManaged {
 
@@ -125,6 +126,8 @@ public class WhenMongoDbIsRemoteManaged {
 				+ ManagedMongoDb.MONGODB_EXECUTABLE_W);
 		expectedCommand.add(ManagedMongoDb.DBPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
+		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
+		expectedCommand.add(DBPort.PORT+"");
 		expectedCommand.add(ManagedMongoDb.FORK_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
@@ -176,6 +179,8 @@ public class WhenMongoDbIsRemoteManaged {
 				+ ManagedMongoDb.MONGODB_EXECUTABLE_X);
 		expectedCommand.add(ManagedMongoDb.DBPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
+		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
+		expectedCommand.add(DBPort.PORT+"");
 		expectedCommand.add(ManagedMongoDb.FORK_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
@@ -227,6 +232,8 @@ public class WhenMongoDbIsRemoteManaged {
 				+ ManagedMongoDb.MONGODB_EXECUTABLE_X);
 		expectedCommand.add(ManagedMongoDb.DBPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
+		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
+		expectedCommand.add(DBPort.PORT+"");
 		expectedCommand.add(ManagedMongoDb.FORK_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);

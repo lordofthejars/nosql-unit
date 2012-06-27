@@ -9,7 +9,7 @@ import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
-public final class MongoDbLowLevelOps {
+public class MongoDbLowLevelOps {
 
 	public boolean assertThatConnectionIsPossible(String host, int port, int retries) throws InterruptedException, UnknownHostException, MongoException {
 	
