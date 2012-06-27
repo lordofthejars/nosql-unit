@@ -2,8 +2,10 @@ package com.lordofthejars.nosqlunit.core;
 
 import java.lang.reflect.Field;
 
-import org.mockito.internal.util.reflection.AccessibilityChanger;
-
+/*
+ * Copyright (c) 2007 Mockito contributors
+ * This class is made available under the terms of the MIT License.
+ */
 public class FieldSetter {
 
     private final Object target;

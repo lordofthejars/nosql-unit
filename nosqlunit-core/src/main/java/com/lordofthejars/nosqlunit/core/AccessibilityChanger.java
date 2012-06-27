@@ -2,6 +2,10 @@ package com.lordofthejars.nosqlunit.core;
 
 import java.lang.reflect.AccessibleObject;
 
+/*
+ * Copyright (c) 2007 Mockito contributors
+ * This class is made available under the terms of the MIT License.
+ */
 public class AccessibilityChanger {
     
     private Boolean wasAccessible = null;
