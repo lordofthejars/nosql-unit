@@ -1,15 +1,120 @@
-% NoSQLUnit: Version
-% Alex Soto www.lordofthejars.com
+% NoSQLUnit Reference Manual
+% 
 % 
 
 Documentation
 =============
 
-Html: [View](http://lordofthejars.github.com/nosql-unit/nosqlunit.html)
-Pdf: [Download](http://lordofthejars.github.com/nosql-unit/nosqlunit.pdf)
+Html: [View](http://lordofthejars.github.com/nosql-unit/index.html)
+Pdf: [Download](http://lordofthejars.github.com/nosql-unit/index.pdf)
+
+What's New?
+===========
+
+Simultaneous engines
+--------------------
+
+Sometimes applications will contain more than one *NoSQL* engine, for
+example some parts of your model will be expressed better as a graph (
+Neo4J for example), but other parts will be more natural in a column way
+(for example using Cassandra ). *NoSQLUnit* supports this kind of
+scenarios by providing in integration tests a way to not load all
+datasets into one system, but choosing which datasets are stored in each
+backend.
+
+For declaring more than one engine, you must give a name to each
+database *Rule* using `connectionIdentifier()` method in configuration
+instance.
+
+~~~~ {.java}
+@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+                                        .databaseName("test").connectionIdentifier("one").build() ,this);
+~~~~
+
+And also you need to provide an identified dataset for each engine, by
+using `withSelectiveLocations` attribute of `@UsingDataSet` annotation.
+You must set up the pair "named connection" / datasets.
+
+~~~~ {.java}
+@UsingDataSet(withSelectiveLocations =                                              
+                { @Selective(identifier = "one", locations = "test3") }, 
+            loadStrategy = LoadStrategyEnum.REFRESH)
+~~~~
+
+In [example](#what-snew.dataset-selective) we are refreshing database
+declared on [previous example](#what-snew.name-database) with data
+located at *test3* file.
+
+Also works in expectations annotation:
+
+~~~~ {.java}
+@ShouldMatchDataSet(withSelectiveMatcher = 
+                { @SelectiveMatcher(identifier = "one", location = "test3") 
+                })
+~~~~
+
+For more information see chapter about [advanced
+features](#advanced.simultaneous-engine-title).
+
+Support for JSR-330
+-------------------
+
+*NoSQLUnit* supports two annotations of JSR-330 aka Dependency Injection
+for Java. Concretely @Inject and @Named annotations.
+
+During test execution you may need to access underlying class used to
+load and assert data to execute extra operations to backend. *NoSQLUnit*
+will inspect @Inject annotations of test fields, and try to set own
+driver to attribute. For example in case of MongoDb, com.mongodb.Mongo
+instance will be injected.
+
+~~~~ {.java}
+@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+                        .databaseName("test").build() ,this);
+
+@Inject
+private Mongo mongo;
+~~~~
+
+> **Warning**
+>
+> Note that in [example](#what-snew.injection) we are setting `this` as
+> second parameter to the Rule.
+
+But if you are using more than one engine at same time (see
+[chapter](#advanced.simultaneous-engine-title)) you need a way to
+distinguish each connection. For fixing this problem, you must use
+@Named annotation by putting the identifier given in configuration
+instance. For example:
+
+~~~~ {.java}
+@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+                    .databaseName("test").connectionIdentifier("one").build() ,this);
+
+@Rule
+public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
+                    .databaseName("test2").connectionIdentifier("two").build() ,this);
+
+@Named("one")
+@Inject
+private Mongo mongo1;
+    
+@Named("two")
+@Inject
+private Mongo mongo2;
+~~~~
+
+For more information see [advanced features](#advanced.jsr330-title)
+chapter.
+
+NoSQLUnit Core
+==============
 
 Overview
-========
+--------
 
 Unit testing is a method by which the smallest testable part of an
 application is validated. Unit tests must follow the FIRST Rules; these
@@ -49,7 +154,7 @@ helps us to manage lifecycle of NoSQL systems and also take care of
 maintaining databases into known state.
 
 Requirements
-============
+------------
 
 To run *NoSQLUnit* , *JUnit 4.10* or later must be provided. This is
 because of *NoSQLUnit* is using *Rules* , and they have changed from
@@ -58,7 +163,7 @@ previous versions to 4.10.
 Although it should work with JDK 5 , jars are compiled using JDK 6 .
 
 NoSQLUnit
-=========
+---------
 
 *NoSQLUnit* is a *JUnit* extension to make writing unit and integration
 tests of systems that use NoSQL backend easier and is composed by two
@@ -91,8 +196,7 @@ And finally two annotations are provided,
 [@ShouldMatchDataSet](#verifying_database) , (thank you so much
 *Arquillian* people for the name).
 
-Seeding Database
-----------------
+### Seeding Database
 
 @UsingDataSet is used to seed database with defined data set. In brief
 data sets are files that contain all data to be inserted to configured
@@ -104,7 +208,11 @@ loadStrategy .
 
 With locations attribute you can specify *classpath* datasets location.
 Locations are relative to test class location. Note that more than one
-dataset can be specified. If files are not specified explicitly, next
+dataset can be specified. 
+
+Also withSelectiveLocations attribute can be used to specify datasets location. See Advanced Usage chapter for more information.
+
+If files are not specified explicitly, next
 strategy is applied:
 
 -   First searches for a file on classpath in same package of test class
@@ -140,15 +248,14 @@ An example of usage:
 @UsingDataSet(locations="my_data_set.json", loadStrategy=LoadStrategyEnum.REFRESH)
 ~~~~
 
-Verifying Database
-------------------
+### Verifying Database
 
 Sometimes it might imply a huge amount of work asserting database state
 directly from testing code. By using *@ShouldMatchDataSet* on test
 method, *NoSQLUnit* will check if database contains expected entries
 after test execution. As with *@ShouldMatchDataSet* annotation you can
-define classpath file location, or if it is not supplied next convention
-is used:
+define classpath file location, or using withSelectiveMatche, see Advanced Usage chapter for more information. 
+If it is not dataset supplied next convention is used:
 
 -   First searches for a file on classpath in same package of test class
     with next file name, `[test class name]#[test method
@@ -171,8 +278,11 @@ An example of usage:
 @ShouldMatchDataSet(location="my_expected_data_set.json")
 ~~~~
 
+MongoDb Engine
+==============
+
 MongoDb
-=======
+-------
 
 MongoDb is a *NoSQL* database that stores structured data as *JSON-like*
 documents with dynamic schemas.
@@ -192,8 +302,7 @@ documents with dynamic schemas.
 
   : Manager Rule
 
-Maven Setup
------------
+### Maven Setup
 
 To use *NoSQLUnit* with MongoDb you only need to add next dependency:
 
@@ -242,8 +351,7 @@ To install add next [repository](#conf.jmockmongo_repo) and
 </dependency>
 ~~~~
 
-Dataset Format
---------------
+### Dataset Format
 
 Default dataset file format in *MongoDb* module is *json* .
 
@@ -271,10 +379,9 @@ Datasets must have next [format](#ex.mongodb_dataset) :
 Notice that if attributes value are integers, double quotes are not
 required.
 
-Getting Started
----------------
+### Getting Started
 
-### Lifecycle Management Strategy
+#### Lifecycle Management Strategy
 
 First step is defining which lifecycle management strategy is required
 for your tests. Depending on kind of test you are implementing (unit
@@ -403,7 +510,7 @@ you (or System like Maven ) is the responsible of starting and stopping
 the server. This mode is used in deployment tests where you are testing
 your application on real environment.
 
-### Configuring MongoDb Connection
+#### Configuring MongoDb Connection
 
 Next step is configuring **Mongodb** rule in charge of maintaining
 *MongoDb* database into known state by inserting and deleting defined
@@ -461,7 +568,7 @@ import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mo
 public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb().databaseName("test").host("my_remote_host").build());
 ~~~~
 
-### Complete Example
+#### Complete Example
 
 Consider a library application, which apart from multiple operations, it
 allow us to add new books to system. Our [model](#example.book_model) is
@@ -585,19 +692,154 @@ You can watch full example at
 [github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo)
 .
 
+Advanced Usage
+==============
+
+Simultaneous engines
+====================
+
+Sometimes applications will contain more than one *NoSQL* engine, for
+example some parts of your model will be expressed better as a graph (
+Neo4J for example), but other parts will be more natural in a column way
+(for example using Cassandra ). *NoSQLUnit* supports this kind of
+scenarios by providing in integration tests a way to not load all
+datasets into one system, but choosing which datasets are stored in each
+backend.
+
+For declaring more than one engine, you must give a name to each
+database *Rule* using `connectionIdentifier()` method in configuration
+instance.
+
+~~~~ {.java}
+@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+                                        .databaseName("test").connectionIdentifier("one").build() ,this);
+~~~~
+
+And also you need to provide an identified dataset for each engine, by
+using `withSelectiveLocations` attribute of `@UsingDataSet` annotation.
+You must set up the pair "named connection" / datasets.
+
+~~~~ {.java}
+@UsingDataSet(withSelectiveLocations =                                              
+                { @Selective(identifier = "one", locations = "test3") }, 
+            loadStrategy = LoadStrategyEnum.REFRESH)
+~~~~
+
+In [example](#advanced.dataset-selective) we are refreshing database
+declared on [previous example](#advanced.name-database) with data
+located at *test3* file.
+
+Also works in expectations annotation:
+
+~~~~ {.java}
+@ShouldMatchDataSet(withSelectiveMatcher = 
+                { @SelectiveMatcher(identifier = "one", location = "test3") 
+                })
+~~~~
+
+When you use more than one engine at a time you should take under
+consideration next rules:
+
+-   If location attribute is set, it will use it and will ignore
+    withSelectiveMatcher
+    attribute data. Location data is populated through all registered
+    systems.
+-   If location is not set, then system tries to insert data defined in
+    withSelectiveMatcher
+    attribute to each backend.
+-   If
+    withSelectiveMatcher
+    attribute is not set, then default strategy (explained in
+    section
+    ) is taken. Note that default strategy will replicate all datasets
+    to defined engines.
+
+You can also use the same approach for inserting data into same engine
+but in different databases. If you have one MongoDb instance with two
+databases, you can also write tests for both databases at one time. For
+example:
+
+~~~~ {.java}
+@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+                    .databaseName("test").connectionIdentifier("one").build() ,this);
+
+@Rule
+public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
+                    .databaseName("test2").connectionIdentifier("two").build() ,this);
+
+@Test
+@UsingDataSet(withSelectiveLocations = {
+        @Selective(identifier = "one", locations = "json.test"),
+        @Selective(identifier = "two", locations = "json3.test") }, 
+    loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+public void my_test() {...}
+~~~~
+
+Support for JSR-330
+===================
+
+*NoSQLUnit* supports two annotations of JSR-330 aka Dependency Injection
+for Java. Concretely @Inject and @Named annotations.
+
+During test execution you may need to access underlying class used to
+load and assert data to execute extra operations to backend. *NoSQLUnit*
+will inspect @Inject annotations of test fields, and try to set own
+driver to attribute. For example in case of MongoDb, com.mongodb.Mongo
+instance will be injected.
+
+~~~~ {.java}
+@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+                        .databaseName("test").build() ,this);
+
+@Inject
+private Mongo mongo;
+~~~~
+
+> **Warning**
+>
+> Note that in [example](#advanced.injection) we are setting `this` as
+> second parameter to the Rule.
+
+But if you are using more than one engine at same time (see
+[chapter](#advanced.simultaneous-engine-title)) you need a way to
+distinguish each connection. For fixing this problem, you must use
+@Named annotation by putting the identifier given in configuration
+instance. For example:
+
+~~~~ {.java}
+@Rule
+public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
+                    .databaseName("test").connectionIdentifier("one").build() ,this);
+
+@Rule
+public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
+                    .databaseName("test2").connectionIdentifier("two").build() ,this);
+
+@Named("one")
+@Inject
+private Mongo mongo1;
+    
+@Named("two")
+@Inject
+private Mongo mongo2;
+~~~~
+
+
+Stay In Touch
+=============
+
 Future releases
-===============
+---------------
 
-In next project release 0.3.1, a new feature will be implemented. As
-features *@Inject* will be able to be used to have access to underlying
-connection into tests.
-
-Version 0.4.0 there will be support for *Neo4J and Cassandra.*
+Version 0.4.0 will have support for *Neo4J and Cassandra.*
 
 Next versions will contain support for *HBase* and *CouchDb* .
 
 Stay in Touch
-=============
+-------------
 
   ---------- ------------------------------------------------------------------
   Email:     asotobu at gmail.com
@@ -605,4 +847,5 @@ Stay in Touch
   Twitter:   @alexsotob
   Github:    [NoSQLUnit Github](https://github.com/lordofthejars/nosql-unit/)
   ---------- ------------------------------------------------------------------
+
 

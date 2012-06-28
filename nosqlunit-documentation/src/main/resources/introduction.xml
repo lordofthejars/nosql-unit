@@ -261,7 +261,13 @@
 				are relative to test class location.
 				Note that more than one dataset
 				can
-				be specified. If files are not
+				be specified. 
+			</para>
+			<para>
+			Also <methodname>withSelectiveLocations</methodname> attribute can be used to specify datasets location. See <link linkend="advanced.simultaneous-engine-title">Advanced Usage</link> chapter for more information.
+			</para>
+			<para>
+				If files are not
 				specified explicitly, next strategy is
 				applied:
 			</para>
@@ -361,9 +367,11 @@
 				execution. As with
 				<emphasis>@ShouldMatchDataSet</emphasis>
 				annotation you can define
-				classpath file location, or if it is not
-				supplied next convention is
-				used:
+				classpath file location, or using <methodname>withSelectiveMatcher</methodname> See <link linkend="advanced.simultaneous-engine-title">Advanced Usage</link> chapter for more information. 
+			</para>
+
+			<para>
+			If it is not dataset is supplied next convention is	used:
 			</para>
 
 			<itemizedlist>
