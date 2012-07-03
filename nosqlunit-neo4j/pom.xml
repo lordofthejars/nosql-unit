@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>nosqlunit</artifactId>
+		<groupId>com.lordofthejars</groupId>
+		<version>0.3.2-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<artifactId>nosqlunit-neo4j</artifactId>
+
+	<dependencies>
+
+		<dependency>
+			<artifactId>nosqlunit-core</artifactId>
+			<groupId>com.lordofthejars</groupId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-kernel</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
