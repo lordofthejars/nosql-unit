@@ -9,6 +9,10 @@
 	</parent>
 	<artifactId>nosqlunit-neo4j</artifactId>
 
+	<properties>
+		<blueprints.tinkerpop.version>2.0.0</blueprints.tinkerpop.version>
+	</properties>
+
 	<dependencies>
 
 		<dependency>
@@ -18,9 +22,132 @@
 		</dependency>
 
 		<dependency>
+				<groupId>xmlunit</groupId>
+				<artifactId>xmlunit</artifactId>
+			</dependency>
+	
+		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-kernel</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>stax</groupId>
+			<artifactId>stax-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j.app</groupId>
+			<artifactId>neo4j-server</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>blueprints-core</artifactId>
+					<groupId>com.tinkerpop.blueprints</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>blueprints-neo4j-graph</artifactId>
+					<groupId>com.tinkerpop.blueprints</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-jaxrs</artifactId>
+					<groupId>org.codehaus.jackson</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>log4j-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>2.6.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.tinkerpop.blueprints</groupId>
+			<artifactId>blueprints-neo4j-graph</artifactId>
+			<version>${blueprints.tinkerpop.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.neo4j</groupId>
+					<artifactId>neo4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.neo4j</groupId>
+					<artifactId>neo4j-ha</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.neo4j</groupId>
+					<artifactId>neo4j-management</artifactId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-jaxrs</artifactId>
+					<groupId>org.codehaus.jackson</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>stax</groupId>
+					<artifactId>stax-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+    		<groupId>org.neo4j</groupId>
+    		<artifactId>neo4j-rest-graphdb</artifactId>
+    		<version>1.6.M02</version>
+    		<exclusions>
+    			<exclusion>
+    				<groupId>org.neo4j</groupId>
+					<artifactId>neo4j-kernel</artifactId>
+    			</exclusion>
+    			<exclusion>
+    				<groupId>org.neo4j</groupId>
+					<artifactId>neo4j-lucene-index</artifactId>
+    			</exclusion>
+    			<exclusion>
+    				<artifactId>jersey-core</artifactId>
+    				<groupId>com.sun.jersey</groupId>
+    			</exclusion>
+    			<exclusion>
+    				<artifactId>server-api</artifactId>
+    				<groupId>org.neo4j</groupId>
+    			</exclusion>
+    		</exclusions>
+		</dependency>
+
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>neo4j java binding</id>
+			<url>http://m2.neo4j.org/content/repositories/releases/</url>
+		</repository>
+	</repositories>
 
 </project>
