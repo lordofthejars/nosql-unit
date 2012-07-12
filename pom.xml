@@ -41,7 +41,7 @@
 
 	<properties>
 		<mongo.version>2.7.3</mongo.version>
-		<mongomock.version>0.0.1-SNAPSHOT</mongomock.version>
+		<mongomock.version>0.0.2</mongomock.version>
 		<junit.version>4.10</junit.version>
 		<hamcrest.version>1.3.RC2</hamcrest.version>
 		<mockito.version>1.9.0</mockito.version>
