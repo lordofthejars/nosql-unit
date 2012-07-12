@@ -46,6 +46,7 @@ public class GraphMLReader {
 
 			boolean inVertex = false;
 			boolean inEdge = false;
+			int graphDepth = 0;
 
 			while (reader.hasNext()) {
 
@@ -62,7 +63,7 @@ public class GraphMLReader {
 						keyIdMap.put(id, attributeName);
 						keyTypes.put(attributeName, attributeType);
 
-					} else if (elementName.equals(GraphMLTokens.NODE)) {
+					} else if (elementName.equals(GraphMLTokens.NODE) && isRootGraph(graphDepth)) {
 
 						currentVertexId = reader.getAttributeValue(null, GraphMLTokens.ID);
 
@@ -74,7 +75,7 @@ public class GraphMLReader {
 
 						inVertex = true;
 
-					} else if (elementName.equals(GraphMLTokens.EDGE)) {
+					} else if (elementName.equals(GraphMLTokens.EDGE) && isRootGraph(graphDepth)) {
 
 						currentEdgeId = reader.getAttributeValue(null, GraphMLTokens.ID);
 
@@ -88,7 +89,7 @@ public class GraphMLReader {
 
 						inEdge = true;
 
-					} else if (elementName.equals(GraphMLTokens.DATA)) {
+					} else if (elementName.equals(GraphMLTokens.DATA) && isRootGraph(graphDepth)) {
 
 						String key = reader.getAttributeValue(null, GraphMLTokens.KEY);
 						String attributeName = keyIdMap.get(key);
@@ -126,8 +127,11 @@ public class GraphMLReader {
 								}
 							}
 						} else {
-							throw new IllegalArgumentException("Attribute key: "+key+" is not declared.");
+							throw new IllegalArgumentException("Attribute key: " + key + " is not declared.");
 						}
+						
+					} else if (elementName.equals(GraphMLTokens.GRAPH)) {
+						graphDepth++;
 					}
 
 				} else {
@@ -136,13 +140,13 @@ public class GraphMLReader {
 
 						String elementName = reader.getName().getLocalPart();
 
-						if (elementName.equals(GraphMLTokens.NODE)) {
+						if (elementName.equals(GraphMLTokens.NODE) && isRootGraph(graphDepth)) {
 
 							currentNode = null;
 							currentVertexId = null;
 							inVertex = false;
 
-						} else if (elementName.equals(GraphMLTokens.EDGE)) {
+						} else if (elementName.equals(GraphMLTokens.EDGE) && isRootGraph(graphDepth)) {
 
 							addEdge(nodes, orphanEdges, currentEdge);
 
@@ -152,6 +156,8 @@ public class GraphMLReader {
 
 						} else if (elementName.equals(GraphMLTokens.GRAPHML)) {
 							addOrphanEdgesWithNewParents(nodes, orphanEdges);
+						}else if (elementName.equals(GraphMLTokens.GRAPH)) {
+							graphDepth--;
 						}
 					}
 				}
@@ -166,6 +172,10 @@ public class GraphMLReader {
 
 	}
 
+	private boolean isRootGraph(int graphDepth) {
+		return graphDepth == 1;
+	}
+	
 	private void addOrphanEdgesWithNewParents(Map<String, Node> nodes, List<Edge> edgesWithoutNodeDefined) {
 		for (Edge edge : edgesWithoutNodeDefined) {
 			if (isEdgeInsertable(edge, nodes)) {

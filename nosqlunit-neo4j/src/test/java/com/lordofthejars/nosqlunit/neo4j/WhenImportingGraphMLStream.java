@@ -189,6 +189,38 @@ public class WhenImportingGraphMLStream {
 			"    </graph>\n" + 
 			"</graphml>";
 	
+	private static final String SUBGRAPH_DATA_GRAPH = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" + 
+			"            <graph id=\"H\" edgedefault=\"directed\">\n" + 
+			"            	<node id=\"20\">\n" + 
+			"            		<data key=\"name\">Her</data>\n" + 
+			"            	</node>\n" + 
+			"            </graph>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"15\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.5</data>\n" + 
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
+	
 	@Mock
 	private GraphDatabaseService graphDatabaseService;
 
@@ -258,6 +290,39 @@ public class WhenImportingGraphMLStream {
 
 		verify(relationship1, times(1)).setProperty("weight", (Float) 0.5f);
 		verify(relationship2, times(1)).setProperty("weight", (Float) 0.8f);
+	}
+	
+	@Test
+	public void parser_should_ignore_all_subgraphs() {
+		
+		Node node15 = mock(Node.class);
+		Node node25 = mock(Node.class);
+		Node node3 = mock(Node.class);
+
+		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+
+		Relationship relationship1 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
+
+		Relationship relationship2 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node3), any(RelationshipType.class))).thenReturn(relationship2);
+
+		GraphMLReader graphMLReader = new GraphMLReader(graphDatabaseService);
+
+		graphMLReader.read(new ByteArrayInputStream(SUBGRAPH_DATA_GRAPH.getBytes()));
+
+		verify(graphDatabaseService, times(3)).createNode();
+
+		verify(node15, times(1)).createRelationshipTo(eq(node25), any(DynamicRelationshipType.class));
+		verify(node15, times(1)).createRelationshipTo(eq(node3), any(DynamicRelationshipType.class));
+
+		verify(node15).setProperty("name", "I");
+		verify(node25).setProperty("name", "you");
+		verify(node3).setProperty("name", "him");
+
+		verify(relationship1, times(1)).setProperty("weight", (Float) 0.5f);
+		verify(relationship2, times(1)).setProperty("weight", (Float) 0.8f);
+		
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
