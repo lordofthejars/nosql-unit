@@ -193,4 +193,11 @@
 			</plugin>
 		</plugins>
 	</build>
+
+    <repositories>
+        <repository>
+            <id>thiloplanz-snapshot</id>
+            <url>http://repository-thiloplanz.forge.cloudbees.com/snapshot/</url>
+        </repository>
+    </repositories>
 </project>
