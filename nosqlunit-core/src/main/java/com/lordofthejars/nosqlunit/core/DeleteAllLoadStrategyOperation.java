@@ -1,5 +1,7 @@
 package com.lordofthejars.nosqlunit.core;
 
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +16,7 @@ public class DeleteAllLoadStrategyOperation implements LoadStrategyOperation {
 	}
 
 	@Override
-	public void executeScripts(String[] contentDataset) {
+	public void executeScripts(InputStream[] contentDataset) {
 		
 		LOGGER.debug("Calling Clean Load Strategy.");
 		

@@ -8,6 +8,8 @@ import static org.junit.Assert.fail;
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,19 +52,19 @@ public class WhenExpectedDataShouldBeCompared {
 	public void empty_database_and_empty_expectation_should_be_equals() {
 		
 		MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
-		boolean isEquals = mongoOperation.databaseIs("{}");
+		boolean isEquals = mongoOperation.databaseIs(new ByteArrayInputStream("{}".getBytes()));
 		
 		assertThat(isEquals, is(true));
 	}
 	
 	@Test
-	public void empty_expected_collection_and_database_collection_with_content_should_fail() {
+	public void empty_expected_collection_and_database_collection_with_content_should_fail() throws UnsupportedEncodingException {
 		try {
 		
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection has 0 elements but insert collection has 1"));
@@ -71,21 +73,21 @@ public class WhenExpectedDataShouldBeCompared {
 	
 	
 	@Test
-	public void empty_expected_collection_and_empty_database_collection_should_be_equal() {
+	public void empty_expected_collection_and_empty_database_collection_should_be_equal() throws UnsupportedEncodingException {
 		
 		MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		createCollection(getMongoDB(), "col1");
 		
-		boolean isEquals = mongoOperation.databaseIs("{\"col1\":[]}");
+		boolean isEquals = mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[]}".getBytes("UTF-8")));
 		assertThat(isEquals, is(true));
 	}
 	
 	@Test
-	public void empty_expected_collection_and_empty_database_should_fail() {
+	public void empty_expected_collection_and_empty_database_should_fail() throws UnsupportedEncodingException {
 		try {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col1] but insert collection names are []"));
@@ -94,11 +96,11 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void empty_expectation_and_empty_database_collection_should_fail() {
+	public void empty_expectation_and_empty_database_collection_should_fail() throws UnsupportedEncodingException {
 		try {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 			createCollection(getMongoDB(), "col1");
-			mongoOperation.databaseIs("{}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [] but insert collection names are [col1]"));
@@ -107,12 +109,12 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void empty_expected_collection_and_empty_database_collection_with_different_names_should_fail() {
+	public void empty_expected_collection_and_empty_database_collection_with_different_names_should_fail() throws UnsupportedEncodingException {
 		try {
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 			createCollection(getMongoDB(), "col1");
 		
-			mongoOperation.databaseIs("{\"col2\":[]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col2\":[]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col2] but insert collection names are [col1]"));
@@ -121,23 +123,23 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void expected_collection_and_database_collection_with_same_content_should_be_equals() {
+	public void expected_collection_and_database_collection_with_same_content_should_be_equals() throws UnsupportedEncodingException {
 		
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			boolean isEquals = mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			boolean isEquals = mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			assertThat(isEquals, is(true));
 		
 	}
 	
 	@Test
-	public void expected_collection_and_database_collection_with_different_content_should_fail() {
+	public void expected_collection_and_database_collection_with_different_content_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Soto\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Object # { \"name\" : \"Soto\"} # is not found into collection [col1]"));
@@ -146,13 +148,13 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void expected_collection_with_content_and_database_collection_empty_should_fail() {
+	public void expected_collection_with_content_and_database_collection_empty_should_fail() throws UnsupportedEncodingException {
 		
 		try {
 			createCollection(getMongoDB(), "col1");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection has 1 elements but insert collection has 0"));
@@ -161,12 +163,12 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void expected_collection_and_database_collection_with_different_names_should_fail() {
+	public void expected_collection_and_database_collection_with_different_names_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col2\":[{\"name\":\"Alex\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col2\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col2] but insert collection names are [col1]"));
@@ -175,13 +177,13 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void less_expected_collection_than_database_collection_should_fail() {
+	public void less_expected_collection_than_database_collection_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			addCollectionWithData(getMongoDB(), "col3", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col1] but insert collection names are [col1, col3]"));
@@ -190,12 +192,12 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void expected_collection_has_some_items_different_than_database_collection_items_should_fail() {
+	public void expected_collection_has_some_items_different_than_database_collection_items_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}, {\"name\":\"Soto\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}, {\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection has 2 elements but insert collection has 1"));
@@ -204,14 +206,14 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void expected_collection_item_has_more_attributes_than_database_collection_item_attributes_should_fail() {
+	public void expected_collection_item_has_more_attributes_than_database_collection_item_attributes_should_fail() throws UnsupportedEncodingException {
 		try {
 			//Inserted one element
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			//Expected with two elements
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}".getBytes("UTF-8")));
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Object # { \"name\" : \"Alex\" , \"surname\" : \"Soto\"} # is not found into collection [col1]"));
 		}
@@ -219,14 +221,14 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void expected_collection_item_has_same_attributes_as_database_collection_item_attributes_but_different_values_should_fail() {
+	public void expected_collection_item_has_same_attributes_as_database_collection_item_attributes_but_different_values_should_fail() throws UnsupportedEncodingException {
 		try {
 			//Inserted one element
 			addCollectionWithTwoData(getMongoDB(), "col1", "name", "Alex","surname", "Sot");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			//Expected with two elements
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Object # { \"name\" : \"Alex\" , \"surname\" : \"Soto\"} # is not found into collection [col1]"));
@@ -235,14 +237,14 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	@Test
-	public void expected_collection_item_has_less_attributes_than_database_collection_item_attributes_should_fail() {
+	public void expected_collection_item_has_less_attributes_than_database_collection_item_attributes_should_fail() throws UnsupportedEncodingException {
 		try {
 			//Inserted one element
 			addCollectionWithTwoData(getMongoDB(), "col1", "name", "Alex","surname", "Soto");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			//Expected with two elements
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected DbObject and insert DbObject have different keys: Expected: [name] Inserted: [name, surname]"));
@@ -252,12 +254,12 @@ public class WhenExpectedDataShouldBeCompared {
 	
 	
 	@Test
-	public void expected_collection_has_all_items_different_than_database_collection_items_should_fail() {
+	public void expected_collection_has_all_items_different_than_database_collection_items_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Soto\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Object # { \"name\" : \"Soto\"} # is not found into collection [col1]"));
@@ -267,12 +269,12 @@ public class WhenExpectedDataShouldBeCompared {
 	
 	
 	@Test
-	public void more_expected_collection_than_database_collection_should_fail() {
+	public void more_expected_collection_than_database_collection_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
-			mongoOperation.databaseIs("{\"col1\":[{\"name\":\"Alex\"}], \"col3\":[{\"name\":\"Alex\"}]}");
+			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}], \"col3\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected collection names are [col1, col3] but insert collection names are [col1]"));

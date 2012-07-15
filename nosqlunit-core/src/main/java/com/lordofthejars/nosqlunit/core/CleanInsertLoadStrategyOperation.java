@@ -1,5 +1,7 @@
 package com.lordofthejars.nosqlunit.core;
 
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +17,7 @@ public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 	}
 
 	@Override
-	public void executeScripts(String[] contentDataset) {
+	public void executeScripts(InputStream[] contentDataset) {
 
 		LOGGER.debug("Calling Clean and Insert Load Strategy.");
 
@@ -28,8 +30,8 @@ public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 		}
 	}
 
-	private void executeInsert(String[] contentDataset) {
-		for (String dataScript : contentDataset) {
+	private void executeInsert(InputStream[] contentDataset) {
+		for (InputStream dataScript : contentDataset) {
 			this.databaseOperation.insert(dataScript);
 		}
 	}

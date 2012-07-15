@@ -32,6 +32,31 @@ public final class IOUtils {
 		return resourceBase.getResourceAsStream(dataLocation) != null;
 	}
 	
+	public static List<InputStream> getAllStreamsFromClasspathBaseResource(Class<?> resourceBase, String[] dataLocations) {
+		
+		final List<InputStream> scriptContent = new ArrayList<InputStream>();
+		
+		for (int i=0;i<dataLocations.length;i++) {
+			InputStream content = getStreamFromClasspathBaseResource(resourceBase, dataLocations[i]);
+			
+			if(content != null) {
+				scriptContent.add(content);
+			}
+		}
+		
+		return scriptContent;
+	}
+	
+	public static InputStream getStreamFromClasspathBaseResource(Class<?> resourceBase, String dataLocation) {
+		
+		if(isFileAvailableOnClasspath(resourceBase, dataLocation)) {
+			return resourceBase.getResourceAsStream(dataLocation);
+		} else {
+			return null;
+		}
+		
+	}
+	
 	public static String readAllStreamFromClasspathBaseResource(Class<?> resourceBase, String dataLocation) throws IOException {
 		
 		if(isFileAvailableOnClasspath(resourceBase, dataLocation)) {

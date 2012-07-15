@@ -3,6 +3,10 @@ package com.lordofthejars.nosqlunit.core;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,10 +26,10 @@ public class WhenRefreshOperationIsExecuted {
 	public void insert_operations_should_be_executed() {
 		
 		RefreshLoadStrategyOperation refreshLoadStrategyOperation = new RefreshLoadStrategyOperation(databaseOperation);
-		String[] contents = new String[]{"My name is","Jimmy Pop"};
+		InputStream[] contents = new InputStream[]{new ByteArrayInputStream("My name is".getBytes()), new ByteArrayInputStream("Jimmy Pop".getBytes())};
 		
 		refreshLoadStrategyOperation.executeScripts(contents);
-		verify(databaseOperation, times(2)).insertNotPresent(anyString());
+		verify(databaseOperation, times(2)).insertNotPresent(any(InputStream.class));
 		
 	}
 
@@ -33,7 +37,7 @@ public class WhenRefreshOperationIsExecuted {
 	public void refresh_operation_should_throw_an_exception_is_no_data_available() {
 		
 		RefreshLoadStrategyOperation refreshLoadStrategyOperation = new RefreshLoadStrategyOperation(databaseOperation);
-		String[] contents = new String[]{};
+		InputStream[] contents = new InputStream[]{};
 		refreshLoadStrategyOperation.executeScripts(contents);
 	}
 	

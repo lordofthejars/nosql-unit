@@ -1,5 +1,7 @@
 package com.lordofthejars.nosqlunit.core;
 
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,11 +17,11 @@ public class RefreshLoadStrategyOperation implements LoadStrategyOperation {
 	}
 
 	@Override
-	public void executeScripts(String[] contentDataset) {
+	public void executeScripts(InputStream[] contentDataset) {
 
 		LOGGER.debug("Calling Refresh Load Strategy.");
 		if (contentDataset.length > 0) {
-			for (String dataScript : contentDataset) {
+			for (InputStream dataScript : contentDataset) {
 				this.databaseOperation.insertNotPresent(dataScript);
 			}
 		} else {

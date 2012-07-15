@@ -7,6 +7,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,10 +113,10 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet)
 					throws IOException {
 
-				String scriptContent = loadExpectedContentScript(description,
+				InputStream scriptContent = loadExpectedContentScript(description,
 						shouldMatchDataSet);
 
-				if (isNotEmptyString(scriptContent)) {
+				if (isNotEmptyStream(scriptContent)) {
 					getDatabaseOperation().databaseIs(scriptContent);
 				} else {
 					throw new IllegalArgumentException(
@@ -125,11 +126,11 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 			}
 
-			private String loadExpectedContentScript(
+			private InputStream loadExpectedContentScript(
 					final Description description,
 					ShouldMatchDataSet shouldMatchDataSet) throws IOException {
 				String location = shouldMatchDataSet.location();
-				String scriptContent = "";
+				InputStream scriptContent = null;
 
 				if (isNotEmptyString(location)) {
 					scriptContent = loadExpectedResultFromLocationAttribute(location);
@@ -146,7 +147,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 						
 					} else {
 						scriptContent = loadExpectedResultFromDefaultLocation(
-								description, shouldMatchDataSet, scriptContent);
+								description, shouldMatchDataSet);
 					}
 				}
 				return scriptContent;
@@ -163,10 +164,13 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 						having(on(SelectiveMatcher.class).location(), notNullValue())));
 			}
 			
-			private String loadExpectedResultFromDefaultLocation(
+			private InputStream loadExpectedResultFromDefaultLocation(
 					final Description description,
-					ShouldMatchDataSet shouldMatchDataSet, String scriptContent)
+					ShouldMatchDataSet shouldMatchDataSet)
 					throws IOException {
+				
+				InputStream scriptContent = null;
+				
 				String defaultLocation = defaultDataSetLocationResolver
 						.resolveDefaultDataSetLocation(
 								shouldMatchDataSet, description,
@@ -179,10 +183,10 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				return scriptContent;
 			}
 
-			private String loadExpectedResultFromLocationAttribute(
+			private InputStream loadExpectedResultFromLocationAttribute(
 					String location) throws IOException {
-				String scriptContent;
-				scriptContent = IOUtils.readAllStreamFromClasspathBaseResource(
+				InputStream scriptContent;
+				scriptContent = IOUtils.getStreamFromClasspathBaseResource(
 						defaultDataSetLocationResolver.getResourceBase(),
 						location);
 				return scriptContent;
@@ -193,7 +197,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 				String[] locations = usingDataSet.locations();
 
-				List<String> scriptContent = new ArrayList<String>();
+				List<InputStream> scriptContent = new ArrayList<InputStream>();
 
 				scriptContent.addAll(loadGlobalDataSets(usingDataSet,
 						description, locations));
@@ -204,14 +208,14 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 						.getLoadStrategyInstance(loadStrategyEnum,
 								getDatabaseOperation());
 				loadStrategyOperation.executeScripts(scriptContent
-						.toArray(new String[scriptContent.size()]));
+						.toArray(new InputStream[scriptContent.size()]));
 
 			}
 
-			private List<String> loadSelectiveDataSets(UsingDataSet usingDataSet)
+			private List<InputStream> loadSelectiveDataSets(UsingDataSet usingDataSet)
 					throws IOException {
 
-				List<String> scriptContent = new ArrayList<String>();
+				List<InputStream> scriptContent = new ArrayList<InputStream>();
 
 				if (isSelectiveLocationsAttributeSpecified(usingDataSet)) {
 					Selective[] selectiveLocations = usingDataSet
@@ -225,7 +229,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 											.locations())) {
 								scriptContent
 										.addAll(IOUtils
-												.readAllStreamsFromClasspathBaseResource(
+												.getAllStreamsFromClasspathBaseResource(
 														defaultDataSetLocationResolver
 																.getResourceBase(),
 														selective.locations()));
@@ -237,16 +241,16 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				return scriptContent;
 			}
 
-			private List<String> loadGlobalDataSets(UsingDataSet usingDataSet,
+			private List<InputStream> loadGlobalDataSets(UsingDataSet usingDataSet,
 					Description description, String[] locations)
 					throws IOException {
 
-				List<String> scriptContent = new ArrayList<String>();
+				List<InputStream> scriptContent = new ArrayList<InputStream>();
 
 				if (isLocationsAttributeSpecified(locations)) {
 
 					scriptContent.addAll(IOUtils
-							.readAllStreamsFromClasspathBaseResource(
+							.getAllStreamsFromClasspathBaseResource(
 									defaultDataSetLocationResolver
 											.getResourceBase(), locations));
 
@@ -258,7 +262,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 					if (location != null) {
 						scriptContent.add(IOUtils
-								.readAllStreamFromClasspathBaseResource(
+								.getStreamFromClasspathBaseResource(
 										defaultDataSetLocationResolver
 												.getResourceBase(), location));
 					}
@@ -285,6 +289,10 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				return false;
 			}
 
+			private boolean isNotEmptyStream(InputStream inputStream) {
+				return inputStream != null;
+			}
+			
 			private boolean isNotEmptyString(String location) {
 				return location != null && !"".equals(location.trim());
 			}

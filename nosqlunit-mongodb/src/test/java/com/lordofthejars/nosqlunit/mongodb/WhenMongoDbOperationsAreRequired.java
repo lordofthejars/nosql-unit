@@ -11,6 +11,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +59,7 @@ public class WhenMongoDbOperationsAreRequired {
 	}
 	
 	@Test
-	public void refresh_operation_should_only_insert_elements_ont_inserted_before() {
+	public void refresh_operation_should_only_insert_elements_ont_inserted_before() throws UnsupportedEncodingException {
 		
 		DBCollection collection1 = mock(DBCollection.class);
 		DBCollection collection2 = mock(DBCollection.class);
@@ -67,7 +69,7 @@ public class WhenMongoDbOperationsAreRequired {
 		when(db.getCollection("collection2")).thenReturn(collection2);
 		
 		MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost", "test"));
-		mongoOperation.insertNotPresent(DATA);
+		mongoOperation.insertNotPresent(new ByteArrayInputStream(DATA.getBytes("UTF-8")));
 		
 		verify(collection1, times(2)).insert(any(BasicDBObject.class));
 		verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
@@ -75,7 +77,7 @@ public class WhenMongoDbOperationsAreRequired {
 	}
 	
 	@Test
-	public void insert_opertation_should_add_data_into_collections() {
+	public void insert_opertation_should_add_data_into_collections() throws UnsupportedEncodingException {
 	
 		DBCollection collection1 = mock(DBCollection.class);
 		DBCollection collection2 = mock(DBCollection.class);
@@ -84,7 +86,7 @@ public class WhenMongoDbOperationsAreRequired {
 		when(db.getCollection("collection2")).thenReturn(collection2);
 		
 		MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost","test"));
-		mongoOperation.insert(DATA);
+		mongoOperation.insert(new ByteArrayInputStream(DATA.getBytes("UTF-8")));
 		
 		verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
 		verifyInsertedData(EXPECTED_COLLECTION_2, collection2);

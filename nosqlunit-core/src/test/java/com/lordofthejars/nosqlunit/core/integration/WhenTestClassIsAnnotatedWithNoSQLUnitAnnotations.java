@@ -1,15 +1,22 @@
 package com.lordofthejars.nosqlunit.core.integration;
 
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.hamcrest.CoreMatchers.is;
+
+import java.io.InputStream;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -20,6 +27,7 @@ import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.lordofthejars.nosqlunit.core.InjectAnnotationProcessor;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.LoadStrategyFactory;
@@ -77,8 +85,15 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
+		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		
 		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Class Annotation" });
+				streamCaptor.capture());
+		
+		InputStream[] isContents = streamCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Class Annotation"));
+		
 	}
 
 	@Test
@@ -109,12 +124,22 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
+		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+	
+
 		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Class Annotation", "Selective Annotation" });
+				streamCaptor.capture());
+		
+		InputStream[] isContents = streamCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Class Annotation"));
+		
+		scriptContent = IOUtils.readFullStream(isContents[1]);
+		assertThat(scriptContent, is("Selective Annotation"));
 	}
 
 	@Test
-	public void selective_annotations_should_load_not_load_data_of_not_identified_rules()
+	public void selective_annotations_should_not_load_data_of_not_identified_rules()
 			throws Throwable {
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
@@ -139,10 +164,15 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
+		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
-		verify(loadStrategyOperation, times(0)).executeScripts(
-				new String[] { "Selective Annotation" });
+		verify(loadStrategyOperation, times(1)).executeScripts(
+				streamCaptor.capture());
+		
+		assertThat(streamCaptor.getValue(), arrayWithSize(0));
+				
 	}
 
 	@Test
@@ -171,10 +201,20 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
+		
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
+		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		
+		
 		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Selective Annotation" });
+				streamCaptor.capture());
+		
+		InputStream[] isContents = streamCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Selective Annotation"));
+		
+		
 	}
 
 	@Test
@@ -206,11 +246,25 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
+		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+		
 		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Default Class Name Strategy 2" });
+				streamsCaptor.capture());
+		
+		InputStream[] isContents = streamsCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Default Class Name Strategy 2"));
+		
+		
+		
 		verify(databaseOperation, times(1)).databaseIs(
-				"Default Class Name Strategy 2");
-
+				streamCaptor.capture());
+		
+		InputStream isContent = streamCaptor.getValue();
+		scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Default Class Name Strategy 2"));
+		
 	}
 
 	@Test
@@ -243,10 +297,22 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
+		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+
 		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Default Class Name Strategy" });
+				streamsCaptor.capture());
+		
+		InputStream[] isContents = streamsCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Default Class Name Strategy"));
+		
 		verify(databaseOperation, times(1)).databaseIs(
-				"Default Class Name Strategy");
+				streamCaptor.capture());
+		
+		InputStream isContent = streamCaptor.getValue();
+		scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Default Class Name Strategy"));
 
 	}
 
@@ -280,11 +346,23 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
-		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Default Method Name Strategy" });
-		verify(databaseOperation, times(1)).databaseIs(
-				"Default Method Name Strategy");
+		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
+		verify(loadStrategyOperation, times(1)).executeScripts(
+				streamsCaptor.capture());
+		
+		InputStream[] isContents = streamsCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Default Method Name Strategy"));
+		
+		verify(databaseOperation, times(1)).databaseIs(
+				streamCaptor.capture());
+		
+		InputStream isContent = streamCaptor.getValue();
+		scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Default Method Name Strategy"));
+		
 	}
 
 	@Test
@@ -317,9 +395,24 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
+		
+		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+
 		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Method Annotation" });
-		verify(databaseOperation, times(1)).databaseIs("Method Annotation");
+				streamsCaptor.capture());
+		
+		InputStream[] isContents = streamsCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Method Annotation"));
+		
+		verify(databaseOperation, times(1)).databaseIs(
+				streamCaptor.capture());
+		
+		InputStream isContent = streamCaptor.getValue();
+		scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Method Annotation"));
+		
 
 	}
 
@@ -351,10 +444,23 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
-		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Class Annotation" });
-		verify(databaseOperation, times(1)).databaseIs("Method Annotation");
+		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
+		verify(loadStrategyOperation, times(1)).executeScripts(
+				streamsCaptor.capture());
+		
+		InputStream[] isContents = streamsCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Class Annotation"));
+		
+		verify(databaseOperation, times(1)).databaseIs(
+				streamCaptor.capture());
+		
+		InputStream isContent = streamCaptor.getValue();
+		scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Method Annotation"));
+		
 	}
 
 	@Test
@@ -383,10 +489,24 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
+		
+		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
 		verify(loadStrategyOperation, times(1)).executeScripts(
-				new String[] { "Class Annotation" });
-		verify(databaseOperation, times(1)).databaseIs("Class Annotation");
+				streamsCaptor.capture());
+		
+		InputStream[] isContents = streamsCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContents[0]);
+		assertThat(scriptContent, is("Class Annotation"));
+		
+		verify(databaseOperation, times(1)).databaseIs(
+				streamCaptor.capture());
+		
+		InputStream isContent = streamCaptor.getValue();
+		scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Class Annotation"));
+		
 
 	}
 
@@ -419,7 +539,14 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
-		verify(databaseOperation, times(1)).databaseIs("Selective Annotation");
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+		
+		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+		
+		InputStream isContent = streamCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Selective Annotation"));
+		
 
 	}
 
@@ -484,10 +611,15 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, description).evaluate();
 
-		verify(databaseOperation, times(1)).databaseIs("Class Annotation");
+		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+		
+		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
+		InputStream isContent = streamCaptor.getValue();
+		String scriptContent = IOUtils.readFullStream(isContent);
+		assertThat(scriptContent, is("Class Annotation"));
+		
 	}
-
 }
 
 @UsingDataSet(locations = "test2", withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.REFRESH)

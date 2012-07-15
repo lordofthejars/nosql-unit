@@ -1,12 +1,14 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.mongodb.BasicDBList;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -28,9 +30,12 @@ public final class MongoOperation implements DatabaseOperation {
 	}
 
 	@Override
-	public void insert(String jsonData) {
+	public void insert(InputStream contentStream) {
 
+		
 		try {
+
+			String jsonData = loadContentFromInputStream(contentStream);
 
 			DBObject parsedData = parseData(jsonData);
 			DB mongoDb = getMongoDb();
@@ -90,9 +95,11 @@ public final class MongoOperation implements DatabaseOperation {
 	}
 
 	@Override
-	public boolean databaseIs(String expectedJsonData) {
+	public boolean databaseIs(InputStream contentStream) {
 
 		try {
+			String expectedJsonData = loadContentFromInputStream(contentStream);
+			
 			DBObject parsedData = parseData(expectedJsonData);
 			MongoDbAssertion.strictAssertEquals(parsedData, getMongoDb());
 			
@@ -105,9 +112,12 @@ public final class MongoOperation implements DatabaseOperation {
 	}
 
 	@Override
-	public void insertNotPresent(String jsonData) {
+	public void insertNotPresent(InputStream contentStream) {
 		
 		try {
+			
+			String jsonData = loadContentFromInputStream(contentStream);
+			
 			DBObject parsedData = parseData(jsonData);
 			DB mongoDb = getMongoDb();
 			
@@ -175,6 +185,10 @@ public final class MongoOperation implements DatabaseOperation {
 		return db;
 	}
 
+	private String loadContentFromInputStream(InputStream inputStreamContent) throws IOException {
+		return IOUtils.readFullStream(inputStreamContent);
+	}
+	
 	@Override
 	public Object connectionManager() {
 		return mongo;
