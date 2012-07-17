@@ -1,4 +1,4 @@
-package com.lordofthejars.nosqlunit.neo4j;
+package com.lordofthejars.nosqlunit.graph.parser;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;

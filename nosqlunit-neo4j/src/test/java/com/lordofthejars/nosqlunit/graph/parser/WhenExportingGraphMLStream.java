@@ -1,4 +1,4 @@
-package com.lordofthejars.nosqlunit.neo4j;
+package com.lordofthejars.nosqlunit.graph.parser;
 
 import static org.xmlmatchers.XmlMatchers.isEquivalentTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
