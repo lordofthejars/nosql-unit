@@ -115,6 +115,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.2</version>
+		</dependency>
+            
 	</dependencies>
 
 	<build>
