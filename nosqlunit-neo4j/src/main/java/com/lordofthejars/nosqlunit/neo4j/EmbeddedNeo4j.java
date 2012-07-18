@@ -7,13 +7,14 @@ import java.io.File;
 import org.junit.rules.ExternalResource;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.server.configuration.Configurator;
 
 import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 
 public class EmbeddedNeo4j extends ExternalResource {
 
 	protected static final String LOCALHOST = "127.0.0.1";
-	protected static final int PORT = 7474;
+	protected static final int PORT = Configurator.DEFAULT_WEBSERVER_PORT;
 
 	protected static final String DEFAULT_NEO4J_TARGET_PATH = "target" + File.separatorChar + "neo4j-temp";
 
