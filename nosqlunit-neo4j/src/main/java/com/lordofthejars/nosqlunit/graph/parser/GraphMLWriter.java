@@ -18,7 +18,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.tooling.GlobalGraphOperations;
+
+import com.lordofthejars.nosqlunit.neo4j.Neo4jLowLevelOps;
 
 public class GraphMLWriter {
 
@@ -35,13 +36,12 @@ public class GraphMLWriter {
 		Map<String, String> vertexKeyTypes = Collections.EMPTY_MAP;
 		Map<String, String> edgeKeyTypes = Collections.EMPTY_MAP;
 
-		GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(this.graphDatabaseService);
 
-		List<Node> nodes = loadAllNodes(globalGraphOperations);
+		List<Node> nodes = loadAllNodes();
 		vertexKeyTypes = findNodeKeys(nodes);
 
 		
-		List<Relationship> relationships = loadAllRelationships(globalGraphOperations);
+		List<Relationship> relationships = loadAllRelationships();
 		edgeKeyTypes = findRelationshipKeys(relationships);
 
 		final XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
@@ -68,12 +68,11 @@ public class GraphMLWriter {
 
 	}
 	
-	private List<Relationship> loadAllRelationships(GlobalGraphOperations globalGraphOperations) {
+	private List<Relationship> loadAllRelationships() {
 
 		List<Relationship> relationships = new ArrayList<Relationship>();
 		
-		Iterable<Relationship> relationshipIterable = globalGraphOperations.getAllRelationships();
-		Iterator<Relationship> relationshipIterator = relationshipIterable.iterator();
+		Iterator<Relationship> relationshipIterator = Neo4jLowLevelOps.getAllRelationships(graphDatabaseService);
 
 		while (relationshipIterator.hasNext()) {
 			relationships.add(relationshipIterator.next());
@@ -84,12 +83,10 @@ public class GraphMLWriter {
 	}
 	
 
-	private List<Node> loadAllNodes(GlobalGraphOperations globalGraphOperations) {
+	private List<Node> loadAllNodes() {
 
 		List<Node> nodes = new ArrayList<Node>();
-		
-		Iterable<Node> nodeIterable = globalGraphOperations.getAllNodes();
-		Iterator<Node> nodeIterator = nodeIterable.iterator();
+		Iterator<Node> nodeIterator = Neo4jLowLevelOps.getAllNodes(this.graphDatabaseService);
 
 		while (nodeIterator.hasNext()) {
 			nodes.add(nodeIterator.next());

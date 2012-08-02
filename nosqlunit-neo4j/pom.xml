@@ -36,7 +36,15 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-kernel</artifactId>
 		</dependency>
-
+		
+		<dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-cypher</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>org.neo4j.server.plugin</groupId>
+        	<artifactId>neo4j-cypher-plugin</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>stax</groupId>
 			<artifactId>stax-api</artifactId>

@@ -131,6 +131,7 @@ public class GraphMLReader {
 						}
 						
 					} else if (elementName.equals(GraphMLTokens.GRAPH)) {
+						nodes.put("0", this.graphDatabaseService.getReferenceNode());
 						graphDepth++;
 					}
 

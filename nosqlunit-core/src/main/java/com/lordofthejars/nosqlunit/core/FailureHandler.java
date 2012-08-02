@@ -7,4 +7,8 @@ public class FailureHandler {
 		return new NoSqlAssertionError(String.format(message, args));
 	}
 	
+	public static final IllegalStateException createIllegalStateFailure(String message, Object...args) {
+		return new IllegalStateException(String.format(message, args));
+	}
+	
 }

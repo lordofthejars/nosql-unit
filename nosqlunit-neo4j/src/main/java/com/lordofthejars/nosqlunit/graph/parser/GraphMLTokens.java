@@ -3,7 +3,7 @@ package com.lordofthejars.nosqlunit.graph.parser;
 public class GraphMLTokens {
 	
 	public static final String XML_SCHEMA_NAMESPACE_TAG = "xsi";
-    public static final String DEFAULT_GRAPHML_SCHEMA_LOCATION = "http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd";
+    public static final String DEFAULT_GRAPHML_SCHEMA_LOCATION = "http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd";
     public static final String XML_SCHEMA_LOCATION_ATTRIBUTE = "schemaLocation";
     public static final String GRAPHML = "graphml";
     public static final String XMLNS = "xmlns";
