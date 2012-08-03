@@ -35,7 +35,7 @@ import com.lordofthejars.nosqlunit.graph.parser.GraphMLWriter;
 
 public class WhenExportingGraphMLStream {
 
-	private static final String EXPECTED_GRAPH = "<?xml version=\"1.0\" ?><graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd\"><key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"></key><key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"></key><graph id=\"G\" edgedefault=\"directed\"><node id=\"0\"><data key=\"name\">I</data></node><node id=\"1\"><data key=\"name\">You</data></node><edge id=\"0\" source=\"0\" target=\"1\" label=\"KNOWS\"><data key=\"weight\">0.5</data></edge></graph></graphml>";
+	private static final String EXPECTED_GRAPH = "<?xml version=\"1.0\" ?><graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\"><key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"></key><key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"></key><graph id=\"G\" edgedefault=\"directed\"><node id=\"0\"><data key=\"name\">I</data></node><node id=\"1\"><data key=\"name\">You</data></node><edge id=\"0\" source=\"0\" target=\"1\" label=\"KNOWS\"><data key=\"weight\">0.5</data></edge></graph></graphml>";
 	
 	@Mock
 	GraphDatabaseAPI graphDatabaseAPI;
