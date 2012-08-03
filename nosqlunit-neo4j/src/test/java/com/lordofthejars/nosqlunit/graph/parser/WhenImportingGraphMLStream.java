@@ -53,6 +53,33 @@ public class WhenImportingGraphMLStream {
 			"    </graph>\n" + 
 			"</graphml>";
 
+	private static final String WELL_FORMED_GRAPH_WITH_REFERENCE_NODE = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"0\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.5</data>\n" + 
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
+	
 	private static final String MISPLACED_EDGES_GRAPH = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
 			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
 			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
@@ -232,12 +259,14 @@ public class WhenImportingGraphMLStream {
 	}
 
 	@Test
-	public void parser_Should_Insert_Data_Into_Neo4j() throws FileNotFoundException {
+	public void parser_should_insert_data_into_neo4j() throws FileNotFoundException {
 
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
 		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
 
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -264,11 +293,13 @@ public class WhenImportingGraphMLStream {
 	}
 
 	@Test
-	public void parser_Should_Work_With_Misplaced_Edges() {
+	public void parser_should_work_with_misplaced_edges() {
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
 		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
 
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -300,7 +331,10 @@ public class WhenImportingGraphMLStream {
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
 		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
 
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -327,13 +361,51 @@ public class WhenImportingGraphMLStream {
 		
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void parser_Should_Throw_An_Exception_If_Any_Edge_Is_Orphan() {
+	@Test
+	public void parser_should_use_id_0_as_reference_node() {
 		
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
 		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
 
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+
+		Relationship relationship1 = mock(Relationship.class);
+		when(referenceNode.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
+
+		Relationship relationship2 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node3), any(RelationshipType.class))).thenReturn(relationship2);
+
+		GraphMLReader graphMLReader = new GraphMLReader(graphDatabaseService);
+
+		graphMLReader.read(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_REFERENCE_NODE.getBytes()));
+
+		verify(graphDatabaseService, times(3)).createNode();
+
+		verify(referenceNode, times(1)).createRelationshipTo(eq(node25), any(DynamicRelationshipType.class));
+		verify(node15, times(1)).createRelationshipTo(eq(node3), any(DynamicRelationshipType.class));
+
+		verify(node15).setProperty("name", "I");
+		verify(node25).setProperty("name", "you");
+		verify(node3).setProperty("name", "him");
+
+		verify(relationship1, times(1)).setProperty("weight", (Float) 0.5f);
+		verify(relationship2, times(1)).setProperty("weight", (Float) 0.8f);
+		
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void parser_should_throw_an_exception_if_any_edge_is_orphan() {
+		
+		Node node15 = mock(Node.class);
+		Node node25 = mock(Node.class);
+		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
+
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -348,7 +420,7 @@ public class WhenImportingGraphMLStream {
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void parser_Should_Throw_An_Exception_If_Key_Is_Not_Defined() {
+	public void parser_should_throw_an_exception_if_key_is_not_defined() {
 		
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
@@ -368,7 +440,7 @@ public class WhenImportingGraphMLStream {
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void parser_Should_Throw_An_Exception_If_Id_Is_Defined_In_Node_Data_Section() {
+	public void parser_should_throw_an_Exception_if_id_is_defined_in_node_data_section() {
 		
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
@@ -388,7 +460,7 @@ public class WhenImportingGraphMLStream {
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void parser_Should_Throw_An_Exception_If_Label_Is_Defined_In_Edge_Data_Section() {
+	public void parser_should_throw_an_exception_if_label_is_defined_in_edge_data_section() {
 		
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
