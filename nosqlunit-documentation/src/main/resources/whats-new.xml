@@ -7,6 +7,123 @@
 	<title>What's New?</title>
 
 	<section>
+		<title>Neo4j Support</title>
+
+		<para>
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			supports
+			<emphasis>Neo4j</emphasis>
+			by using next classes:
+		</para>
+		<para>
+			<table border="1">
+				<caption>Lifecycle Management Rules</caption>
+
+				<tr>
+					<td>Embedded</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j
+						</classname>
+					</td>
+				</tr>
+
+				<tr>
+					<td>Managed Wrapping</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer
+						</classname>
+					</td>
+				</tr>
+				<tr>
+					<td>Managed</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer
+						</classname>
+					</td>
+				</tr>
+			</table>
+		</para>
+		<para>
+			<table border="1">
+				<caption>Manager Rule</caption>
+
+				<tr>
+					<td>NoSQLUnit Management</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.neo4j.Neo4jRule
+						</classname>
+					</td>
+				</tr>
+			</table>
+		</para>
+
+		<para>
+			Default dataset file format in
+			<emphasis>Neo4j</emphasis>
+			module is
+			<link xlink:href="http://graphml.graphdrawing.org/">GraphML</link>
+			.
+			<emphasis>GraphML</emphasis>
+			is a comprehensive and easy-to-use file format for graphs.
+		</para>
+		<example xml:id="ex.whats-newneo4j_dataset">
+			<title>Example of GraphML Dataset</title>
+
+			<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+    <key id="attr1" for="edge" attr.name="attr1" attr.type="float"/>
+    <key id="attr2" for="node" attr.name="attr2" attr.type="string"/>
+    <graph id="G" edgedefault="directed">
+        <node id="1">
+            <data key="attr2">value1</data>
+        </node>
+        <node id="2">
+            <data key="attr2">value2</data>
+        </node>
+        <edge id="7" source="1" target="2" label="label1">
+            <data key="attr1">float</data>
+        </edge>
+    </graph>
+</graphml>]]></programlisting>
+		</example>
+
+		<para>
+			A simple example of using embedded
+			<emphasis>Neo4j</emphasis>
+			lifecycle management could be:
+		</para>
+
+		<example xml:id="program.whats-new-neo_embedded_conf">
+			<title>Embedded Neo4j</title>
+
+			<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
+
+@ClassRule
+public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();]]></programlisting>
+		</example>
+
+		<para>
+			And for configuring
+			<emphasis>Neo4j</emphasis>
+			connection:
+		</para>
+
+		<example xml:id="program.what-s-new-embedded_connection_neo4j_parameters">
+			<title>Neo4j with embedded configuration</title>
+
+			<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
+
+@Rule
+public Neo4jRule neo4jRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().build());]]></programlisting>
+		</example>
+
+	</section>
+
+	<section>
 		<title>Simultaneous engines</title>
 
 		<para>
@@ -38,53 +155,90 @@
 			<function>connectionIdentifier()</function>
 			method in configuration instance.
 		</para>
-		
-		<example xml:id="what-snew.name-database">
-				<title>Given a name database rule</title>
 
-				<programlisting language="java"><![CDATA[@Rule
+		<example xml:id="what-snew.name-database">
+			<title>Given a name database rule</title>
+
+			<programlisting language="java"><![CDATA[@Rule
 public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
                                         .databaseName("test").connectionIdentifier("one").build() ,this);]]></programlisting>
 		</example>
 		<para>
-		And also you need to provide an identified dataset for each engine, by using <function>withSelectiveLocations</function> attribute of <function>@UsingDataSet</function> annotation. You must set up the pair "named connection" / datasets.  
+			And also you need to provide an identified dataset for each engine,
+			by using
+			<function>withSelectiveLocations</function>
+			attribute of
+			<function>@UsingDataSet</function>
+			annotation. You must set up the pair "named connection" / datasets.
 		</para>
-		
-		<example xml:id="what-snew.dataset-selective">
-				<title>Selective dataset example</title>
 
-				<programlisting language="java"><![CDATA[@UsingDataSet(withSelectiveLocations =												 
+		<example xml:id="what-snew.dataset-selective">
+			<title>Selective dataset example</title>
+
+			<programlisting language="java"><![CDATA[@UsingDataSet(withSelectiveLocations =												 
 				{ @Selective(identifier = "one", locations = "test3") }, 
 			loadStrategy = LoadStrategyEnum.REFRESH)]]></programlisting>
 		</example>
-		<para>In <link linkend="what-snew.dataset-selective">example</link> we are refreshing database declared on <link linkend="what-snew.name-database">previous example</link> with data located at <emphasis>test3</emphasis> file. 
-		</para>
-		
 		<para>
-		Also works in expectations annotation:
+			In
+			<link linkend="what-snew.dataset-selective">example</link>
+			we are refreshing database declared on
+			<link linkend="what-snew.name-database">previous example</link>
+			with data located at
+			<emphasis>test3</emphasis>
+			file.
 		</para>
-		
-		<example xml:id="what-snew.expected-dataset-selective">
-				<title>Selective expectation example</title>
 
-				<programlisting language="java"><![CDATA[@ShouldMatchDataSet(withSelectiveMatcher = 
+		<para>
+			Also works in expectations annotation:
+		</para>
+
+		<example xml:id="what-snew.expected-dataset-selective">
+			<title>Selective expectation example</title>
+
+			<programlisting language="java"><![CDATA[@ShouldMatchDataSet(withSelectiveMatcher = 
 				{ @SelectiveMatcher(identifier = "one", location = "test3") 
 				})]]></programlisting>
 		</example>
-		<para>For more information see chapter about <link linkend="advanced.simultaneous-engine-title">advanced features</link>.</para>
-		
+		<para>
+			For more information see chapter about
+			<link linkend="advanced.simultaneous-engine-title">advanced features</link>
+			.
+		</para>
+
 	</section>
-	
+
 	<section>
 		<title>Support for JSR-330</title>
-		
-		<para><emphasis role="bold">NoSQLUnit</emphasis> supports two annotations of <acronym>JSR-330</acronym> aka Dependency Injection for Java. Concretely <classname>@Inject</classname> and <classname>@Named</classname> annotations.</para>
-		<para>During test execution you may need to access underlying class used to load and assert data to execute extra operations to backend. <emphasis role="bold">NoSQLUnit</emphasis> will inspect <classname>@Inject</classname> annotations of test fields, and try to set own driver to attribute. For example in case of <application>MongoDb</application>, <classname>com.mongodb.Mongo</classname> instance will be injected.</para>
-		
-		<example xml:id="what-snew.injection">
-				<title>Injection example</title>
 
-				<programlisting language="java"><![CDATA[@Rule
+		<para>
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			supports two annotations of
+			<acronym>JSR-330</acronym>
+			aka Dependency Injection for Java. Concretely
+			<classname>@Inject</classname>
+			and
+			<classname>@Named</classname>
+			annotations.
+		</para>
+		<para>
+			During test execution you may need to access underlying class used to
+			load and assert data to execute extra operations to backend.
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			will inspect
+			<classname>@Inject</classname>
+			annotations of test fields, and try to set own driver to attribute.
+			For example in case of
+			<application>MongoDb</application>
+			,
+			<classname>com.mongodb.Mongo</classname>
+			instance will be injected.
+		</para>
+
+		<example xml:id="what-snew.injection">
+			<title>Injection example</title>
+
+			<programlisting language="java"><![CDATA[@Rule
 public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
 						.databaseName("test").build() ,this);
 
@@ -92,16 +246,28 @@ public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
 private Mongo mongo;]]></programlisting>
 		</example>
 		<warning>
-			<para>Note that in <link linkend="what-snew.injection">example</link> we are setting <varname>this</varname> as second parameter to the Rule.</para>
+			<para>
+				Note that in
+				<link linkend="what-snew.injection">example</link>
+				we are setting
+				<varname>this</varname>
+				as second parameter to the Rule.
+			</para>
 		</warning>
-		
+
 		<para>
-		But if you are using more than one engine at same time (see <link linkend="advanced.simultaneous-engine-title">chapter</link>) you need a way to distinguish each connection. For fixing this problem, you must use <classname>@Named</classname> annotation by putting the identifier given in configuration instance. For example:
+			But if you are using more than one engine at same time (see
+			<link linkend="advanced.simultaneous-engine-title">chapter</link>
+			) you need a way to distinguish each connection. For fixing this
+			problem, you must use
+			<classname>@Named</classname>
+			annotation by putting the identifier given in configuration instance.
+			For example:
 		</para>
 		<example xml:id="what-snew.named-injection">
-				<title>Named injection example</title>
+			<title>Named injection example</title>
 
-				<programlisting language="java"><![CDATA[@Rule
+			<programlisting language="java"><![CDATA[@Rule
 public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
 					.databaseName("test").connectionIdentifier("one").build() ,this);
 
@@ -118,8 +284,10 @@ private Mongo mongo1;
 private Mongo mongo2;]]></programlisting>
 		</example>
 		<para>
-		For more information see <link linkend="advanced.jsr330-title">advanced features</link> chapter.
+			For more information see
+			<link linkend="advanced.jsr330-title">advanced features</link>
+			chapter.
 		</para>
 	</section>
-	
+
 </chapter>

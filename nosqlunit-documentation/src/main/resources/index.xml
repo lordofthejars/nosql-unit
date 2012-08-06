@@ -65,6 +65,7 @@
 			</para>
 		</partintro>
 		<xi:include href="./mongodb.xml"/>
+		<xi:include href="./neo4j.xml"/>
 	</part>
 
 	<part id="advanced-usage-part">
