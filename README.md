@@ -17,6 +17,7 @@ Neo4j Support
 *NoSQLUnit* supports *Neo4j* by using next classes:
 
   ------------------ ------------------------------------------------------------
+  In-Memory			 com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j
   Embedded           com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j
   Managed Wrapping   com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer
   Managed            com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer
@@ -765,6 +766,7 @@ features of a mature and robust database.
 *NoSQLUnit* supports *Neo4j* by using next classes:
 
   ------------------ ------------------------------------------------------------
+  In-Memory			 com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j
   Embedded           com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j
   Managed Wrapping   com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer
   Managed            com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer
@@ -850,10 +852,22 @@ where:
 
 First step is defining which lifecycle management strategy is required
 for your tests. Depending on kind of test you are implementing (unit
-test, integration test, deployment test, ...) you will require an
+test, integration test, deployment test, ...) you will require an in-memory approach,
 embedded approach, managed approach or remote approach. Note that there
 is no implementation of a *Neo4j* in-memory database at this time, but
 embedded strategy for unit tests will be the better one.
+
+##### In-Memory Lifecycle
+
+To configure *in-memory* approach you should only instantiate next
+[rule](#program.neo_inmemory_conf) :
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j.InMemoryNeo4jRuleBuilder.newInMemoryNeo4j;
+
+@ClassRule
+public static InMemoryNeo4j inMemoryNeo4j = newInMemoryNeo4j().build();
+~~~~
 
 ##### Embedded Lifecycle
 
@@ -951,9 +965,9 @@ To make developer's life easier and code more readable, a fluent
 interface can be used to create these configuration objects. Two
 different kind of configuration builders exist.
 
-##### Embedded Connection
+##### In-Memory/Embedded Connection
 
-The first one is for configuring a connection to embedded *Neo4j* .
+The first one is for configuring a connection to In-Memory/Embedded *Neo4j* .
 
 ~~~~ {.java}
 import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
@@ -967,6 +981,8 @@ If you are only registering one embedded *Neo4j* instance like previous
 are using more than one *Neo4j* embedded connection like explained in
 [Simultaneous Engine](#advanced.simultaneous-engine-title) section,
 `targetPath` shall be provided by using `buildFromTargetPath` method.
+
+If you are using in-memory approach mixed with embedded approach, target path for in-memory instance can be found at *InMemoryNeo4j.INMEMORY_NEO4J_TARGET_PATH* variable.
 
 ##### Remote Connection
 
