@@ -50,7 +50,7 @@ public class MatrixManager {
 				RelTypes.KNOWS, Direction.OUTGOING);
 	}
 
-	private Node getNeoNode() {
+	public Node getNeoNode() {
 		return graphDb.getReferenceNode().getSingleRelationship(RelTypes.NEO_NODE, Direction.OUTGOING).getEndNode();
 	}
 

@@ -10,7 +10,7 @@
 
 	<properties>
 		<github.global.server>github</github.global.server>
-		<documentation>0.3.2</documentation>
+		<documentation>0.3.3</documentation>
 	</properties>
 
 

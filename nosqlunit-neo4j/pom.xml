@@ -88,6 +88,12 @@
 
 		<dependency>
 			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-kernel</artifactId>
+			<type>test-jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-rest-graphdb</artifactId>
 			<version>1.6.M02</version>
 			<exclusions>

@@ -20,6 +20,15 @@
 				<caption>Lifecycle Management Rules</caption>
 
 				<tr>
+					<td>In Memory</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j
+						</classname>
+					</td>
+				</tr>
+
+				<tr>
 					<td>Embedded</td>
 
 					<td>

@@ -27,6 +27,15 @@
 				<caption>Lifecycle Management Rules</caption>
 
 				<tr>
+					<td>In Memory</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j
+						</classname>
+					</td>
+				</tr>
+
+				<tr>
 					<td>Embedded</td>
 
 					<td>
@@ -197,14 +206,28 @@
 					First step is defining which lifecycle management strategy is
 					required for your tests. Depending on kind of test you are
 					implementing (unit test, integration test, deployment test, ...)
-					you will require an embedded approach, managed approach or remote
-					approach. Note that there is no implementation of a
-					<emphasis>Neo4j</emphasis>
-					in-memory
-					database at this time, but embedded strategy for unit
-					tests will be
-					the better one.
+					you will require an in-memory approach, embedded approach, managed approach or remote
+					approach. 
 				</para>
+				<section>
+					<title>In-memory Lifecycle</title>
+					<para>
+					To configure
+					<emphasis role="bold">in-memory</emphasis>
+					approach you should only instantiate next <link linkend="program.neo_inmemory_conf">rule</link>
+					:
+				</para>
+
+				<example xml:id="program.neo_inmemory_conf">
+					<title>In-Memory Neo4j</title>
+
+					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j.InMemoryNeo4jRuleBuilder.newInMemoryNeo4j;
+
+@ClassRule
+public static InMemoryNeo4j inMemoryNeo4j = newInMemoryNeo4j().build();]]></programlisting>
+				</example>
+					
+				</section>
 				<section>
 				<title>Embedded Lifecycle</title>
 				<para>
@@ -431,9 +454,9 @@ public static ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().ne
 					different kind of configuration builders exist.
 				</para>
 				<section>
-				<title>Embedded Connection</title>
+				<title>In-Memory/Embedded Connection</title>
 				<para>
-					The first one is for configuring a connection to embedded
+					The first one is for configuring a connection to in-memory/embedded
 					<emphasis>Neo4j</emphasis>
 					.
 				</para>
@@ -462,6 +485,9 @@ public Neo4jRule neo4jRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().b
 					shall be provided by using
 					<function>buildFromTargetPath</function>
 					method.
+				</para>
+				<para>
+					If you are using in-memory approach mixed with embedded approach, target path for in-memory instance can be found at <constant>InMemoryNeo4j.INMEMORY_NEO4J_TARGET_PATH</constant> variable.
 				</para>
 				</section>
 				<section>
