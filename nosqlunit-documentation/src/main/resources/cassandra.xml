@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="cassandra" xmlns="http://docbook.org/ns/docbook"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook">
+
+	<title>Cassandra Engine</title>
+
+	<section>
+		<title>Cassandra</title>
+
+		<para>
+			<application>Cassandra</application>
+			is a BigTable data model running on an Amazon Dynamo-like
+			infrastructure.
+		</para>
+
+		<para>
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			supports
+			<emphasis>Cassandra</emphasis>
+			by using next classes:
+		</para>
+		<para>
+			<table border="1">
+				<caption>Lifecycle Management Rules</caption>
+
+				<tr>
+					<td>Embedded</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra
+						</classname>
+					</td>
+				</tr>
+
+				<tr>
+					<td>Managed</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.cassandra.ManagedCassandra
+						</classname>
+					</td>
+				</tr>
+			</table>
+		</para>
+		<para>
+			<table border="1">
+				<caption>Manager Rule</caption>
+
+				<tr>
+					<td>NoSQLUnit Management</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.cassandra.CassandraRule
+						</classname>
+					</td>
+				</tr>
+			</table>
+		</para>
+
+		<section>
+			<title>Maven Setup</title>
+
+			<para>
+				To use
+				<emphasis role="bold">NoSQLUnit</emphasis>
+				with
+				<application>Cassandra</application>
+				you only need to add next
+				dependency:
+			</para>
+
+			<example xml:id="conf.nosqlunit_cassandra_dep">
+				<title>NoSqlUnit Maven Repository</title>
+
+				<programlisting language="xml"><![CDATA[<dependency>
+	<groupId>com.lordofthejars</groupId>
+	<artifactId>nosqlunit-cassandra</artifactId>
+	<version>${version.nosqlunit}</version>
+</dependency>]]></programlisting>
+			</example>
+		</section>
+
+		<section>
+			<title>Dataset Format</title>
+
+			<para>
+				Default dataset file format in
+				<emphasis>Cassandra</emphasis>
+				module is json. To make compatible
+				<emphasis role="bold">NoSQLUnit</emphasis>
+				with
+				<application>
+					<link xlink:href="https://github.com/jsevellec/cassandra-unit/">Cassandra-Unit</link>
+				</application>
+				file format,
+				<classname>DataLoader</classname>
+				of
+				<application>Cassandra-Unit</application>
+				project is used, so same json format file is used.
+			</para>
+
+			<para>
+				Datasets must have next
+				<link linkend="ex.cassandra_dataset">
+					format
+				</link>
+				:
+			</para>
+
+			<example xml:id="ex.cassandra_dataset">
+				<title>Example of Casssandra Dataset</title>
+
+				<programlisting language="json"><![CDATA[{
+    "name" : "",
+    "replicationFactor" : "",
+    "strategy" : "",
+    "columnFamilies" : [{
+        "name" : "",
+        "type" : "",
+        "keyType" : "",
+        "comparatorType" : "",
+        "subComparatorType" : "",
+        "defaultColumnValueType" : "",
+        "comment" : "",
+        "compactionStrategy" : "",
+        "compactionStrategyOptions" : [{
+            "name" : "",
+            "value": ""
+        }],
+        "gcGraceSeconds" : "",
+        "maxCompactionThreshold" : "",
+        "minCompactionThreshold" : "",
+        "readRepairChance" : "",
+        "replicationOnWrite" : "",
+        "columnsMetadata" : [{
+            "name" : "",
+            "validationClass : "",
+            "indexType" : "",
+            "indexName" : ""
+        },
+        ...
+        ]
+        "rows" : [{
+            "key" : "",
+            "columns" : [{
+                "name" : "",
+                "value" : ""
+            },
+            ...
+            ],
+            ...
+            // OR
+            ...
+            "superColumns" : [{
+                "name" : "",
+                "columns" : [{
+                    "name" : "",
+                    "value" : ""
+                },
+                ...
+                ]
+            },
+            ...
+            ]
+        },
+        ...
+        ]
+    },
+    ...
+    ]
+}]]></programlisting>
+			</example>
+			<para>
+				See
+				<link
+					xlink:href="https://github.com/jsevellec/cassandra-unit/wiki/What-can-you-set-into-a-dataSet">Cassandra-Unit Dataset</link>
+				format for more information.
+			</para>
+		</section>
+
+
+		<section>
+			<title>Getting Started</title>
+
+			<section>
+				<title>Lifecycle Management Strategy</title>
+
+				<para>
+					First step is defining which lifecycle management strategy is
+					required for your tests. Depending on kind of test you are
+					implementing (unit test, integration test, deployment test, ...)
+					you will require an embedded approach, managed approach or remote
+					approach.
+				</para>
+
+				<section>
+					<title>Embedded Lifecycle</title>
+					<para>
+						To configure
+						<emphasis role="bold">embedded</emphasis>
+						approach you should only instantiate next
+						<link linkend="program.cassandra_embedded_conf">rule</link>
+						:
+					</para>
+
+					<example xml:id="program.cassandra_embedded_conf">
+						<title>Embedded Cassandra</title>
+
+						<programlisting language="java"><![CDATA[@ClassRule
+public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule().build();]]></programlisting>
+					</example>
+
+					<para>
+						By default embedded
+						<emphasis>Cassandra</emphasis>
+						rule uses next
+						default values:
+					</para>
+
+					<table>
+						<caption>Default Embedded Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								This is the directory where
+								<emphasis>Cassandra</emphasis>
+								server is started and is
+								<constant>target/cassandra-temp</constant>
+								.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Cassandra Configuration File
+							</td>
+							<td>
+								Location of yaml configuration file. By default a configuration
+								file is provided with correct default parameters.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Host
+							</td>
+							<td>
+								localhost
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Port
+							</td>
+							<td>
+								By default port used is 9171. Port cannot be configured, and
+								cannot be changed if you provide an alternative Cassandra
+								Configuration File.
+							</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<title>Managed Lifecycle</title>
+					<para>
+						To configure
+						<emphasis role="bold">managed</emphasis>
+						approach you should only instantiate next
+						<link linkend="program.cassandra_managed_conf">rule</link>
+						:
+					</para>
+
+					<example xml:id="program.cassandra_managed_conf">
+						<title>Managed Cassandra</title>
+
+						<programlisting language="java"><![CDATA[@ClassRule
+public static ManagedCassandra managedCassandra = newManagedCassandraRule().build();]]></programlisting>
+					</example>
+
+					<para>
+						By default managed
+						<emphasis>Cassandra</emphasis>
+						rule uses next
+						default values but can be configured
+						programmatically:
+					</para>
+
+					<table>
+						<caption>Default Managed Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								This is the directory where
+								<emphasis>Cassandra</emphasis>
+								server is started and is
+								<constant>target/cassandra-temp</constant>
+								.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								CassandraPath
+							</td>
+							<td>
+								<emphasis>Cassandra</emphasis>
+								installation directory which by default is
+								retrieved from
+								<varname>CASSANDRA_HOME</varname>
+								system environment
+								variable.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Port
+							</td>
+							<td>
+								By default port used is 9160. If port is changed in
+								<emphasis>Cassandra</emphasis>
+								configuration file, this port should be configured too here.
+							</td>
+						</tr>
+					</table>
+
+				</section>
+				<section>
+					<title>Remote Lifecycle</title>
+					<para>
+						Configuring
+						<emphasis role="bold">remote</emphasis>
+						approach
+						does not require any special rule because you (or System
+						like
+						<application>Maven</application>
+						) is the responsible of starting and
+						stopping the server. This mode
+						is used in deployment tests where you
+						are testing your application
+						on real environment.
+					</para>
+				</section>
+			</section>
+
+			<section>
+				<title>Configuring Cassandra Connection</title>
+
+				<para>
+					Next step is configuring
+					<emphasis role="bold">Cassandra</emphasis>
+					rule in charge of maintaining
+					<emphasis>Cassandra</emphasis>
+					graph into known state by inserting and deleting defined
+					datasets.
+					You must register
+					<classname>CassandraRule</classname>
+					<emphasis>JUnit</emphasis>
+					rule class, which
+					requires a configuration parameter with
+					information like host,
+					port, or cluster name.
+				</para>
+
+				<para>To make developer's life easier and code more readable, a
+					fluent
+					interface can be used to create these configuration objects.
+					Three
+					different kind of configuration builders exist.
+				</para>
+				<section>
+					<title>Embedded Connection</title>
+					<para>
+						The first one is for configuring a connection to embedded
+						<emphasis>Cassandra</emphasis>
+						.
+					</para>
+
+					<example xml:id="program.embedded_connection_cassandra_parameters">
+						<title>Cassandra with embedded configuration</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandraConfigurationBuilder.newEmbeddedCassandraConfiguration;
+
+@Rule
+public CassandraRule cassandraRule = new CassandraRule(newEmbeddedCassandraConfiguration().clusterName("Test Cluster").build());]]></programlisting>
+					</example>
+					<para>
+						Host and port parameters are already configured.
+					</para>
+				</section>
+
+				<section>
+					<title>Managed Connection</title>
+					<para>
+						The first one is for configuring a connection to managed
+						<emphasis>Cassandra</emphasis>
+						.
+					</para>
+
+					<example xml:id="program.managed_connection_cassandra_parameters">
+						<title>Cassandra with managed configuration</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandraConfigurationBuilder.newManagedCassandraConfiguration;
+
+@Rule
+public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfiguration().clusterName("Test Cluster").build());]]></programlisting>
+					</example>
+					<para>
+						Host and port parameters are already configured with default
+						parameters of managed lifecycle. If port is changed, this class
+						provides a method to set it.
+					</para>
+				</section>
+
+				<section>
+					<title>Remote Connection</title>
+					<para>
+						The first one is for configuring a connection to remote
+						<emphasis>Cassandra</emphasis>
+						.
+					</para>
+
+					<example xml:id="program.remote_connection_cassandra_parameters">
+						<title>Cassandra with remote configuration</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.cassandra.RemoteCassandraConfigurationBuilder.newRemoteCassandraConfiguration;
+
+@Rule
+public CassandraRule cassandraRule = new CassandraRule(newRemoteCassandraConfiguration().host("192.168.1.1").clusterName("Test Cluster").build());]]></programlisting>
+					</example>
+					<para>
+						Port parameter is already configured with default parameter
+						of managed lifecycle. If port is changed, this class provides a
+						method to set it. Note that host parameter must be specified in
+						this case.
+					</para>
+				</section>
+
+			</section>
+
+			<section>
+				<title>Verifying Graph</title>
+				<para>
+					<classname>@ShouldMatchDataSet</classname>
+					is also supported for
+					<emphasis>Cassandra</emphasis>
+					graphs but we should keep in mind some considerations.
+				</para>
+				<warning>
+					In
+					<emphasis role="bold">NoSQLUnit</emphasis>
+					, expectations can only be used over data, not over configuration
+					parameters, so for example fields set in
+					<link linkend="ex.cassandra_dataset">dataset</link>
+					file like compactionStrategy, gcGraceSeconds or
+					maxCompactionThreshold are not used.
+					Maybe in future will be
+					supported but for now only data (keyspace, columnfamilyname,
+					columns, supercolumns, ...) are supported.
+				</warning>
+
+			</section>
+
+			<section>
+				<title>Full Example</title>
+
+				<para>
+					To show how to use
+					<emphasis role="bold">NoSQLUnit</emphasis>
+					with
+					<emphasis>Cassandra</emphasis>
+					,
+					we are going to create a
+					very simple application.
+				</para>
+				<para>
+					<link linkend="program.person_cassandra_manager">PersonManager</link>
+					is the business class responsible of inserting new friends and
+					counting the number of Neo's friends.
+				</para>
+				<example xml:id="program.person_cassandra_manager">
+					<title>Cassandra with managed configuration</title>
+
+					<programlisting language="java"><![CDATA[public class PersonManager {
+	
+	private ColumnFamilyTemplate<String, String> template;
+	
+	public PersonManager(String clusterName, String keyspaceName, String host) {
+		Cluster cluster = HFactory.getOrCreateCluster(clusterName, host);
+		Keyspace keyspace = HFactory.createKeyspace(keyspaceName, cluster);
+		
+        template = new ThriftColumnFamilyTemplate<String, String>(keyspace,
+        		"personFamilyName", 
+                                                               StringSerializer.get(),        
+                                                               StringSerializer.get());
+		
+	}
+	
+	public String getCarByPersonName(String name) {
+		ColumnFamilyResult<String, String> queryColumns = template.queryColumns(name);
+		return queryColumns.getString("car");
+	}
+	
+	public void updateCarByPersonName(String name, String car) {
+		ColumnFamilyUpdater<String, String> createUpdater = template.createUpdater(name);
+		createUpdater.setString("car", car);
+		
+		template.update(createUpdater);
+	}
+	
+}]]></programlisting>
+				</example>
+
+				<para>
+					And now one unit test and one integration test is written:
+				</para>
+				<para>
+					For
+					<link linkend="program.person_cassandra_unit">unit</link>
+					test we are going to use embedded approach:
+				</para>
+				<example xml:id="program.person_cassandra_unit">
+					<title>Cassandra with managed configuration</title>
+
+					<programlisting language="java"><![CDATA[import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+
+import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra.EmbeddedCassandraRuleBuilder.newEmbeddedCassandraRule;
+import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandraConfigurationBuilder.newEmbeddedCassandraConfiguration;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.cassandra.CassandraRule;
+import com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+
+public class WhenPersonWantsToKnowItsCar {
+
+	@ClassRule
+	public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule().build();
+	
+	@Rule
+	public CassandraRule cassandraRule = new CassandraRule(newEmbeddedCassandraConfiguration().clusterName("Test Cluster").build());
+	
+	
+	@Test
+	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	public void car_should_be_returned() {
+		
+		PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
+		String car = personManager.getCarByPersonName("mary");
+		
+		assertThat(car, is("ford"));
+		
+	}
+	
+}]]></programlisting>
+				</example>
+
+				<para>
+					And as
+					<link linkend="program.person_cassandra_integration">integration test</link>
+					, the managed one:
+				</para>
+				<example xml:id="program.person_cassandra_integration">
+					<title>Cassandra with managed configuration</title>
+
+					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandraConfigurationBuilder.newManagedCassandraConfiguration;
+import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandra.ManagedCassandraRuleBuilder.newManagedCassandraRule;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.cassandra.CassandraRule;
+import com.lordofthejars.nosqlunit.cassandra.ManagedCassandra;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+
+public class WhenPersonWantsToUpdateItsCar {
+
+	static {
+		System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
+	}
+	
+	@ClassRule
+	public static ManagedCassandra managedCassandra = newManagedCassandraRule().build();
+	
+	@Rule
+	public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfiguration().clusterName("Test Cluster").build());
+	
+	@Test
+	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	@ShouldMatchDataSet(location="expected-persons.json")
+	public void new_car_should_be_updated() {
+		
+		PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
+		personManager.updateCarByPersonName("john", "opel");
+		
+	}
+	
+}]]></programlisting>
+				</example>
+
+				<para>Note that in both cases we are using the same dataset as
+					initial state, which looks like:
+				</para>
+				<example xml:id="program.expected_cassandra_file">
+					<title>persons.json Cassandra file</title>
+
+					<programlisting language="json"><![CDATA[{
+    "name" : "persons",
+    "columnFamilies" : [{
+        "name" : "personFamilyName",
+	"keyType" : "UTF8Type",
+	"defaultColumnValueType" : "UTF8Type",
+	"comparatorType" : "UTF8Type",
+        "rows" : [{
+            "key" : "john",
+            "columns" : [{
+                "name" : "age",
+                "value" : "22"
+            },
+            {
+                "name" : "car",
+                "value" : "toyota"
+            }]
+        },
+        {
+            "key" : "mary",
+            "columns" : [{
+                "name" : "age",
+                "value" : "33"
+            },
+            {
+                "name" : "car",
+                "value" : "ford"
+            }]
+        }]
+    }]
+}]]></programlisting>
+				</example>
+
+			</section>
+
+
+		</section>
+
+	</section>
+
+
+</chapter>

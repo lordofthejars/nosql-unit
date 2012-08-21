@@ -8,169 +8,6 @@ Documentation
 Html: [View](http://lordofthejars.github.com/nosql-unit/index.html)
 Pdf: [Download](http://lordofthejars.github.com/nosql-unit/index.pdf)
 
-What's New?
-===========
-
-Neo4j Support
--------------
-
-*NoSQLUnit* supports *Neo4j* by using next classes:
-
-  ------------------ ------------------------------------------------------------
-  In-Memory			 com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j
-  Embedded           com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j
-  Managed Wrapping   com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer
-  Managed            com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer
-  ------------------ ------------------------------------------------------------
-
-  : Lifecycle Management Rules
-
-  ---------------------- ---------------------------------------------
-  NoSQLUnit Management   com.lordofthejars.nosqlunit.neo4j.Neo4jRule
-  ---------------------- ---------------------------------------------
-
-  : Manager Rule
-
-Default dataset file format in *Neo4j* module is
-[GraphML](http://graphml.graphdrawing.org/) . *GraphML* is a
-comprehensive and easy-to-use file format for graphs.
-
-~~~~ {.xml}
-<?xml version="1.0" encoding="UTF-8"?>
-<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
-    <key id="attr1" for="edge" attr.name="attr1" attr.type="float"/>
-    <key id="attr2" for="node" attr.name="attr2" attr.type="string"/>
-    <graph id="G" edgedefault="directed">
-        <node id="1">
-            <data key="attr2">value1</data>
-        </node>
-        <node id="2">
-            <data key="attr2">value2</data>
-        </node>
-        <edge id="7" source="1" target="2" label="label1">
-            <data key="attr1">float</data>
-        </edge>
-    </graph>
-</graphml>
-~~~~
-
-A simple example of using embedded *Neo4j* lifecycle management could
-be:
-
-~~~~ {.java}
-import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
-
-@ClassRule
-public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();
-~~~~
-
-And for configuring *Neo4j* connection:
-
-~~~~ {.java}
-import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
-
-@Rule
-public Neo4jRule neo4jRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().build());
-~~~~
-
-Simultaneous engines
---------------------
-
-Sometimes applications will contain more than one *NoSQL* engine, for
-example some parts of your model will be expressed better as a graph (
-Neo4J for example), but other parts will be more natural in a column way
-(for example using Cassandra ). *NoSQLUnit* supports this kind of
-scenarios by providing in integration tests a way to not load all
-datasets into one system, but choosing which datasets are stored in each
-backend.
-
-For declaring more than one engine, you must give a name to each
-database *Rule* using `connectionIdentifier()` method in configuration
-instance.
-
-~~~~ {.java}
-@Rule
-public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
-                                        .databaseName("test").connectionIdentifier("one").build() ,this);
-~~~~
-
-And also you need to provide an identified dataset for each engine, by
-using `withSelectiveLocations` attribute of `@UsingDataSet` annotation.
-You must set up the pair "named connection" / datasets.
-
-~~~~ {.java}
-@UsingDataSet(withSelectiveLocations =                                              
-                { @Selective(identifier = "one", locations = "test3") }, 
-            loadStrategy = LoadStrategyEnum.REFRESH)
-~~~~
-
-In [example](#what-snew.dataset-selective) we are refreshing database
-declared on [previous example](#what-snew.name-database) with data
-located at *test3* file.
-
-Also works in expectations annotation:
-
-~~~~ {.java}
-@ShouldMatchDataSet(withSelectiveMatcher = 
-                { @SelectiveMatcher(identifier = "one", location = "test3") 
-                })
-~~~~
-
-For more information see chapter about [advanced
-features](#advanced.simultaneous-engine-title) .
-
-Support for JSR-330
--------------------
-
-*NoSQLUnit* supports two annotations of JSR-330 aka Dependency Injection
-for Java. Concretely @Inject and @Named annotations.
-
-During test execution you may need to access underlying class used to
-load and assert data to execute extra operations to backend. *NoSQLUnit*
-will inspect @Inject annotations of test fields, and try to set own
-driver to attribute. For example in case of MongoDb , com.mongodb.Mongo
-instance will be injected.
-
-~~~~ {.java}
-@Rule
-public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
-                        .databaseName("test").build() ,this);
-
-@Inject
-private Mongo mongo;
-~~~~
-
-> **Warning**
->
-> Note that in [example](#what-snew.injection) we are setting `this` as
-> second parameter to the Rule.
-
-But if you are using more than one engine at same time (see
-[chapter](#advanced.simultaneous-engine-title) ) you need a way to
-distinguish each connection. For fixing this problem, you must use
-@Named annotation by putting the identifier given in configuration
-instance. For example:
-
-~~~~ {.java}
-@Rule
-public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
-                    .databaseName("test").connectionIdentifier("one").build() ,this);
-
-@Rule
-public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
-                    .databaseName("test2").connectionIdentifier("two").build() ,this);
-
-@Named("one")
-@Inject
-private Mongo mongo1;
-    
-@Named("two")
-@Inject
-private Mongo mongo2;
-~~~~
-
-For more information see [advanced features](#advanced.jsr330-title)
-chapter.
 
 NoSQLUnit Core
 ==============
@@ -1219,6 +1056,415 @@ which looks like:
         </edge>
     </graph>
 </graphml>
+~~~~
+
+Cassandra Engine
+================
+
+Cassandra
+=========
+
+Cassandra is a BigTable data model running on an Amazon Dynamo-like
+infrastructure.
+
+**NoSQLUnit** supports *Cassandra* by using next classes:
+
+  ---------- ---------------------------------------------------------
+  Embedded   com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra
+  Managed    com.lordofthejars.nosqlunit.cassandra.ManagedCassandra
+  ---------- ---------------------------------------------------------
+
+  : Lifecycle Management Rules
+
+  ---------------------- -----------------------------------------------------
+  NoSQLUnit Management   com.lordofthejars.nosqlunit.cassandra.CassandraRule
+  ---------------------- -----------------------------------------------------
+
+  : Manager Rule
+
+Maven Setup
+-----------
+
+To use **NoSQLUnit** with Cassandra you only need to add next
+dependency:
+
+~~~~ {.xml}
+<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-cassandra</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+~~~~
+
+Dataset Format
+--------------
+
+Default dataset file format in *Cassandra* module is json. To make
+compatible **NoSQLUnit** with
+[Cassandra-Unit](https://github.com/jsevellec/cassandra-unit/) file
+format, DataLoader of Cassandra-Unit project is used, so same json
+format file is used.
+
+Datasets must have next [format](#ex.cassandra_dataset) :
+
+~~~~ {.json}
+{
+    "name" : "",
+    "replicationFactor" : "",
+    "strategy" : "",
+    "columnFamilies" : [{
+        "name" : "",
+        "type" : "",
+        "keyType" : "",
+        "comparatorType" : "",
+        "subComparatorType" : "",
+        "defaultColumnValueType" : "",
+        "comment" : "",
+        "compactionStrategy" : "",
+        "compactionStrategyOptions" : [{
+            "name" : "",
+            "value": ""
+        }],
+        "gcGraceSeconds" : "",
+        "maxCompactionThreshold" : "",
+        "minCompactionThreshold" : "",
+        "readRepairChance" : "",
+        "replicationOnWrite" : "",
+        "columnsMetadata" : [{
+            "name" : "",
+            "validationClass : "",
+            "indexType" : "",
+            "indexName" : ""
+        },
+        ...
+        ]
+        "rows" : [{
+            "key" : "",
+            "columns" : [{
+                "name" : "",
+                "value" : ""
+            },
+            ...
+            ],
+            ...
+            // OR
+            ...
+            "superColumns" : [{
+                "name" : "",
+                "columns" : [{
+                    "name" : "",
+                    "value" : ""
+                },
+                ...
+                ]
+            },
+            ...
+            ]
+        },
+        ...
+        ]
+    },
+    ...
+    ]
+}
+~~~~
+
+See [Cassandra-Unit
+Dataset](https://github.com/jsevellec/cassandra-unit/wiki/What-can-you-set-into-a-dataSet)
+format for more information.
+
+Getting Started
+---------------
+
+### Lifecycle Management Strategy
+
+First step is defining which lifecycle management strategy is required
+for your tests. Depending on kind of test you are implementing (unit
+test, integration test, deployment test, ...) you will require an
+embedded approach, managed approach or remote approach.
+
+#### Embedded Lifecycle
+
+To configure **embedded** approach you should only instantiate next
+[rule](#program.cassandra_embedded_conf) :
+
+~~~~ {.java}
+@ClassRule
+public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule().build();
+~~~~
+
+By default embedded *Cassandra* rule uses next default values:
+
+  ------------------------------ --------------------------------------------------------------------------------------------------------------------------------------------
+  Target path                    This is the directory where *Cassandra* server is started and is `target/cassandra-temp` .
+  Cassandra Configuration File   Location of configuration file. By default a configuration file is provided with correct default parameters.
+  Host                           localhost
+  Port                           By default port used is 9171. Port cannot be configured, and cannot be changed if you provide an alternative Cassandra Configuration File.
+  ------------------------------ --------------------------------------------------------------------------------------------------------------------------------------------
+
+  : Default Embedded Values
+
+#### Managed Lifecycle
+
+To configure **managed** approach you should only instantiate next
+[rule](#program.cassandra_managed_conf) :
+
+~~~~ {.java}
+@ClassRule
+public static ManagedCassandra managedCassandra = newManagedCassandraRule().build();
+~~~~
+
+By default managed *Cassandra* rule uses next default values but can be
+configured programmatically:
+
+  --------------- -----------------------------------------------------------------------------------------------------------------------
+  Target path     This is the directory where *Cassandra* server is started and is `target/cassandra-temp` .
+  CassandraPath   *Cassandra* installation directory which by default is retrieved from `CASSANDRA_HOME` system environment variable.
+  Port            By default port used is 9160. If port is changed in *Cassandra* installation, new port should be configured too here.
+  --------------- -----------------------------------------------------------------------------------------------------------------------
+
+  : Default Managed Values
+
+#### Remote Lifecycle
+
+Configuring **remote** approach does not require any special rule
+because you (or System like Maven ) is the responsible of starting and
+stopping the server. This mode is used in deployment tests where you are
+testing your application on real environment.
+
+### Configuring Cassandra Connection
+
+Next step is configuring **Cassandra** rule in charge of maintaining
+*Cassandra* graph into known state by inserting and deleting defined
+datasets. You must register CassandraRule *JUnit* rule class, which
+requires a configuration parameter with information like host, port, or
+cluster name.
+
+To make developer's life easier and code more readable, a fluent
+interface can be used to create these configuration objects. Three
+different kind of configuration builders exist.
+
+#### Embedded Connection
+
+The first one is for configuring a connection to embedded *Cassandra* .
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandraConfigurationBuilder.newEmbeddedCassandraConfiguration;
+
+@Rule
+public CassandraRule cassandraRule = new CassandraRule(newEmbeddedCassandraConfiguration().clusterName("Test Cluster").build());
+~~~~
+
+Host and port parameters are already configured.
+
+#### Managed Connection
+
+The first one is for configuring a connection to managed *Cassandra* .
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandraConfigurationBuilder.newManagedCassandraConfiguration;
+
+@Rule
+public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfiguration().clusterName("Test Cluster").build());
+~~~~
+
+Host and port parameters are already configured with default parameters
+of managed lifecycle. If port is changed, this class provides a method
+to set it.
+
+#### Remote Connection
+
+The first one is for configuring a connection to remote *Cassandra* .
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.cassandra.RemoteCassandraConfigurationBuilder.newRemoteCassandraConfiguration;
+
+@Rule
+public CassandraRule cassandraRule = new CassandraRule(newRemoteCassandraConfiguration().host("192.168.1.1").clusterName("Test Cluster").build());
+~~~~
+
+Port parameter is already configured with default parameter of managed
+lifecycle. If port is changed, this class provides a method to set it.
+Note that host parameter must be specified in this case.
+
+### Verifying Graph
+
+@ShouldMatchDataSet is also supported for *Cassandra* graphs but we
+should keep in mind some considerations.
+
+> **Warning**
+>
+> In
+> NoSQLUnit
+> , expectations can only be used over data, not over configuration
+> parameters, so for example fields set in
+> dataset
+> file like compactionStrategy, gcGraceSeconds or maxCompactionThreshold
+> are not used. Maybe in future will be supported but for now only data
+> (keyspace, columnfamilyname, columns, supercolumns, ...) are
+> supported.
+
+### Full Example
+
+To show how to use **NoSQLUnit** with *Cassandra* , we are going to
+create a very simple application.
+
+[PersonManager](#program.person_cassandra_manager) is the business class
+responsible of inserting new friends and counting the number of Neo's
+friends.
+
+~~~~ {.java}
+public class PersonManager {
+    
+    private ColumnFamilyTemplate<String, String> template;
+    
+    public PersonManager(String clusterName, String keyspaceName, String host) {
+        Cluster cluster = HFactory.getOrCreateCluster(clusterName, host);
+        Keyspace keyspace = HFactory.createKeyspace(keyspaceName, cluster);
+        
+        template = new ThriftColumnFamilyTemplate<String, String>(keyspace,
+                "personFamilyName", 
+                                                               StringSerializer.get(),        
+                                                               StringSerializer.get());
+        
+    }
+    
+    public String getCarByPersonName(String name) {
+        ColumnFamilyResult<String, String> queryColumns = template.queryColumns(name);
+        return queryColumns.getString("car");
+    }
+    
+    public void updateCarByPersonName(String name, String car) {
+        ColumnFamilyUpdater<String, String> createUpdater = template.createUpdater(name);
+        createUpdater.setString("car", car);
+        
+        template.update(createUpdater);
+    }
+    
+}
+~~~~
+
+And now one unit test and one integration test is written:
+
+For [unit](#program.person_cassandra_unit) test we are going to use
+embedded approach:
+
+~~~~ {.java}
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+
+import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra.EmbeddedCassandraRuleBuilder.newEmbeddedCassandraRule;
+import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandraConfigurationBuilder.newEmbeddedCassandraConfiguration;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.cassandra.CassandraRule;
+import com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+
+public class WhenPersonWantsToKnowItsCar {
+
+    @ClassRule
+    public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule().build();
+    
+    @Rule
+    public CassandraRule cassandraRule = new CassandraRule(newEmbeddedCassandraConfiguration().clusterName("Test Cluster").build());
+    
+    
+    @Test
+    @UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+    public void car_should_be_returned() {
+        
+        PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
+        String car = personManager.getCarByPersonName("mary");
+        
+        assertThat(car, is("ford"));
+        
+    }
+    
+}
+~~~~
+
+And as [integration test](#program.person_cassandra_integration) , the
+managed one:
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandraConfigurationBuilder.newManagedCassandraConfiguration;
+import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandra.ManagedCassandraRuleBuilder.newManagedCassandraRule;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.cassandra.CassandraRule;
+import com.lordofthejars.nosqlunit.cassandra.ManagedCassandra;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+
+public class WhenPersonWantsToUpdateItsCar {
+
+    static {
+        System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
+    }
+    
+    @ClassRule
+    public static ManagedCassandra managedCassandra = newManagedCassandraRule().build();
+    
+    @Rule
+    public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfiguration().clusterName("Test Cluster").build());
+    
+    @Test
+    @UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+    @ShouldMatchDataSet(location="expected-persons.json")
+    public void new_car_should_be_updated() {
+        
+        PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
+        personManager.updateCarByPersonName("john", "opel");
+        
+    }
+    
+}
+~~~~
+
+Note that in both cases we are using the same dataset as initial state,
+which looks like:
+
+~~~~ {.json}
+{
+    "name" : "persons",
+    "columnFamilies" : [{
+        "name" : "personFamilyName",
+    "keyType" : "UTF8Type",
+    "defaultColumnValueType" : "UTF8Type",
+    "comparatorType" : "UTF8Type",
+        "rows" : [{
+            "key" : "john",
+            "columns" : [{
+                "name" : "age",
+                "value" : "22"
+            },
+            {
+                "name" : "car",
+                "value" : "toyota"
+            }]
+        },
+        {
+            "key" : "mary",
+            "columns" : [{
+                "name" : "age",
+                "value" : "33"
+            },
+            {
+                "name" : "car",
+                "value" : "ford"
+            }]
+        }]
+    }]
+}
 ~~~~
 
 Advanced Usage

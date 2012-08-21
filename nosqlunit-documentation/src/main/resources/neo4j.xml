@@ -743,7 +743,7 @@ public class WhenNeoMeetsANewFriend {
 				<para>Note that in both cases we are using the same dataset as
 					initial state, which looks like:</para>
 				<example xml:id="program.expected_neo4j_file">
-					<title>Neo4j with managed configuration</title>
+					<title>matrix.xml Neo4j file</title>
 
 					<programlisting language="xml"><![CDATA[<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

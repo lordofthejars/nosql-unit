@@ -35,17 +35,17 @@
 
 	<toc></toc>
 
-	<part id="whats-new-part">
-		<title>What's New?</title>
-		<partintro id="whats-new-intro">
-			<para>
-				For those who are already familiar with <emphasis role="bold">NoSQLUnit</emphasis>, this chapter
-				provides a brief overview of the new features. In this section, only
-				last 5 versions will be highlighted.
-			</para>
-		</partintro>
-		<xi:include href="./whats-new.xml"/>
-	</part>
+<!-- 	<part id="whats-new-part"> -->
+<!-- 		<title>What's New?</title> -->
+<!-- 		<partintro id="whats-new-intro"> -->
+<!-- 			<para> -->
+<!-- 				For those who are already familiar with <emphasis role="bold">NoSQLUnit</emphasis>, this chapter -->
+<!-- 				provides a brief overview of the new features. In this section, only -->
+<!-- 				last 5 versions will be highlighted. -->
+<!-- 			</para> -->
+<!-- 		</partintro> -->
+<!-- 		<xi:include href="./whats-new.xml"/> -->
+<!-- 	</part> -->
 
 	<part id="nosqlunit-introduction-part">
 		<title>NoSQLUnit Core</title>
@@ -66,6 +66,7 @@
 		</partintro>
 		<xi:include href="./mongodb.xml"/>
 		<xi:include href="./neo4j.xml"/>
+		<xi:include href="./cassandra.xml"/>
 	</part>
 
 	<part id="advanced-usage-part">

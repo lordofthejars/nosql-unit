@@ -1,0 +1,31 @@
+{
+    "name" : "persons",
+    "columnFamilies" : [{
+        "name" : "personFamilyName",
+	"keyType" : "UTF8Type",
+	"defaultColumnValueType" : "UTF8Type",
+	"comparatorType" : "UTF8Type",
+        "rows" : [{
+            "key" : "john",
+            "columns" : [{
+                "name" : "age",
+                "value" : "22"
+            },
+            {
+                "name" : "car",
+                "value" : "toyota"
+            }]
+        },
+        {
+            "key" : "mary",
+            "columns" : [{
+                "name" : "age",
+                "value" : "33"
+            },
+            {
+                "name" : "car",
+                "value" : "ford"
+            }]
+        }]
+    }]
+}
