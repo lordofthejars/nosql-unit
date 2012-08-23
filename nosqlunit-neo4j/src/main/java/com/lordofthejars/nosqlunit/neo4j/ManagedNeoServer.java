@@ -8,16 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.rules.ExternalResource;
 import org.neo4j.server.configuration.Configurator;
 
+import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
-import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
 
-public class ManagedNeoServer extends ExternalResource {
+public class ManagedNeoServer extends AbstractLifecycleManager {
 
 	private static final String START_COMMAND = "start";
 	private static final String STOP_COMMAND = "stop";
@@ -87,29 +86,46 @@ public class ManagedNeoServer extends ExternalResource {
 	}
 
 	@Override
-	protected void before() throws Throwable {
-		if (isServerNotStartedYet()) {
-
-			File targetPathDirectory = ensureTargetPathDoesNotExitsAndReturnCompositePath();
-
-			if (targetPathDirectory.mkdirs()) {
-				startNeo4jAsADaemon();
-
-				boolean isServerUp = assertThatConnectionIsPossible();
-
-				if (!isServerUp) {
-					throw new IllegalStateException("Couldn't establish a connection with " + this.neo4jPath
-							+ " server at /127.0.0.1:" + port);
-				}
-			} else {	
-				throw new IllegalStateException("Target Path " + targetPathDirectory
-						+ " could not be created.");
-			}
-
-		}
-
-		ConnectionManagement.getInstance().addConnection(LOCALHOST, port);
+	protected String getHost() {
+		return LOCALHOST;
 	}
+
+	@Override
+	protected int getPort() {
+		return port;
+	}
+
+	@Override
+	protected void doStart() throws Throwable {
+		File targetPathDirectory = ensureTargetPathDoesNotExitsAndReturnCompositePath();
+
+		if (targetPathDirectory.mkdirs()) {
+			startNeo4jAsADaemon();
+
+			boolean isServerUp = assertThatConnectionIsPossible();
+
+			if (!isServerUp) {
+				throw new IllegalStateException("Couldn't establish a connection with " + this.neo4jPath
+						+ " server at /127.0.0.1:" + port);
+			}
+		} else {	
+			throw new IllegalStateException("Target Path " + targetPathDirectory
+					+ " could not be created.");
+		}
+	}
+
+	@Override
+	protected void doStop() {
+		try {
+			stopNeo4j();
+		} catch (InterruptedException e) {
+			throw new IllegalArgumentException(e);
+		} finally {
+			// until neo4j 1.8 data directory cannot be configured.
+			ensureTargetPathDoesNotExitsAndReturnCompositePath();
+		}
+	}
+
 
 	private boolean assertThatConnectionIsPossible() throws InterruptedException {
 
@@ -221,24 +237,6 @@ public class ManagedNeoServer extends ExternalResource {
 		return this.commandLineExecutor.getConsoleOutput(pwd);
 	}
 
-	private boolean isServerNotStartedYet() {
-		return !ConnectionManagement.getInstance().isConnectionRegistered(LOCALHOST, port);
-	}
-
-	@Override
-	protected void after() {
-		int remainingConnections = ConnectionManagement.getInstance().removeConnection(LOCALHOST, port);
-		if (noMoreConnectionsToManage(remainingConnections)) {
-			try {
-				stopNeo4j();
-			} catch (InterruptedException e) {
-				throw new IllegalArgumentException(e);
-			} finally {
-				// until neo4j 1.8 data directory cannot be configured.
-				ensureTargetPathDoesNotExitsAndReturnCompositePath();
-			}
-		}
-	}
 
 	private File ensureTargetPathDoesNotExitsAndReturnCompositePath() {
 		File dbPath = new File(targetPath);
@@ -246,10 +244,6 @@ public class ManagedNeoServer extends ExternalResource {
 			deleteDir(dbPath);
 		}
 		return dbPath;
-	}
-
-	private boolean noMoreConnectionsToManage(int remainingConnections) {
-		return remainingConnections < 1;
 	}
 
 	protected void setCommandLineExecutor(CommandLineExecutor commandLineExecutor) {

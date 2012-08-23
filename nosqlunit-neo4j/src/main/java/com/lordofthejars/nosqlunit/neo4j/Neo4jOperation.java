@@ -29,7 +29,7 @@ import com.lordofthejars.nosqlunit.core.FailureHandler;
 import com.lordofthejars.nosqlunit.graph.parser.GraphMLReader;
 import com.lordofthejars.nosqlunit.graph.parser.GraphMLWriter;
 
-public class Neo4jOperation implements DatabaseOperation {
+public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(Neo4jOperation.class);
 	private static String EOL = System.getProperty("line.separator");
@@ -189,7 +189,7 @@ public class Neo4jOperation implements DatabaseOperation {
 	}
 
 	@Override
-	public Object connectionManager() {
+	public GraphDatabaseService connectionManager() {
 		return this.graphDatabaseService;
 	}
 

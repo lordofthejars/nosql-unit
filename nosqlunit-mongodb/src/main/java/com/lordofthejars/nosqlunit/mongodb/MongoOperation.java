@@ -17,7 +17,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoOptions;
 import com.mongodb.util.JSON;
 
-public final class MongoOperation implements DatabaseOperation {
+public final class MongoOperation implements DatabaseOperation<Mongo> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
 	
@@ -190,7 +190,7 @@ public final class MongoOperation implements DatabaseOperation {
 	}
 	
 	@Override
-	public Object connectionManager() {
+	public Mongo connectionManager() {
 		return mongo;
 	}
 

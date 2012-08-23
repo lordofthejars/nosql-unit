@@ -12,7 +12,40 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 
 	private static final String EXTENSION = "json";
 	
-	private DatabaseOperation databaseOperation;
+	private DatabaseOperation<Mongo> databaseOperation;
+	
+	public static class MongoDbRuleBuilder {
+		
+		private MongoDbConfiguration mongoDbConfiguration;
+		private Object target;
+		
+		private MongoDbRuleBuilder() {
+		}
+		
+		public static MongoDbRuleBuilder newMongoDbRule() {
+			return new MongoDbRuleBuilder();
+		}
+		
+		public MongoDbRuleBuilder configure(MongoDbConfiguration mongoDbConfiguration) {
+			this.mongoDbConfiguration = mongoDbConfiguration;
+			return this;
+		}
+		
+		public MongoDbRuleBuilder unitInstance(Object target) {
+			this.target = target;
+			return this;
+		}
+		
+		public MongoDbRule build() {
+			
+			if(this.mongoDbConfiguration == null) {
+				throw new IllegalArgumentException("Configuration object should be provided.");
+			}
+			
+			return new MongoDbRule(mongoDbConfiguration, target);
+		}
+		
+	}
 	
 	public MongoDbRule(MongoDbConfiguration mongoDbConfiguration) {
 		super(mongoDbConfiguration.getConnectionIdentifier());
@@ -39,7 +72,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	}
 
 	@Override
-	public DatabaseOperation getDatabaseOperation() {
+	public DatabaseOperation<Mongo> getDatabaseOperation() {
 		return this.databaseOperation;
 	}
 

@@ -4,7 +4,6 @@ import static com.lordofthejars.nosqlunit.core.IOUtils.deleteDir;
 
 import java.io.File;
 
-import org.junit.rules.ExternalResource;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.kernel.GraphDatabaseAPI;
@@ -12,9 +11,9 @@ import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.EmbeddedServerConfigurator;
 
-import com.lordofthejars.nosqlunit.core.ConnectionManagement;
+import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 
-public class ManagedWrappingNeoServer extends ExternalResource {
+public class ManagedWrappingNeoServer extends AbstractLifecycleManager {
 
 	protected static final String LOCALHOST = "127.0.0.1";
 
@@ -62,15 +61,32 @@ public class ManagedWrappingNeoServer extends ExternalResource {
 	}
 	
 	@Override
-	protected void before() throws Throwable {
-		if (isServerNotStartedYet()) {
+	protected String getHost() {
+		return LOCALHOST;
+	}
 
+
+	@Override
+	protected int getPort() {
+		return port;
+	}
+
+
+	@Override
+	protected void doStart() throws Throwable {
+		cleanDb();
+		createWrappingEmbeddedGraphDatabaseService();
+		graphDb.start();
+	}
+
+
+	@Override
+	protected void doStop() {
+		try {
+			this.graphDb.stop();
+		} finally {
 			cleanDb();
-			createWrappingEmbeddedGraphDatabaseService();
-			graphDb.start();
 		}
-
-		ConnectionManagement.getInstance().addConnection(LOCALHOST, port);
 	}
 
 
@@ -87,24 +103,6 @@ public class ManagedWrappingNeoServer extends ExternalResource {
 	}
 
 
-	@Override
-	protected void after() {
-		int remainingConnections = ConnectionManagement.getInstance()
-				.removeConnection(LOCALHOST, port);
-		if (noMoreConnectionsToManage(remainingConnections)) {
-			try {
-				this.graphDb.stop();
-			} finally {
-				cleanDb();
-			}
-		}
-	}
-
-
-	private boolean noMoreConnectionsToManage(int remainingConnections) {
-		return remainingConnections < 1;
-	}
-	
 	private void cleanDb() {
 		File dbPath = new File(targetPath);
 		if (dbPath.exists()) {
@@ -112,9 +110,6 @@ public class ManagedWrappingNeoServer extends ExternalResource {
 		}
 	}
 
-	private boolean isServerNotStartedYet() {
-		return !ConnectionManagement.getInstance().isConnectionRegistered(LOCALHOST, port);
-	}
 
 	private void setTargetPath(String targetPath) {
 		this.targetPath = targetPath;
@@ -126,10 +121,6 @@ public class ManagedWrappingNeoServer extends ExternalResource {
 	
 	private void setPort(int port) {
 		this.port = port;
-	}
-	
-	private int getPort() {
-		return port;
 	}
 	
 }

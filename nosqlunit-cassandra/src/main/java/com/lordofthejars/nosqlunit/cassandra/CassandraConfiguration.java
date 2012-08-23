@@ -1,14 +1,12 @@
 package com.lordofthejars.nosqlunit.cassandra;
 
-import com.lordofthejars.nosqlunit.core.Configuration;
+import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
 
-public class CassandraConfiguration implements Configuration {
+public class CassandraConfiguration extends AbstractJsr330Configuration {
 
 	private String clusterName;
 	private String host;
 	private int port;
-	
-	private String connectionIdentifier = "";
 	
 	public CassandraConfiguration() {
 		super();
@@ -44,13 +42,6 @@ public class CassandraConfiguration implements Configuration {
 	public void setPort(int port) {
 		this.port = port;
 	}
-	
-	public void setConnectionIdentifier(String connectionIdentifier) {
-		this.connectionIdentifier = connectionIdentifier;
-	}
-	
-	public String getConnectionIdentifier() {
-		return connectionIdentifier;
-	}
+
 	
 }

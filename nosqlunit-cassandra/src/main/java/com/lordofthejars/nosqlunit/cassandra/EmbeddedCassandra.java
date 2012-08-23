@@ -5,11 +5,10 @@ import java.io.IOException;
 
 import org.apache.cassandra.config.ConfigurationException;
 import org.apache.thrift.transport.TTransportException;
-import org.junit.rules.ExternalResource;
 
-import com.lordofthejars.nosqlunit.core.ConnectionManagement;
+import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 
-public class EmbeddedCassandra extends ExternalResource {
+public class EmbeddedCassandra extends AbstractLifecycleManager {
 
 	protected static final String DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION = "cu-cassandra.yaml";
 	
@@ -60,41 +59,36 @@ public class EmbeddedCassandra extends ExternalResource {
 
 	}
 	
+	
+	
 	@Override
-	protected void before() throws Throwable {
-		if (isServerNotStartedYet()) {
-			createEmbeddedCassandra();
-		}
+	protected String getHost() {
+		return LOCALHOST;
+	}
 
-		ConnectionManagement.getInstance().addConnection(LOCALHOST, PORT);
+	@Override
+	protected int getPort() {
+		return PORT;
+	}
+
+	@Override
+	protected void doStart() throws Throwable {
+		createEmbeddedCassandra();
+	}
+
+	@Override
+	protected void doStop() {
+		stopEmbeddedCassandra();
 	}
 
 	private void createEmbeddedCassandra() throws TTransportException, IOException, InterruptedException, ConfigurationException {
 		embeddedCassandraServerHelper.startEmbeddedCassandra(cassandraConfigurationFile, targetPath);
 	}
 
-	@Override
-	protected void after() {
-		int remainingConnections = ConnectionManagement.getInstance()
-				.removeConnection(LOCALHOST, PORT);
-		if (noMoreConnectionsToManage(remainingConnections)) {
-			stopEmbeddedCassandra();
-		}
-	}
-
 	private void stopEmbeddedCassandra() {
 		embeddedCassandraServerHelper.stopEmbeddedCassandra();
 	}
 
-	private boolean noMoreConnectionsToManage(int remainingConnections) {
-		return remainingConnections < 1;
-	}
-
-	
-	private boolean isServerNotStartedYet() {
-		return !ConnectionManagement.getInstance().isConnectionRegistered(LOCALHOST, PORT);
-	}
-	
 	public String getTargetPath() {
 		return targetPath;
 	}

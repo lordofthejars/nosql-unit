@@ -1,14 +1,12 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.lordofthejars.nosqlunit.core.Configuration;
+import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
 import com.mongodb.DBPort;
 
-public final class MongoDbConfiguration implements Configuration {
+public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	
 	private static final String DEFAULT_HOST = "localhost";
 
-	private String connectionIdentifier = "";
-	
 	private String databaseName;
 	
 	private String username;
@@ -35,10 +33,6 @@ public final class MongoDbConfiguration implements Configuration {
 		this.password = password;
 	}
 	
-
-	public String getConnectionIdentifier() {
-		return connectionIdentifier;
-	}
 	
 	public boolean isAuthenticateParametersSet() {
 		return this.username != null && this.password !=null; 
@@ -84,7 +78,4 @@ public final class MongoDbConfiguration implements Configuration {
 		this.host = host;
 	}
 	
-	public void setConnectionIdentifier(String connectionIdentifier) {
-		this.connectionIdentifier = connectionIdentifier;
-	}
 }

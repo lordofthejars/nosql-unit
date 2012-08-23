@@ -12,15 +12,13 @@ import java.util.concurrent.CountDownLatch;
 
 import me.prettyprint.cassandra.service.CassandraHost;
 
-import org.junit.rules.ExternalResource;
-
+import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
-import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
 
-public class ManagedCassandra extends ExternalResource {
+public class ManagedCassandra extends AbstractLifecycleManager {
 
 	static Process pwd;
 	
@@ -96,34 +94,48 @@ public class ManagedCassandra extends ExternalResource {
 
 	}
 
+	
+	
 	@Override
-	protected void before() throws Throwable {
-		if (isServerNotStartedYet()) {
-			final CountDownLatch startupLatch = new CountDownLatch(1);
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						startCassandraAsDaemon();
-						startupLatch.countDown();
-					} catch (InterruptedException e) {
-						throw new IllegalStateException(e);
-					}
-				}
-			}).start();
-			
-			try {
-				startupLatch.await(10, SECONDS);
-			} catch (InterruptedException e) {
-				throw new AssertionError(e);
-			}
-			
-		}
-		
-		ConnectionManagement.getInstance().addConnection(LOCALHOST, port);
+	protected String getHost() {
+		return LOCALHOST;
 	}
 
-	
+
+	@Override
+	protected int getPort() {
+		return port;
+	}
+
+
+	@Override
+	protected void doStart() throws Throwable {
+		final CountDownLatch startupLatch = new CountDownLatch(1);
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					startCassandraAsDaemon();
+					startupLatch.countDown();
+				} catch (InterruptedException e) {
+					throw new IllegalStateException(e);
+				}
+			}
+		}).start();
+		
+		try {
+			startupLatch.await(10, SECONDS);
+		} catch (InterruptedException e) {
+			throw new AssertionError(e);
+		}
+	}
+
+
+	@Override
+	protected void doStop() {
+		stopCassandra();
+	}
+
 	private List<String> startCassandraAsDaemon() throws InterruptedException {
 
 		try {
@@ -186,27 +198,9 @@ public class ManagedCassandra extends ExternalResource {
 		}
 
 	}
-	
-	@Override
-	protected void after() {
-		
-		int remainingConnections = ConnectionManagement.getInstance().removeConnection(LOCALHOST, port);
-		if (noMoreConnectionsToManage(remainingConnections)) {
-			stopCassandra();
-		}
-	}
-
 
 	private void stopCassandra() {
 		pwd.destroy();
-	}
-
-	private boolean noMoreConnectionsToManage(int remainingConnections) {
-		return remainingConnections < 1;
-	}
-	
-	private boolean isServerNotStartedYet() {
-		return !ConnectionManagement.getInstance().isConnectionRegistered(LOCALHOST, port);
 	}
 
 	private void addExtraCommandLineArgument(String argumentName, String argumentValue) {

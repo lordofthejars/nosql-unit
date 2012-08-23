@@ -4,14 +4,13 @@ import static com.lordofthejars.nosqlunit.core.IOUtils.deleteDir;
 
 import java.io.File;
 
-import org.junit.rules.ExternalResource;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.server.configuration.Configurator;
 
-import com.lordofthejars.nosqlunit.core.ConnectionManagement;
+import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 
-public class EmbeddedNeo4j extends ExternalResource {
+public class EmbeddedNeo4j extends AbstractLifecycleManager {
 
 	protected static final String LOCALHOST = "127.0.0.1";
 	protected static final int PORT = Configurator.DEFAULT_WEBSERVER_PORT;
@@ -52,42 +51,37 @@ public class EmbeddedNeo4j extends ExternalResource {
 	}
 
 	@Override
-	protected void before() throws Throwable {
-		
-		if (isServerNotStartedYet()) {
-
-			cleanDb();
-			createEmbeddedGraphDatabaseService();
-			
-			EmbeddedNeo4jInstances.getInstance().addGraphDatabaseService(graphDb, targetPath);
-			registerShutdownHook(graphDb);
-			
-		}
-
-		ConnectionManagement.getInstance().addConnection(LOCALHOST+targetPath, PORT);
-	}
-
-	private void createEmbeddedGraphDatabaseService() {
-		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(this.targetPath);
+	protected String getHost() {
+		return LOCALHOST+targetPath;
 	}
 
 	@Override
-	protected void after() {
-		int remainingConnections = ConnectionManagement.getInstance()
-				.removeConnection(LOCALHOST+targetPath, PORT);
-		if (noMoreConnectionsToManage(remainingConnections)) {
-			try {
-				this.graphDb.shutdown();
-				EmbeddedNeo4jInstances.getInstance().removeGraphDatabaseService(targetPath);
-			} finally {
-				cleanDb();
-			}
+	protected int getPort() {
+		return PORT;
+	}
+
+	@Override
+	protected void doStart() throws Throwable {
+		cleanDb();
+		createEmbeddedGraphDatabaseService();
+		
+		EmbeddedNeo4jInstances.getInstance().addGraphDatabaseService(graphDb, targetPath);
+		registerShutdownHook(graphDb);
+	}
+
+	@Override
+	protected void doStop() {
+		try {
+			this.graphDb.shutdown();
+			EmbeddedNeo4jInstances.getInstance().removeGraphDatabaseService(targetPath);
+		} finally {
+			cleanDb();
 		}
 	}
 
-	
-	private boolean noMoreConnectionsToManage(int remainingConnections) {
-		return remainingConnections < 1;
+
+	private void createEmbeddedGraphDatabaseService() {
+		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(this.targetPath);
 	}
 	
 	private void cleanDb() {
@@ -95,10 +89,6 @@ public class EmbeddedNeo4j extends ExternalResource {
 		if (dbPath.exists()) {
 			deleteDir(dbPath);
 		}
-	}
-
-	private boolean isServerNotStartedYet() {
-		return !ConnectionManagement.getInstance().isConnectionRegistered(LOCALHOST+targetPath, PORT);
 	}
 
 	private void setTargetPath(String targetPath) {
@@ -121,4 +111,6 @@ public class EmbeddedNeo4j extends ExternalResource {
 		return targetPath;
 	}
 
+	
+	
 }

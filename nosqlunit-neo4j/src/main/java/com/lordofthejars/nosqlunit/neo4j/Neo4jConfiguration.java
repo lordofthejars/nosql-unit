@@ -2,13 +2,11 @@ package com.lordofthejars.nosqlunit.neo4j;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 
-import com.lordofthejars.nosqlunit.core.Configuration;
+import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
 
-public class Neo4jConfiguration implements Configuration {
+public class Neo4jConfiguration extends AbstractJsr330Configuration {
 
 	protected static final String DEFAULT_URI = "http://localhost:7474/db/data";
-	
-	private String connectionIdentifier = "";
 	
 	private String uri = DEFAULT_URI;
 	
@@ -64,13 +62,5 @@ public class Neo4jConfiguration implements Configuration {
 	public GraphDatabaseService getGraphDatabaseService() {
 		return graphDatabaseService;
 	}
-	
-	public String getConnectionIdentifier() {
-		return connectionIdentifier;
-	}
-	
-	public void setConnectionIdentifier(String connectionIdentifier) {
-		this.connectionIdentifier = connectionIdentifier;
-	}
-	
+
 }

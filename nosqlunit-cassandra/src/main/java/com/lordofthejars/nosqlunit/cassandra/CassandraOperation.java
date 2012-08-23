@@ -13,7 +13,7 @@ import org.cassandraunit.DataLoader;
 
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 
-public class CassandraOperation implements DatabaseOperation {
+public class CassandraOperation implements DatabaseOperation<Keyspace> {
 
 	private Keyspace keyspace;
 	private Cluster cluster;
@@ -75,7 +75,7 @@ public class CassandraOperation implements DatabaseOperation {
 	}
 
 	@Override
-	public Object connectionManager() {
+	public Keyspace connectionManager() {
 		return keyspace;
 	}
 

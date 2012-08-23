@@ -10,10 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.rules.ExternalResource;
-
+import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
-import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
@@ -22,7 +20,7 @@ import com.mongodb.DBPort;
 /**
  * Run a mongodb server before each test suite.
  */
-public class ManagedMongoDb extends ExternalResource {
+public class ManagedMongoDb extends AbstractLifecycleManager {
 
 	private static final String LOCALHOST = "127.0.0.1";
 
@@ -125,53 +123,45 @@ public class ManagedMongoDb extends ExternalResource {
 	}
 
 	@Override
-	protected void before() throws Throwable {
-
-		if (isServerNotStartedYet()) {
-
-			File dbPath = ensureDbPathDoesNotExitsAndReturnCompositePath();
-
-			if (dbPath.mkdirs()) {
-				startMongoDBAsADaemon();
-				boolean isServerUp = assertThatConnectionToMongoDbIsPossible(NUM_RETRIES_TO_CHECK_SERVER_UP);
-
-				if (!isServerUp) {
-					throw new IllegalStateException(
-							"Couldn't establish a connection with "
-									+ this.mongodPath
-									+ " server at /127.0.0.1:"+port);
-				}
-
-			} else {
-				throw new IllegalStateException("Db Path " + dbPath
-						+ " could not be created.");
-			}
-		}
-		ConnectionManagement.getInstance()
-				.addConnection(LOCALHOST, port);
-	}
-
-	private boolean isServerNotStartedYet() {
-		return !ConnectionManagement.getInstance().isConnectionRegistered(
-				LOCALHOST, port);
+	protected String getHost() {
+		return LOCALHOST;
 	}
 
 	@Override
-	protected void after() {
-		int remainingConnections = ConnectionManagement.getInstance()
-				.removeConnection(LOCALHOST, port);
-		if (noMoreConnectionsToManage(remainingConnections)) {
-			try {
-				this.mongoDbLowLevelOps.shutdown(LOCALHOST, port);
-			} finally {
-				ensureDbPathDoesNotExitsAndReturnCompositePath();
+	protected int getPort() {
+		return this.port;
+	}
+
+	@Override
+	protected void doStart() throws Throwable {
+		File dbPath = ensureDbPathDoesNotExitsAndReturnCompositePath();
+
+		if (dbPath.mkdirs()) {
+			startMongoDBAsADaemon();
+			boolean isServerUp = assertThatConnectionToMongoDbIsPossible(NUM_RETRIES_TO_CHECK_SERVER_UP);
+
+			if (!isServerUp) {
+				throw new IllegalStateException(
+						"Couldn't establish a connection with "
+								+ this.mongodPath
+								+ " server at /127.0.0.1:"+port);
 			}
+
+		} else {
+			throw new IllegalStateException("Db Path " + dbPath
+					+ " could not be created.");
 		}
 	}
 
-	private boolean noMoreConnectionsToManage(int remainingConnections) {
-		return remainingConnections < 1;
+	@Override
+	protected void doStop() {
+		try {
+			this.mongoDbLowLevelOps.shutdown(LOCALHOST, port);
+		} finally {
+			ensureDbPathDoesNotExitsAndReturnCompositePath();
+		}
 	}
+	
 
 	private List<String> startMongoDBAsADaemon() throws InterruptedException {
 
@@ -324,4 +314,8 @@ public class ManagedMongoDb extends ExternalResource {
 	protected void setMongoDbLowLevelOps(MongoDbLowLevelOps mongoDbLowLevelOps) {
 		this.mongoDbLowLevelOps = mongoDbLowLevelOps;
 	}
+
+
+
+	
 }
