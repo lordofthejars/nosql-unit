@@ -58,23 +58,6 @@ public class WhenMongoDbOperationsAreRequired {
 		when(mongo.getDB(anyString())).thenReturn(db);
 	}
 	
-	@Test
-	public void refresh_operation_should_only_insert_elements_ont_inserted_before() throws UnsupportedEncodingException {
-		
-		DBCollection collection1 = mock(DBCollection.class);
-		DBCollection collection2 = mock(DBCollection.class);
-		
-		
-		when(db.getCollection("collection1")).thenReturn(collection1);
-		when(db.getCollection("collection2")).thenReturn(collection2);
-		
-		MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost", "test"));
-		mongoOperation.insertNotPresent(new ByteArrayInputStream(DATA.getBytes("UTF-8")));
-		
-		verify(collection1, times(2)).insert(any(BasicDBObject.class));
-		verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
-		
-	}
 	
 	@Test
 	public void insert_opertation_should_add_data_into_collections() throws UnsupportedEncodingException {

@@ -70,11 +70,6 @@ public class CassandraOperation implements DatabaseOperation<Keyspace> {
 	}
 
 	@Override
-	public void insertNotPresent(InputStream dataScript) {
-		throw new UnsupportedOperationException("REFRESH strategy is not supported.");
-	}
-
-	@Override
 	public Keyspace connectionManager() {
 		return keyspace;
 	}

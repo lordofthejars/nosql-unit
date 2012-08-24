@@ -183,10 +183,6 @@ public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
 		return neo4jGraphMlRepresentation;
 	}
 
-	@Override
-	public void insertNotPresent(InputStream dataScript) {
-		throw new UnsupportedOperationException("REFRESH strategy is not supported.");
-	}
 
 	@Override
 	public GraphDatabaseService connectionManager() {

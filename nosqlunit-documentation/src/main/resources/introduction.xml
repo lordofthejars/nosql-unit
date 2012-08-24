@@ -338,19 +338,11 @@
 						method.
 					</td>
 				</tr>
-
-				<tr>
-					<td>REFRESH</td>
-
-					<td>Insert all data defined in datasets that are not present on
-						database.
-					</td>
-				</tr>
 			</table>
 
 			<para>An example of usage:</para>
 
-			<programlisting language="java"><![CDATA[@UsingDataSet(locations="my_data_set.json", loadStrategy=LoadStrategyEnum.REFRESH)]]></programlisting>
+			<programlisting language="java"><![CDATA[@UsingDataSet(locations="my_data_set.json", loadStrategy=LoadStrategyEnum.INSERT)]]></programlisting>
 		</section>
 
 		<section>

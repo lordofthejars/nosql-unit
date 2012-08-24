@@ -136,7 +136,6 @@ strategies are:
   INSERT          Insert defined datasets before executing any test method.
   DELETE\_ALL     Deletes all elements of database before executing any test method.
   CLEAN\_INSERT   This is the most used strategy. It deletes all elements of database and then insert defined datasets before executing any test method.
-  REFRESH         Insert all data defined in datasets that are not present on database.
   --------------- ----------------------------------------------------------------------------------------------------------------------------------------
 
   : Load Strategies
@@ -144,7 +143,7 @@ strategies are:
 An example of usage:
 
 ~~~~ {.java}
-@UsingDataSet(locations="my_data_set.json", loadStrategy=LoadStrategyEnum.REFRESH)
+@UsingDataSet(locations="my_data_set.json", loadStrategy=LoadStrategyEnum.INSERT)
 ~~~~
 
 ### Verifying Database

@@ -85,41 +85,7 @@ public class WhenMongoDbRuleIsRegistered {
 		
 	}
 	
-	@Test
-	public void should_insert_only_new_elements_with_refresh_strategy() throws Throwable {
-		
-		MongoDbConfiguration mongoDbConfiguration = mongoDb()
-				.databaseName("test").build();
-		MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDbConfiguration);
-		
-		Statement noStatement = new Statement() {
-			
-			@Override
-			public void evaluate() throws Throwable {
-				
-			}
-		};
-		
-		UsingDataSetAnnotationTest usingDataSetAnnotationTest = new UsingDataSetAnnotationTest(new String[]{"json.test"}, LoadStrategyEnum.CLEAN_INSERT);
-		Description description = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", usingDataSetAnnotationTest);
-		
-		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, description);
-		mongodbStatement.evaluate();
-		
-		UsingDataSetAnnotationTest refreshedDataSetTest = new UsingDataSetAnnotationTest(new String[]{"json3.test"}, LoadStrategyEnum.REFRESH);
-		Description refreshedDescription = Description.createTestDescription(WhenMongoDbRuleIsRegistered.class, "nosqltest", refreshedDataSetTest);
-		
-		Statement refreshMongodbStatement = remoteMongoDbRule.apply(noStatement, refreshedDescription);
-		refreshMongodbStatement.evaluate();
-		
-		DBObject currentData = findOneDBOjectByParameter("collection1",
-				"id", 9);	
-		assertThat((String)currentData.get("code"), is("Another row 9"));
-		
-		int numberOfElementsWithId1 = countDBObjectsByParameter("collection1", "id", 1);
-		assertThat(numberOfElementsWithId1, is(1));
-		
-	}
+
 	
 	@Test
 	public void should_clean_dataset_with_delete_all_strategy() throws Throwable {

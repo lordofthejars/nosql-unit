@@ -62,7 +62,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 			throws Throwable {
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -101,7 +101,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 			throws Throwable {
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -143,7 +143,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 			throws Throwable {
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -180,7 +180,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 			throws Throwable {
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -223,7 +223,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -422,7 +422,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -469,7 +469,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -516,7 +516,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -556,7 +556,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -588,7 +588,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
-						LoadStrategyEnum.REFRESH, databaseOperation))
+						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
 		Description description = Description.createTestDescription(
@@ -622,27 +622,27 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 	}
 }
 
-@UsingDataSet(locations = "test2", withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.REFRESH)
+@UsingDataSet(locations = "test2", withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.INSERT)
 class MyGlobalAndSelectiveClass {
 
 }
 
-@UsingDataSet(withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.REFRESH)
+@UsingDataSet(withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.INSERT)
 class MySelectiveClass {
 
 }
 
-@UsingDataSet(loadStrategy = LoadStrategyEnum.REFRESH)
+@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
 class MyTestClass {
 
 }
 
-@UsingDataSet(loadStrategy = LoadStrategyEnum.REFRESH)
+@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
 class MyUknownClass {
 
 }
 
-@UsingDataSet(locations = "test2", loadStrategy = LoadStrategyEnum.REFRESH)
+@UsingDataSet(locations = "test2", loadStrategy = LoadStrategyEnum.INSERT)
 @ShouldMatchDataSet(location = "test2")
 class DefaultClass {
 

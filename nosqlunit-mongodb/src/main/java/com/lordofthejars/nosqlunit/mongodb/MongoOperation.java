@@ -111,55 +111,7 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 
 	}
 
-	@Override
-	public void insertNotPresent(InputStream contentStream) {
-		
-		try {
-			
-			String jsonData = loadContentFromInputStream(contentStream);
-			
-			DBObject parsedData = parseData(jsonData);
-			DB mongoDb = getMongoDb();
-			
-			insertAllElementsNotInsertedBefore(parsedData, mongoDb);
-			
-		} catch (IOException e) {
-			throw new IllegalArgumentException(
-					"Unexpected error reading expected data set file.", e);
-		}
-		
-		
-	}
 
-	private void insertAllElementsNotInsertedBefore(DBObject parsedData,
-			DB mongoDb) {
-		Set<String> collectionaNames = parsedData.keySet();
-
-		for (String collectionName : collectionaNames) {
-
-			BasicDBList dataObjects = (BasicDBList) parsedData
-					.get(collectionName);
-
-			DBCollection dbCollection = mongoDb.getCollection(collectionName);
-
-			for (Object dataObject : dataObjects) {
-				DBObject dbObject = dbCollection.findOne((DBObject) dataObject);
-				
-				if(wasDbObjectNotInserted(dbObject)) {
-					
-					LOGGER.debug("Inserting Unique Object {} To {}.", dataObject, dbCollection.getName());
-					
-					dbCollection.insert((DBObject)dataObject);
-				}
-				
-			}
-
-		}
-	}
-
-	private boolean wasDbObjectNotInserted(DBObject dbObject) {
-		return dbObject == null;
-	}
 	
 	private DBObject parseData(String jsonData) throws IOException {
 		DBObject parsedData = (DBObject) JSON.parse(jsonData);
