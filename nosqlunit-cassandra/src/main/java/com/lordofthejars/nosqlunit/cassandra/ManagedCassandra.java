@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.cassandra;
 
+import static com.lordofthejars.nosqlunit.core.IOUtils.deleteDir;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.io.File;
@@ -93,8 +94,6 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 		}
 
 	}
-
-	
 	
 	@Override
 	protected String getHost() {
@@ -110,12 +109,24 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+
+		File targetPathDirectory = ensureTargetPathDoesNotExitsAndReturnCompositePath();
+
+		if (targetPathDirectory.mkdirs()) {
+			startCassandraAsDaemon();
+		} else {
+			throw new IllegalStateException("Target Path " + targetPathDirectory + " could not be created.");
+		}
+	}
+
+
+	private void startCassandraAsDaemon() throws AssertionError {
 		final CountDownLatch startupLatch = new CountDownLatch(1);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					startCassandraAsDaemon();
+					startCassandraProcess();
 					startupLatch.countDown();
 				} catch (InterruptedException e) {
 					throw new IllegalStateException(e);
@@ -133,10 +144,14 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStop() {
-		stopCassandra();
+		try {
+			stopCassandra();
+		}finally {
+			ensureTargetPathDoesNotExitsAndReturnCompositePath();
+		}
 	}
 
-	private List<String> startCassandraAsDaemon() throws InterruptedException {
+	private List<String> startCassandraProcess() throws InterruptedException {
 
 		try {
 			pwd = startProcess();
@@ -199,6 +214,14 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 
 	}
 
+	private File ensureTargetPathDoesNotExitsAndReturnCompositePath() {
+		File dbPath = new File(targetPath);
+		if (dbPath.exists()) {
+			deleteDir(dbPath);
+		}
+		return dbPath;
+	}
+	
 	private void stopCassandra() {
 		pwd.destroy();
 	}

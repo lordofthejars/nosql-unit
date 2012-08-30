@@ -190,6 +190,42 @@ public class WhenManagedCassandraLifecycleIsManaged {
 	}
 	
 	@Test
+	public void cassandra_should_be_started_in_Linux_from_custom_location() throws Throwable {
+		
+		
+		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
+				OperatingSystem.LINUX_OS);
+		
+		
+		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
+
+		Process mockProcess = mock(Process.class);
+		when(mockProcess.exitValue()).thenReturn(0);
+
+		when(
+				commandLineExecutor.startProcessInDirectoryAndArguments(
+						anyString(), anyList())).thenReturn(mockProcess);
+		
+		ManagedCassandra managedCassandra = newManagedCassandraRule().cassandraPath("/opt/cassandra").port(9191).build();
+		
+		managedCassandra.setCommandLineExecutor(commandLineExecutor);
+		managedCassandra.setOperatingSystemResolver(operatingSystemResolver);
+		
+		managedCassandra.before();
+		
+		List<String> expectedCommand = new ArrayList<String>();
+		expectedCommand.add("/opt/cassandra"+File.separatorChar+ManagedCassandra.CASSANDRA_BINARY_DIRECTORY+File.separatorChar+ManagedCassandra.CASSANDRA_EXECUTABLE_X);
+		expectedCommand.add(ManagedCassandra.FOREGROUND_ARGUMENT_NAME);
+		
+		managedCassandra.after();
+
+		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
+				ManagedCassandra.DEFAULT_CASSANDRA_TARGET_PATH, expectedCommand);
+		
+		
+	}
+	
+	@Test
 	public void cassandra_should_be_started_in_MacOsX() throws Throwable {
 		
 		System.setProperty("CASSANDRA_HOME", "/opt/cassandra");

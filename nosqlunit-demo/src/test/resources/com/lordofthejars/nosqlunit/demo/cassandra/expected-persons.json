@@ -1,5 +1,5 @@
 {
-    "name" : "persons",
+    "name" : "person",
     "columnFamilies" : [{
         "name" : "personFamilyName",
 	"keyType" : "UTF8Type",

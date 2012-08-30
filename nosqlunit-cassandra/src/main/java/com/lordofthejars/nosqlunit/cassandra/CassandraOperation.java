@@ -3,7 +3,6 @@ package com.lordofthejars.nosqlunit.cassandra;
 import java.io.InputStream;
 import java.util.List;
 
-import me.prettyprint.cassandra.service.CassandraHostConfigurator;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
@@ -23,6 +22,7 @@ public class CassandraOperation implements DatabaseOperation<Keyspace> {
 	
 	public CassandraOperation(CassandraConfiguration cassandraConfiguration) {
 		this.cassandraConfiguration = cassandraConfiguration;
+		cluster = HFactory.getOrCreateCluster(cassandraConfiguration.getClusterName(), getFullHost());
 	}
 	
 	@Override
@@ -33,7 +33,6 @@ public class CassandraOperation implements DatabaseOperation<Keyspace> {
 		DataLoader dataLoader = new DataLoader(cassandraConfiguration.getClusterName(), getFullHost());
 		dataLoader.load(dataSet);
 		
-		cluster = HFactory.getOrCreateCluster(cassandraConfiguration.getClusterName(), getFullHost());
 		keyspace = HFactory.createKeyspace(dataSet.getKeyspace().getName(), cluster);
 	}
 
@@ -47,10 +46,7 @@ public class CassandraOperation implements DatabaseOperation<Keyspace> {
 	}
 
 	private void dropKeyspaces() {
-		//String host = DatabaseDescriptor.getRpcAddress().getHostName();
-		//int port = DatabaseDescriptor.getRpcPort();
-		Cluster cluster = HFactory.getOrCreateCluster(this.cassandraConfiguration.getClusterName(), new CassandraHostConfigurator(getFullHost()));
-		/* get all keyspace */
+		
 		List<KeyspaceDefinition> keyspaces = cluster.describeKeyspaces();
 
 		/* drop all keyspace except internal cassandra keyspace */
@@ -61,6 +57,8 @@ public class CassandraOperation implements DatabaseOperation<Keyspace> {
 				cluster.dropKeyspace(keyspaceName);
 			}
 		}
+		
+		List<KeyspaceDefinition> keyspaces2 = cluster.describeKeyspaces();
 	}
 	
 	@Override

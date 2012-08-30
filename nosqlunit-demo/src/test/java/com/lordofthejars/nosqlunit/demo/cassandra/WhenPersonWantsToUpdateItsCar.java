@@ -30,7 +30,7 @@ public class WhenPersonWantsToUpdateItsCar {
 	@ShouldMatchDataSet(location="expected-persons.json")
 	public void new_car_should_be_updated() {
 		
-		PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
+		PersonManager personManager = new PersonManager("Test Cluster", "person", "localhost:9160");
 		personManager.updateCarByPersonName("john", "opel");
 		
 	}

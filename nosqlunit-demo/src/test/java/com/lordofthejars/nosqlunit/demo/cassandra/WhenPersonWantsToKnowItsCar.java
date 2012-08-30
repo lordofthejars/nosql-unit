@@ -28,7 +28,7 @@ public class WhenPersonWantsToKnowItsCar {
 	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 	public void car_should_be_returned() {
 		
-		PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
+		PersonManager personManager = new PersonManager("Test Cluster", "person", "localhost:9171");
 		String car = personManager.getCarByPersonName("mary");
 		
 		assertThat(car, is("ford"));
