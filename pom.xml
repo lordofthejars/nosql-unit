@@ -53,10 +53,25 @@
 		<stax.version>1.0.1</stax.version>
 		<hamcrest.xml.version>0.10</hamcrest.xml.version>
 		<cassandra.unit.version>1.1.0.1</cassandra.unit.version>
+		<jedis.version>2.1.0</jedis.version>
+		<json.simple.version>1.1.1</json.simple.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>redis.clients</groupId>
+				<artifactId>jedis</artifactId>
+				<version>${jedis.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.googlecode.json-simple</groupId>
+				<artifactId>json-simple</artifactId>
+				<version>${json.simple.version}</version>
+			</dependency>
+
 
 			<dependency>
 				<groupId>org.cassandraunit</groupId>
@@ -221,6 +236,7 @@
 		<module>nosqlunit-documentation</module>
 		<module>nosqlunit-neo4j</module>
 		<module>nosqlunit-cassandra</module>
+		<module>nosqlunit-redis</module>
 	</modules>
 
 	<build>
@@ -259,7 +275,8 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>

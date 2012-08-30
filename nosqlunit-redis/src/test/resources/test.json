@@ -1,0 +1,44 @@
+{
+"data":[
+			{"simple": [
+				{
+					"key":"key1", 
+					"value":"value1"
+				}
+				]
+			},
+      		{"list": [{
+              			"key":"key3",
+              			"values":[
+                  			{"value":"value3"},
+                  			{"value":"value4"}
+              			]
+					  }]
+      		},
+      		
+     		{"sortset": [{
+                     "key":"key4",
+                     "values":[
+                           {"score":2, "value":"value5" },{"score":3, "value":1 }, {"score":1, "value":"value6" }]
+                 }]
+      		}, 
+      		{"hash": [
+      					{
+      						"key":"user",
+      						"values":[
+      							{"field":"name", "value":"alex"},
+      							{"field":"password", "value":"alex"}
+      						]
+      					}
+      				]
+      		},
+      		{"set":[{
+              			"key":"key3",
+              			"values":[
+                  			{"value":"value3"},
+                  			{"value":"value4"}
+              			]
+					  }]
+      		}
+]
+}
