@@ -1,6 +1,7 @@
 package com.lordofthejars.nosqlunit.cassandra;
 
 import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.join;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectUnique;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -24,10 +25,7 @@ import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.query.ColumnQuery;
 import me.prettyprint.hector.api.query.QueryResult;
 import me.prettyprint.hector.api.query.SuperColumnQuery;
-import me.prettyprint.hector.api.query.SuperCountQuery;
-import me.prettyprint.hector.api.query.SuperSliceQuery;
 
-import org.apache.cassandra.tools.GetVersion;
 import org.cassandraunit.dataset.DataSet;
 import org.cassandraunit.model.ColumnFamilyModel;
 import org.cassandraunit.model.ColumnModel;
@@ -35,6 +33,7 @@ import org.cassandraunit.model.RowModel;
 import org.cassandraunit.model.SuperColumnModel;
 import org.cassandraunit.serializer.GenericTypeSerializer;
 import org.cassandraunit.type.GenericType;
+import org.cassandraunit.type.GenericTypeEnum;
 
 import com.lordofthejars.nosqlunit.core.FailureHandler;
 
@@ -99,7 +98,7 @@ public class CassandraAssertion {
 	private static void checkNotStandardColumnsInSuperColumns(RowModel expectedRowModel, int size) throws Error {
 		if(size > 0) {
 			throw FailureHandler.createFailure("Standard columns for key %s are not allowed because is defined as super column.",
-					expectedRowModel.getKey().getValue());
+					asString(expectedRowModel.getKey()));
 		}
 	}
 
@@ -149,7 +148,7 @@ public class CassandraAssertion {
 		for (HColumn<byte[], byte[]> hColumn : columns) {
 			if(!areLoadValuesOnExpectedList(expectedColumns, hColumn.getName(), hColumn.getValue())){
 				throw FailureHandler.createFailure("Row with key %s and supercolumn %s does not contain expected column.",
-						expectedRowModel.getKey().getValue(),expectedSuperColumnModel.getName().getValue());
+						asString(expectedRowModel.getKey()),expectedSuperColumnModel.getName().getValue());
 			}
 		}
 	}
@@ -170,7 +169,7 @@ public class CassandraAssertion {
 
 		if (countNumberOfSuperColumnsByKey != size) {
 			throw FailureHandler.createFailure("Expected number of supercolumns for key %s is %s but was counted %s.",
-					expectedRowModel.getKey().getValue(), size, countNumberOfSuperColumnsByKey);
+					asString(expectedRowModel.getKey()), size, countNumberOfSuperColumnsByKey);
 		}
 	}
 
@@ -199,12 +198,13 @@ public class CassandraAssertion {
 	private static void checkColumnName(ColumnModel expectedColumnModel, HColumn<byte[], byte[]> hColumn) throws Error {
 		if(hColumn == null) {
 			throw FailureHandler.createFailure("Expected name of column is %s but was not found.",
-					expectedColumnModel.getName().getValue());
+					asString(expectedColumnModel.getName()));
 		}
 	}
 
 	private static byte[] getBytes(GenericType genericType) {
 
+		
 		return GenericTypeSerializer.get().toBytes(genericType);
 
 	}
@@ -215,7 +215,7 @@ public class CassandraAssertion {
 
 		if (!areLoadValuesOnExpectedList(expectedRowModel.getColumns(), expectedColumnName, expectedColumnValue)) {
 			throw FailureHandler.createFailure("Row with key %s does not contain column with name %s and value %s.",
-					expectedRowModel.getKey().getValue(), new String(expectedColumnName), new String(
+					asString(expectedRowModel.getKey()), new String(expectedColumnName), new String(
 							expectedColumnValue));
 		}
 	}
@@ -248,15 +248,17 @@ public class CassandraAssertion {
 		int expectedNumberOfColumns = expectedRowModel.getColumns().size();
 		if (numberOfColumns != expectedNumberOfColumns) {
 			throw FailureHandler.createFailure("Expected number of columns for key %s is %s but was counted %s.",
-					expectedRowModel.getKey().getValue(), expectedNumberOfColumns, numberOfColumns);
+					asString(expectedRowModel.getKey()), expectedNumberOfColumns, numberOfColumns);
 		}
 	}
 
+	
+	
 	// change to bytearray instead of string
 	private static int countNumberOfColumnsByKey(Keyspace keyspace, String expectedColumnFamilyName,
 			RowModel expectedRowModel) {
-		QueryResult<Integer> qr = HFactory.createCountQuery(keyspace, StringSerializer.get(), StringSerializer.get())
-				.setColumnFamily(expectedColumnFamilyName).setKey(expectedRowModel.getKey().getValue())
+		QueryResult<Integer> qr = HFactory.createCountQuery(keyspace, GenericTypeSerializer.get(), StringSerializer.get())
+				.setColumnFamily(expectedColumnFamilyName).setKey(expectedRowModel.getKey())
 				.setRange(null, null, 1000000000).execute();
 
 		int numberOfColumns = qr.get();
@@ -327,4 +329,14 @@ public class CassandraAssertion {
 
 	}
 
+	private static String asString(GenericType genericType) {
+		
+		if(genericType.getType() == GenericTypeEnum.COMPOSITE_TYPE) {
+			return "<"+join(genericType.getCompositeValues())+">";
+		}
+		
+		return genericType.getValue();
+		
+	}
+	
 }

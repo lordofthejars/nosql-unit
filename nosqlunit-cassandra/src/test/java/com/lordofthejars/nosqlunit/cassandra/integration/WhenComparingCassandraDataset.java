@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.cassandra.integration;
 
+import static org.junit.Assert.fail;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra.EmbeddedCassandraRuleBuilder.newEmbeddedCassandraRule;
@@ -459,6 +460,138 @@ public class WhenComparingCassandraDataset {
 			"    }]\n" + 
 			"}";
 	
+	private static final String INSERT_DATA_WITH_KEY_COMPOSITE_TYPE = "{\n" + 
+			"    \"name\" : \"MyKeyspace\",\n" + 
+			"    \"columnFamilies\" : [{\n" + 
+			"        \"name\" : \"ColumnFamilyName\",\n" + 
+			"		 \"keyType\" : \"CompositeType(UTF8Type,UTF8Type)\",\n"+
+			"        \"defaultColumnValueType\" : \"UTF8Type\",\n"+
+			"        \"comparatorType\" : \"UTF8Type\",\n"+
+			"        \"rows\" : [{\n" + 
+			"            \"key\" : \"jsmith:hero\",\n" + 
+			"            \"columns\" : [{\n" + 
+			"                \"name\" : \"first\",\n" + 
+			"                \"value\" : \"aaa\"\n" + 
+			"            },{" +
+			"				 \"name\": \"11\",\n" +
+		    "				 \"value\" : \"bb\"\n"+
+			"			 }]\n" + 
+			"        }]\n" + 
+			"    }]\n" + 
+			"}";
+	
+	private static final String INSERT_DATA_WITH_DIFFERENT_KEY_COMPOSITE_TYPE = "{\n" + 
+			"    \"name\" : \"MyKeyspace\",\n" + 
+			"    \"columnFamilies\" : [{\n" + 
+			"        \"name\" : \"ColumnFamilyName\",\n" + 
+			"		 \"keyType\" : \"CompositeType(UTF8Type,UTF8Type)\",\n"+
+			"        \"defaultColumnValueType\" : \"UTF8Type\",\n"+
+			"        \"comparatorType\" : \"UTF8Type\",\n"+
+			"        \"rows\" : [{\n" + 
+			"            \"key\" : \"jsmith:villain\",\n" + 
+			"            \"columns\" : [{\n" + 
+			"                \"name\" : \"first\",\n" + 
+			"                \"value\" : \"aaa\"\n" + 
+			"            },{" +
+			"				 \"name\": \"11\",\n" +
+		    "				 \"value\" : \"bb\"\n"+
+			"			 }]\n" + 
+			"        }]\n" + 
+			"    }]\n" + 
+			"}";
+	
+	private static final String INSERT_DATA_WITH_DIFFERENT_KEY_TYPE_COMPOSITE_TYPE_UTF8 = "{\n" + 
+			"    \"name\" : \"MyKeyspace\",\n" + 
+			"    \"columnFamilies\" : [{\n" + 
+			"        \"name\" : \"ColumnFamilyName\",\n" + 
+			"		 \"keyType\" : \"CompositeType(UTF8Type,UTF8Type)\",\n"+
+			"        \"defaultColumnValueType\" : \"UTF8Type\",\n"+
+			"        \"comparatorType\" : \"UTF8Type\",\n"+
+			"        \"rows\" : [{\n" + 
+			"            \"key\" : \"10:hero\",\n" + 
+			"            \"columns\" : [{\n" + 
+			"                \"name\" : \"first\",\n" + 
+			"                \"value\" : \"aaa\"\n" + 
+			"            },{" +
+			"				 \"name\": \"11\",\n" +
+		    "				 \"value\" : \"bb\"\n"+
+			"			 }]\n" + 
+			"        }]\n" + 
+			"    }]\n" + 
+			"}";
+	
+	private static final String INSERT_DATA_WITH_DIFFERENT_KEY_TYPE_COMPOSITE_TYPE = "{\n" + 
+			"    \"name\" : \"MyKeyspace\",\n" + 
+			"    \"columnFamilies\" : [{\n" + 
+			"        \"name\" : \"ColumnFamilyName\",\n" + 
+			"		 \"keyType\" : \"CompositeType(LongType,UTF8Type)\",\n"+
+			"        \"defaultColumnValueType\" : \"UTF8Type\",\n"+
+			"        \"comparatorType\" : \"UTF8Type\",\n"+
+			"        \"rows\" : [{\n" + 
+			"            \"key\" : \"10:hero\",\n" + 
+			"            \"columns\" : [{\n" + 
+			"                \"name\" : \"first\",\n" + 
+			"                \"value\" : \"aaa\"\n" + 
+			"            },{" +
+			"				 \"name\": \"11\",\n" +
+		    "				 \"value\" : \"bb\"\n"+
+			"			 }]\n" + 
+			"        }]\n" + 
+			"    }]\n" + 
+			"}";
+	
+	
+	private static final String INSERT_DATA_WITH_COLUMN_NAME_COMPOSITE_TYPE = "{\n" + 
+			"    \"name\" : \"MyKeyspace\",\n" + 
+			"    \"columnFamilies\" : [{\n" + 
+			"        \"name\" : \"ColumnFamilyName\",\n" + 
+			"		 \"keyType\" : \"UTF8Type\",\n"+
+			"        \"defaultColumnValueType\" : \"UTF8Type\",\n"+
+			"        \"comparatorType\" : \"CompositeType(UTF8Type,IntegerType)\",\n"+
+			"        \"rows\" : [{\n" + 
+			"            \"key\" : \"jsmith\",\n" + 
+			"            \"columns\" : [{\n" + 
+			"                \"name\" : \"first:0\",\n" + 
+			"                \"value\" : \"aaa\"\n" + 
+			"            }]\n" + 
+			"        }]\n" + 
+			"    }]\n" + 
+			"}";
+	
+	private static final String INSERT_DATA_WITH_COLUMN_NAME_DIFFERENT_COMPOSITE_TYPE = "{\n" + 
+			"    \"name\" : \"MyKeyspace\",\n" + 
+			"    \"columnFamilies\" : [{\n" + 
+			"        \"name\" : \"ColumnFamilyName\",\n" + 
+			"		 \"keyType\" : \"UTF8Type\",\n"+
+			"        \"defaultColumnValueType\" : \"UTF8Type\",\n"+
+			"        \"comparatorType\" : \"CompositeType(UTF8Type,UTF8Type)\",\n"+
+			"        \"rows\" : [{\n" + 
+			"            \"key\" : \"jsmith\",\n" + 
+			"            \"columns\" : [{\n" + 
+			"                \"name\" : \"first:0\",\n" + 
+			"                \"value\" : \"aaa\"\n" + 
+			"            }]\n" + 
+			"        }]\n" + 
+			"    }]\n" + 
+			"}";
+	
+	private static final String INSERT_DATA_WITH_DIFFERENT_COLUMN_NAME_COMPOSITE_TYPE = "{\n" + 
+			"    \"name\" : \"MyKeyspace\",\n" + 
+			"    \"columnFamilies\" : [{\n" + 
+			"        \"name\" : \"ColumnFamilyName\",\n" + 
+			"		 \"keyType\" : \"UTF8Type\",\n"+
+			"        \"defaultColumnValueType\" : \"UTF8Type\",\n"+
+			"        \"comparatorType\" : \"CompositeType(UTF8Type,IntegerType)\",\n"+
+			"        \"rows\" : [{\n" + 
+			"            \"key\" : \"jsmith\",\n" + 
+			"            \"columns\" : [{\n" + 
+			"                \"name\" : \"first:2\",\n" + 
+			"                \"value\" : \"aaa\"\n" + 
+			"            }]\n" + 
+			"        }]\n" + 
+			"    }]\n" + 
+			"}";
+	
 	@Rule
 	public EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().build();
 	
@@ -489,6 +622,7 @@ public class WhenComparingCassandraDataset {
 		try {
 		
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_DIFFERENT_COLUMN_NAME.getBytes())), cluster, keyspace);
+			fail();
 		} catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected name of column is aa but was not found."));
 		}
@@ -508,6 +642,7 @@ public class WhenComparingCassandraDataset {
 		try {
 		
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_DIFFERENT_KEYSPACE.getBytes())), cluster, keyspace);
+			fail();
 		} catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected keyspace name is MyKeyspace2 but was MyKeyspace."));
 		}
@@ -527,6 +662,7 @@ public class WhenComparingCassandraDataset {
 		try {
 		
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_MULTIPLE_COLUMNS_FAMILY.getBytes())), cluster, keyspace);
+			fail();
 		} catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected number of column families is 2 but was 1."));
 		}
@@ -546,6 +682,7 @@ public class WhenComparingCassandraDataset {
 		try {
 		
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_DIFFERENT_COLUMN_FAMILY.getBytes())), cluster, keyspace);
+			fail();
 		} catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(),is("Expected name of column family is beautifulColumnFamilyName but was not found."));
 		}
@@ -565,6 +702,7 @@ public class WhenComparingCassandraDataset {
 		try {
 		
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_DIFFERENT_NUMBER_ROWS.getBytes())), cluster, keyspace);
+			fail();
 		} catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected keys for column family ColumnFamilyName is 2 but was counted 1."));
 		}
@@ -584,6 +722,7 @@ public class WhenComparingCassandraDataset {
 		try {
 		
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_DIFFERENT_COLUMN_NUMBERS.getBytes())), cluster, keyspace);
+			fail();
 		} catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected number of columns for key jsmith is 1 but was counted 2."));
 		}
@@ -603,6 +742,7 @@ public class WhenComparingCassandraDataset {
 		try {
 		
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_DIFFERENT_VALUES.getBytes())), cluster, keyspace);
+			fail();
 		} catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Row with key jsmith does not contain column with name 11 and value bb."));
 		}
@@ -635,6 +775,7 @@ public class WhenComparingCassandraDataset {
 	    
 		try {
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_MULTIPLE_SUPER_COLUMNS.getBytes())), cluster, keyspace);
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(),is("Expected number of supercolumns for key 10 is 2 but was counted 1."));
 		}
@@ -652,6 +793,7 @@ public class WhenComparingCassandraDataset {
 	    
 		try {
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_SUPER_COLUMN_WITH_ONE_COLUMN.getBytes())), cluster, keyspace);
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected number of columns inside supercolumn 1100 for key 10 is 2 but was counted 1."));
 		}
@@ -669,6 +811,7 @@ public class WhenComparingCassandraDataset {
 	    
 		try {
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_SUPER_COLUMN_WITH_DIFFERENT_VALUE.getBytes())), cluster, keyspace);
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Row with key 10 and supercolumn 1100 does not contain expected column."));
 		}
@@ -686,6 +829,7 @@ public class WhenComparingCassandraDataset {
 	    
 		try {
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_SUPER_COLUMN_WITH_DIFFERENT_COLUMN_NAME.getBytes())), cluster, keyspace);
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Row with key 10 and supercolumn 1100 does not contain expected column."));
 		}
@@ -703,6 +847,7 @@ public class WhenComparingCassandraDataset {
 	    
 		try {
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_SUPER_COLUMN_DIFFERENT_NAME.getBytes())), cluster, keyspace);
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Supercolumn 1111 is not found into database."));
 		}
@@ -720,6 +865,7 @@ public class WhenComparingCassandraDataset {
 	    
 		try {
 			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_MIXED_SUPER_COLUMN.getBytes())), cluster, keyspace);
+			fail();
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Standard columns for key 10 are not allowed because is defined as super column."));
 		}
@@ -751,6 +897,108 @@ public class WhenComparingCassandraDataset {
 	    
 
 		CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_DIFFERENT_TYPES_DIFFERENT_TYPE.getBytes())), cluster, keyspace);
+		
+	}
+	
+	@Test
+	public void no_exception_should_be_thrown_if_composite_key_is_expected() {
+		
+		CassandraOperation cassandraOperation = new CassandraOperation(new CassandraConfiguration("Test Cluster", "localhost", 9171));
+		cassandraOperation.insert(new ByteArrayInputStream(INSERT_DATA_WITH_KEY_COMPOSITE_TYPE.getBytes()));
+		
+		
+	    Cluster cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9171");
+		Keyspace keyspace = HFactory.createKeyspace("MyKeyspace", cluster);
+		
+		CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_KEY_COMPOSITE_TYPE.getBytes())), cluster, keyspace);
+		
+	}
+	
+	@Test
+	public void exception_should_be_thrown_if_composite_key_is_not_expected() {
+		
+		CassandraOperation cassandraOperation = new CassandraOperation(new CassandraConfiguration("Test Cluster", "localhost", 9171));
+		cassandraOperation.insert(new ByteArrayInputStream(INSERT_DATA_WITH_KEY_COMPOSITE_TYPE.getBytes()));
+		
+		
+	    Cluster cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9171");
+		Keyspace keyspace = HFactory.createKeyspace("MyKeyspace", cluster);
+		
+		try {
+			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_DIFFERENT_KEY_COMPOSITE_TYPE.getBytes())), cluster, keyspace);
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(),is("Expected number of columns for key <jsmith, villain> is 2 but was counted 0."));			
+		}
+	}
+	
+	@Test
+	public void exception_should_be_thrown_if_composite_key_type_is_different() {
+		
+		CassandraOperation cassandraOperation = new CassandraOperation(new CassandraConfiguration("Test Cluster", "localhost", 9171));
+		cassandraOperation.insert(new ByteArrayInputStream(INSERT_DATA_WITH_DIFFERENT_KEY_TYPE_COMPOSITE_TYPE_UTF8.getBytes()));
+		
+		
+	    Cluster cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9171");
+		Keyspace keyspace = HFactory.createKeyspace("MyKeyspace", cluster);
+		
+		try {
+			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_DIFFERENT_KEY_TYPE_COMPOSITE_TYPE.getBytes())), cluster, keyspace);
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected number of columns for key <10, hero> is 2 but was counted 0."));	
+		}
+	}
+	
+	@Test
+	public void no_exception_should_be_thrown_if_composite_column_name_is_expected() {
+		
+		CassandraOperation cassandraOperation = new CassandraOperation(new CassandraConfiguration("Test Cluster", "localhost", 9171));
+		cassandraOperation.insert(new ByteArrayInputStream(INSERT_DATA_WITH_COLUMN_NAME_COMPOSITE_TYPE.getBytes()));
+		
+		
+	    Cluster cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9171");
+		Keyspace keyspace = HFactory.createKeyspace("MyKeyspace", cluster);
+		
+		CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_COLUMN_NAME_COMPOSITE_TYPE.getBytes())), cluster, keyspace);
+		
+	}
+	
+	@Test
+	public void exception_should_be_thrown_if_composite_column_name_is_not_expected() {
+		
+		CassandraOperation cassandraOperation = new CassandraOperation(new CassandraConfiguration("Test Cluster", "localhost", 9171));
+		cassandraOperation.insert(new ByteArrayInputStream(INSERT_DATA_WITH_COLUMN_NAME_COMPOSITE_TYPE.getBytes()));
+		
+		
+	    Cluster cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9171");
+		Keyspace keyspace = HFactory.createKeyspace("MyKeyspace", cluster);
+		
+		try {
+			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_DIFFERENT_COLUMN_NAME_COMPOSITE_TYPE.getBytes())), cluster, keyspace);
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected name of column is <first, 2> but was not found."));
+		}
+		
+	}
+	
+	@Test
+	public void exception_should_be_thrown_if_composite_type_of_column_name_is_not_expected() {
+		
+		CassandraOperation cassandraOperation = new CassandraOperation(new CassandraConfiguration("Test Cluster", "localhost", 9171));
+		cassandraOperation.insert(new ByteArrayInputStream(INSERT_DATA_WITH_COLUMN_NAME_COMPOSITE_TYPE.getBytes()));
+		
+		
+	    Cluster cluster = HFactory.getOrCreateCluster("Test Cluster", "localhost:9171");
+		Keyspace keyspace = HFactory.createKeyspace("MyKeyspace", cluster);
+		
+		try {
+			CassandraAssertion.strictAssertEquals(new InputStreamJsonDataSet(new ByteArrayInputStream(INSERT_DATA_WITH_COLUMN_NAME_DIFFERENT_COMPOSITE_TYPE.getBytes())), cluster, keyspace);
+			fail();
+		}catch(NoSqlAssertionError e) {
+			assertThat(e.getMessage(), is("Expected name of column is <first, 0> but was not found."));
+		}
 		
 	}
 	
