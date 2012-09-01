@@ -1,5 +1,8 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
+import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBuilder.inMemoryMongoDb;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+
 import java.net.UnknownHostException;
 
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
@@ -34,6 +37,22 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 		public MongoDbRuleBuilder unitInstance(Object target) {
 			this.target = target;
 			return this;
+		}
+		
+		public MongoDbRule defaultEmbeddedMongoDb(String databaseName) {
+			return new MongoDbRule(inMemoryMongoDb().databaseName(databaseName).build());
+		}
+		
+		public MongoDbRule defaultEmbeddedMongoDb(String databaseName, Object target) {
+			return new MongoDbRule(inMemoryMongoDb().databaseName(databaseName).build(), target);
+		}
+		
+		public MongoDbRule defaultManagedMongoDb(String databaseName) {
+			return new MongoDbRule(mongoDb().databaseName(databaseName).build());
+		}
+		
+		public MongoDbRule defaultManagedMongoDb(String databaseName, Object target) {
+			return new MongoDbRule(mongoDb().databaseName(databaseName).build(), target);
 		}
 		
 		public MongoDbRule build() {

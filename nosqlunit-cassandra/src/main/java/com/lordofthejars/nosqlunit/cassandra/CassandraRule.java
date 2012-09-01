@@ -1,5 +1,8 @@
 package com.lordofthejars.nosqlunit.cassandra;
 
+import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandraConfigurationBuilder.newEmbeddedCassandraConfiguration;
+import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandraConfigurationBuilder.newManagedCassandraConfiguration;
+
 import me.prettyprint.hector.api.Keyspace;
 
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
@@ -32,6 +35,22 @@ public class CassandraRule extends AbstractNoSqlTestRule {
 		public CassandraRuleBuilder unitInstance(Object target) {
 			this.target = target;
 			return this;
+		}
+		
+		public CassandraRule defaultEmbeddedCassandra(String clusterName) {
+			return new CassandraRule(newEmbeddedCassandraConfiguration().clusterName(clusterName).build());
+		}
+		
+		public CassandraRule defaultEmbeddedCassandra(String clusterName, Object target) {
+			return new CassandraRule(newEmbeddedCassandraConfiguration().clusterName(clusterName).build(), target);
+		}
+		
+		public CassandraRule defaultManagedCassandra(String clusterName) {
+			return new CassandraRule(newManagedCassandraConfiguration().clusterName(clusterName).build());
+		}
+		
+		public CassandraRule defaultManagedCassandra(String clusterName, Object target) {
+			return new CassandraRule(newManagedCassandraConfiguration().clusterName(clusterName).build(), target);
 		}
 		
 		public CassandraRule build() {
