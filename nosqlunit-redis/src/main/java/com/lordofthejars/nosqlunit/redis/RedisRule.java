@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.redis;
 
+import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
 import redis.clients.jedis.Jedis;
 
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
@@ -10,6 +11,48 @@ public class RedisRule extends AbstractNoSqlTestRule {
 	private static final String EXTENSION = "json";
 	
 	private DatabaseOperation<Jedis> databaseOperation;
+	
+	public static class RedisRuleBuilder {
+		
+		private RedisConfiguration redisConfiguration;
+		private Object target;
+		
+		private RedisRuleBuilder() {
+			super();
+		}
+		
+		public static RedisRuleBuilder newRedisRule() {
+			return new RedisRuleBuilder();
+		}
+		
+		public RedisRuleBuilder configure(RedisConfiguration redisConfiguration) {
+			this.redisConfiguration = redisConfiguration;
+			return this;
+		}
+		
+		public RedisRuleBuilder unitInstance(Object target) {
+			this.target = target;
+			return this;
+		}
+		
+		public RedisRule defaultManagedRedis() {
+			return new RedisRule(newManagedRedisConfiguration().build());
+		}
+		
+		public RedisRule defaultManagedRedis(Object target) {
+			return new RedisRule(newManagedRedisConfiguration().build(), target);
+		}
+		
+		public RedisRule build() {
+
+			if(this.redisConfiguration == null) {
+				throw new IllegalArgumentException("Configuration object should be provided.");
+			}
+			
+			return new RedisRule(redisConfiguration, target);
+		}
+		
+	}
 	
 	public RedisRule(RedisConfiguration redisConfiguration) {
 		super(redisConfiguration.getConnectionIdentifier());

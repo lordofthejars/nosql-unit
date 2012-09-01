@@ -1,20 +1,23 @@
 package com.lordofthejars.nosqlunit.redis;
 
-import static org.hamcrest.collection.IsMapContaining.hasKey;
+import static org.hamcrest.Matchers.equalTo;
 
+import static ch.lambdaj.collection.LambdaCollections.with;
 import static ch.lambdaj.Lambda.extract;
 import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.Lambda.having;
+
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.DATA_TOKEN;
+import static com.lordofthejars.nosqlunit.redis.parser.DataReader.FIELD_TOKEN;
+import static com.lordofthejars.nosqlunit.redis.parser.DataReader.HASH_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.KEY_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.LIST_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SCORE_TOKEN;
+import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SET_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SIMPLE_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SORTSET_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.VALUES_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.VALUE_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.HASH_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.FIELD_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SET_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toByteArray;
 
 import java.io.InputStream;
@@ -22,7 +25,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -137,29 +139,20 @@ public class RedisAssertion {
 
 			Set<Entry<byte[], byte[]>> currentFieldsSet = currentFields.entrySet();
 
-			boolean matchFieldNameAndValue = false;
 
-			for (Entry<byte[], byte[]> currentFieldValue : currentFieldsSet) {
-
-				byte[] currentField = currentFieldValue.getKey();
-
-				if (Arrays.equals(expectedFieldName, currentField)) {
-
-					byte[] currentValue = currentFieldValue.getValue();
-
-					if (!Arrays.equals(expectedFieldValue, currentValue)) {
-						throw FailureHandler.createFailure("Key %s and field %s does not contain element %s but %s.",
-								new String(key), new String(expectedFieldName), new String(expectedFieldValue),
-								new String(currentValue));
-					}
-
-					matchFieldNameAndValue = true;
-					break;
+			Entry<byte[], byte[]> unique = with(currentFieldsSet).unique(having(on(Entry.class).getKey(), equalTo(expectedFieldName)));
+			
+			if(unique != null) {
+				
+				byte[] currentValue = unique.getValue();
+				
+				if (!Arrays.equals(expectedFieldValue, currentValue)) {
+					throw FailureHandler.createFailure("Key %s and field %s does not contain element %s but %s.",
+							new String(key), new String(expectedFieldName), new String(expectedFieldValue),
+							new String(currentValue));
 				}
-			}
-
-			if (!matchFieldNameAndValue) {
-
+				
+			} else {
 				throw FailureHandler.createFailure("Field %s is not found for key %s.", new String(expectedFieldName),
 						new String(key));
 			}

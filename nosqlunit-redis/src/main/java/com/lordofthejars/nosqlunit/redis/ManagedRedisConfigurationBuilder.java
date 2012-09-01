@@ -48,6 +48,7 @@ public class ManagedRedisConfigurationBuilder {
 			
 		}
 		
+		this.redisConfiguration.setJedis(jedis);
 		return redisConfiguration;
 	}
 	

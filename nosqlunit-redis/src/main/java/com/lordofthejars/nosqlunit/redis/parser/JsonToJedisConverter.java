@@ -1,7 +1,12 @@
 package com.lordofthejars.nosqlunit.redis.parser;
 
+import java.io.UnsupportedEncodingException;
+
+
 public class JsonToJedisConverter {
 
+	private static final String DEFAULT_CHARSET = "UTF-8";
+	
 	private JsonToJedisConverter() {
 		super();
 	}
@@ -17,11 +22,19 @@ public class JsonToJedisConverter {
 		} else {
 			if (object instanceof Boolean) {
 				Boolean bool = (Boolean) object;
-				return bool.toString().getBytes();
+				try {
+					return bool.toString().getBytes(DEFAULT_CHARSET);
+				} catch (UnsupportedEncodingException e) {
+					throw new IllegalArgumentException(e);
+				}
 			} else {
 				if (object instanceof String) {
 					String stringValue = (String) object;
-					return stringValue.getBytes();
+					try {
+						return stringValue.getBytes(DEFAULT_CHARSET);
+					} catch (UnsupportedEncodingException e) {
+						throw new IllegalArgumentException(e);
+					}
 				} else {
 					throw new IllegalArgumentException("Class type " + object.getClass()
 							+ " is not supported to be converted to byte[].");
