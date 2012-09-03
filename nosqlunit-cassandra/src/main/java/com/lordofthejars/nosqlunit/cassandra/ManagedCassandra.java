@@ -159,7 +159,6 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 			
 			if (pwd.exitValue() != 0) {
 				List<String> consoleOutput = getConsoleOutput(pwd);
-				System.out.println(consoleOutput);
 			}
 			return null;
 		} catch (IOException e) {
@@ -182,7 +181,6 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 		List<String> programAndArguments = new ArrayList<String>();
 
 		programAndArguments.add(getExecutablePath());
-		programAndArguments.add("start");
 		programAndArguments.add(FOREGROUND_ARGUMENT_NAME);
 		
 		for (String argument : this.singleCommandArguments) {
