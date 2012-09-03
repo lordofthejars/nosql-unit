@@ -67,6 +67,7 @@
 		<xi:include href="./mongodb.xml"/>
 		<xi:include href="./neo4j.xml"/>
 		<xi:include href="./cassandra.xml"/>
+		<xi:include href="./redis.xml"/>
 	</part>
 
 	<part id="advanced-usage-part">

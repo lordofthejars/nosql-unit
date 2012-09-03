@@ -149,57 +149,63 @@
 				value.
 			</para>
 
-			<table>
-				<caption>Possible values in Redis Dataset</caption>
-				<tr>
-					<td>simple</td>
-					<td>In case we want to store simple key/value elements. This
-						element will contain an array of key/value entries.
-					</td>
-				</tr>
-				<tr>
-					<td>list</td>
-					<td>
-						In case we want to store a key with a list of values. This element
-						contain a
-						<emphasis>key</emphasis>
-						field
-						for key name and
-						<emphasis>values</emphasis>
-						field
-						with an array of values.
-					</td>
-				</tr>
-				<tr>
-					<td>set</td>
-					<td>In case we want to store a key within a set (no duplicates
-						allowed). Structure is the same as list element.
-					</td>
-				</tr>
-				<tr>
-					<td>sortset</td>
-					<td>
-						In case we want to store a key within a sorted set. This element
-						contain the key, and an array of values, which each one, apart
-						from value field, also contain
-						<emphasis>score</emphasis>
-						field of type Number, to set the order into sorted set.
-					</td>
-				</tr>
-				<tr>
-					<td>hash</td>
-					<td>
-						In case we want to store a key within a map of field/value. In
-						this case
-						<emphasis>field</emphasis>
-						element set the field name, and
-						<emphasis>value</emphasis>
-						set the
-						value of that field.
-					</td>
-				</tr>
-			</table>
-
+			<para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis>simple</emphasis>
+							:
+							In case we want to store simple key/value elements. This
+							element will contain an array of key/value entries.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>list</emphasis>
+							:
+							In case we want to store a key with a list of values. This element
+							contain a
+							<emphasis>key</emphasis>
+							field
+							for key name and
+							<emphasis>values</emphasis>
+							field
+							with an array of values.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>set</emphasis>
+							In case we want to store a key within a set (no duplicates
+							allowed). Structure is the same as list element.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>sortset</emphasis>
+							:
+							In case we want to store a key within a sorted set. This element
+							contain the key, and an array of values, which each one, apart
+							from value field, also contain
+							<emphasis>score</emphasis>
+							field of type Number, to set the order into sorted set.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis>hash</emphasis>
+							:
+							In case we want to store a key within a map of field/value. In
+							this case
+							<emphasis>field</emphasis>
+							element set the field name, and
+							<emphasis>value</emphasis>
+							set the
+							value of that field.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
 
 		</section>
 
@@ -253,59 +259,60 @@ public static ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/
 						programmatically:
 					</para>
 
-					<table>
-						<caption>Default Managed Values</caption>
-						<tr>
-							<td>
-								Target path
-							</td>
-							<td>
-								This is the directory where
-								<emphasis>Redis</emphasis>
-								server is started and is
-								<constant>target/redis-temp</constant>
-								.
-							</td>
-						</tr>
-						<tr>
-							<td>
-								RedisPath
-							</td>
-							<td>
-								<emphasis>Cassandra</emphasis>
-								installation directory which by default is
-								retrieved from
-								<varname>REDIS_HOME</varname>
-								system environment
-								variable.
-							</td>
-						</tr>
-						<tr>
-							<td>
-								Port
-							</td>
-							<td>
-								By default port used is 6379. If port is changed in
-								<emphasis>Redis</emphasis>
-								configuration file, this port should be configured too here.
-							</td>
-						</tr>
-						<tr>
-							<td>
-								Configuration File
-							</td>
-							<td>
-								By default
-								<emphasis>Redis</emphasis>
-								can work with no configuration file, it uses default values,
-								but if we need to start
-								<emphasis>Redis</emphasis>
-								with an specific configuration file located in any directory
-								file path should be set.
-							</td>
-						</tr>
-					</table>
-
+					<para>
+						<table>
+							<caption>Default Managed Values</caption>
+							<tr>
+								<td>
+									Target path
+								</td>
+								<td>
+									This is the directory where
+									<emphasis>Redis</emphasis>
+									server is started and is
+									<constant>target/redis-temp</constant>
+									.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									RedisPath
+								</td>
+								<td>
+									<emphasis>Cassandra</emphasis>
+									installation directory which by default is
+									retrieved from
+									<varname>REDIS_HOME</varname>
+									system environment
+									variable.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Port
+								</td>
+								<td>
+									By default port used is 6379. If port is changed in
+									<emphasis>Redis</emphasis>
+									configuration file, this port should be configured too here.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Configuration File
+								</td>
+								<td>
+									By default
+									<emphasis>Redis</emphasis>
+									can work with no configuration file, it uses default values,
+									but if we need to start
+									<emphasis>Redis</emphasis>
+									with an specific configuration file located in any directory
+									file path should be set.
+								</td>
+							</tr>
+						</table>
+					</para>
 				</section>
 				<section>
 					<title>Remote Lifecycle</title>
@@ -406,7 +413,8 @@ public RedisRule redisRule = new RedisRule(newRemoteRedisConfiguration().host("1
 				<para>
 					<classname>@ShouldMatchDataSet</classname>
 					is also supported for
-					<emphasis>Redis</emphasis> engine.
+					<emphasis>Redis</emphasis>
+					engine.
 				</para>
 			</section>
 
