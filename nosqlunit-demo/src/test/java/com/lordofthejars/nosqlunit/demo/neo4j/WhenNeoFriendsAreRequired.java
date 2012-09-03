@@ -1,9 +1,11 @@
 package com.lordofthejars.nosqlunit.demo.neo4j;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
+
+
 import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
-import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
+import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import javax.inject.Inject;
 
@@ -23,7 +25,7 @@ public class WhenNeoFriendsAreRequired {
 	public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();
 	
 	@Rule
-	public Neo4jRule neo4jRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().build(), this);
+	public Neo4jRule neo4jRule = newNeo4jRule().defaultEmbeddedNeo4j(this);
 	
 	@Inject
 	private GraphDatabaseService graphDatabaseService;

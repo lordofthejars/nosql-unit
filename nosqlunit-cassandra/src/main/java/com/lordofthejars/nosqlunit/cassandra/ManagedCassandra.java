@@ -156,10 +156,10 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 		try {
 			pwd = startProcess();
 			pwd.waitFor();
+			
 			if (pwd.exitValue() != 0) {
 				List<String> consoleOutput = getConsoleOutput(pwd);
-				throw new IllegalStateException("Cassandra [" + cassandraPath + " at port " + port
-						+ "] could not be started. Next console message was thrown: " + consoleOutput);
+				System.out.println(consoleOutput);
 			}
 			return null;
 		} catch (IOException e) {
@@ -182,6 +182,7 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 		List<String> programAndArguments = new ArrayList<String>();
 
 		programAndArguments.add(getExecutablePath());
+		programAndArguments.add("start");
 		programAndArguments.add(FOREGROUND_ARGUMENT_NAME);
 		
 		for (String argument : this.singleCommandArguments) {

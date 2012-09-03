@@ -178,6 +178,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 		
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add("/opt/cassandra"+File.separatorChar+ManagedCassandra.CASSANDRA_BINARY_DIRECTORY+File.separatorChar+ManagedCassandra.CASSANDRA_EXECUTABLE_X);
+		expectedCommand.add("start");
 		expectedCommand.add(ManagedCassandra.FOREGROUND_ARGUMENT_NAME);
 		
 		managedCassandra.after();
@@ -215,6 +216,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 		
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add("/opt/cassandra"+File.separatorChar+ManagedCassandra.CASSANDRA_BINARY_DIRECTORY+File.separatorChar+ManagedCassandra.CASSANDRA_EXECUTABLE_X);
+		expectedCommand.add("start");
 		expectedCommand.add(ManagedCassandra.FOREGROUND_ARGUMENT_NAME);
 		
 		managedCassandra.after();
@@ -252,6 +254,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 		
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add("/opt/cassandra"+File.separatorChar+ManagedCassandra.CASSANDRA_BINARY_DIRECTORY+File.separatorChar+ManagedCassandra.CASSANDRA_EXECUTABLE_X);
+		expectedCommand.add("start");
 		expectedCommand.add(ManagedCassandra.FOREGROUND_ARGUMENT_NAME);
 		
 		managedCassandra.after();
@@ -290,6 +293,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 		
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add("/opt/cassandra"+File.separatorChar+ManagedCassandra.CASSANDRA_BINARY_DIRECTORY+File.separatorChar+ManagedCassandra.CASSANDRA_EXECUTABLE_W);
+		expectedCommand.add("start");
 		expectedCommand.add(ManagedCassandra.FOREGROUND_ARGUMENT_NAME);
 		
 		managedCassandra.after();

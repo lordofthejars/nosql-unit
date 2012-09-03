@@ -54,7 +54,7 @@ public class CassandraOperation implements DatabaseOperation<Keyspace> {
 			String keyspaceName = keyspaceDefinition.getName();
 
 			if (!INTERNAL_CASSANDRA_KEYSPACE.equals(keyspaceName)) {
-				cluster.dropKeyspace(keyspaceName);
+				cluster.dropKeyspace(keyspaceName, true);
 			}
 		}
 		

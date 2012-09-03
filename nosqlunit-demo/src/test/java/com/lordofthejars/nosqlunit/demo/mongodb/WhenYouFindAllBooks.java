@@ -1,27 +1,33 @@
 package com.lordofthejars.nosqlunit.demo.mongodb;
 
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.demo.model.Book;
+import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 
 @UsingDataSet
 public class WhenYouFindAllBooks {
 
 
+	@ClassRule
+	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo").appendSingleCommandLineArguments("-vvv")
+	.build();
+	
 	@Rule
-	public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb()
-			.databaseName("test").build());
+	public MongoDbRule remoteMongoDbRule = newMongoDbRule().defaultManagedMongoDb("test");
 	
 	@Test
 	@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)

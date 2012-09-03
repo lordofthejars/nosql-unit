@@ -1,14 +1,14 @@
 package com.lordofthejars.nosqlunit.demo.mongodb;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.demo.model.Book;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
@@ -21,8 +21,7 @@ public class WhenANewBookIsCreated {
 	.build();
 	
 	@Rule
-	public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb()
-			.databaseName("test").build());
+	public MongoDbRule remoteMongoDbRule =  newMongoDbRule().defaultManagedMongoDb("test");
 	
 	@Test
 	@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)

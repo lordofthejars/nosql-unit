@@ -1,6 +1,6 @@
 package com.lordofthejars.nosqlunit.demo.cassandra;
 
-import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandraConfigurationBuilder.newManagedCassandraConfiguration;
+import static com.lordofthejars.nosqlunit.cassandra.CassandraRule.CassandraRuleBuilder.newCassandraRule;
 import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandra.ManagedCassandraRuleBuilder.newManagedCassandraRule;
 
 import org.junit.ClassRule;
@@ -23,7 +23,7 @@ public class WhenPersonWantsToUpdateItsCar {
 	public static ManagedCassandra managedCassandra = newManagedCassandraRule().build();
 	
 	@Rule
-	public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfiguration().clusterName("Test Cluster").build());
+	public CassandraRule cassandraRule = newCassandraRule().defaultManagedCassandra("Test Cluster");
 	
 	@Test
 	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)

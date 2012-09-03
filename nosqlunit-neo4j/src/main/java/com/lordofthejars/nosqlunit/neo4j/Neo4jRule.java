@@ -1,5 +1,8 @@
 package com.lordofthejars.nosqlunit.neo4j;
 
+import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServerConfigurationBuilder.newManagedNeoServerConfiguration;
+import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
@@ -32,6 +35,22 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 		public Neo4jRuleBuilder unitInstance(Object target) {
 			this.target = target;
 			return this;
+		}
+		
+		public Neo4jRule defaultEmbeddedNeo4j() {
+			return new Neo4jRule(newEmbeddedNeoServerConfiguration().build());
+		}
+		
+		public Neo4jRule defaultEmbeddedNeo4j(Object target) {
+			return new Neo4jRule(newEmbeddedNeoServerConfiguration().build(), target);
+		}
+		
+		public Neo4jRule defaultManagedNeo4j() {
+			return new Neo4jRule(newManagedNeoServerConfiguration().build());
+		}
+		
+		public Neo4jRule defaultManagedNeo4j(Object target) {
+			return new Neo4jRule(newManagedNeoServerConfiguration().build(), target);
 		}
 		
 		public Neo4jRule build() {

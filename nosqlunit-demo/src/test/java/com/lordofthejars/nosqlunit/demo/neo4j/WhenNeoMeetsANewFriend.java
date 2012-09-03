@@ -1,7 +1,7 @@
 package com.lordofthejars.nosqlunit.demo.neo4j;
 
 import static com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer.ManagedWrappingNeoServerRuleBuilder.newWrappingNeoServerNeo4jRule;
-import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServerConfigurationBuilder.newManagedNeoServerConfiguration;
+import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
 
 import javax.inject.Inject;
 
@@ -22,7 +22,7 @@ public class WhenNeoMeetsANewFriend {
 	public static ManagedWrappingNeoServer managedWrappingNeoServer = newWrappingNeoServerNeo4jRule().build();
 	
 	@Rule
-	public Neo4jRule neo4jRule = new Neo4jRule(newManagedNeoServerConfiguration().build(), this);
+	public Neo4jRule neo4jRule = newNeo4jRule().defaultManagedNeo4j(this);
 	
 	@Inject
 	private GraphDatabaseService graphDatabaseService;

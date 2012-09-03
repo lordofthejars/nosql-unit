@@ -19,8 +19,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -31,7 +30,6 @@ import com.lordofthejars.nosqlunit.graph.parser.GraphMLWriter;
 
 public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(Neo4jOperation.class);
 	private static String EOL = System.getProperty("line.separator");
 
 	private GraphDatabaseService graphDatabaseService;

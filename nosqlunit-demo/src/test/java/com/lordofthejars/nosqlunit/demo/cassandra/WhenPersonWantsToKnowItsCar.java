@@ -1,10 +1,9 @@
 package com.lordofthejars.nosqlunit.demo.cassandra;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-
+import static com.lordofthejars.nosqlunit.cassandra.CassandraRule.CassandraRuleBuilder.newCassandraRule;
 import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra.EmbeddedCassandraRuleBuilder.newEmbeddedCassandraRule;
-import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandraConfigurationBuilder.newEmbeddedCassandraConfiguration;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -21,7 +20,7 @@ public class WhenPersonWantsToKnowItsCar {
 	public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule().build();
 	
 	@Rule
-	public CassandraRule cassandraRule = new CassandraRule(newEmbeddedCassandraConfiguration().clusterName("Test Cluster").build());
+	public CassandraRule cassandraRule = newCassandraRule().defaultEmbeddedCassandra("Test Cluster");
 	
 	
 	@Test
