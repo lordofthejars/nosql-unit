@@ -1196,7 +1196,7 @@ By default embedded *Cassandra* rule uses next default values:
 
   ------------------------------ --------------------------------------------------------------------------------------------------------------------------------------------
   Target path                    This is the directory where *Cassandra* server is started and is `target/cassandra-temp` .
-  Cassandra Configuration File   Location of configuration file. By default a configuration file is provided with correct default parameters.
+  Cassandra Configuration File   Location of yaml configuration file. By default a configuration file is provided with correct default parameters.
   Host                           localhost
   Port                           By default port used is 9171. Port cannot be configured, and cannot be changed if you provide an alternative Cassandra Configuration File.
   ------------------------------ --------------------------------------------------------------------------------------------------------------------------------------------
@@ -1216,11 +1216,11 @@ public static ManagedCassandra managedCassandra = newManagedCassandraRule().buil
 By default managed *Cassandra* rule uses next default values but can be
 configured programmatically:
 
-  --------------- -----------------------------------------------------------------------------------------------------------------------
+  --------------- ------------------------------------------------------------------------------------------------------------------------------
   Target path     This is the directory where *Cassandra* server is started and is `target/cassandra-temp` .
   CassandraPath   *Cassandra* installation directory which by default is retrieved from `CASSANDRA_HOME` system environment variable.
-  Port            By default port used is 9160. If port is changed in *Cassandra* installation, new port should be configured too here.
-  --------------- -----------------------------------------------------------------------------------------------------------------------
+  Port            By default port used is 9160. If port is changed in *Cassandra* configuration file, this port should be configured too here.
+  --------------- ------------------------------------------------------------------------------------------------------------------------------
 
   : Default Managed Values
 
@@ -1273,7 +1273,7 @@ to set it.
 
 #### Remote Connection
 
-The first one is for configuring a connection to remote *Cassandra* .
+Configuring a connection to remote *Cassandra* .
 
 ~~~~ {.java}
 import static com.lordofthejars.nosqlunit.cassandra.RemoteCassandraConfigurationBuilder.newRemoteCassandraConfiguration;
@@ -1286,10 +1286,10 @@ Port parameter is already configured with default parameter of managed
 lifecycle. If port is changed, this class provides a method to set it.
 Note that host parameter must be specified in this case.
 
-### Verifying Graph
+### Verifying Data
 
-@ShouldMatchDataSet is also supported for *Cassandra* graphs but we
-should keep in mind some considerations.
+@ShouldMatchDataSet is also supported for *Cassandra* data but we should
+keep in mind some considerations.
 
 > **Warning**
 >
@@ -1309,8 +1309,7 @@ To show how to use **NoSQLUnit** with *Cassandra* , we are going to
 create a very simple application.
 
 [PersonManager](#program.person_cassandra_manager) is the business class
-responsible of inserting new friends and counting the number of Neo's
-friends.
+responsible of getting and updating person's car.
 
 ~~~~ {.java}
 public class PersonManager {
@@ -1465,9 +1464,349 @@ which looks like:
     }]
 }
 ~~~~
+Redis Engine
+============
+
+Redis
+=====
+
+Redis is an open source, advanced key-value store. It is often referred
+to as a data structure server since keys can contain strings, hashes,
+lists, sets and sorted sets.
+
+**NoSQLUnit** supports *Redis* by using next classes:
+
+  --------- ------------------------------------------------
+  Managed   com.lordofthejars.nosqlunit.redis.ManagedRedis
+  --------- ------------------------------------------------
+
+  : Lifecycle Management Rules
+
+  ---------------------- ---------------------------------------------
+  NoSQLUnit Management   com.lordofthejars.nosqlunit.redis.RedisRule
+  ---------------------- ---------------------------------------------
+
+  : Manager Rule
+
+Maven Setup
+-----------
+
+To use **NoSQLUnit** with Redis you only need to add next dependency:
+
+~~~~ {.xml}
+<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-redis</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+~~~~
+
+Dataset Format
+--------------
+
+Default dataset file format in *Redis* module is json.
+
+Datasets must have next [format](#ex.redis_dataset) :
+
+~~~~ {.json}
+{
+"data":[
+            {"simple": [
+                {
+                    "key":"key1", 
+                    "value":"value1"
+                }
+                ]
+            },
+            {"list": [{
+                        "key":"key3",
+                        "values":[
+                            {"value":"value3"},
+                            {"value":"value4"}
+                        ]
+                      }]
+            },
+            
+            {"sortset": [{
+                     "key":"key4",
+                     "values":[
+                           {"score":2, "value":"value5" },{"score":3, "value":1 }, {"score":1, "value":"value6" }]
+                 }]
+            }, 
+            {"hash": [
+                        {
+                            "key":"user",
+                            "values":[
+                                {"field":"name", "value":"alex"},
+                                {"field":"password", "value":"alex"}
+                            ]
+                        }
+                    ]
+            },
+            {"set":[{
+                        "key":"key3",
+                        "values":[
+                            {"value":"value3"},
+                            {"value":"value4"}
+                        ]
+                      }]
+            }
+]
+}
+~~~~
+
+Root element must be called *data* , and then depending on kind of
+structured data we need to store, one or more of next elements should
+appear. Note that key field is used to set the key of the element, and
+value field is used to set a value.
+
+  --------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  simple    In case we want to store simple key/value elements. This element will contain an array of key/value entries.
+  list      In case we want to store a key with a list of values. This element contain a *key* field for key name and *values* field with an array of values.
+  set       In case we want to store a key within a set (no duplicates allowed). Structure is the same as list element.
+  sortset   In case we want to store a key within a sorted set. This element contain the key, and an array of values, which each one, apart from value field, also contain *score* field of type Number, to set the order into sorted set.
+  hash      In case we want to store a key within a map of field/value. In this case *field* element set the field name, and *value* set the value of that field.
+  --------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  : Possible values in Redis Dataset
+
+Getting Started
+---------------
+
+### Lifecycle Management Strategy
+
+First step is defining which lifecycle management strategy is required
+for your tests. Depending on kind of test you are implementing (unit
+test, integration test, deployment test, ...) you will require an
+embedded approach, managed approach or remote approach.
+
+#### Embedded Lifecycle
+
+> **Warning**
+>
+> Currently
+> Redis
+> does not support embedded lifecycle. For this reason I am developing
+> an embedded in-memory Redis mock. It is based in Jedis library, and
+> will be released in next version.
+
+#### Managed Lifecycle
+
+To configure **managed** approach you should only instantiate next
+[rule](#program.redis_managed_conf) :
+
+~~~~ {.java}
+@ClassRule
+public static ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/redis-2.4.16").build();
+~~~~
+
+By default managed *Redis* rule uses next default values but can be
+configured programmatically:
+
+  -------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Target path          This is the directory where *Redis* server is started and is `target/redis-temp` .
+  RedisPath            *Cassandra* installation directory which by default is retrieved from `REDIS_HOME` system environment variable.
+  Port                 By default port used is 6379. If port is changed in *Redis* configuration file, this port should be configured too here.
+  Configuration File   By default *Redis* can work with no configuration file, it uses default values, but if we need to start *Redis* with an specific configuration file located in any directory file path should be set.
+  -------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  : Default Managed Values
+
+#### Remote Lifecycle
+
+Configuring **remote** approach does not require any special rule
+because you (or System like Maven ) is the responsible of starting and
+stopping the server. This mode is used in deployment tests where you are
+testing your application on real environment.
+
+### Configuring Redis Connection
+
+Next step is configuring **Redis** rule in charge of maintaining *Redis*
+store into known state by inserting and deleting defined datasets. You
+must register RedisRule *JUnit* rule class, which requires a
+configuration parameter with information like host, port, or cluster
+name.
+
+To make developer's life easier and code more readable, a fluent
+interface can be used to create these configuration objects. Three
+different kind of configuration builders exist.
+
+#### Managed Connection
+
+The first one is for configuring a connection to managed *Redis* .
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
+                        
+@Rule
+public RedisRule redisRule = new RedisRule(newManagedRedisConfiguration().build());
+                        
+~~~~
+
+Host and port parameters are already configured with default parameters
+of managed lifecycle. If port is changed, this class provides a method
+to set it.
+
+#### Remote Connection
+
+Configuring a connection to remote *Redis* .
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.redis.RemoteRedisConfigurationBuilder.newRemoteRedisConfiguration;
+
+@Rule
+public RedisRule redisRule = new RedisRule(newRemoteRedisConfiguration().host("192.168.1.1").build());
+~~~~
+
+Port parameter is already configured with default parameter of managed
+lifecycle. If port is changed, this class provides a method to set it.
+Note that host parameter must be specified in this case.
+
+### Verifying Data
+
+@ShouldMatchDataSet is also supported for *Redis* engine.
+
+### Full Example
+
+To show how to use **NoSQLUnit** with *Redis* , we are going to create a
+very simple application.
+
+[BookManager](#program.book_redis_manager) is the business class
+responsible of inserting new books and finding books by their title.
+
+~~~~ {.java}
+public class BookManager {
+    
+    private static final String TITLE_FIELD_NAME = "title";
+    private static final String NUMBER_OF_PAGES = "numberOfPages";
+    
+    private Jedis jedis;
+    
+    public BookManager(Jedis jedis) {
+        this.jedis = jedis;
+    }
+    
+    public void insertBook(Book book) {
+        
+        Map<String, String> fields = new HashMap<String, String>();
+        
+        fields.put(TITLE_FIELD_NAME, book.getTitle());
+        fields.put(NUMBER_OF_PAGES, Integer.toString(book.getNumberOfPages()));
+        
+        jedis.hmset(book.getTitle(), fields);
+    }
+
+    public Book findBookByTitle(String title) {
+        
+        Map<String, String> fields = jedis.hgetAll(title);
+        return new Book(fields.get(TITLE_FIELD_NAME), Integer.parseInt(fields.get(NUMBER_OF_PAGES)));
+        
+    }
+    
+}
+~~~~
+
+And now one integration test is written:
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.redis.RedisRule.RedisRuleBuilder.newRedisRule;
+import static com.lordofthejars.nosqlunit.redis.ManagedRedis.ManagedRedisRuleBuilder.newManagedRedisRule;
+
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import redis.clients.jedis.Jedis;
+
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import com.lordofthejars.nosqlunit.demo.model.Book;
+import com.lordofthejars.nosqlunit.redis.ManagedRedis;
+import com.lordofthejars.nosqlunit.redis.RedisRule;
+
+public class WhenYouFindABook {
+
+    static {
+        System.setProperty("REDIS_HOME", "/opt/redis-2.4.16");
+    }
+
+    @ClassRule
+    public static ManagedRedis managedRedis = newManagedRedisRule().build();
+
+    @Rule
+    public RedisRule redisRule = newRedisRule().defaultManagedRedis();
+    
+    @Test
+    @UsingDataSet(locations="book.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+    public void book_should_be_returned_if_title_is_in_database() {
+        
+        BookManager bookManager = new BookManager(new Jedis("localhost"));
+        Book findBook = bookManager.findBookByTitle("The Hobbit");
+        
+        assertThat(findBook, is(new Book("The Hobbit", 293)));
+        
+    }
+
+}
+~~~~
+
+And dataset used is:
+
+~~~~ {.json}
+{
+"data":[    
+            {"hash": [
+                        {
+                            "key":"The Hobbit",
+                            "values":[
+                                {"field":"title", "value":"The Hobbit"},
+                                {"field":"numberOfPages", "value":"293"}
+                            ]
+                        }
+                    ]
+            }
+]
+}
+~~~~
 
 Advanced Usage
 ==============
+
+Fast Way
+========
+
+When you instantiate a Rule for maintaining database into known state (
+MongoDbRule , Neo4jRule , ...) **NoSQLUnit** requires you set a
+configuration object with properties like host, port, database name, ...
+but although most of the time default values are enough, we still need
+to create the configuration object, which means our code becomes harder
+to read.
+
+We can avoid this by using an inner builder inside each rule, which
+creates for us a Rule with default parameters set. For example for
+Neo4jRule :
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
+@Rule
+public Neo4jRule neo4jRule = newNeo4jRule().defaultEmbeddedNeo4j();
+~~~~
+
+In previous [example](#advanced.fastway-database) Neo4jRule is
+configured to be used as embedded approach with default parameters.
+
+Another example using CassandraRule in managed way.
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.cassandra.CassandraRule.CassandraRuleBuilder.newCassandraRule;
+@Rule
+public CassandraRule cassandraRule = newCassandraRule().defaultManagedCassandra("Test Cluster");
+~~~~
+
+And each Rule contains their builder class to create default values.
 
 Simultaneous engines
 ====================
@@ -1475,7 +1814,7 @@ Simultaneous engines
 Sometimes applications will contain more than one *NoSQL* engine, for
 example some parts of your model will be expressed better as a graph (
 Neo4J for example), but other parts will be more natural in a column way
-(for example using Cassandra ). *NoSQLUnit* supports this kind of
+(for example using Cassandra ). **NoSQLUnit** supports this kind of
 scenarios by providing in integration tests a way to not load all
 datasets into one system, but choosing which datasets are stored in each
 backend.
@@ -1554,14 +1893,14 @@ public void my_test() {...}
 Support for JSR-330
 ===================
 
-*NoSQLUnit* supports two annotations of JSR-330 aka Dependency Injection
-for Java. Concretely @Inject and @Named annotations.
+**NoSQLUnit** supports two annotations of JSR-330 aka Dependency
+Injection for Java. Concretely @Inject and @Named annotations.
 
 During test execution you may need to access underlying class used to
-load and assert data to execute extra operations to backend. *NoSQLUnit*
-will inspect @Inject annotations of test fields, and try to set own
-driver to attribute. For example in case of MongoDb, com.mongodb.Mongo
-instance will be injected.
+load and assert data to execute extra operations to backend.
+**NoSQLUnit** will inspect @Inject annotations of test fields, and try
+to set own driver to attribute. For example in case of MongoDb ,
+com.mongodb.Mongo instance will be injected.
 
 ~~~~ {.java}
 @Rule
@@ -1578,7 +1917,7 @@ private Mongo mongo;
 > second parameter to the Rule.
 
 But if you are using more than one engine at same time (see
-[chapter](#advanced.simultaneous-engine-title)) you need a way to
+[chapter](#advanced.simultaneous-engine-title) ) you need a way to
 distinguish each connection. For fixing this problem, you must use
 @Named annotation by putting the identifier given in configuration
 instance. For example:

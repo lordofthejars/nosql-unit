@@ -417,7 +417,7 @@ public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfig
 				<section>
 					<title>Remote Connection</title>
 					<para>
-						The first one is for configuring a connection to remote
+						Configuring a connection to remote
 						<emphasis>Cassandra</emphasis>
 						.
 					</para>
@@ -477,11 +477,10 @@ public CassandraRule cassandraRule = new CassandraRule(newRemoteCassandraConfigu
 				</para>
 				<para>
 					<link linkend="program.person_cassandra_manager">PersonManager</link>
-					is the business class responsible of inserting new friends and
-					counting the number of Neo's friends.
+					is the business class responsible of getting and updating person's car.
 				</para>
 				<example xml:id="program.person_cassandra_manager">
-					<title>Cassandra with managed configuration</title>
+					<title>PersonCar cassandra with manager.</title>
 
 					<programlisting language="java"><![CDATA[public class PersonManager {
 	
@@ -522,7 +521,7 @@ public CassandraRule cassandraRule = new CassandraRule(newRemoteCassandraConfigu
 					test we are going to use embedded approach:
 				</para>
 				<example xml:id="program.person_cassandra_unit">
-					<title>Cassandra with managed configuration</title>
+					<title>Cassandra with embedded configuration</title>
 
 					<programlisting language="java"><![CDATA[import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;

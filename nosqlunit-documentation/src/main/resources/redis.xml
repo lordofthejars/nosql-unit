@@ -378,7 +378,7 @@ public RedisRule redisRule = new RedisRule(newManagedRedisConfiguration().build(
 				<section>
 					<title>Remote Connection</title>
 					<para>
-						The first one is for configuring a connection to remote
+						Configuring a connection to remote
 						<emphasis>Redis</emphasis>
 						.
 					</para>
@@ -417,180 +417,119 @@ public RedisRule redisRule = new RedisRule(newRemoteRedisConfiguration().host("1
 					To show how to use
 					<emphasis role="bold">NoSQLUnit</emphasis>
 					with
-					<emphasis>Cassandra</emphasis>
+					<emphasis>Redis</emphasis>
 					,
 					we are going to create a
 					very simple application.
 				</para>
 				<para>
-					<link linkend="program.person_cassandra_manager">PersonManager</link>
-					is the business class responsible of inserting new friends and
-					counting the number of Neo's friends.
+					<link linkend="program.book_redis_manager">BookManager</link>
+					is the business class responsible of inserting new books and
+					finding books by their title.
 				</para>
-				<example xml:id="program.person_cassandra_manager">
-					<title>Cassandra with managed configuration</title>
+				<example xml:id="program.book_redis_manager">
+					<title>Book manager with Redis</title>
 
-					<programlisting language="java"><![CDATA[public class PersonManager {
+					<programlisting language="java"><![CDATA[public class BookManager {
 	
-	private ColumnFamilyTemplate<String, String> template;
+	private static final String TITLE_FIELD_NAME = "title";
+	private static final String NUMBER_OF_PAGES = "numberOfPages";
 	
-	public PersonManager(String clusterName, String keyspaceName, String host) {
-		Cluster cluster = HFactory.getOrCreateCluster(clusterName, host);
-		Keyspace keyspace = HFactory.createKeyspace(keyspaceName, cluster);
-		
-        template = new ThriftColumnFamilyTemplate<String, String>(keyspace,
-        		"personFamilyName", 
-                                                               StringSerializer.get(),        
-                                                               StringSerializer.get());
-		
+	private Jedis jedis;
+	
+	public BookManager(Jedis jedis) {
+		this.jedis = jedis;
 	}
 	
-	public String getCarByPersonName(String name) {
-		ColumnFamilyResult<String, String> queryColumns = template.queryColumns(name);
-		return queryColumns.getString("car");
-	}
-	
-	public void updateCarByPersonName(String name, String car) {
-		ColumnFamilyUpdater<String, String> createUpdater = template.createUpdater(name);
-		createUpdater.setString("car", car);
+	public void insertBook(Book book) {
 		
-		template.update(createUpdater);
+		Map<String, String> fields = new HashMap<String, String>();
+		
+		fields.put(TITLE_FIELD_NAME, book.getTitle());
+		fields.put(NUMBER_OF_PAGES, Integer.toString(book.getNumberOfPages()));
+		
+		jedis.hmset(book.getTitle(), fields);
+	}
+
+	public Book findBookByTitle(String title) {
+		
+		Map<String, String> fields = jedis.hgetAll(title);
+		return new Book(fields.get(TITLE_FIELD_NAME), Integer.parseInt(fields.get(NUMBER_OF_PAGES)));
+		
 	}
 	
 }]]></programlisting>
 				</example>
 
 				<para>
-					And now one unit test and one integration test is written:
+					And now one integration test is written:
 				</para>
-				<para>
-					For
-					<link linkend="program.person_cassandra_unit">unit</link>
-					test we are going to use embedded approach:
-				</para>
-				<example xml:id="program.person_cassandra_unit">
-					<title>Cassandra with managed configuration</title>
 
-					<programlisting language="java"><![CDATA[import static org.junit.Assert.assertThat;
+				<example xml:id="program.book_redis_integration">
+					<title>Redis with managed configuration</title>
+
+					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.redis.RedisRule.RedisRuleBuilder.newRedisRule;
+import static com.lordofthejars.nosqlunit.redis.ManagedRedis.ManagedRedisRuleBuilder.newManagedRedisRule;
+
+import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
-import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra.EmbeddedCassandraRuleBuilder.newEmbeddedCassandraRule;
-import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandraConfigurationBuilder.newEmbeddedCassandraConfiguration;
-
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import redis.clients.jedis.Jedis;
+
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.cassandra.CassandraRule;
-import com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import com.lordofthejars.nosqlunit.demo.model.Book;
+import com.lordofthejars.nosqlunit.redis.ManagedRedis;
+import com.lordofthejars.nosqlunit.redis.RedisRule;
 
-public class WhenPersonWantsToKnowItsCar {
-
-	@ClassRule
-	public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule().build();
-	
-	@Rule
-	public CassandraRule cassandraRule = new CassandraRule(newEmbeddedCassandraConfiguration().clusterName("Test Cluster").build());
-	
-	
-	@Test
-	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	public void car_should_be_returned() {
-		
-		PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
-		String car = personManager.getCarByPersonName("mary");
-		
-		assertThat(car, is("ford"));
-		
-	}
-	
-}]]></programlisting>
-				</example>
-
-				<para>
-					And as
-					<link linkend="program.person_cassandra_integration">integration test</link>
-					, the managed one:
-				</para>
-				<example xml:id="program.person_cassandra_integration">
-					<title>Cassandra with managed configuration</title>
-
-					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandraConfigurationBuilder.newManagedCassandraConfiguration;
-import static com.lordofthejars.nosqlunit.cassandra.ManagedCassandra.ManagedCassandraRuleBuilder.newManagedCassandraRule;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.cassandra.CassandraRule;
-import com.lordofthejars.nosqlunit.cassandra.ManagedCassandra;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-
-public class WhenPersonWantsToUpdateItsCar {
+public class WhenYouFindABook {
 
 	static {
-		System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
+		System.setProperty("REDIS_HOME", "/opt/redis-2.4.16");
 	}
-	
+
 	@ClassRule
-	public static ManagedCassandra managedCassandra = newManagedCassandraRule().build();
-	
+	public static ManagedRedis managedRedis = newManagedRedisRule().build();
+
 	@Rule
-	public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfiguration().clusterName("Test Cluster").build());
+	public RedisRule redisRule = newRedisRule().defaultManagedRedis();
 	
 	@Test
-	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	@ShouldMatchDataSet(location="expected-persons.json")
-	public void new_car_should_be_updated() {
+	@UsingDataSet(locations="book.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	public void book_should_be_returned_if_title_is_in_database() {
 		
-		PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
-		personManager.updateCarByPersonName("john", "opel");
+		BookManager bookManager = new BookManager(new Jedis("localhost"));
+		Book findBook = bookManager.findBookByTitle("The Hobbit");
+		
+		assertThat(findBook, is(new Book("The Hobbit", 293)));
 		
 	}
-	
+
 }]]></programlisting>
 				</example>
 
-				<para>Note that in both cases we are using the same dataset as
-					initial state, which looks like:
+				<para>And dataset used is:
 				</para>
-				<example xml:id="program.expected_cassandra_file">
-					<title>persons.json Cassandra file</title>
+				<example xml:id="program.expected_redis_file">
+					<title>book.json Redis file</title>
 
 					<programlisting language="json"><![CDATA[{
-    "name" : "persons",
-    "columnFamilies" : [{
-        "name" : "personFamilyName",
-	"keyType" : "UTF8Type",
-	"defaultColumnValueType" : "UTF8Type",
-	"comparatorType" : "UTF8Type",
-        "rows" : [{
-            "key" : "john",
-            "columns" : [{
-                "name" : "age",
-                "value" : "22"
-            },
-            {
-                "name" : "car",
-                "value" : "toyota"
-            }]
-        },
-        {
-            "key" : "mary",
-            "columns" : [{
-                "name" : "age",
-                "value" : "33"
-            },
-            {
-                "name" : "car",
-                "value" : "ford"
-            }]
-        }]
-    }]
+"data":[	
+      		{"hash": [
+      					{
+      						"key":"The Hobbit",
+      						"values":[
+      							{"field":"title", "value":"The Hobbit"},
+      							{"field":"numberOfPages", "value":"293"}
+      						]
+      					}
+      				]
+      		}
+]
 }]]></programlisting>
 				</example>
 
