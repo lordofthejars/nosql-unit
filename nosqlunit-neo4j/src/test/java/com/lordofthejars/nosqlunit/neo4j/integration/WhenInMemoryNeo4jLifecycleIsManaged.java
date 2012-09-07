@@ -1,13 +1,10 @@
 package com.lordofthejars.nosqlunit.neo4j.integration;
 
-import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
 import static com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j.InMemoryNeo4jRuleBuilder.newInMemoryNeo4j;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
-import java.io.File;
 
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -15,7 +12,6 @@ import org.junit.runners.model.Statement;
 import org.neo4j.server.configuration.Configurator;
 
 import com.lordofthejars.nosqlunit.core.ConnectionManagement;
-import com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j;
 import com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4jInstances;
 import com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j;
 
