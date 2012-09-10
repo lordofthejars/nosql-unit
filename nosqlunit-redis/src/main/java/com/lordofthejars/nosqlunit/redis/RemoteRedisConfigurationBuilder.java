@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.redis;
 
+
 import redis.clients.jedis.Jedis;
 
 public class RemoteRedisConfigurationBuilder {
@@ -54,7 +55,7 @@ public class RemoteRedisConfigurationBuilder {
 			
 		}
 		
-		this.redisConfiguration.setJedis(jedis);
+		this.redisConfiguration.setDatabaseOperation(new RedisOperation(jedis));
 		return redisConfiguration;
 	}
 	

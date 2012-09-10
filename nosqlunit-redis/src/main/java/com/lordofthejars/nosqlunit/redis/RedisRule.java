@@ -1,7 +1,7 @@
 package com.lordofthejars.nosqlunit.redis;
 
 import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.BinaryJedisCommands;
 
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
@@ -10,11 +10,11 @@ public class RedisRule extends AbstractNoSqlTestRule {
 
 	private static final String EXTENSION = "json";
 	
-	private DatabaseOperation<Jedis> databaseOperation;
+	private DatabaseOperation<? extends BinaryJedisCommands> databaseOperation;
 	
 	public static class RedisRuleBuilder {
 		
-		private RedisConfiguration redisConfiguration;
+		private AbstractRedisConfiguration redisConfiguration;
 		private Object target;
 		
 		private RedisRuleBuilder() {
@@ -25,7 +25,7 @@ public class RedisRule extends AbstractNoSqlTestRule {
 			return new RedisRuleBuilder();
 		}
 		
-		public RedisRuleBuilder configure(RedisConfiguration redisConfiguration) {
+		public RedisRuleBuilder configure(AbstractRedisConfiguration redisConfiguration) {
 			this.redisConfiguration = redisConfiguration;
 			return this;
 		}
@@ -54,20 +54,20 @@ public class RedisRule extends AbstractNoSqlTestRule {
 		
 	}
 	
-	public RedisRule(RedisConfiguration redisConfiguration) {
+	public RedisRule(AbstractRedisConfiguration redisConfiguration) {
 		super(redisConfiguration.getConnectionIdentifier());
 		
-		this.databaseOperation = new RedisOperation(redisConfiguration.getJedis());
+		this.databaseOperation = redisConfiguration.getDatabaseOperation();
 	}
 	
 	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/
-	public RedisRule(RedisConfiguration redisConfiguration, Object target) {
+	public RedisRule(AbstractRedisConfiguration redisConfiguration, Object target) {
 		this(redisConfiguration);
 		setTarget(target);
 	}
 	
 	@Override
-	public DatabaseOperation<Jedis> getDatabaseOperation() {
+	public DatabaseOperation<? extends BinaryJedisCommands> getDatabaseOperation() {
 		return databaseOperation;
 	}
 

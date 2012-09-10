@@ -1,22 +1,24 @@
 package com.lordofthejars.nosqlunit.redis;
 
+import static ch.lambdaj.Lambda.forEach;
+
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.ShardedJedis;
 
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.lordofthejars.nosqlunit.redis.parser.DataReader;
 
-public class RedisOperation implements DatabaseOperation<Jedis> {
+public class ShardedRedisOperation implements DatabaseOperation<ShardedJedis> {
 
-	private Jedis jedis;
+	private ShardedJedis shardedJedis;
 	private DataReader dataReader;
 	
-	public RedisOperation(Jedis jedis) {
-		this.jedis = jedis;
-		this.dataReader = new DataReader(jedis);
+	public ShardedRedisOperation(ShardedJedis shardedJedis) {
+		this.shardedJedis = shardedJedis;
+		this.dataReader = new DataReader(shardedJedis);
 	}
 	
 	@Override
@@ -26,7 +28,7 @@ public class RedisOperation implements DatabaseOperation<Jedis> {
 
 	@Override
 	public void deleteAll() {
-		this.jedis.flushAll();
+		forEach(shardedJedis.getAllShards()).flushAll();
 	}
 
 	@Override
@@ -34,21 +36,21 @@ public class RedisOperation implements DatabaseOperation<Jedis> {
 		RedisAssertion.strictAssertEquals(new RedisConnectionCallback() {
 			
 			@Override
-			public List<Jedis> getAllJedis() {
-				return Arrays.asList(jedis);
+			public Collection<Jedis> getAllJedis() {
+				return shardedJedis.getAllShards();
 			}
 			
 			@Override
 			public Jedis getActiveJedis(byte[] key) {
-				return jedis;
+				return shardedJedis.getShard(key);
 			}
 		}, expectedData);
 		return true;
 	}
 
 	@Override
-	public Jedis connectionManager() {
-		return jedis;
+	public ShardedJedis connectionManager() {
+		return shardedJedis;
 	}
 
 }

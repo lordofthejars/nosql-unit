@@ -1,12 +1,9 @@
 package com.lordofthejars.nosqlunit.redis;
 
-import static org.hamcrest.Matchers.equalTo;
-
-import static ch.lambdaj.collection.LambdaCollections.with;
 import static ch.lambdaj.Lambda.extract;
-import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.having;
-
+import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.collection.LambdaCollections.with;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.DATA_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.FIELD_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.HASH_TOKEN;
@@ -19,6 +16,7 @@ import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SORTSET_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.VALUES_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.DataReader.VALUE_TOKEN;
 import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toByteArray;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,7 +39,7 @@ import com.lordofthejars.nosqlunit.core.FailureHandler;
 
 public class RedisAssertion {
 
-	public static void strictAssertEquals(Jedis jedis, InputStream expectedData) {
+	public static void strictAssertEquals(RedisConnectionCallback redisConnectionCallback, InputStream expectedData) {
 
 		Object parse = JSONValue.parse(new InputStreamReader(expectedData));
 		JSONObject rootObject = (JSONObject) parse;
@@ -55,24 +53,24 @@ public class RedisAssertion {
 
 			if (elementObject.containsKey(SIMPLE_TOKEN)) {
 
-				expectedTotalNumberOfKeys += checkSimpleValues(elementObject, jedis);
+				expectedTotalNumberOfKeys += checkSimpleValues(elementObject, redisConnectionCallback);
 
 			} else {
 
 				if (elementObject.containsKey(LIST_TOKEN)) {
-					expectedTotalNumberOfKeys += checkListsValue(elementObject, jedis);
+					expectedTotalNumberOfKeys += checkListsValue(elementObject, redisConnectionCallback);
 				} else {
 
 					if (elementObject.containsKey(SORTSET_TOKEN)) {
-						expectedTotalNumberOfKeys += checkSortSetsValue(elementObject, jedis);
+						expectedTotalNumberOfKeys += checkSortSetsValue(elementObject, redisConnectionCallback);
 					} else {
 
 						if (elementObject.containsKey(HASH_TOKEN)) {
-							expectedTotalNumberOfKeys += checkHashesValue(elementObject, jedis);
+							expectedTotalNumberOfKeys += checkHashesValue(elementObject, redisConnectionCallback);
 						} else {
 
 							if (elementObject.containsKey(SET_TOKEN)) {
-								expectedTotalNumberOfKeys += checkSetsValue(elementObject, jedis);
+								expectedTotalNumberOfKeys += checkSetsValue(elementObject, redisConnectionCallback);
 							}
 
 						}
@@ -82,12 +80,14 @@ public class RedisAssertion {
 			}
 		}
 
-		checkNumberOfKeys(jedis, expectedTotalNumberOfKeys);
+		checkNumberOfKeys(redisConnectionCallback, expectedTotalNumberOfKeys);
 
 	}
 
-	private static void checkNumberOfKeys(Jedis jedis, long expectedTotalNumberOfKeys) throws Error {
-		Long insertedElements = jedis.dbSize();
+	private static void checkNumberOfKeys(RedisConnectionCallback redisConnectionCallback,
+			long expectedTotalNumberOfKeys) throws Error {
+	
+		long insertedElements = countNumberOfAllElements(redisConnectionCallback);
 
 		if (expectedTotalNumberOfKeys != insertedElements) {
 			throw FailureHandler.createFailure("Number of expected keys are %s but was found %s.",
@@ -95,7 +95,17 @@ public class RedisAssertion {
 		}
 	}
 
-	private static long checkHashesValue(JSONObject expectedElementObject, Jedis jedis) {
+	private static long countNumberOfAllElements(RedisConnectionCallback redisConnectionCallback) {
+		long insertedElements = 0;
+		
+		for (Jedis jedis : redisConnectionCallback.getAllJedis()) {
+			insertedElements += jedis.dbSize();
+		}
+		return insertedElements;
+	}
+
+	private static long checkHashesValue(JSONObject expectedElementObject,
+			RedisConnectionCallback redisConnectionCallback) {
 		long numberOfKeys = 0;
 
 		JSONArray expectedSortsetsObject = (JSONArray) expectedElementObject.get(HASH_TOKEN);
@@ -103,7 +113,7 @@ public class RedisAssertion {
 		for (Object object : expectedSortsetsObject) {
 
 			JSONObject expectedHashObject = (JSONObject) object;
-			checkHashValues(jedis, expectedHashObject);
+			checkHashValues(redisConnectionCallback, expectedHashObject);
 
 			numberOfKeys++;
 
@@ -112,11 +122,13 @@ public class RedisAssertion {
 		return numberOfKeys;
 	}
 
-	private static void checkHashValues(Jedis jedis, JSONObject expectedHashObject) {
+	private static void checkHashValues(RedisConnectionCallback redisConnectionCallback, JSONObject expectedHashObject) {
 
 		Object expectedKey = expectedHashObject.get(KEY_TOKEN);
 
 		byte[] key = toByteArray(expectedKey);
+		Jedis jedis = redisConnectionCallback.getActiveJedis(key);
+
 		checkType(jedis, expectedKey, key, "hash");
 
 		/** field:.., value:... */
@@ -126,7 +138,6 @@ public class RedisAssertion {
 
 		checkNumberOfFields(key, expectedValuesArray, currentFields);
 		checkFields(key, expectedValuesArray, currentFields);
-
 	}
 
 	private static void checkFields(byte[] key, JSONArray expectedValuesArray, Map<byte[], byte[]> currentFields) {
@@ -139,19 +150,19 @@ public class RedisAssertion {
 
 			Set<Entry<byte[], byte[]>> currentFieldsSet = currentFields.entrySet();
 
+			Entry<byte[], byte[]> unique = with(currentFieldsSet).unique(
+					having(on(Entry.class).getKey(), equalTo(expectedFieldName)));
 
-			Entry<byte[], byte[]> unique = with(currentFieldsSet).unique(having(on(Entry.class).getKey(), equalTo(expectedFieldName)));
-			
-			if(unique != null) {
-				
+			if (unique != null) {
+
 				byte[] currentValue = unique.getValue();
-				
+
 				if (!Arrays.equals(expectedFieldValue, currentValue)) {
 					throw FailureHandler.createFailure("Key %s and field %s does not contain element %s but %s.",
-							new String(key), new String(expectedFieldName), new String(expectedFieldValue),
-							new String(currentValue));
+							new String(key), new String(expectedFieldName), new String(expectedFieldValue), new String(
+									currentValue));
 				}
-				
+
 			} else {
 				throw FailureHandler.createFailure("Field %s is not found for key %s.", new String(expectedFieldName),
 						new String(key));
@@ -170,7 +181,7 @@ public class RedisAssertion {
 		}
 	}
 
-	private static long checkSortSetsValue(JSONObject expectedElementObject, Jedis jedis) {
+	private static long checkSortSetsValue(JSONObject expectedElementObject, RedisConnectionCallback redisConnectionCallback) {
 
 		long numberOfKeys = 0;
 
@@ -178,7 +189,7 @@ public class RedisAssertion {
 
 		for (Object object : expectedSortsetsObject) {
 			JSONObject expectedSortsetObject = (JSONObject) object;
-			checkSortSetValues(jedis, expectedSortsetObject);
+			checkSortSetValues(redisConnectionCallback, expectedSortsetObject);
 
 			numberOfKeys++;
 		}
@@ -186,10 +197,12 @@ public class RedisAssertion {
 		return numberOfKeys;
 	}
 
-	private static void checkSortSetValues(Jedis jedis, JSONObject expectedSortsetObject) throws Error {
+	private static void checkSortSetValues(RedisConnectionCallback redisConnectionCallback, JSONObject expectedSortsetObject) throws Error {
 		Object expectedKey = expectedSortsetObject.get(KEY_TOKEN);
 
 		byte[] key = toByteArray(expectedKey);
+		Jedis jedis = redisConnectionCallback.getActiveJedis(key);
+		
 		checkType(jedis, expectedKey, key, "zset");
 
 		/** value:.., score:... */
@@ -232,14 +245,14 @@ public class RedisAssertion {
 
 	}
 
-	private static long checkSetsValue(JSONObject expectedElementObject, Jedis jedis) {
+	private static long checkSetsValue(JSONObject expectedElementObject, RedisConnectionCallback redisConnectionCallback) {
 		long numberOfKeys = 0;
 
 		JSONArray expectedListsObject = (JSONArray) expectedElementObject.get(SET_TOKEN);
 
 		for (Object object : expectedListsObject) {
 			JSONObject expectedListObject = (JSONObject) object;
-			checkSetValues(jedis, expectedListObject);
+			checkSetValues(redisConnectionCallback, expectedListObject);
 
 			numberOfKeys++;
 		}
@@ -247,14 +260,16 @@ public class RedisAssertion {
 		return numberOfKeys;
 	}
 
-	private static void checkSetValues(Jedis jedis, JSONObject expectedSetObject) {
+	private static void checkSetValues(RedisConnectionCallback redisConnectionCallback, JSONObject expectedSetObject) {
 
 		JSONArray expectedValuesArray = (JSONArray) expectedSetObject.get(VALUES_TOKEN);
 		Set<byte[]> expectedSetValues = extractSetOfValues(expectedValuesArray);
 
 		Object expectedKey = expectedSetObject.get(KEY_TOKEN);
+		
 		byte[] key = toByteArray(expectedKey);
-
+		Jedis jedis = redisConnectionCallback.getActiveJedis(key);
+		
 		checkType(jedis, expectedKey, key, "set");
 
 		Set<byte[]> elements = jedis.smembers(key);
@@ -300,7 +315,7 @@ public class RedisAssertion {
 		}
 	}
 
-	private static long checkListsValue(JSONObject expectedElementObject, Jedis jedis) {
+	private static long checkListsValue(JSONObject expectedElementObject, RedisConnectionCallback redisConnectionCallback) {
 
 		long numberOfKeys = 0;
 
@@ -308,7 +323,7 @@ public class RedisAssertion {
 
 		for (Object object : expectedListsObject) {
 			JSONObject expectedListObject = (JSONObject) object;
-			checkListValues(jedis, expectedListObject);
+			checkListValues(redisConnectionCallback, expectedListObject);
 
 			numberOfKeys++;
 		}
@@ -316,13 +331,15 @@ public class RedisAssertion {
 		return numberOfKeys;
 	}
 
-	private static void checkListValues(Jedis jedis, JSONObject expectedListObject) throws Error {
+	private static void checkListValues(RedisConnectionCallback redisConnectionCallback, JSONObject expectedListObject) throws Error {
 		JSONArray expectedValuesArray = (JSONArray) expectedListObject.get(VALUES_TOKEN);
 		List<byte[]> expectedListValues = extractListOfValues(expectedValuesArray);
 
 		Object expectedKey = expectedListObject.get(KEY_TOKEN);
 		byte[] key = toByteArray(expectedKey);
 
+		Jedis jedis = redisConnectionCallback.getActiveJedis(key);
+		
 		checkType(jedis, expectedKey, key, "list");
 
 		List<byte[]> elements = jedis.lrange(key, 0, -1);
@@ -381,7 +398,7 @@ public class RedisAssertion {
 		return listValues;
 	}
 
-	private static long checkSimpleValues(JSONObject expectedElementObject, Jedis jedis) {
+	private static long checkSimpleValues(JSONObject expectedElementObject, RedisConnectionCallback redisConnectionCallback) {
 
 		long numberOfKeys = 0;
 
@@ -393,6 +410,8 @@ public class RedisAssertion {
 			Object expectedKey = expectedSimpleElementObject.get(KEY_TOKEN);
 			byte[] key = toByteArray(expectedKey);
 
+			Jedis jedis = redisConnectionCallback.getActiveJedis(key);
+			
 			checkType(jedis, expectedKey, key, "string");
 
 			byte[] value = jedis.get(key);

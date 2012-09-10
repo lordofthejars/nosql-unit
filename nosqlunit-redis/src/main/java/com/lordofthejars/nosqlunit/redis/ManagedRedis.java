@@ -21,11 +21,11 @@ import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResol
 
 public class ManagedRedis extends AbstractLifecycleManager {
 
-	static Process pwd;
+	Process pwd;
 
 	private static final String LOCALHOST = "127.0.0.1";
 
-	protected static final int DEFAULT_PORT = 6379;
+	public static final int DEFAULT_PORT = 6379;
 	protected static final String DEFAULT_REDIS_TARGET_PATH = "target" + File.separatorChar + "redis-temp";
 	protected static final String REDIS_BINARY_DIRECTORY = "src";
 
@@ -142,7 +142,7 @@ public class ManagedRedis extends AbstractLifecycleManager {
 		}).start();
 
 		try {
-			startupLatch.await(10, SECONDS);
+			startupLatch.await(5, SECONDS);
 		} catch (InterruptedException e) {
 			throw new AssertionError(e);
 		}

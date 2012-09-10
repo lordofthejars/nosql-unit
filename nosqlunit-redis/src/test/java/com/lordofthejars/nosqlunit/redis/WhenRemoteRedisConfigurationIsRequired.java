@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import static com.lordofthejars.nosqlunit.redis.RemoteRedisConfigurationBuilder.newRemoteRedisConfiguration;
+
 import org.junit.Test;
 
 public class WhenRemoteRedisConfigurationIsRequired {
@@ -16,7 +17,7 @@ public class WhenRemoteRedisConfigurationIsRequired {
 		
 		assertThat(remoteConfiguration.getHost(), is("localhost"));
 		assertThat(remoteConfiguration.getPort(), is(ManagedRedis.DEFAULT_PORT));
-		assertThat(remoteConfiguration.getJedis(), notNullValue());
+		assertThat(remoteConfiguration.getDatabaseOperation(), notNullValue());
 		
 	}
 	

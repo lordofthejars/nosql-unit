@@ -14,7 +14,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.BinaryJedisCommands;
 
 public class DataReader {
 
@@ -32,9 +32,9 @@ public class DataReader {
 	public static final String EXPIRE_AT_SEC_TOKEN = "expireAtSeconds";
 	public static final String SET_TOKEN = "set";
 
-	private Jedis jedis;
+	private BinaryJedisCommands jedis;
 
-	public DataReader(Jedis jedis) {
+	public DataReader(BinaryJedisCommands jedis) {
 		this.jedis = jedis;
 	}
 
