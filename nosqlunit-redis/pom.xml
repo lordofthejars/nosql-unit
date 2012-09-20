@@ -12,6 +12,11 @@
 	<dependencies>
 	
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+	
+		<dependency>
 			<artifactId>nosqlunit-core</artifactId>
 			<groupId>com.lordofthejars</groupId>
 			<version>${project.version}</version>
