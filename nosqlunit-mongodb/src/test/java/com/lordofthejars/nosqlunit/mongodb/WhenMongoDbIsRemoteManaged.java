@@ -128,7 +128,6 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
 		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
 		expectedCommand.add(DBPort.PORT+"");
-		expectedCommand.add(ManagedMongoDb.FORK_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add("myArgument");
@@ -181,7 +180,6 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
 		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
 		expectedCommand.add(DBPort.PORT+"");
-		expectedCommand.add(ManagedMongoDb.FORK_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add("myArgument");
@@ -234,7 +232,6 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
 		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
 		expectedCommand.add(DBPort.PORT+"");
-		expectedCommand.add(ManagedMongoDb.FORK_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add("myArgument");
