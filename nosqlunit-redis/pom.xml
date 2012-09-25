@@ -12,6 +12,11 @@
 	<dependencies>
 	
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+	
+		<dependency>
 			<artifactId>nosqlunit-core</artifactId>
 			<groupId>com.lordofthejars</groupId>
 			<version>${project.version}</version>
@@ -20,6 +25,11 @@
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
+		</dependency>
+	
+		<dependency>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>jsr305</artifactId>
 		</dependency>
 	
 		<dependency>
