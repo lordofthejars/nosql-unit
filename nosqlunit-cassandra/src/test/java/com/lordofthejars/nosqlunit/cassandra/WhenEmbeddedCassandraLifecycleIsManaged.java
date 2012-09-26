@@ -36,7 +36,7 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 			@Override
 			public void evaluate() throws Throwable {
 			
-				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.PORT), is(true));
+				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.DEFAULT_HOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
 			}
 		};
 		
@@ -46,7 +46,7 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 		verify(embeddedCassandraServerHelper).startEmbeddedCassandra(EmbeddedCassandra.DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION, EmbeddedCassandra.DEFAULT_CASSANDRA_TARGET_PATH);
 		verify(embeddedCassandraServerHelper).stopEmbeddedCassandra();
 		
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.PORT), is(false));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.DEFAULT_HOST, EmbeddedCassandra.DEFAULT_PORT), is(false));
 		
 	}
 	
@@ -61,7 +61,7 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 			@Override
 			public void evaluate() throws Throwable {
 			
-				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.PORT), is(true));
+				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.DEFAULT_HOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
 			}
 		};
 		
@@ -71,7 +71,7 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 		verify(embeddedCassandraServerHelper).startEmbeddedCassandra("my_cassandra.yaml", "tmp");
 		verify(embeddedCassandraServerHelper).stopEmbeddedCassandra();
 		
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.PORT), is(false));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.DEFAULT_HOST, EmbeddedCassandra.DEFAULT_PORT), is(false));
 		
 	}
 	
@@ -92,14 +92,14 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 					
 					@Override
 					public void evaluate() throws Throwable {
-						assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.PORT), is(true));
+						assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.DEFAULT_HOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
 					}
 				};
 				
 				Statement defaultStatement = defaultEmbeddedCassandra.apply(defaultNoStatement, Description.EMPTY);
 				defaultStatement.evaluate();
 				
-				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.PORT), is(true));
+				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.DEFAULT_HOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
 				
 			}
 		};
@@ -110,7 +110,7 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 		verify(embeddedCassandraServerHelper).startEmbeddedCassandra(EmbeddedCassandra.DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION, EmbeddedCassandra.DEFAULT_CASSANDRA_TARGET_PATH);
 		verify(embeddedCassandraServerHelper).stopEmbeddedCassandra();
 		
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.PORT), is(false));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.DEFAULT_HOST, EmbeddedCassandra.DEFAULT_PORT), is(false));
 		
 		
 	}

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.cassandra.config.ConfigurationException;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.thrift.transport.TTransportException;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
@@ -12,8 +13,8 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 
 	protected static final String DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION = "cu-cassandra.yaml";
 	
-	protected static final String LOCALHOST = "localhost";
-	protected static final int PORT = 9171;
+	protected static final String DEFAULT_HOST = "localhost";
+	protected static final int DEFAULT_PORT = 9171;
 	
 	protected static final String DEFAULT_CASSANDRA_TARGET_PATH = "target" + File.separatorChar + "cassandra-temp";
 	
@@ -63,12 +64,12 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 	
 	@Override
 	protected String getHost() {
-		return LOCALHOST;
+		return DatabaseDescriptor.getRpcAddress().getHostName();
 	}
 
 	@Override
 	protected int getPort() {
-		return PORT;
+        return DatabaseDescriptor.getRpcPort();
 	}
 
 	@Override
