@@ -1,0 +1,7 @@
+# intellij project files
+.idea/
+*.iml
+
+# backup files
+*~
+
