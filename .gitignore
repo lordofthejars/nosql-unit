@@ -1,0 +1,16 @@
+#intellij project files
+.idea/
+*.iml
+.buildcache/
+
+#eclipse project files
+.classpath
+.project
+.settings
+
+#backup files
+*~
+
+#maven temp files
+target/
+
