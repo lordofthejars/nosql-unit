@@ -1,12 +1,15 @@
 package com.lordofthejars.nosqlunit.redis.embedded;
 
-import static ch.lambdaj.collection.LambdaCollections.with;
 import static ch.lambdaj.Lambda.convert;
+import static ch.lambdaj.collection.LambdaCollections.with;
 import static java.nio.ByteBuffer.wrap;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -14,13 +17,14 @@ import java.util.Set;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-public class SetDatatypeOperations {
+public class SetDatatypeOperations extends ExpirationDatatypeOperations implements RedisDatatypeOperations {
+
+	protected static final String SET = "set";
 
 	private static final Random random = new Random();
 
-	protected Multimap<ByteBuffer, ByteBuffer> setElements = HashMultimap
-			.create();
-	
+	protected Multimap<ByteBuffer, ByteBuffer> setElements = HashMultimap.create();
+
 	/**
 	 * Add the specified member to the set value stored at key. If member is
 	 * already a member of the set no operation is performed. If key does not
@@ -36,9 +40,9 @@ public class SetDatatypeOperations {
 	public Long sadd(final byte[] key, final byte[]... members) {
 
 		long numberOfAddedElements = 0;
-		
+
 		for (byte[] bs : members) {
-			if(setElements.put(wrap(key), wrap(bs))) {
+			if (setElements.put(wrap(key), wrap(bs))) {
 				numberOfAddedElements++;
 			}
 		}
@@ -85,8 +89,7 @@ public class SetDatatypeOperations {
 
 		Set<ByteBuffer> targetKey = differenceElements(keys);
 
-		List<byte[]> diff = convert(targetKey,
-				ByteBuffer2ByteArrayConverter.createByteBufferConverter());
+		List<byte[]> diff = convert(targetKey, ByteBuffer2ByteArrayConverter.createByteBufferConverter());
 		return new HashSet<byte[]>(diff);
 
 	}
@@ -96,17 +99,14 @@ public class SetDatatypeOperations {
 			return new HashSet<ByteBuffer>();
 		}
 
-		Set<ByteBuffer> targetKey = new HashSet<ByteBuffer>(
-				getReferenceElement(keys));
+		Set<ByteBuffer> targetKey = new HashSet<ByteBuffer>(getReferenceElement(keys));
 		targetKey = removeElements(targetKey, keys);
 		return targetKey;
 	}
 
-	private Set<ByteBuffer> removeElements(Set<ByteBuffer> targetKey,
-			final byte[]... keys) {
+	private Set<ByteBuffer> removeElements(Set<ByteBuffer> targetKey, final byte[]... keys) {
 		for (int index = 1; index < keys.length; index++) {
-			Collection<ByteBuffer> collectionElements = setElements
-					.get(wrap(keys[index]));
+			Collection<ByteBuffer> collectionElements = setElements.get(wrap(keys[index]));
 			targetKey.removeAll(collectionElements);
 		}
 
@@ -114,19 +114,18 @@ public class SetDatatypeOperations {
 	}
 
 	/**
-     * This command works exactly like {@link #sdiff(String...) SDIFF} but
-     * instead of being returned the resulting set is stored in dstkey.
-     * 
-     * @param dstkey
-     * @param keys
-     * @return Status code reply
-     */
+	 * This command works exactly like {@link #sdiff(String...) SDIFF} but
+	 * instead of being returned the resulting set is stored in dstkey.
+	 * 
+	 * @param dstkey
+	 * @param keys
+	 * @return Status code reply
+	 */
 	public Long sdiffstore(final byte[] dstkey, final byte[]... keys) {
 
 		Set<ByteBuffer> sdiff = differenceElements(keys);
 
 		setElements.replaceValues(wrap(dstkey), sdiff);
-		
 
 		return (long) sdiff.size();
 	}
@@ -156,45 +155,41 @@ public class SetDatatypeOperations {
 
 		Set<ByteBuffer> targetKey = intersactionElements(keys);
 
-		List<byte[]> intersaction = convert(targetKey,
-				ByteBuffer2ByteArrayConverter.createByteBufferConverter());
+		List<byte[]> intersaction = convert(targetKey, ByteBuffer2ByteArrayConverter.createByteBufferConverter());
 
 		return new HashSet<byte[]>(intersaction);
 
 	}
 
 	private Set<ByteBuffer> intersactionElements(final byte[]... keys) {
-		
+
 		if (keys.length == 0) {
 			return new HashSet<ByteBuffer>();
 		}
-		
-		Set<ByteBuffer> targetKey = new HashSet<ByteBuffer>(
-				getReferenceElement(keys));
+
+		Set<ByteBuffer> targetKey = new HashSet<ByteBuffer>(getReferenceElement(keys));
 		targetKey = retainElements(targetKey, keys);
 		return targetKey;
 	}
 
-	private Set<ByteBuffer> retainElements(Set<ByteBuffer> targetKey,
-			final byte[]... keys) {
+	private Set<ByteBuffer> retainElements(Set<ByteBuffer> targetKey, final byte[]... keys) {
 		for (int index = 1; index < keys.length; index++) {
-			Collection<ByteBuffer> collectionElements = setElements
-					.get(wrap(keys[index]));
+			Collection<ByteBuffer> collectionElements = setElements.get(wrap(keys[index]));
 			targetKey.retainAll(collectionElements);
 		}
 
 		return targetKey;
 	}
 
-	 /**
-     * This commnad works exactly like {@link #sinter(String...) SINTER} but
-     * instead of being returned the resulting set is sotred as dstkey.
-     * <p>
-     * 
-     * @param dstkey
-     * @param keys
-     * @return Status code reply
-     */
+	/**
+	 * This commnad works exactly like {@link #sinter(String...) SINTER} but
+	 * instead of being returned the resulting set is sotred as dstkey.
+	 * <p>
+	 * 
+	 * @param dstkey
+	 * @param keys
+	 * @return Status code reply
+	 */
 	public Long sinterstore(final byte[] dstkey, final byte[]... keys) {
 
 		Set<ByteBuffer> sintersect = intersactionElements(keys);
@@ -233,8 +228,7 @@ public class SetDatatypeOperations {
 
 		Collection<ByteBuffer> elements = setElements.get(wrap(key));
 
-		List<byte[]> allElements = convert(elements,
-				ByteBuffer2ByteArrayConverter.createByteBufferConverter());
+		List<byte[]> allElements = convert(elements, ByteBuffer2ByteArrayConverter.createByteBufferConverter());
 		return new HashSet<byte[]>(allElements);
 	}
 
@@ -260,8 +254,7 @@ public class SetDatatypeOperations {
 	 *         element was not found on the first set and no operation was
 	 *         performed
 	 */
-	public Long smove(final byte[] srckey, final byte[] dstkey,
-			final byte[] member) {
+	public Long smove(final byte[] srckey, final byte[] dstkey, final byte[] member) {
 
 		boolean isElementPresent = sismember(srckey, member);
 
@@ -364,34 +357,40 @@ public class SetDatatypeOperations {
 
 		Set<ByteBuffer> unionElements = unionElements(keys);
 
-		List<byte[]> allElements = convert(unionElements,
-				ByteBuffer2ByteArrayConverter.createByteBufferConverter());
+		List<byte[]> allElements = convert(unionElements, ByteBuffer2ByteArrayConverter.createByteBufferConverter());
 		return new HashSet<byte[]>(allElements);
 	}
 
-	 /**
-     * This command works exactly like {@link #sunion(String...) SUNION} but
-     * instead of being returned the resulting set is stored as dstkey. Any
-     * existing value in dstkey will be over-written.
-     * <p>
-     * 
-     * @param dstkey
-     * @param keys
-     * @return Status code reply
-     */
+	/**
+	 * This command works exactly like {@link #sunion(String...) SUNION} but
+	 * instead of being returned the resulting set is stored as dstkey. Any
+	 * existing value in dstkey will be over-written.
+	 * <p>
+	 * 
+	 * @param dstkey
+	 * @param keys
+	 * @return Status code reply
+	 */
 	public Long sunionstore(final byte[] dstkey, final byte[]... keys) {
 
 		Set<ByteBuffer> sunion = unionElements(keys);
 		setElements.replaceValues(wrap(dstkey), sunion);
-		
+
 		return (long) sunion.size();
 	}
-	
+
+	public long getNumberOfKeys() {
+		return this.setElements.keySet().size();
+	}
+
+	public void flushAllKeys() {
+		this.setElements.clear();
+	}
+
 	private Collection<ByteBuffer> getReferenceElement(final byte[]... keys) {
 		return setElements.get(wrap(keys[0]));
 	}
 
-	
 	private Set<ByteBuffer> unionElements(final byte[]... keys) {
 		Set<ByteBuffer> unionElements = new HashSet<ByteBuffer>();
 
@@ -401,7 +400,7 @@ public class SetDatatypeOperations {
 
 		return unionElements;
 	}
-	
+
 	private byte[] removeElement(final byte[] srckey, final byte[] member) {
 		Collection<ByteBuffer> elements = setElements.get(wrap(srckey));
 		boolean isRemoved = elements.remove(wrap(member));
@@ -413,7 +412,7 @@ public class SetDatatypeOperations {
 	private int randomInteger(int n) {
 		return random.nextInt(n);
 	}
-	
+
 	private byte[] elementInPosition(Collection<byte[]> elements, int position) {
 		int currentPosition = 0;
 
@@ -427,6 +426,77 @@ public class SetDatatypeOperations {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Long del(byte[]... keys) {
+
+		long numberOfRemovedElements = 0;
+
+		for (byte[] key : keys) {
+			ByteBuffer wrappedKey = wrap(key);
+			if (this.setElements.containsKey(wrappedKey)) {
+				this.setElements.removeAll(wrappedKey);
+				removeExpiration(key);
+				numberOfRemovedElements++;
+			}
+		}
+
+		return numberOfRemovedElements;
+	}
+
+	@Override
+	public boolean exists(byte[] key) {
+		return this.setElements.containsKey(wrap(key));
+	}
+
+	@Override
+	public boolean renameKey(byte[] key, byte[] newKey) {
+		ByteBuffer wrappedKey = wrap(key);
+
+		if (this.setElements.containsKey(wrappedKey)) {
+			Collection<ByteBuffer> elements = this.setElements.get(wrappedKey);
+			this.setElements.removeAll(wrap(newKey));
+			this.setElements.putAll(wrap(newKey), elements);
+			this.setElements.removeAll(wrappedKey);
+			
+			renameTtlKey(key, newKey);
+			
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public List<byte[]> keys() {
+		return new ArrayList<byte[]>(convert(this.setElements.keySet(),
+				ByteBuffer2ByteArrayConverter.createByteBufferConverter()));
+	}
+
+	@Override
+	public String type() {
+		return SET;
+	}
+
+	@Override
+	public List<byte[]> sort(byte[] key) {
+		try {
+			return sortNumberValues(key);
+		} catch (NumberFormatException e) {
+			return convert(this.setElements.get(wrap(key)),
+					ByteBuffer2ByteArrayConverter.createByteBufferConverter());
+		}
+	}
+
+	
+	private List<byte[]> sortNumberValues(byte[] key) {
+		Collection<ByteBuffer> elements = this.setElements.get(wrap(key));
+		List<Double> values = convert(elements, ByteBufferAsString2DoubleConverter.createByteBufferAsStringToDoubleConverter());
+		
+		Collections.sort(values);
+		return new LinkedList<byte[]>(convert(values,
+				DoubleToStringByteArrayConverter.createDoubleToStringByteArrayConverter()));
 	}
 	
 }

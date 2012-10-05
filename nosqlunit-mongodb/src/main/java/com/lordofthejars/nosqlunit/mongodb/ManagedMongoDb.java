@@ -5,10 +5,8 @@ import static com.lordofthejars.nosqlunit.core.IOUtils.deleteDir;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
@@ -27,7 +25,6 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
 
 	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
-	protected static final String FORK_ARGUMENT_NAME = "--fork";
 	protected static final String DBPATH_ARGUMENT_NAME = "--dbpath";
 	protected static final String PORT_ARGUMENT_NAME= "--port";
 	protected static final String DEFAULT_MONGO_LOGPATH = "logpath";
@@ -164,41 +161,12 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 	
 
 	private List<String> startMongoDBAsADaemon() throws InterruptedException {
-
-		Process pwd;
-		try {
-			pwd = startProcess();
-			List<String> lines = getConsoleOutput(pwd);
-			pwd.waitFor();
-			if (pwd.exitValue() != 0) {
-				throw new IllegalStateException(
-						"Mongodb ["
-								+ mongodPath
-								+ DBPATH_ARGUMENT_NAME
-								+ dbRelativePath
-								+ PORT_ARGUMENT_NAME
-								+ port
-								+ FORK_ARGUMENT_NAME
-								+ LOGPATH_ARGUMENT_NAME
-								+ logRelativePath
-								+ "] could not be started. Next console message was thrown: "
-								+ lines);
-			}
-			return lines;
-		} catch (IOException e) {
-			throw new IllegalStateException(
-					"Mongodb ["
-							+ mongodPath
-							+ DBPATH_ARGUMENT_NAME
-							+ dbRelativePath
-							+ PORT_ARGUMENT_NAME
-							+ port
-							+ FORK_ARGUMENT_NAME
-							+ LOGPATH_ARGUMENT_NAME
-							+ logRelativePath
-							+ "] could not be started. Next console message was thrown: "
-							+ e.getMessage());
-		}
+        CountDownLatch processIsReady = new CountDownLatch(1);
+        ProcessRunnable processRunnable = new ProcessRunnable(processIsReady);
+        Thread thread = new Thread(processRunnable);
+        thread.start();
+        processIsReady.await();
+        return processRunnable.consoleOutput;
 	}
 
 	private Process startProcess() throws IOException {
@@ -219,7 +187,6 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 		programAndArguments.add(dbRelativePath);
 		programAndArguments.add(PORT_ARGUMENT_NAME);
 		programAndArguments.add(Integer.toString(port));
-		programAndArguments.add(FORK_ARGUMENT_NAME);
 		programAndArguments.add(LOGPATH_ARGUMENT_NAME);
 		programAndArguments.add(logRelativePath);
 
@@ -316,6 +283,60 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 	}
 
 
+    public class ProcessRunnable implements Runnable {
 
-	
+        private CountDownLatch processIsReady;
+        private List<String> consoleOutput;
+
+        public ProcessRunnable(CountDownLatch processIsReady) {
+            this.processIsReady = processIsReady;
+        }
+
+        @Override
+        public void run() {
+            Process pwd;
+            try {
+                pwd = startProcess();
+                consoleOutput = getConsoleOutput(pwd);
+            } catch (IOException e) {
+                throw prepareException(e);
+            } finally {
+                processIsReady.countDown();
+            }
+
+            try {
+                pwd.waitFor();
+                if (pwd.exitValue() != 0) {
+                    throw new IllegalStateException(
+                            "Mongodb ["
+                                    + mongodPath
+                                    + DBPATH_ARGUMENT_NAME
+                                    + dbRelativePath
+                                    + PORT_ARGUMENT_NAME
+                                    + port
+                                    + LOGPATH_ARGUMENT_NAME
+                                    + logRelativePath
+                                    + "] could not be started. Next console message was thrown: "
+                                    + consoleOutput);
+                }
+            } catch (InterruptedException ie) {
+                throw prepareException(ie);
+            }
+
+        }
+
+        private IllegalStateException prepareException(Exception e) {
+            return new IllegalStateException(
+                    "Mongodb ["
+                            + mongodPath
+                            + DBPATH_ARGUMENT_NAME
+                            + dbRelativePath
+                            + PORT_ARGUMENT_NAME
+                            + port
+                            + LOGPATH_ARGUMENT_NAME
+                            + logRelativePath
+                            + "] could not be started. Next console message was thrown: "
+                            + e.getMessage());
+        }
+    }
 }

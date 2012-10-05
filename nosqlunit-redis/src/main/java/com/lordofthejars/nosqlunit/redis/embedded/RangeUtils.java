@@ -1,15 +1,15 @@
 package com.lordofthejars.nosqlunit.redis.embedded;
 
-import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.select;
+import static ch.lambdaj.Lambda.selectFirst;
 import static ch.lambdaj.Lambda.selectMax;
 import static ch.lambdaj.Lambda.selectMin;
-import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +26,34 @@ public class RangeUtils {
 		super();
 	}
 	
+	public static byte[] concat(byte[] first, byte[] second) {
+		  byte[] result = Arrays.copyOf(first, first.length + second.length);
+		  System.arraycopy(second, 0, result, first.length, second.length);
+		  return result;
+	}
+	
+	public static int calculateEnd(int end, int size) {
+		if (end >= size) {
+			return size;
+		} else {
+			if (end < 0) {
+				end++;
+				return size + end;
+			} else {
+				return end + 1;
+			}
+		}
+	}
+
+	public static long calculateStart(long start, long size) {
+		return start < 0 ? size + start : start;
+	}
+	
+	public static int calculateStart(int start, int size) {
+		return start < 0 ? size + start : start;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public static List<ScoredByteBuffer> limitListByOffsetCount(int offset, int count, List<ScoredByteBuffer> elements) {
 		if(offset >= elements.size()) {
 			return Collections.EMPTY_LIST;

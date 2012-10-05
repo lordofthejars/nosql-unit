@@ -3,26 +3,24 @@ package com.lordofthejars.nosqlunit.redis.embedded;
 import static ch.lambdaj.Lambda.closure;
 import static ch.lambdaj.Lambda.convert;
 import static ch.lambdaj.Lambda.extract;
+import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.of;
 import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectUnique;
 import static ch.lambdaj.Lambda.var;
-import static ch.lambdaj.Lambda.filter;
 import static ch.lambdaj.collection.LambdaCollections.with;
-import static com.lordofthejars.nosqlunit.redis.embedded.RangeUtils.getRealScoreForMinValue;
 import static com.lordofthejars.nosqlunit.redis.embedded.RangeUtils.getRealScoreForMaxValue;
+import static com.lordofthejars.nosqlunit.redis.embedded.RangeUtils.getRealScoreForMinValue;
 import static java.nio.ByteBuffer.wrap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
-import static redis.clients.jedis.Protocol.toByteArray;
 import static redis.clients.jedis.Protocol.Keyword.AGGREGATE;
 import static redis.clients.jedis.Protocol.Keyword.WEIGHTS;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,19 +34,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.hamcrest.Matcher;
-
-import redis.clients.jedis.Tuple;
 import redis.clients.jedis.ZParams;
 import redis.clients.util.SafeEncoder;
-import ch.lambdaj.collection.LambdaCollection;
 import ch.lambdaj.function.closure.Closure1;
+import ch.lambdaj.function.convert.Converter;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
-public class SortsetDatatypeOperations {
+public class SortsetDatatypeOperations extends ExpirationDatatypeOperations implements RedisDatatypeOperations {
 
+	protected static final String ZSET = "zset";
 	protected Multimap<ByteBuffer, ScoredByteBuffer> sortset = TreeMultimap.create();
 
 	public Long zadd(final byte[] key, final double score, final byte[] member) {
@@ -1054,13 +1050,14 @@ public class SortsetDatatypeOperations {
 		return (long) elementsToRemove.size();
 	}
 
+	@SuppressWarnings("unchecked")
 	private Set<ScoredByteBuffer> getElementsByRange(Collection<ScoredByteBuffer> elements, final int start,
 			final int end) {
 
-		List<ScoredByteBuffer> listOfElements = new LinkedList(elements);
+		List<ScoredByteBuffer> listOfElements = new LinkedList<ScoredByteBuffer>(elements);
 
-		int calculatedStart = calculateStart(start, listOfElements.size());
-		int calculatedEnd = calculateEnd(end, listOfElements.size());
+		int calculatedStart = RangeUtils.calculateStart(start, listOfElements.size());
+		int calculatedEnd = RangeUtils.calculateEnd(end, listOfElements.size());
 
 		try {
 			List<ScoredByteBuffer> subList = listOfElements.subList(calculatedStart, calculatedEnd);
@@ -1071,21 +1068,12 @@ public class SortsetDatatypeOperations {
 
 	}
 
-	private int calculateEnd(int end, int size) {
-		if (end >= size) {
-			return size;
-		} else {
-			if (end < 0) {
-				end++;
-				return size + end;
-			} else {
-				return end + 1;
-			}
-		}
+	public long getNumberOfKeys() {
+		return this.sortset.keySet().size();
 	}
-
-	private int calculateStart(int start, int size) {
-		return start < 0 ? size + start : start;
+	
+	public void flushAllKeys() {
+		this.sortset.clear();
 	}
 
 	private void updateDestinationWithZParams(final byte[] dstkey, String typeOfAggregation,
@@ -1159,6 +1147,7 @@ public class SortsetDatatypeOperations {
 		return weightValues.size() == 0 || weightValues.size() == sets.length;
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<ByteBuffer> getWeightValues(List<ByteBuffer> parameters) {
 		if (parameters.contains(wrap(WEIGHTS.raw))) {
 			int weightsWordIndex = parameters.indexOf(wrap(WEIGHTS.raw));
@@ -1289,4 +1278,90 @@ public class SortsetDatatypeOperations {
 
 	}
 
+	@Override
+	public Long del(byte[]... keys) {
+		long numberOfRemovedElements = 0;
+		
+		for (byte[] key : keys) {
+			ByteBuffer wrappedKey = wrap(key);
+			if(this.sortset.containsKey(wrappedKey)) {
+				this.sortset.removeAll(wrappedKey);
+				removeExpiration(key);
+				numberOfRemovedElements++;
+			}
+		}
+		
+		return numberOfRemovedElements;
+	}
+
+	@Override
+	public boolean exists(byte[] key) {
+		return this.sortset.containsKey(wrap(key));
+	}
+
+	@Override
+	public boolean renameKey(byte[] key, byte[] newKey) {
+		ByteBuffer wrappedKey = wrap(key);
+
+		if (this.sortset.containsKey(wrappedKey)) {
+			Collection<ScoredByteBuffer> elements = this.sortset.get(wrappedKey);
+			this.sortset.removeAll(wrap(newKey));
+			this.sortset.putAll(wrap(newKey), elements);
+			this.sortset.removeAll(wrappedKey);
+			
+			renameTtlKey(key, newKey);
+			
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public List<byte[]> keys() {
+		return new ArrayList<byte[]>(convert(this.sortset.keySet(),
+				ByteBuffer2ByteArrayConverter.createByteBufferConverter()));
+	}
+
+	@Override
+	public String type() {
+		return ZSET;
+	}
+
+	@Override
+	public List<byte[]> sort(byte[] key) {
+		try {
+			return sortNumberValues(key);
+		} catch (NumberFormatException e) {
+			Collection<ScoredByteBuffer> scoredElements = this.sortset.get(wrap(key));
+			Collection<ByteBuffer> elements = convert(scoredElements, ScoredByteBufferToByteBuffer.createScoredByteBufferToByteBufferConverter());
+			return convert(elements,
+					ByteBuffer2ByteArrayConverter.createByteBufferConverter());
+		}
+	}
+
+	private List<byte[]> sortNumberValues(byte[] key) {
+		Collection<ScoredByteBuffer> scoredElements = this.sortset.get(wrap(key));
+		Collection<ByteBuffer> elements = convert(scoredElements, ScoredByteBufferToByteBuffer.createScoredByteBufferToByteBufferConverter());
+		
+		List<Double> values = convert(elements, ByteBufferAsString2DoubleConverter.createByteBufferAsStringToDoubleConverter());
+		
+		Collections.sort(values);
+		return new LinkedList<byte[]>(convert(values,
+				DoubleToStringByteArrayConverter.createDoubleToStringByteArrayConverter()));
+	}
+	
+	private static class ScoredByteBufferToByteBuffer implements Converter<ScoredByteBuffer, ByteBuffer> {
+
+		private static ScoredByteBufferToByteBuffer createScoredByteBufferToByteBufferConverter() {
+			return new ScoredByteBufferToByteBuffer();
+		}
+		
+		@Override
+		public ByteBuffer convert(ScoredByteBuffer from) {
+			return from.getByteBuffer();
+		}
+		
+	}
+	
 }

@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,8 +20,9 @@ import redis.clients.util.JedisByteHashMap;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
-public class HashDatatypeOperations {
+public class HashDatatypeOperations extends ExpirationDatatypeOperations implements RedisDatatypeOperations {
 
+	protected static final String HASH = "hash";
 	protected Table<ByteBuffer, ByteBuffer, ByteBuffer> hashElements = HashBasedTable.create();
 
 	/**
@@ -38,12 +40,13 @@ public class HashDatatypeOperations {
 	 *         1 is returned.
 	 */
 	public Long hset(final byte[] key, final byte[] field, final byte[] value) {
+		long result = 0L;
 		
 		if(hashElements.put(wrap(key), wrap(field), wrap(value)) == null) {
-			return 1L;			
-		} else {
-			return 0L;
-		}
+			result = 1L;			
+		} 
+		
+		return result;
 	}
 
 	/**
@@ -247,6 +250,14 @@ public class HashDatatypeOperations {
 				ByteBuffer2ByteArrayConverter.createByteBufferConverter()));
 	}
 
+	public long getNumberOfKeys() {
+		return this.hashElements.rowKeySet().size();
+	}
+	
+	public void flushAllKeys() {
+		this.hashElements.clear();
+	}
+	
 	private Long setLongValue(final byte[] key, final byte[] field, final long value) {
 		try {
 			hset(key, field, Long.toString(value).getBytes("UTF-8"));
@@ -293,6 +304,80 @@ public class HashDatatypeOperations {
 		Map<ByteBuffer, ByteBuffer> row = hashElements.row(wrap(key));
 		Set<ByteBuffer> columnKeySet = row.keySet();
 		return columnKeySet;
+	}
+	
+	@Override
+	public String type() {
+		return HASH;
+	}
+
+	@Override
+	public List<byte[]> keys() {
+		return new ArrayList<byte[]>(convert(this.hashElements.columnKeySet(),
+				ByteBuffer2ByteArrayConverter.createByteBufferConverter()));
+	}
+
+	@Override
+	public Long del(byte[]... keys) {
+		long numberOfRemovedElements = 0;
+		
+		for (byte[] key : keys) {
+			
+			ByteBuffer wrappedKey = wrap(key);
+			
+			if(this.hashElements.containsRow(wrappedKey)) {
+				deleteAllFields(wrappedKey);
+				removeExpiration(key);
+				numberOfRemovedElements++;
+			}
+		}
+		
+		return numberOfRemovedElements;
+	}
+
+	private void deleteAllFields(ByteBuffer key) {
+		Map<ByteBuffer, ByteBuffer> fields = this.hashElements.row(key);
+		Set<ByteBuffer> columns = fields.keySet();
+		
+		Iterator<ByteBuffer> iterator = columns.iterator();
+		
+		while(iterator.hasNext()) {
+			iterator.next();
+			iterator.remove();
+		}
+	}
+
+	@Override
+	public boolean exists(byte[] key) {
+		ByteBuffer rowKey = wrap(key);
+		return this.hashElements.containsRow(rowKey);
+	}
+
+	@Override
+	public boolean renameKey(byte[] key, byte[] newKey) {
+		ByteBuffer wrappedKey = wrap(key);
+		if(this.hashElements.containsRow(wrappedKey )) {
+			Map<ByteBuffer, ByteBuffer> row = this.hashElements.row(wrappedKey);
+
+			deleteAllFields(wrap(newKey));
+			
+			Set<Entry<ByteBuffer, ByteBuffer>> entries = row.entrySet();
+			
+			for (Entry<ByteBuffer, ByteBuffer> entry : entries) {
+				hashElements.put(wrap(newKey), entry.getKey(), entry.getValue());
+			}
+			
+			deleteAllFields(wrappedKey);
+			renameTtlKey(key, newKey);
+			
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<byte[]> sort(byte[] key) {
+		throw new UnsupportedOperationException();
 	}
 
 	
