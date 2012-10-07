@@ -13,12 +13,13 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 	protected static final String DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION = "cu-cassandra.yaml";
 	
 	protected static final String LOCALHOST = "localhost";
-	protected static final int PORT = 9171;
+	protected static final int DEFAULT_PORT = 9171;
 	
 	protected static final String DEFAULT_CASSANDRA_TARGET_PATH = "target" + File.separatorChar + "cassandra-temp";
 	
 	private String targetPath = DEFAULT_CASSANDRA_TARGET_PATH;
 	private String cassandraConfigurationFile = DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION;
+	private int port = DEFAULT_PORT;
 	
 	private EmbeddedCassandraServerHelper embeddedCassandraServerHelper = new EmbeddedCassandraServerHelper();
 	
@@ -48,6 +49,11 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 			return this;
 		}
 		
+		public EmbeddedCassandraRuleBuilder port(int port) {
+			this.embeddedCassandra.setPort(port);
+			return this;
+		}
+		
 		public EmbeddedCassandra build() {
 			
 			if (this.embeddedCassandra.getTargetPath() == null) {
@@ -59,8 +65,6 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 
 	}
 	
-	
-	
 	@Override
 	protected String getHost() {
 		return LOCALHOST;
@@ -68,7 +72,7 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 
 	@Override
 	protected int getPort() {
-		return PORT;
+		return port;
 	}
 
 	@Override
@@ -100,6 +104,11 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 	public void setTargetPath(String targetPath) {
 		this.targetPath = targetPath;
 	}
+	
+	public void setPort(int port) {
+		this.port = port;
+	}
+	
 	
 	public void setCassandraConfigurationFile(String cassandraConfigurationFile) {
 		this.cassandraConfigurationFile = cassandraConfigurationFile;
