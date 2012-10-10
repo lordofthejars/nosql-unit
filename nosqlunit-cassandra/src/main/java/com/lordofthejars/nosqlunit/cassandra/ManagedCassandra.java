@@ -36,7 +36,7 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 
 	protected static final String FOREGROUND_ARGUMENT_NAME = "-Dcassandra-foreground=yes";
 
-	protected static final String DEFAULT_CASSANDRA_TARGET_PATH = "target" + File.separatorChar + "cassandra-temp";
+	public static final String DEFAULT_CASSANDRA_TARGET_PATH = "target" + File.separatorChar + "cassandra-temp";
 	protected static final String CASSANDRA_BINARY_DIRECTORY = "bin";
 
 	protected String CASSANDRA_CONF_DIRECTORY = "/conf";
@@ -253,7 +253,7 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 		return cassandraPath;
 	}
 
-	protected void setCommandLineExecutor(CommandLineExecutor commandLineExecutor) {
+	public void setCommandLineExecutor(CommandLineExecutor commandLineExecutor) {
 		this.commandLineExecutor = commandLineExecutor;
 	}
 
