@@ -1,15 +1,13 @@
 package com.lordofthejars.nosqlunit.redis.embedded;
 
 import static java.nio.ByteBuffer.wrap;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +25,7 @@ import com.lordofthejars.nosqlunit.redis.embedded.ExpirationDatatypeOperations.T
 
 public class EmbeddedJedisUsedWithByteArray {
 
+	private static final int SLEEP_IN_MILLIS = 1200;
 	private static final byte[] JIVE = "Jive".getBytes();
 	private static final byte[] MY_JUANITA = "My Juanita".getBytes();
 	private static final byte[] ROCK_THIS_TOWN = "Rock This Town".getBytes();
@@ -430,6 +429,75 @@ public class EmbeddedJedisUsedWithByteArray {
 	}
 
 	@Test
+	public void dbsize_should_return_zero_if_keys_expired_value() throws InterruptedException {
+
+		embeddedJedis.set(JIVE, MY_JUANITA);
+		embeddedJedis.set(WALTZ, DARK_WALTZ);
+		
+		assertThat(embeddedJedis.dbSize(), is(2L));
+		
+		embeddedJedis.expire(JIVE, 1);
+		embeddedJedis.expire(WALTZ, 1);
+		
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
+
+		assertThat(embeddedJedis.dbSize(), is(0L));
+	}
+	
+	@Test
+	public void rename_should_return_ko_if_key_expired_value() throws InterruptedException {
+
+		embeddedJedis.set(JIVE, MY_JUANITA);
+		
+		embeddedJedis.expire(JIVE, 1);
+		
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
+		assertThat(embeddedJedis.rename(JIVE, WALTZ), is("-"));
+	}
+	
+	@Test
+	public void renamenx_should_rename_key_if_new_key_expired_value() throws InterruptedException {
+
+		embeddedJedis.set(JIVE, MY_JUANITA);
+		embeddedJedis.set(WALTZ, DARK_WALTZ);
+		
+		assertThat(embeddedJedis.renamenx(JIVE, WALTZ), is(0L));
+		
+		embeddedJedis.expire(WALTZ, 1);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
+		
+		assertThat(embeddedJedis.renamenx(JIVE, WALTZ), is(1L));
+	}
+	
+	@Test
+	public void keys_should_not_return_expired_keys() throws InterruptedException {
+
+		embeddedJedis.set(JIVE, MY_JUANITA);
+		embeddedJedis.set(WALTZ, DARK_WALTZ);
+		
+		Set<byte[]> allKeys = embeddedJedis.keys("*".getBytes());
+		assertThat(allKeys.size(), is(2));
+		
+		embeddedJedis.expire(WALTZ, 1);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
+		
+		allKeys = embeddedJedis.keys("*".getBytes());
+		assertThat(allKeys.size(), is(1));
+	}
+	
+	@Test
+	public void persist_should_avoid_expiration() throws InterruptedException {
+
+		embeddedJedis.set(JIVE, MY_JUANITA);
+		embeddedJedis.expire(JIVE, 1);
+		embeddedJedis.persist(JIVE);
+		TimeUnit.SECONDS.sleep(2);
+		byte[] newSong = embeddedJedis.get(JIVE);
+		assertThat(newSong, is(MY_JUANITA));
+
+	}
+	
+	@Test
 	public void append_should_insertvalue_if_expired_key() throws InterruptedException {
 
 		embeddedJedis.set(JIVE, DURATION);
@@ -653,7 +721,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		Long lengthOfElement = embeddedJedis.hlen(JIVE);
 		assertThat(lengthOfElement, is(2L));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 		lengthOfElement = embeddedJedis.hlen(JIVE);
 
 		assertThat(lengthOfElement, is(0L));
@@ -668,7 +736,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		Set<byte[]> numberOfKeys = embeddedJedis.hkeys(JIVE);
 		assertThat(numberOfKeys, hasSize(1));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 		numberOfKeys = embeddedJedis.hkeys(JIVE);
 
 		assertThat(numberOfKeys, hasSize(0));
@@ -684,7 +752,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		Collection<byte[]> elements = embeddedJedis.hvals(JIVE);
 		assertThat(elements, hasSize(2));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 		elements = embeddedJedis.hvals(JIVE);
 
 		assertThat(elements, hasSize(0));
@@ -700,7 +768,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		Map<byte[], byte[]> elements = embeddedJedis.hgetAll(JIVE);
 		assertThat(elements.entrySet(), hasSize(2));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 		elements = embeddedJedis.hgetAll(JIVE);
 
 		assertThat(elements.entrySet(), hasSize(0));
@@ -716,7 +784,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		Long numberOfTotalInsertedElements = embeddedJedis.rpush(JIVE, MY_JUANITA);
 		assertThat(numberOfTotalInsertedElements, is(3L));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 		Long result = embeddedJedis.rpush(JIVE, MY_JUANITA);
 		assertThat(result, is(1L));
 
@@ -731,7 +799,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		Long numberOfTotalInsertedElements = embeddedJedis.lpush(JIVE, ROCK_THIS_TOWN);
 		assertThat(numberOfTotalInsertedElements, is(3L));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 		Long result = embeddedJedis.lpush(JIVE, MY_JUANITA);
 		assertThat(result, is(1L));
 
@@ -744,7 +812,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		embeddedJedis.lpush(JIVE, MY_JUANITA);
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 		assertThat(embeddedJedis.llen(JIVE), is(0L));
 
 	}
@@ -758,7 +826,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		List<byte[]> elements = embeddedJedis.lrange(JIVE, 0, -1);
 		assertThat(elements, hasSize(2));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.lrange(JIVE, 0, -1);
 		assertThat(elements, hasSize(0));
@@ -775,7 +843,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		List<byte[]> elements = embeddedJedis.lrange(JIVE, 0, -1);
 		assertThat(elements, hasSize(1));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		String result = embeddedJedis.ltrim(JIVE, 1, -1);
 		assertThat(result, is("-"));
@@ -791,7 +859,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		byte[] element = embeddedJedis.lindex(JIVE, 0);
 		assertThat(element, is(MY_JUANITA));
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		element = embeddedJedis.lindex(JIVE, 0);
 		assertThat(element, is(nullValue()));
@@ -809,7 +877,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		assertThat(elements, hasSize(2));
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		result = embeddedJedis.lset(JIVE, 0, MY_JUANITA);
 		assertThat(result, is("-"));
@@ -827,7 +895,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		assertThat(removed, is(1L));
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		removed = embeddedJedis.lrem(JIVE, 0, MY_JUANITA);
 		assertThat(removed, is(0L));
@@ -844,7 +912,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		element = embeddedJedis.lpop(JIVE);
 		assertThat(element, is(nullValue()));
@@ -861,7 +929,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		element = embeddedJedis.rpop(JIVE);
 		assertThat(element, is(nullValue()));
@@ -877,7 +945,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		embeddedJedis.sadd(JIVE, MY_JUANITA);
 		numberOfElements = embeddedJedis.setDatatypeOperations.scard(JIVE);
@@ -895,7 +963,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.smembers(JIVE);
 		assertThat(elements.size(), is(0));
@@ -913,7 +981,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		removedElements = embeddedJedis.srem(JIVE, ROCK_THIS_TOWN);
 		assertThat(removedElements, is(0L));
@@ -924,14 +992,13 @@ public class EmbeddedJedisUsedWithByteArray {
 	public void spop_should_return_null_if_key_expired() throws InterruptedException {
 
 		embeddedJedis.sadd(JIVE, ROCK_THIS_TOWN);
-		embeddedJedis.sadd(JIVE, MY_JUANITA);
 		byte[] removedElements = embeddedJedis.spop(JIVE);
 
 		assertThat(removedElements, is(ROCK_THIS_TOWN));
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		removedElements = embeddedJedis.spop(JIVE);
 		assertThat(removedElements, is(nullValue()));
@@ -949,7 +1016,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		numberOfElements = embeddedJedis.scard(JIVE);
 		assertThat(numberOfElements, is(0L));
@@ -967,7 +1034,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		present = embeddedJedis.sismember(JIVE, ROCK_THIS_TOWN);
 
@@ -986,7 +1053,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		element = embeddedJedis.srandmember(JIVE);
 		assertThat(element, is(nullValue()));
@@ -1000,7 +1067,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		embeddedJedis.zadd(JIVE, 1, MY_JUANITA);
 		assertThat(embeddedJedis.sortsetDatatypeOperations.zcard(JIVE), is(1L));
@@ -1014,7 +1081,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		Map<Double, byte[]> elements = new HashMap<Double, byte[]>();
 		elements.put(1D, MY_JUANITA);
@@ -1035,7 +1102,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrange(JIVE, 0, -1);
 		assertThat(elements.size(), is(0));
@@ -1053,7 +1120,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrange(JIVE, 0, -1);
 		assertThat(elements.size(), is(0));
@@ -1070,7 +1137,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		newValue = embeddedJedis.zincrby(JIVE, 2D, DURATION);
 		assertThat(newValue, is(2D));
@@ -1087,7 +1154,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		indexValue = embeddedJedis.zrank(JIVE, MY_JUANITA);
 		assertThat(indexValue, is(nullValue()));
@@ -1104,7 +1171,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		indexValue = embeddedJedis.zrevrank(JIVE, MY_JUANITA);
 		assertThat(indexValue, is(nullValue()));
@@ -1122,7 +1189,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrange(JIVE, 0, -1);
 		assertThat(elements.size(), is(0));
@@ -1142,7 +1209,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrangeWithScores(JIVE, 0, 3);
 		assertThat(elements, hasSize(0));
@@ -1162,7 +1229,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeWithScores(JIVE, 0, 3);
 		assertThat(elements, hasSize(0));
@@ -1180,7 +1247,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		numberOfElements = embeddedJedis.zcard(JIVE);
 		assertThat(numberOfElements, is(0L));
@@ -1198,7 +1265,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		score = embeddedJedis.zscore(JIVE, ROCK_THIS_TOWN);
 		assertThat(score, is(nullValue()));
@@ -1216,7 +1283,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.sort(JIVE);
 		assertThat(elements.size(), is(0));
@@ -1234,7 +1301,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		numberOfElementsBetweenRange = embeddedJedis.zcount(JIVE, 0, 1);
 		assertThat(numberOfElementsBetweenRange, is(0L));
@@ -1252,7 +1319,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		numberOfElementsBetweenRange = embeddedJedis.zcount(JIVE, "-inf".getBytes(), "+inf".getBytes());
 		assertThat(numberOfElementsBetweenRange, is(0L));
@@ -1270,13 +1337,49 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrangeByScore(JIVE, 0, 1);
 		assertThat(elements.size(), is(0));
 
 	}
 
+	@Test
+	public void zrangeByScore_with_infinite_should_return_empty_set_if_key_expired() throws InterruptedException {
+
+		embeddedJedis.zadd(JIVE, 1, MY_JUANITA);
+		embeddedJedis.zadd(JIVE, 2, ROCK_THIS_TOWN);
+
+		Set<byte[]> elements = embeddedJedis.zrangeByScore(JIVE, "-inf".getBytes(), "1".getBytes());
+		assertThat(elements, contains(MY_JUANITA));
+
+		embeddedJedis.expire(JIVE, 1);
+
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
+
+		elements = embeddedJedis.zrangeByScore(JIVE, "-inf".getBytes(), "+inf".getBytes());
+		assertThat(elements.size(), is(0));
+
+	}
+	
+	@Test
+	public void zrangeByScore_with_infinite_and_offset_should_return_empty_set_if_key_expired() throws InterruptedException {
+
+		embeddedJedis.zadd(JIVE, 1, MY_JUANITA);
+		embeddedJedis.zadd(JIVE, 2, ROCK_THIS_TOWN);
+
+		Set<byte[]> elements = embeddedJedis.zrangeByScore(JIVE, "-inf".getBytes(), "1".getBytes(), 0, 1);
+		assertThat(elements, contains(MY_JUANITA));
+
+		embeddedJedis.expire(JIVE, 1);
+
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
+
+		elements = embeddedJedis.zrangeByScore(JIVE, "-inf".getBytes(), "+inf".getBytes(), 0, 1);
+		assertThat(elements.size(), is(0));
+
+	}
+	
 	@Test
 	public void zrangeByScore_with_offset_should_return_empty_set_if_key_expired() throws InterruptedException {
 
@@ -1288,7 +1391,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrangeByScore(JIVE, 0, 2, 1, 1);
 		assertThat(elements.size(), is(0));
@@ -1308,7 +1411,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrangeByScoreWithScores(JIVE, 0, 3);
 		assertThat(elements, hasSize(0));
@@ -1328,7 +1431,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrangeByScoreWithScores(JIVE, "-inf".getBytes(), "+inf".getBytes());
 		assertThat(elements, hasSize(0));
@@ -1347,7 +1450,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrangeByScoreWithScores(JIVE, "-inf".getBytes(), "+inf".getBytes(), 1, 1);
 		assertThat(elements, hasSize(0));
@@ -1365,7 +1468,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeByScore(JIVE, 0, 1);
 		assertThat(elements.size(), is(0));
@@ -1383,7 +1486,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeByScore(JIVE, 2, 0, 1, 1);
 		assertThat(elements.size(), is(0));
@@ -1401,7 +1504,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeByScore(JIVE, "+inf".getBytes(), "-inf".getBytes());
 		assertThat(elements.size(), is(0));
@@ -1421,7 +1524,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeByScoreWithScores(JIVE, 3, 0);
 		assertThat(elements, hasSize(0));
@@ -1440,7 +1543,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeByScoreWithScores(JIVE, 3, 0, 1, 1);
 		assertThat(elements, hasSize(0));
@@ -1460,7 +1563,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeByScoreWithScores(JIVE, "+inf".getBytes(), "-inf".getBytes());
 		assertThat(elements, hasSize(0));
@@ -1479,7 +1582,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		elements = embeddedJedis.zrevrangeByScoreWithScores(JIVE, "+inf".getBytes(), "-inf".getBytes(), 1, 1);
 		assertThat(elements, hasSize(0));
@@ -1497,7 +1600,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		removedElements = embeddedJedis.zremrangeByRank(JIVE, 0, 1);
 		assertThat(removedElements, is(0L));
@@ -1515,7 +1618,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		removedElements = embeddedJedis.zremrangeByScore(JIVE, 0, 1);
 		assertThat(removedElements, is(0L));
@@ -1533,7 +1636,7 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		removedElements = embeddedJedis.zremrangeByScore(JIVE, "-inf".getBytes(), "1".getBytes());
 		assertThat(removedElements, is(0L));
@@ -1551,7 +1654,7 @@ public class EmbeddedJedisUsedWithByteArray {
 			
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		numberOfElements = embeddedJedis.linsert(JIVE, LIST_POSITION.AFTER, MY_JUANITA, DARK_WALTZ);
 		assertThat(numberOfElements, is(0L));
@@ -1569,7 +1672,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		numberOfElements = embeddedJedis.lpushx(JIVE, MY_JUANITA);
 		assertThat(numberOfElements, is(0L));
@@ -1587,7 +1690,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		numberOfElements = embeddedJedis.rpushx(JIVE, MY_JUANITA);
 		assertThat(numberOfElements, is(0L));
@@ -1603,7 +1706,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		boolean previousBit = embeddedJedis.setbit(JIVE, 2, "1".getBytes());
 		assertThat(previousBit, is(false));
@@ -1622,7 +1725,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		assertThat(embeddedJedis.getbit(JIVE, 8), is(false));
 
@@ -1641,7 +1744,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		newLength = embeddedJedis.setrange(JIVE, 0, values);
 		assertThat(newLength, is(2L));
@@ -1658,7 +1761,7 @@ public class EmbeddedJedisUsedWithByteArray {
 		
 		embeddedJedis.expire(JIVE, 1);
 
-		TimeUnit.MILLISECONDS.sleep(1300);
+		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
 		result = embeddedJedis.getrange(JIVE, 1, 3);
 		assertThat(result.length, is(0));

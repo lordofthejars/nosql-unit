@@ -11,7 +11,11 @@ public class ByteArrayToStringConverter implements Converter<byte[], String> {
 	
 	@Override
 	public String convert(byte[] from) {
-		return SafeEncoder.encode(from);
+		if(from != null) {
+			return SafeEncoder.encode(from);
+		} else {
+			return null;
+		}
 	}
 
 }

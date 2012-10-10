@@ -1,6 +1,7 @@
 package com.lordofthejars.nosqlunit.redis;
 
 
+
 public class RedisConfiguration extends AbstractRedisConfiguration {
 
 	private String host;
@@ -41,5 +42,5 @@ public class RedisConfiguration extends AbstractRedisConfiguration {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 }

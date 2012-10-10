@@ -80,7 +80,7 @@ public class ShardedRedisConfigurationBuilder {
 		
 		public ShardInfoBuilder timeout(int timeout) {
 			this.timeout = timeout;
-				return this;
+			return this;
 		}
 		
 		public ShardInfoBuilder weight(int weight) {

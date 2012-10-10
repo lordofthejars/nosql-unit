@@ -251,7 +251,7 @@ public class WhenKeysServerOperationsAreExecuted {
 		listDatatypeOperations.lpush(MARILLION, SUGAR_MICE);
 		listDatatypeOperations.lpush(MIRILLION, SUGAR_MICE);
 		
-		Set<byte[]> keys = keysServerOperations.keys("M[ai]rillion");
+		Set<byte[]> keys = keysServerOperations.keys("M[ai]rillion".getBytes());
 		assertThat(keys, containsInAnyOrder(MARILLION, MIRILLION));
 		assertThat(listDatatypeOperations.keys().size(), is(3));
 		

@@ -3,7 +3,6 @@ package com.lordofthejars.nosqlunit.redis.embedded;
 import static ch.lambdaj.collection.LambdaCollections.with;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -14,9 +13,15 @@ import java.util.Set;
 import redis.clients.jedis.BinaryClient;
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
 import redis.clients.jedis.BinaryJedisCommands;
+import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.JedisMonitor;
+import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.PipelineBlock;
 import redis.clients.jedis.SortingParams;
 import redis.clients.jedis.Tuple;
+import redis.clients.util.Slowlog;
 import ch.lambdaj.function.convert.Converter;
 
 import com.lordofthejars.nosqlunit.redis.embedded.ListDatatypeOperations.ListPositionEnum;
@@ -35,6 +40,10 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	protected SortsetDatatypeOperations sortsetDatatypeOperations;
 	protected StringDatatypeOperations stringDatatypeOperations;
 	protected KeysServerOperations keysServerOperations;
+	protected PubSubServerOperations pubSubServerOperations;
+	protected ConnectionServerOperations connectionServerOperations;
+	protected ScriptingServerOperations scriptingServerOperations;
+	protected TransactionServerOperations transactionServerOperations;
 
 	public EmbeddedJedis() {
 		hashDatatypeOperations = new HashDatatypeOperations();
@@ -42,6 +51,10 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 		setDatatypeOperations = new SetDatatypeOperations();
 		sortsetDatatypeOperations = new SortsetDatatypeOperations();
 		stringDatatypeOperations = new StringDatatypeOperations();
+		pubSubServerOperations = new PubSubServerOperations();
+		connectionServerOperations = new ConnectionServerOperations();
+		scriptingServerOperations = new ScriptingServerOperations();
+		transactionServerOperations = new TransactionServerOperations();
 		keysServerOperations = KeysServerOperations.createKeysServerOperations(hashDatatypeOperations,
 				listDatatypeOperations, setDatatypeOperations, sortsetDatatypeOperations, stringDatatypeOperations);
 	}
@@ -581,6 +594,18 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 		return new LinkedHashSet<Tuple>(with(zrangeByScoreWithScores).convert(toTuple()));
 	}
 
+	public Set<byte[]> zrangeByScore(byte[] key, byte[] min, byte[] max) {
+		updateTtl(key);
+		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
+		return this.sortsetDatatypeOperations.zrangeByScore(key, min, max);
+	}
+
+	public Set<byte[]> zrangeByScore(byte[] key, byte[] min, byte[] max, int offset, int count) {
+		updateTtl(key);
+		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
+		return this.sortsetDatatypeOperations.zrangeByScore(key, min, max, offset, count);
+	}
+
 	@Override
 	public Long zremrangeByRank(byte[] key, int start, int end) {
 		updateTtl(key);
@@ -611,17 +636,64 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 
 	@Override
 	public Long objectRefcount(byte[] key) {
-		throw new UnsupportedOperationException("Object ref count is not supported.");
+		return this.keysServerOperations.objectRefcount(key);
 	}
 
 	@Override
 	public Long objectIdletime(byte[] key) {
-		throw new UnsupportedOperationException("Object idle time is not supported.");
+		return this.keysServerOperations.objectIdletime(key);
 	}
 
 	@Override
 	public byte[] objectEncoding(byte[] key) {
-		throw new UnsupportedOperationException("Object encoding is not supported.");
+		return this.keysServerOperations.objectEncoding(key);
+	}
+
+	public Long objectRefcount(String key) {
+		return this.objectRefcount(toByteArray().convert(key));
+	}
+
+	public Long objectIdletime(String key) {
+		return this.objectIdletime(toByteArray().convert(key));
+	}
+
+	public byte[] objectEncoding(String key) {
+		return this.objectEncoding(toByteArray().convert(key));
+	}
+
+	public void psubscribe(final JedisPubSub jedisPubSub, final byte[]... patterns) {
+		this.pubSubServerOperations.psubscribe(jedisPubSub, patterns);
+	}
+
+	public void psubscribe(final JedisPubSub jedisPubSub, final String... patterns) {
+		byte[][] arrayOfPatterns = with(patterns).convert(toByteArray()).toArray(new byte[patterns.length][]);
+		this.psubscribe(jedisPubSub, arrayOfPatterns);
+	}
+
+	public void psubscribe(BinaryJedisPubSub jedisPubSub, byte[]... patterns) {
+		this.pubSubServerOperations.psubscribe(jedisPubSub, patterns);
+	}
+
+	public void subscribe(JedisPubSub jedisPubSub, String... channels) {
+		byte[][] arrayOfChanenls = with(channels).convert(toByteArray()).toArray(new byte[channels.length][]);
+		this.subscribe(jedisPubSub, arrayOfChanenls);
+	}
+
+	public void subscribe(JedisPubSub jedisPubSub, byte[]... channels) {
+		this.pubSubServerOperations.subscribe(jedisPubSub, channels);
+	}
+
+	public void psubscribe(BinaryJedisPubSub jedisPubSub, String... patterns) {
+		byte[][] arrayOfPatterns = with(patterns).convert(toByteArray()).toArray(new byte[patterns.length][]);
+		this.psubscribe(jedisPubSub, arrayOfPatterns);
+	}
+
+	public Long publish(byte[] channel, byte[] message) {
+		return this.pubSubServerOperations.publish(channel, message);
+	}
+
+	public Long publish(String channel, String message) {
+		return this.publish(toByteArray().convert(channel), toByteArray().convert(message));
 	}
 
 	@Override
@@ -655,13 +727,100 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 		checkValidTypeOrNone(key, StringDatatypeOperations.STRING);
 		return this.stringDatatypeOperations.setrange(key, offset, value);
 	}
-	
+
 	public byte[] getrange(byte[] key, long startOffset, long endOffset) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, StringDatatypeOperations.STRING);
 		return this.stringDatatypeOperations.getrange(key, startOffset, endOffset);
 	}
-	
+
+	public Long dbSize() {
+		updateAllTtlTimes();
+		return this.keysServerOperations.dbSize();
+	}
+
+	public String flushDB() {
+		return this.keysServerOperations.flushDB();
+	}
+
+	public String flushAll() {
+		return this.flushDB();
+	}
+
+	public Long del(final byte[]... keys) {
+		return this.keysServerOperations.del(keys);
+	}
+
+	public Long del(final String... keys) {
+		byte[][] arrayOfFields = with(keys).convert(toByteArray()).toArray(new byte[keys.length][]);
+		return this.del(arrayOfFields);
+	}
+
+	public String rename(final String oldkey, final String newkey) {
+		return this.rename(toByteArray().convert(oldkey), toByteArray().convert(newkey));
+	}
+
+	public String rename(final byte[] oldkey, final byte[] newkey) {
+		updateTtl(oldkey);
+		updateTtl(newkey);
+		return this.keysServerOperations.rename(oldkey, newkey);
+	}
+
+	/**
+	 * Rename oldkey into newkey but fails if the destination key newkey already
+	 * exists.
+	 * <p>
+	 * Time complexity: O(1)
+	 * 
+	 * @param oldkey
+	 * @param newkey
+	 * @return Integer reply, specifically: 1 if the key was renamed 0 if the
+	 *         target key already exist
+	 */
+	public Long renamenx(final byte[] oldkey, final byte[] newkey) {
+		updateTtl(oldkey);
+		updateTtl(newkey);
+		return this.keysServerOperations.renamenx(oldkey, newkey);
+	}
+
+	public Set<byte[]> keys(final byte[] pattern) {
+		updateAllTtlTimes();
+		return this.keysServerOperations.keys(pattern);
+	}
+
+	public Set<String> keys(final String pattern) {
+		Set<byte[]> result = this.keys(toByteArray().convert(pattern));
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
+	}
+
+	public Long persist(final String key) {
+		return this.persist(toByteArray().convert(key));
+	}
+
+	public Long persist(final byte[] key) {
+		updateTtl(key);
+		return this.keysServerOperations.persist(key);
+	}
+
+	/**
+	 * Rename oldkey into newkey but fails if the destination key newkey already
+	 * exists.
+	 * <p>
+	 * Time complexity: O(1)
+	 * 
+	 * @param oldkey
+	 * @param newkey
+	 * @return Integer reply, specifically: 1 if the key was renamed 0 if the
+	 *         target key already exist
+	 */
+	public Long renamenx(final String oldkey, final String newkey) {
+		return this.renamenx(toByteArray().convert(oldkey), toByteArray().convert(newkey));
+	}
+
+	public Long move(final byte[] key, final int dbIndex) {
+		return this.move(key, dbIndex);
+	}
+
 	@Override
 	public String set(String key, String value) {
 		return this.set(toByteArray().convert(key), toByteArray().convert(value));
@@ -852,29 +1011,29 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 
 	@Override
 	public List<String> lrange(String key, long start, long end) {
-		List<byte[]> result = this.lrange(toByteArray().convert(key), (int)start, (int)end);
+		List<byte[]> result = this.lrange(toByteArray().convert(key), (int) start, (int) end);
 		return with(result).convert(toStringValue());
 	}
 
 	@Override
 	public String ltrim(String key, long start, long end) {
-		return this.ltrim(toByteArray().convert(key), (int)start, (int)end);
+		return this.ltrim(toByteArray().convert(key), (int) start, (int) end);
 	}
 
 	@Override
 	public String lindex(String key, long index) {
-		byte[] result = this.lindex(toByteArray().convert(key), (int)index);
+		byte[] result = this.lindex(toByteArray().convert(key), (int) index);
 		return toStringValue().convert(result);
 	}
 
 	@Override
 	public String lset(String key, long index, String value) {
-		return this.lset(toByteArray().convert(key), (int)index, toByteArray().convert(value));
+		return this.lset(toByteArray().convert(key), (int) index, toByteArray().convert(value));
 	}
 
 	@Override
 	public Long lrem(String key, long count, String value) {
-		return this.lrem(toByteArray().convert(key), (int)count, toByteArray().convert(value));
+		return this.lrem(toByteArray().convert(key), (int) count, toByteArray().convert(value));
 	}
 
 	@Override
@@ -941,8 +1100,8 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 
 	@Override
 	public Set<String> zrange(String key, long start, long end) {
-		Set<byte[]> result = this.zrange(toByteArray().convert(key), (int)start, (int)end);
-		return new HashSet<String>(with(result).convert(toStringValue()));
+		Set<byte[]> result = this.zrange(toByteArray().convert(key), (int) start, (int) end);
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
@@ -953,213 +1112,440 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 
 	@Override
 	public Double zincrby(String key, double score, String member) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zincrby(toByteArray().convert(key), score, toByteArray().convert(member));
 	}
 
 	@Override
 	public Long zrank(String key, String member) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrank(toByteArray().convert(key), toByteArray().convert(member));
 	}
 
 	@Override
 	public Long zrevrank(String key, String member) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrevrank(toByteArray().convert(key), toByteArray().convert(member));
 	}
 
 	@Override
 	public Set<String> zrevrange(String key, long start, long end) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrevrange(toByteArray().convert(key), (int) start, (int) end);
+		return new LinkedHashSet<String>((with(result).convert(toStringValue())));
 	}
 
 	@Override
 	public Set<Tuple> zrangeWithScores(String key, long start, long end) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrangeWithScores(toByteArray().convert(key), (int) start, (int) end);
 	}
 
 	@Override
 	public Set<Tuple> zrevrangeWithScores(String key, long start, long end) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrevrangeWithScores(toByteArray().convert(key), (int) start, (int) end);
 	}
 
 	@Override
 	public Long zcard(String key) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zcard(toByteArray().convert(key));
 	}
 
 	@Override
 	public Double zscore(String key, String member) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zscore(toByteArray().convert(key), toByteArray().convert(member));
 	}
 
 	@Override
 	public List<String> sort(String key) {
-		// TODO Auto-generated method stub
-		return null;
+		List<byte[]> result = this.sort(toByteArray().convert(key));
+		return with(result).convert(toStringValue());
 	}
 
 	@Override
 	public List<String> sort(String key, SortingParams sortingParameters) {
-		// TODO Auto-generated method stub
-		return null;
+		List<byte[]> result = this.sort(toByteArray().convert(key), sortingParameters);
+		return with(result).convert(toStringValue());
 	}
 
 	@Override
 	public Long zcount(String key, double min, double max) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zcount(toByteArray().convert(key), min, max);
 	}
 
 	@Override
 	public Long zcount(String key, String min, String max) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zcount(toByteArray().convert(key), toByteArray().convert(min), toByteArray().convert(max));
 	}
 
 	@Override
 	public Set<String> zrangeByScore(String key, double min, double max) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrangeByScore(toByteArray().convert(key), min, max);
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<String> zrangeByScore(String key, String min, String max) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrangeByScore(toByteArray().convert(key), toByteArray().convert(min), toByteArray()
+				.convert(max));
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<String> zrevrangeByScore(String key, double max, double min) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrevrangeByScore(toByteArray().convert(key), max, min);
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<String> zrangeByScore(String key, double min, double max, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrangeByScore(toByteArray().convert(key), min, max, offset, count);
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<String> zrevrangeByScore(String key, String max, String min) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrevrangeByScore(toByteArray().convert(key), toByteArray().convert(max),
+				toByteArray().convert(min));
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<String> zrangeByScore(String key, String min, String max, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrangeByScore(toByteArray().convert(key), toByteArray().convert(min), toByteArray()
+				.convert(max), offset, count);
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<String> zrevrangeByScore(String key, double max, double min, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrevrangeByScore(toByteArray().convert(key), max, min, offset, count);
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<Tuple> zrangeByScoreWithScores(String key, double min, double max) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrangeByScoreWithScores(toByteArray().convert(key), min, max);
 	}
 
 	@Override
 	public Set<Tuple> zrevrangeByScoreWithScores(String key, double max, double min) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrevrangeByScoreWithScores(toByteArray().convert(key), max, min);
 	}
 
 	@Override
 	public Set<Tuple> zrangeByScoreWithScores(String key, double min, double max, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrangeByScoreWithScores(toByteArray().convert(key), min, max, offset, count);
 	}
 
 	@Override
 	public Set<String> zrevrangeByScore(String key, String max, String min, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<byte[]> result = this.zrevrangeByScore(toByteArray().convert(key), toByteArray().convert(max),
+				toByteArray().convert(min), offset, count);
+		return new LinkedHashSet<String>(with(result).convert(toStringValue()));
 	}
 
 	@Override
 	public Set<Tuple> zrangeByScoreWithScores(String key, String min, String max) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrangeByScoreWithScores(toByteArray().convert(key), toByteArray().convert(min), toByteArray()
+				.convert(max));
 	}
 
 	@Override
 	public Set<Tuple> zrevrangeByScoreWithScores(String key, String max, String min) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrevrangeByScoreWithScores(toByteArray().convert(key), toByteArray().convert(max), toByteArray()
+				.convert(min));
 	}
 
 	@Override
 	public Set<Tuple> zrangeByScoreWithScores(String key, String min, String max, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrangeByScoreWithScores(toByteArray().convert(key), toByteArray().convert(min), toByteArray()
+				.convert(max), offset, count);
 	}
 
 	@Override
 	public Set<Tuple> zrevrangeByScoreWithScores(String key, double max, double min, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrevrangeByScoreWithScores(toByteArray().convert(key), max, min, offset, count);
 	}
 
 	@Override
 	public Set<Tuple> zrevrangeByScoreWithScores(String key, String max, String min, int offset, int count) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zrevrangeByScoreWithScores(toByteArray().convert(key), toByteArray().convert(max), toByteArray()
+				.convert(min), offset, count);
 	}
 
 	@Override
 	public Long zremrangeByRank(String key, long start, long end) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zremrangeByRank(toByteArray().convert(key), (int) start, (int) end);
 	}
 
 	@Override
 	public Long zremrangeByScore(String key, double start, double end) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zremrangeByScore(toByteArray().convert(key), start, end);
 	}
 
 	@Override
 	public Long zremrangeByScore(String key, String start, String end) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.zremrangeByScore(toByteArray().convert(key), toByteArray().convert(start),
+				toByteArray().convert(end));
 	}
 
 	@Override
 	public Long linsert(String key, LIST_POSITION where, String pivot, String value) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.linsert(toByteArray().convert(key), where, toByteArray().convert(pivot),
+				toByteArray().convert(value));
 	}
 
 	@Override
 	public Long lpushx(String key, String string) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.lpushx(toByteArray().convert(key), toByteArray().convert(string));
 	}
 
 	@Override
 	public Long rpushx(String key, String string) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.rpushx(toByteArray().convert(key), toByteArray().convert(string));
 	}
 
+	public String auth(final String password) {
+		return this.connectionServerOperations.auth(password);
+	}
+
+	public byte[] echo(final byte[] string) {
+		return this.connectionServerOperations.echo(string);
+	}
+
+	public String echo(final String string) {
+		byte[] result = this.echo(toByteArray().convert(string));
+		return toStringValue().convert(result);
+	}
+
+	public String ping() {
+		return this.connectionServerOperations.ping();
+	}
+
+	public String quit() {
+		return this.connectionServerOperations.quit();
+	}
+
+	public String select(final int index) {
+		return this.connectionServerOperations.select(index);
+	}
+
+	/**
+	 * Evaluates scripts using the Lua interpreter built into Redis starting
+	 * from version 2.6.0.
+	 * <p>
+	 * 
+	 * @return Script result
+	 */
+	public Object eval(byte[] script, List<byte[]> keys, List<byte[]> args) {
+		return this.scriptingServerOperations.eval(script, keys, args);
+	}
+
+	public Object eval(byte[] script, byte[] keyCount, byte[][] params) {
+		return this.scriptingServerOperations.eval(script, keyCount, params);
+	}
+
+	public Object eval(String script, int keyCount, String... params) {
+		byte[][] arrayOfParams = with(params).convert(toByteArray()).toArray(new byte[params.length][]);
+		return this.eval(toByteArray().convert(script), toByteArray().convert(Integer.toString(keyCount)),
+				arrayOfParams);
+	}
+
+	public Object eval(String script, List<String> keys, List<String> args) {
+		return this.eval(toByteArray().convert(script), with(keys).convert(toByteArray()),
+				with(args).convert(toByteArray()));
+	}
+
+	public Object eval(String script) {
+		return eval(script, 0);
+	}
+
+	public Object evalsha(String script) {
+		return evalsha(script, 0);
+	}
+
+	public Object evalsha(String sha1, List<String> keys, List<String> args) {
+		return evalsha(sha1, keys.size(), getParams(keys, args));
+	}
+
+	public Object evalsha(String sha1, int keyCount, String... params) {
+		return this.evalsha(toByteArray().convert(sha1), toByteArray().convert(Integer.toString(keyCount)),
+				with(params).convert(toByteArray()).toArray(new byte[params.length][]));
+	}
+
+	public Object evalsha(byte[] sha1, byte[] keyCount, byte[]... params) {
+		return this.scriptingServerOperations.evalsha(sha1, keyCount, params);
+	}
+
+	private String[] getParams(List<String> keys, List<String> args) {
+		int keyCount = keys.size();
+		int argCount = args.size();
+
+		String[] params = new String[keyCount + args.size()];
+
+		for (int i = 0; i < keyCount; i++)
+			params[i] = keys.get(i);
+
+		for (int i = 0; i < argCount; i++)
+			params[keyCount + i] = args.get(i);
+
+		return params;
+	}
+
+	public List<Long> scriptExists(byte[]... sha1) {
+		return this.scriptingServerOperations.scriptExists(sha1);
+	}
+
+	public Boolean scriptExists(String sha1) {
+		String[] a = new String[1];
+		a[0] = sha1;
+		return scriptExists(a).get(0);
+	}
+
+	public List<Boolean> scriptExists(String... sha1) {
+		throw new UnsupportedOperationException("script Exists is not supported");
+	}
+	
+	public byte[] scriptFlush() {
+		return this.scriptingServerOperations.scriptFlush();
+	}
+
+	public byte[] scriptKill() {
+		return this.scriptingServerOperations.scriptKill();
+	}
+
+	public byte[] scriptLoad(byte[] script) {
+		return this.scriptingServerOperations.scriptLoad(script);
+	}
+
+	public String scriptLoad(String script) {
+		byte[] result = this.scriptLoad(toByteArray().convert(script));
+		return toStringValue().convert(result);
+	}
+	
+	public String watch(final byte[]... keys) {
+		return this.transactionServerOperations.watch(keys);
+	}
+
+	public String watch(final String... keys) {
+		return this.watch(with(keys).convert(toByteArray()).toArray(new byte[keys.length][]));
+	}
+
+	public String unwatch() {
+		return this.transactionServerOperations.unwatch();
+	}
+
+	public List<Object> pipelined(final PipelineBlock jedisPipeline) {
+		return this.transactionServerOperations.pipelined(jedisPipeline);
+	}
+
+	public Pipeline pipelined() {
+		return this.transactionServerOperations.pipelined();
+	}
+
+	public String bgrewriteaof() {
+		return this.keysServerOperations.bgrewriteaof();
+	}
+
+	public String save() {
+		return this.keysServerOperations.save();
+	}
+
+	public String bgsave() {
+		return this.keysServerOperations.bgsave();
+	}
+	
+	public List<byte[]> configGet(final byte[] pattern) {
+		return this.keysServerOperations.configGet(pattern);
+	}
+
+	public List<String> configGet(final String pattern) {
+		List<byte[]> result = this.configGet(toByteArray().convert(pattern));
+		return with(result).convert(toStringValue());
+	}
+	
+	public byte[] configSet(final byte[] parameter, final byte[] value) {
+		return this.keysServerOperations.configSet(parameter, value);
+	}
+
+	public String configSet(final String parameter, final String value) {
+		byte[] result =  this.configSet(toByteArray().convert(parameter), toByteArray().convert(value));
+		return toStringValue().convert(result);
+	}
+
+	public String configResetStat() {
+		return this.keysServerOperations.configResetStat();
+	}
+	
+	public String info() {
+		return this.keysServerOperations.info();
+	}
+
+	public Long lastsave() {
+		return this.keysServerOperations.lastsave();
+	}
+
+	public void monitor(final JedisMonitor jedisMonitor) {
+		this.keysServerOperations.monitor(jedisMonitor);
+	}
+	
+	public String shutdown() {
+		return this.keysServerOperations.shutdown();
+	}
+
+	public String slaveof(final String host, final int port) {
+		return this.keysServerOperations.slaveof(host, port);
+	}
+
+	public String slaveofNoOne() {
+		return this.keysServerOperations.slaveofNoOne();
+	}
+
+	public List<Slowlog> slowlogGet() {
+		return this.keysServerOperations.slowlogGet();
+	}
+
+	public List<Slowlog> slowlogGet(long entries) {
+		return this.keysServerOperations.slowlogGet(entries);
+	}
+
+	public byte[] slowlogReset() {
+		return this.keysServerOperations.slowlogReset();
+	}
+	
+	public long slowlogLen() {
+		return this.keysServerOperations.slowlogLen();
+	}
+
+	public List<byte[]> slowlogGetBinary() {
+		return this.keysServerOperations.slowlogGetBinary();
+	}
+
+	public List<byte[]> slowlogGetBinary(long entries) {
+		return this.keysServerOperations.slowlogGetBinary(entries);
+	}
+
+	public void sync() {
+		this.keysServerOperations.sync();
+	}
+	
+	public Long time() {
+		return this.keysServerOperations.time();
+	}
+	
+	public Long getDB() {
+		return this.keysServerOperations.getDB();
+	}
+	
+	public boolean isConnected() {
+		return this.keysServerOperations.isConnected();
+	}
+	
 	private void checkValidTypeOrNone(byte[] key, String type) {
 		String currentType = keysServerOperations.type(key);
 		if (!(KeysServerOperations.NONE.equals(currentType) || currentType.equals(type))) {
 			throw new IllegalArgumentException("ERR Operation against a key holding the wrong kind of value");
 		}
+	}
+
+	private void updateAllTtlTimes() {
+		this.keysServerOperations.updateTtl();
 	}
 
 	private void updateTtl(byte[] key) {
@@ -1208,43 +1594,43 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	private Converter<Map<byte[], byte[]>, Map<String, String>> toMapString() {
-		return new Converter<Map<byte[],byte[]>, Map<String, String>>() {
-			
+		return new Converter<Map<byte[], byte[]>, Map<String, String>>() {
+
 			@Override
 			public Map<String, String> convert(Map<byte[], byte[]> from) {
-				
+
 				Map<String, String> map = new LinkedHashMap<String, String>(from.size());
-				
+
 				Set<byte[]> keySet = from.keySet();
-				
+
 				for (byte[] key : keySet) {
 					map.put(toStringValue().convert(key), toStringValue().convert(from.get(key)));
 				}
-				
+
 				return map;
 			}
 		};
 	}
-	
+
 	private Converter<Map<String, String>, Map<byte[], byte[]>> toMapByteArray() {
-		return new Converter<Map<String,String>, Map<byte[],byte[]>>() {
-			
+		return new Converter<Map<String, String>, Map<byte[], byte[]>>() {
+
 			@Override
 			public Map<byte[], byte[]> convert(Map<String, String> from) {
-				
+
 				Map<byte[], byte[]> map = new LinkedHashMap<byte[], byte[]>(from.size());
-				
+
 				Set<String> keySet = from.keySet();
-				
+
 				for (String key : keySet) {
 					map.put(toByteArray().convert(key), toByteArray().convert(from.get(key)));
 				}
-				
+
 				return map;
 			}
 		};
 	}
-	
+
 	private Converter<byte[], String> toStringValue() {
 		return BYTE_ARRAY_TO_STRING_CONVERTER;
 	}
