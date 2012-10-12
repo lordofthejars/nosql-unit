@@ -165,17 +165,17 @@ Jedis jedis = embeddedRedisBuilder.createEmbeddedJedis();
 
 			<programlisting language="java"><![CDATA[@ClassRule
 public static ManagedRedis managedRedis79 = newManagedRedisRule().redisPath("/opt/redis-2.4.16")
-																 .targetPath("target/redis1")
-																 .configurationPath(getAbsoluteFilePath("src/test/resources/redis_6379.conf"))
-																 .port(6379)
-											.build();
+								.targetPath("target/redis1")
+								.configurationPath(getAbsoluteFilePath("src/test/resources/redis_6379.conf"))
+								.port(6379)
+								.build();
 
 @ClassRule
 public static ManagedRedis managedRedis80 = newManagedRedisRule().redisPath("/opt/redis-2.4.16")
-																 .targetPath("target/redis2")
-																 .configurationPath(getAbsoluteFilePath("src/test/resources/redis_6380.conf"))
-																 .port(6380)
-											.build();
+								.targetPath("target/redis2")
+								.configurationPath(getAbsoluteFilePath("src/test/resources/redis_6380.conf"))
+								.port(6380)
+								.build();
 			]]></programlisting>
 		</example>
 
