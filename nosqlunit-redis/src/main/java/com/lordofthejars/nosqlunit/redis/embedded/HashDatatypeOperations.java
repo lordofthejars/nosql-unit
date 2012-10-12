@@ -255,7 +255,15 @@ public class HashDatatypeOperations extends ExpirationDatatypeOperations impleme
 	}
 	
 	public void flushAllKeys() {
+		removeExpirations();
 		this.hashElements.clear();
+	}
+
+	private void removeExpirations() {
+		List<byte[]> keys = this.keys();
+		for (byte[] key : keys) {
+			this.removeExpiration(key);
+		}
 	}
 	
 	private Long setLongValue(final byte[] key, final byte[] field, final long value) {

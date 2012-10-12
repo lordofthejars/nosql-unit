@@ -14,7 +14,7 @@ public class EmbeddedRedis extends AbstractLifecycleManager {
 	protected static final String LOCALHOST = "127.0.0.1";
 	protected static final int PORT = ManagedRedis.DEFAULT_PORT;
 
-	public static final String INMEMORY_REDIS_TARGET_PATH = "target" + File.separatorChar + "test-data"
+	public static final String INMEMORY_REDIS_TARGET_PATH = "target" + File.separatorChar + "redis-test-data"
 			+ File.separatorChar + "impermanent-db";
 	
 	private String targetPath = INMEMORY_REDIS_TARGET_PATH;

@@ -96,7 +96,7 @@ public class WhenEmbeddedRedisOperationsAreExecuted {
 		
 		Set<String> members = jedis.smembers("key5");
 		
-		assertThat(members, contains("value3", "value4"));
+		assertThat(members, containsInAnyOrder("value3", "value4"));
 		
 		jedis.flushAll();
 		

@@ -384,9 +384,17 @@ public class SetDatatypeOperations extends ExpirationDatatypeOperations implemen
 	}
 
 	public void flushAllKeys() {
+		removeExpirations();
 		this.setElements.clear();
 	}
 
+	private void removeExpirations() {
+		List<byte[]> keys = this.keys();
+		for (byte[] key : keys) {
+			this.removeExpiration(key);
+		}
+	}
+	
 	private Collection<ByteBuffer> getReferenceElement(final byte[]... keys) {
 		return setElements.get(wrap(keys[0]));
 	}

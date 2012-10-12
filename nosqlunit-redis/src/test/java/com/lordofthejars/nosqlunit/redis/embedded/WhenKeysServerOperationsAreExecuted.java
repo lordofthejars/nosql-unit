@@ -4,6 +4,7 @@ package com.lordofthejars.nosqlunit.redis.embedded;
 import static java.nio.ByteBuffer.wrap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
@@ -87,6 +88,20 @@ public class WhenKeysServerOperationsAreExecuted {
 		
 		String result = keysServerOperations.flushAll();
 		assertThat(result, is("OK"));
+		
+		Long numberOfKeys = keysServerOperations.dbSize();
+		assertThat(numberOfKeys, is(0L));
+		
+	}
+	
+	@Test
+	public void flush_all_should_delete_all_elements_and_expirations() {
+		
+		keysServerOperations.expire(JAMES_NAME, 5);
+		
+		String result = keysServerOperations.flushAll();
+		assertThat(result, is("OK"));
+		assertThat(keysServerOperations.ttl(JAMES_NAME), is(-1L));
 		
 		Long numberOfKeys = keysServerOperations.dbSize();
 		assertThat(numberOfKeys, is(0L));
@@ -274,7 +289,7 @@ public class WhenKeysServerOperationsAreExecuted {
 		keysServerOperations.expire(JAMES_NAME, 10);
 		Long timeToExpire = keysServerOperations.ttl(JAMES_NAME);
 		
-		assertThat(timeToExpire, is(10L));
+		assertThat(timeToExpire, is(lessThanOrEqualTo(10L)));
 		
 	}
 	

@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.redis.embedded;
 
 import static ch.lambdaj.collection.LambdaCollections.with;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -20,6 +21,8 @@ import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.PipelineBlock;
 import redis.clients.jedis.SortingParams;
+import redis.clients.jedis.Transaction;
+import redis.clients.jedis.TransactionBlock;
 import redis.clients.jedis.Tuple;
 import redis.clients.util.Slowlog;
 import ch.lambdaj.function.convert.Converter;
@@ -1535,6 +1538,14 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	
 	public boolean isConnected() {
 		return this.keysServerOperations.isConnected();
+	}
+	
+	public Transaction multi() {
+		return this.transactionServerOperations.multi();
+	}
+
+	public List<Object> multi(final TransactionBlock jedisTransaction) {
+		return this.transactionServerOperations.multi(jedisTransaction);
 	}
 	
 	private void checkValidTypeOrNone(byte[] key, String type) {

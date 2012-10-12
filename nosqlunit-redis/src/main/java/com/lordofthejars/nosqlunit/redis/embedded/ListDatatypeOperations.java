@@ -594,9 +594,17 @@ public class ListDatatypeOperations extends ExpirationDatatypeOperations impleme
 	}
 
 	public void flushAllKeys() {
+		removeExpirations();
 		this.blockingMultimap.clear();
 	}
 
+	private void removeExpirations() {
+		List<byte[]> keys = this.keys();
+		for (byte[] key : keys) {
+			this.removeExpiration(key);
+		}
+	}
+	
 	private long removeFirstElements(final int count, ByteBuffer wrappedKey, ByteBuffer wrappedValue) {
 
 		long numberOfElementsRemoved = 0;

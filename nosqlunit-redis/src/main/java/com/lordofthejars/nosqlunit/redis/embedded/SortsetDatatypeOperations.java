@@ -1073,9 +1073,17 @@ public class SortsetDatatypeOperations extends ExpirationDatatypeOperations impl
 	}
 	
 	public void flushAllKeys() {
+		removeExpirations();
 		this.sortset.clear();
 	}
 
+	private void removeExpirations() {
+		List<byte[]> keys = this.keys();
+		for (byte[] key : keys) {
+			this.removeExpiration(key);
+		}
+	}
+	
 	private void updateDestinationWithZParams(final byte[] dstkey, String typeOfAggregation,
 			List<ByteBuffer> weightValues, Set<ByteBuffer> elements, final byte[]... sets) {
 		for (int i = 0; i < sets.length; i++) {

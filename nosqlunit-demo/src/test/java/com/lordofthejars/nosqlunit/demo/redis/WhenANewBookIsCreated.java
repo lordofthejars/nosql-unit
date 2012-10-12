@@ -37,7 +37,6 @@ public class WhenANewBookIsCreated {
 		
 		BookManager bookManager = new BookManager(jedis);
 		bookManager.insertBook(new Book("The Lord Of The Rings", 1299));
-		
 	}
 	
 }

@@ -439,9 +439,17 @@ public class StringDatatypeOperations extends ExpirationDatatypeOperations imple
 	}
 	
 	public void flushAllKeys() {
+		this.removeExpirations();
 		this.simpleTypes.clear();
 	}
 
+	private void removeExpirations() {
+		List<byte[]> keys = this.keys();
+		for (byte[] key : keys) {
+			this.removeExpiration(key);
+		}
+	}
+	
 	@Override
 	public Long del(byte[]... keys) {
 

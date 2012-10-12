@@ -5,6 +5,8 @@ import java.util.List;
 
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.PipelineBlock;
+import redis.clients.jedis.Transaction;
+import redis.clients.jedis.TransactionBlock;
 
 public class TransactionServerOperations {
 
@@ -31,6 +33,14 @@ public class TransactionServerOperations {
 
 	public Pipeline pipelined() {
 		return null;
+	}
+
+	public Transaction multi() {
+		return null;
+	}
+
+	public List<Object> multi(final TransactionBlock jedisTransaction) {
+		return new ArrayList<Object>();
 	}
 
 }
