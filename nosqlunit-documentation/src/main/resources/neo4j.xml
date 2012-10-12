@@ -45,6 +45,15 @@
 				</tr>
 
 				<tr>
+					<td>Spring Embedded</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.neo4j.SpringEmbeddedNeo4j
+						</classname>
+					</td>
+				</tr>
+
+				<tr>
 					<td>Managed Wrapping</td>
 
 					<td>
@@ -206,225 +215,276 @@
 					First step is defining which lifecycle management strategy is
 					required for your tests. Depending on kind of test you are
 					implementing (unit test, integration test, deployment test, ...)
-					you will require an in-memory approach, embedded approach, managed approach or remote
-					approach. 
+					you will require an in-memory approach, embedded approach, managed
+					approach or remote
+					approach.
 				</para>
 				<section>
 					<title>In-memory Lifecycle</title>
 					<para>
-					To configure
-					<emphasis role="bold">in-memory</emphasis>
-					approach you should only instantiate next <link linkend="program.neo_inmemory_conf">rule</link>
-					:
-				</para>
+						To configure
+						<emphasis role="bold">in-memory</emphasis>
+						approach you should only instantiate next
+						<link linkend="program.neo_inmemory_conf">rule</link>
+						:
+					</para>
 
-				<example xml:id="program.neo_inmemory_conf">
-					<title>In-Memory Neo4j</title>
+					<example xml:id="program.neo_inmemory_conf">
+						<title>In-Memory Neo4j</title>
 
-					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j.InMemoryNeo4jRuleBuilder.newInMemoryNeo4j;
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j.InMemoryNeo4jRuleBuilder.newInMemoryNeo4j;
 
 @ClassRule
 public static InMemoryNeo4j inMemoryNeo4j = newInMemoryNeo4j().build();]]></programlisting>
-				</example>
-					
+					</example>
+
 				</section>
 				<section>
-				<title>Embedded Lifecycle</title>
-				<para>
-					To configure
-					<emphasis role="bold">embedded</emphasis>
-					approach you should only instantiate next <link linkend="program.neo_embedded_conf">rule</link>
-					:
-				</para>
+					<title>Embedded Lifecycle</title>
+					<para>
+						To configure
+						<emphasis role="bold">embedded</emphasis>
+						approach you should only instantiate next
+						<link linkend="program.neo_embedded_conf">rule</link>
+						:
+					</para>
 
-				<example xml:id="program.neo_embedded_conf">
-					<title>Embedded Neo4j</title>
+					<example xml:id="program.neo_embedded_conf">
+						<title>Embedded Neo4j</title>
 
-					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
 
 @ClassRule
 public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();]]></programlisting>
-				</example>
+					</example>
 
-				<para>
-					By default embedded
-					<emphasis>Neo4j</emphasis>
-					rule uses next
-					default values:
-				</para>
+					<para>
+						By default embedded
+						<emphasis>Neo4j</emphasis>
+						rule uses next
+						default values:
+					</para>
 
-				<table>
-					<caption>Default Embedded Values</caption>
-					<tr>
-						<td>
-							Target path
-						</td>
-						<td>
-							This is the directory where
-							<emphasis>Neo4j</emphasis>
-							server is started and is
-							<constant>target/neo4j-temp</constant>
-							.
-						</td>
-					</tr>
-				</table>
+					<table>
+						<caption>Default Embedded Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								This is the directory where
+								<emphasis>Neo4j</emphasis>
+								server is started and is
+								<constant>target/neo4j-temp</constant>
+								.
+							</td>
+						</tr>
+					</table>
 				</section>
 				<section>
-				<title>Managed Lifecycle</title>
-				<para>To configure managed way, two possible approaches can be used:
-				</para>
+					<title>Spring Embedded Lifecycle</title>
+					<para>
+						If you are using spring data neo4j project, probably you will use namespace
+						approach to create
+						<classname>GraphDatabaseService</classname>
+						(embedded or remote). If you are using remote, there is no
+						problem, but if you are using embedded approach, you would like
+						that
+						<emphasis role="bold"> NoSQLUnit</emphasis> uses that instance for populating data
+						. For this reason an special lifecycle class has been provided.
+					</para>
+					<para>
+						For example:
+					</para>
+					<example xml:id="program.neo_spring_embedded_context">
+						<title>Spring Neo4j Application Context</title>
 
-				<para>
-					The first one is using an
-					<emphasis role="bold">embedded database wrapped by a server
-					</emphasis>
-					.
-					This is a way to give an embedded database visibility through
-					network (internally we are creating a
-					<classname>WrappingNeoServerBootstrapper</classname>
-					instance)
-					:
-				</para>
+						<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd
+            http://www.springframework.org/schema/data/neo4j
+            http://www.springframework.org/schema/data/neo4j/spring-neo4j-2.0.xsd">
 
-				<example xml:id="program.neo_wrapped_managed_conf">
-					<title>Managed Wrapped Neo4j</title>
+    <context:annotation-config/>
+    <neo4j:config storeDirectory="target/config-test"/>
 
-					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer.ManagedWrappingNeoServerRuleBuilder.newWrappingNeoServerNeo4jRule;
+</beans>
+]]></programlisting>
+					</example>
+					<para>
+						Test look like:
+					</para>
+					<programlisting language="java"><![CDATA[@Autowired
+private ApplicationContext applicationContext;
+...
+SpringEmbeddedNeo4j springEmbeddedGds = newSpringEmbeddedNeo4jRule().beanFactory(applicationContext).build();
+]]></programlisting>
+				</section>
+				<section>
+					<title>Managed Lifecycle</title>
+					<para>To configure managed way, two possible approaches can be
+						used:
+					</para>
+
+					<para>
+						The first one is using an
+						<emphasis role="bold">embedded database wrapped by a server
+						</emphasis>
+						.
+						This is a way to give an embedded database visibility through
+						network (internally we are creating a
+						<classname>WrappingNeoServerBootstrapper</classname>
+						instance)
+						:
+					</para>
+
+					<example xml:id="program.neo_wrapped_managed_conf">
+						<title>Managed Wrapped Neo4j</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer.ManagedWrappingNeoServerRuleBuilder.newWrappingNeoServerNeo4jRule;
 
 @ClassRule
 public static ManagedWrappingNeoServer managedWrappingNeoServer = newWrappingNeoServerNeo4jRule().port(8888).build();]]></programlisting>
-				</example>
+					</example>
 
-				<para>
-					By default wrapped managed
-					<emphasis>Neo4j</emphasis>
-					rule uses next
-					default values, but can be configured
-					programmatically as shown in previous
-					<link linkend="program.neo_wrapped_managed_conf">example</link>
-					:
-				</para>
+					<para>
+						By default wrapped managed
+						<emphasis>Neo4j</emphasis>
+						rule uses next
+						default values, but can be configured
+						programmatically as shown in previous
+						<link linkend="program.neo_wrapped_managed_conf">example</link>
+						:
+					</para>
 
-				<table>
-					<caption>Default Wrapped Values</caption>
-					<tr>
-						<td>
-							Target path
-						</td>
-						<td>
-							The directory where
-							<emphasis>Neo4j</emphasis>
-							server is started and is
-							<constant>target/neo4j-temp</constant>
-							.
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Port
-						</td>
-						<td>
-							Where server is listening incoming messages is 7474.
-						</td>
-					</tr>
-				</table>
+					<table>
+						<caption>Default Wrapped Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								The directory where
+								<emphasis>Neo4j</emphasis>
+								server is started and is
+								<constant>target/neo4j-temp</constant>
+								.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Port
+							</td>
+							<td>
+								Where server is listening incoming messages is 7474.
+							</td>
+						</tr>
+					</table>
 
-				<para>
-					The second strategy is
-					<emphasis role="bold">starting and stopping an already installed
-						server
-					</emphasis>
-					on executing machine, by calling start and stop command lines. Next
-					<link linkend="program.neo_managed_conf">rule</link>
-					should be registered:
-				</para>
+					<para>
+						The second strategy is
+						<emphasis role="bold">starting and stopping an already installed
+							server
+						</emphasis>
+						on executing machine, by calling start and stop command lines.
+						Next
+						<link linkend="program.neo_managed_conf">rule</link>
+						should be registered:
+					</para>
 
-				<example xml:id="program.neo_managed_conf">
-					<title>Managed Neo4j</title>
+					<example xml:id="program.neo_managed_conf">
+						<title>Managed Neo4j</title>
 
-					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer.Neo4jServerRuleBuilder.newManagedNeo4jServerRule;
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer.Neo4jServerRuleBuilder.newManagedNeo4jServerRule;
 
 @ClassRule
 public static ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().neo4jPath("/opt/neo4j").build();]]></programlisting>
-				</example>
+					</example>
 
-				<para>
-					By default managed
-					<emphasis>Neo4j</emphasis>
-					rule uses next
-					default values, but can be configured
-					programmatically as shown in previous
-					<link linkend="program.neo_managed_conf">example</link>
-					:
-				</para>
-
-				<table border="1">
-					<caption>Default Managed Values</caption>
-					<tr>
-						<td>
-							Target path
-						</td>
-						<td>
-							This is the directory where
-							<emphasis>Neo4j</emphasis>
-							process will be started and by default is
-							<constant>target/neo4j-temp</constant>
-							.
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Port 
-						</td>
-						<td>
-							Where server is listening incoming messages is 7474.
-						</td>
-					</tr>
-					<tr>
-						<td>
-							Neo4jPath
-						</td>
-						<td>
-							<emphasis>Neo4j</emphasis>
-							installation directory which by default is
-							retrieved from
-							<varname>NEO4J_HOME</varname>
-							system environment
-							variable.
-						</td>
-					</tr>
-				</table>
-
-				<warning>
 					<para>
-						Versions prior to
+						By default managed
 						<emphasis>Neo4j</emphasis>
-						1.8, port cannot be configured from command line, and port should
-						be changed manually in
-						<filename>conf/neo4j-server.properties</filename>
-						. Although this restriction, if you have configured
-						<emphasis>Neo4j</emphasis>
-						to run through a different port, it should be specified too in
-						<classname>ManagedNeoServer</classname>
-						rule.
+						rule uses next
+						default values, but can be configured
+						programmatically as shown in previous
+						<link linkend="program.neo_managed_conf">example</link>
+						:
 					</para>
-				</warning>
+
+					<table border="1">
+						<caption>Default Managed Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								This is the directory where
+								<emphasis>Neo4j</emphasis>
+								process will be started and by default is
+								<constant>target/neo4j-temp</constant>
+								.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Port
+							</td>
+							<td>
+								Where server is listening incoming messages is 7474.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Neo4jPath
+							</td>
+							<td>
+								<emphasis>Neo4j</emphasis>
+								installation directory which by default is
+								retrieved from
+								<varname>NEO4J_HOME</varname>
+								system environment
+								variable.
+							</td>
+						</tr>
+					</table>
+
+					<warning>
+						<para>
+							Versions prior to
+							<emphasis>Neo4j</emphasis>
+							1.8, port cannot be configured from command line, and port should
+							be changed manually in
+							<filename>conf/neo4j-server.properties</filename>
+							. Although this restriction, if you have configured
+							<emphasis>Neo4j</emphasis>
+							to run through a different port, it should be specified too in
+							<classname>ManagedNeoServer</classname>
+							rule.
+						</para>
+					</warning>
 				</section>
 				<section>
-				<title>Remote Lifecycle</title>
-				<para>
-					Configuring
-					<emphasis role="bold">remote</emphasis>
-					approach
-					does not require any special rule because you (or System
-					like
-					<application>Maven</application>
-					) is the responsible of starting and
-					stopping the server. This mode
-					is used in deployment tests where you
-					are testing your application
-					on real environment.
-				</para>
+					<title>Remote Lifecycle</title>
+					<para>
+						Configuring
+						<emphasis role="bold">remote</emphasis>
+						approach
+						does not require any special rule because you (or System
+						like
+						<application>Maven</application>
+						) is the responsible of starting and
+						stopping the server. This mode
+						is used in deployment tests where you
+						are testing your application
+						on real environment.
+					</para>
 				</section>
 			</section>
 
@@ -454,76 +514,81 @@ public static ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().ne
 					different kind of configuration builders exist.
 				</para>
 				<section>
-				<title>In-Memory/Embedded Connection</title>
-				<para>
-					The first one is for configuring a connection to in-memory/embedded
-					<emphasis>Neo4j</emphasis>
-					.
-				</para>
+					<title>In-Memory/Embedded Connection</title>
+					<para>
+						The first one is for configuring a connection to
+						in-memory/embedded
+						<emphasis>Neo4j</emphasis>
+						.
+					</para>
 
-				<example xml:id="program.embedded_connection_neo4j_parameters">
-					<title>Neo4j with embedded configuration</title>
+					<example xml:id="program.embedded_connection_neo4j_parameters">
+						<title>Neo4j with embedded configuration</title>
 
-					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
 
 @Rule
 public Neo4jRule neo4jRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().build());]]></programlisting>
-				</example>
-				<para>
-					If you are only registering one embedded
-					<emphasis>Neo4j</emphasis>
-					instance like previous 
-					<link linkend="program.neo_embedded_conf">example</link>,
-					calling
-					<function>build</function>
-					is enough. If you are using more than one
-					<emphasis>Neo4j</emphasis>
-					embedded connection like explained in
-					<link linkend="advanced.simultaneous-engine-title">Simultaneous Engine</link>
-					section,
-					<varname>targetPath</varname>
-					shall be provided by using
-					<function>buildFromTargetPath</function>
-					method.
-				</para>
-				<para>
-					If you are using in-memory approach mixed with embedded approach, target path for in-memory instance can be found at <constant>InMemoryNeo4j.INMEMORY_NEO4J_TARGET_PATH</constant> variable.
-				</para>
+					</example>
+					<para>
+						If you are only registering one embedded
+						<emphasis>Neo4j</emphasis>
+						instance like previous
+						<link linkend="program.neo_embedded_conf">example</link>
+						,
+						calling
+						<function>build</function>
+						is enough. If you are using more than one
+						<emphasis>Neo4j</emphasis>
+						embedded connection like explained in
+						<link linkend="advanced.simultaneous-engine-title">Simultaneous Engine</link>
+						section,
+						<varname>targetPath</varname>
+						shall be provided by using
+						<function>buildFromTargetPath</function>
+						method.
+					</para>
+					<para>
+						If you are using in-memory approach mixed with embedded approach,
+						target path for in-memory instance can be found at
+						<constant>InMemoryNeo4j.INMEMORY_NEO4J_TARGET_PATH</constant>
+						variable.
+					</para>
 				</section>
 				<section>
-				<title>Remote Connection</title>
-				<para>
-					The second one is for configuring a connection to remote
-					<emphasis>Neo4j</emphasis>
-					server (it is irrelevant at this level if it is wrapped or not).
-					Default values are:
-				</para>
+					<title>Remote Connection</title>
+					<para>
+						The second one is for configuring a connection to remote
+						<emphasis>Neo4j</emphasis>
+						server (it is irrelevant at this level if it is wrapped or not).
+						Default values are:
+					</para>
 
-				<table border="1">
-					<caption>Default Managed Connection Values</caption>
+					<table border="1">
+						<caption>Default Managed Connection Values</caption>
 
-					<tr>
-						<td>Connection URI</td>
+						<tr>
+							<td>Connection URI</td>
 
-						<td>http://localhost:7474/db/data</td>
-					</tr>
+							<td>http://localhost:7474/db/data</td>
+						</tr>
 
-					<tr>
-						<td>Authentication</td>
+						<tr>
+							<td>Authentication</td>
 
-						<td>No authentication parameters.</td>
-					</tr>
-				</table>
+							<td>No authentication parameters.</td>
+						</tr>
+					</table>
 
-				<example xml:id="program.managed_neo4j_connection_parameters">
-					<title>Neo4j with managed configuration</title>
+					<example xml:id="program.managed_neo4j_connection_parameters">
+						<title>Neo4j with managed configuration</title>
 
-					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServerConfigurationBuilder.newManagedNeoServerConfiguration;
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServerConfigurationBuilder.newManagedNeoServerConfiguration;
 
 @Rule
 public Neo4jRule neo4jRule = new Neo4jRule(newManagedNeoServerConfiguration().build());]]></programlisting>
-				</example>
-			</section>
+					</example>
+				</section>
 			</section>
 			<section>
 				<title>Verifying Graph</title>
@@ -563,7 +628,8 @@ public Neo4jRule neo4jRule = new Neo4jRule(newManagedNeoServerConfiguration().bu
 					for reference node), meanwhile edges starts from 0.
 				</para>
 				<para>
-					This way to compare graphs may change in future (although this strategy
+					This way to compare graphs may change in future (although this
+					strategy
 					will be always supported).
 				</para>
 				<para>
@@ -584,7 +650,8 @@ public Neo4jRule neo4jRule = new Neo4jRule(newManagedNeoServerConfiguration().bu
 					To show how to use
 					<emphasis role="bold">NoSQLUnit</emphasis>
 					with
-					<emphasis>Neo4j</emphasis>, 
+					<emphasis>Neo4j</emphasis>
+					,
 					we are going to create a
 					very simple application that counts Neo's
 					friends.
@@ -741,7 +808,8 @@ public class WhenNeoMeetsANewFriend {
 				</example>
 
 				<para>Note that in both cases we are using the same dataset as
-					initial state, which looks like:</para>
+					initial state, which looks like:
+				</para>
 				<example xml:id="program.expected_neo4j_file">
 					<title>matrix.xml Neo4j file</title>
 

@@ -302,15 +302,6 @@ public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().build();]]
 
 					<listitem>
 						<para>
-							<emphasis>Mongodb</emphasis>
-							is started with
-							<emphasis>fork</emphasis>
-							option.
-						</para>
-					</listitem>
-
-					<listitem>
-						<para>
 							Because after execution of tests all generated data is
 							removed, in
 							<parameter>{target

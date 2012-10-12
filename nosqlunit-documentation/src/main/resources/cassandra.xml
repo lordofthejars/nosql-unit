@@ -238,7 +238,8 @@ public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule
 								Cassandra Configuration File
 							</td>
 							<td>
-								Location of yaml configuration file. By default a configuration
+								Location of yaml configuration file. By default a
+								configuration
 								file is provided with correct default parameters.
 							</td>
 						</tr>
@@ -325,7 +326,13 @@ public static ManagedCassandra managedCassandra = newManagedCassandraRule().buil
 							</td>
 						</tr>
 					</table>
-
+					<warning>
+						To start
+						<emphasis>Cassandra</emphasis>
+						<varname>java.home</varname>
+						must be set. Normally this variable is already configured, you
+						would need to do nothing.
+					</warning>
 				</section>
 				<section>
 					<title>Remote Lifecycle</title>
@@ -477,7 +484,8 @@ public CassandraRule cassandraRule = new CassandraRule(newRemoteCassandraConfigu
 				</para>
 				<para>
 					<link linkend="program.person_cassandra_manager">PersonManager</link>
-					is the business class responsible of getting and updating person's car.
+					is the business class responsible of getting and updating person's
+					car.
 				</para>
 				<example xml:id="program.person_cassandra_manager">
 					<title>PersonCar cassandra with manager.</title>

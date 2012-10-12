@@ -7,6 +7,185 @@
 	<title>Advanced Usage</title>
 
 	<section>
+		<title xml:id="advanced.redis_embedded.section">Embedded In-Memory Redis</title>
+
+		<para>
+			When you are writing unit tests you should keep in mind that they must run fast, which implies, among other
+			things, no interaction with IO subsystem (disk, network, ...). To
+			avoid this interaction in database unit tests, there are embedded
+			in-memory databases like
+			<emphasis>H2</emphasis>
+			,
+			<emphasis>HSQLDB</emphasis>
+			,
+			<emphasis>Derby</emphasis>
+			or in case of
+			<emphasis>NoSQL</emphasis>
+			, engines like
+			<emphasis>Neo4j</emphasis>
+			or
+			<emphasis>Cassandra</emphasis>
+			have their own implementation. But
+			<emphasis>Redis</emphasis>
+			does not have any way to create an embedded in-memory instance in
+			Java. For this reason I have written an embedded in-memory
+			<emphasis>Redis</emphasis>
+			implementation based on
+			<emphasis>Jedis</emphasis>
+			project.
+		</para>
+		<para>
+			If you are using
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			you only have to register embedded
+			<emphasis>Redis</emphasis>
+			rule as described
+			<link linkend="program.redis_embedded_conf">here</link>
+			, and internally
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			will create instance for you, and you
+			will be able to
+			<link linkend="advanced.jsr330-title">inject</link>
+			the instance into your code.
+		</para>
+		<para>
+			But also can be used outside umbrella of
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			, by instantiating manually, as described in next 
+			<link linkend="advanced.instantiate-embedded-redis">example:</link>
+		</para>
+		<example xml:id="advanced.instantiate-embedded-redis">
+			<title>Embedded In-Memory Redis.</title>
+
+			<programlisting language="java"><![CDATA[EmbeddedRedisBuilder embeddedRedisBuilder = new EmbeddedRedisBuilder();
+Jedis jedis = embeddedRedisBuilder.createEmbeddedJedis();	
+			]]></programlisting>
+		</example>
+
+		<para>Notice that Jedis class is the main class defined by Jedis
+			project but proxied to use in-memory data instead of sending requests to remote server.
+		</para>
+
+		<para>
+			Almost all
+			<emphasis>Redis</emphasis>
+			operations have been implemented but it has some limitations:
+		</para>
+		<para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Connection commands do nothing, they do not throw any
+						exception but neither do any action. In fact would not have
+						sense that they do something.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Scripting commands are not supported, and an
+						<classname>UnsupportedOperationException</classname>
+						will be thrown if they are called.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Transaction commands are not supported, but they do not throw
+						any exception, simply returns a null value
+						and in cases of List return type, an empty list is returned.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Pub/Sub commands do nothing.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Server commands are implemented, but there are some commands
+						that have no sense and returns a constant result:
+					</para>
+					<para>
+						<emphasis>move</emphasis>
+						always return 1.
+					</para>
+					<para>
+						<emphasis>debug</emphasis>
+						commands throws an UnsupportedOperationException.
+					</para>
+					<para>
+						<emphasis>bgrewriteaof, save, bgsave, configSet, configResetStat,
+							salveOf, slaveOfNone and slowLogReset
+						</emphasis>
+						returns an OK.
+					</para>
+					<para>
+						<emphasis>configGet, slowLogGet and slowLogGetBinary</emphasis>
+						returns an empty list.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						From Key commands, only sort by pattern is not supported.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		<para>
+			All the other operations, including flushing, expiration
+			control, and each operation of every datatype is supported in the
+			same way Jedis support it. Note that expiration management is also
+			implemented as described in Redis manual.
+		</para>
+		<warning>
+			This implementation of Redis is provided for testing purposes
+			not as a substitution of Redis. Feel free to notify any issue of this
+			implementation so can be fixed or implemented.
+		</warning>
+	</section>
+
+
+	<section>
+		<title xml:id="advanced.multipleinstances-title">Managing lifecycle of multiple instances</title>
+
+		<para>
+			Sometimes your test will require that more than one instance of
+			same
+			database server (running in different ports) was started. For
+			example
+			for testing database sharding. In
+			<link linkend="advanced.multipleinstances-database">next example</link>
+			we see how to
+			configure
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			to manage lifecycle of multiple instances.
+		</para>
+
+		<example xml:id="advanced.multipleinstances-database">
+			<title>Multiple Instances of Redis.</title>
+
+			<programlisting language="java"><![CDATA[@ClassRule
+public static ManagedRedis managedRedis79 = newManagedRedisRule().redisPath("/opt/redis-2.4.16")
+																 .targetPath("target/redis1")
+																 .configurationPath(getAbsoluteFilePath("src/test/resources/redis_6379.conf"))
+																 .port(6379)
+											.build();
+
+@ClassRule
+public static ManagedRedis managedRedis80 = newManagedRedisRule().redisPath("/opt/redis-2.4.16")
+																 .targetPath("target/redis2")
+																 .configurationPath(getAbsoluteFilePath("src/test/resources/redis_6380.conf"))
+																 .port(6380)
+											.build();
+			]]></programlisting>
+		</example>
+
+		<warning>Note that target path should be set to different values for
+			each instance, if not some started processes could not be shutdown.
+		</warning>
+
+	</section>
+
+	<section>
 		<title xml:id="advanced.fast-way-title">Fast Way</title>
 		<para>
 			When you instantiate a Rule for maintaining database into known state
@@ -58,7 +237,9 @@ public Neo4jRule neo4jRule = newNeo4jRule().defaultEmbeddedNeo4j();]]></programl
 public CassandraRule cassandraRule = newCassandraRule().defaultManagedCassandra("Test Cluster");]]></programlisting>
 		</example>
 
-		<para>And each Rule contains their builder class to create default values.</para>
+		<para>And each Rule contains their builder class to create default
+			values.
+		</para>
 
 	</section>
 
@@ -193,7 +374,7 @@ public void my_test() {...}
 		</example>
 	</section>
 	<section>
-		<title xml:is="advanced.jsr330-title">Support for JSR-330</title>
+		<title xml:id="advanced.jsr330-title">Support for JSR-330</title>
 
 		<para>
 			<emphasis role="bold">NoSQLUnit</emphasis>

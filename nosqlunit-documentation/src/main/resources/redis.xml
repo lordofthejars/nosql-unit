@@ -27,6 +27,13 @@
 				<caption>Lifecycle Management Rules</caption>
 
 				<tr>
+					<td>Embedded</td>
+					<td>
+						<classname>com.lordofthejars.nosqlunit.redis.EmbeddedRedis
+						</classname>
+					</td>
+				</tr>
+				<tr>
 					<td>Managed</td>
 
 					<td>
@@ -156,14 +163,16 @@
 							<emphasis>simple</emphasis>
 							:
 							In case we want to store simple key/value elements. This
-							element will contain an array of key/value entries.
+							element
+							will contain an array of key/value entries.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
 							<emphasis>list</emphasis>
 							:
-							In case we want to store a key with a list of values. This element
+							In case we want to store a key with a list of values. This
+							element
 							contain a
 							<emphasis>key</emphasis>
 							field
@@ -226,13 +235,47 @@
 
 				<section>
 					<title>Embedded Lifecycle</title>
-					<warning>
-						Currently
-						<application>Redis</application>
-						does not support embedded lifecycle. For this reason I am
-						developing an embedded in-memory Redis mock. It is based in Jedis
-						library, and will be released in next version.
-					</warning>
+					<para>
+						To configure
+						<emphasis role="bold">embedded</emphasis>
+						approach you should only instantiate next
+						<link linkend="program.redis_embedded_conf">rule</link>
+						:
+					</para>
+
+					<example xml:id="program.redis_embedded_conf">
+						<title>Embedded Redis</title>
+
+						<programlisting language="java"><![CDATA[@ClassRule
+	public static EmbeddedRedis embeddedRedis = newEmbeddedRedisRule().build();]]></programlisting>
+					</example>
+
+					<para>
+						By default managed
+						<emphasis>Redis</emphasis>
+						rule uses next
+						default values but can be configured
+						programmatically:
+					</para>
+					<table>
+						<caption>Default Embedded Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								This is the directory where
+								<emphasis>Redis</emphasis>
+								embedded instance is started and is
+								<constant>target/redis-test-data/impermanent-db</constant>
+								.
+							</td>
+						</tr>
+					</table>
+					<para>Note that target path is only used as a configuration
+						parameter to allow multiple instances of embedded in-memory Redis engine.
+					</para>
+					<para>For more information about embedded in-memory Redis take a tour to section: <link linkend="advanced.redis_embedded.section">Embedded In-Memory Redis</link></para>
 				</section>
 				<section>
 					<title>Managed Lifecycle</title>
@@ -357,11 +400,31 @@ public static ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/
 					Three
 					different kind of configuration builders exist.
 				</para>
+				
+				<section>
+					<title>Embedded Connection</title>
+					<para>
+						The first one is for configuring an embedded connection to managed
+						<emphasis>Redis</emphasis>
+						.
+					</para>
+
+					<example xml:id="program.embedded_connection_redis_parameters">
+						<title>Redis with embedded configuration</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.redis.RedisRule.RedisRuleBuilder.newRedisRule;
+						
+@Rule
+public RedisRule redisRule = newRedisRule().defaultEmbeddedRedis();
+						]]></programlisting>
+					</example>
+				</section>
+
 
 				<section>
 					<title>Managed Connection</title>
 					<para>
-						The first one is for configuring a connection to managed
+						Configuring a connection to managed
 						<emphasis>Redis</emphasis>
 						.
 					</para>
@@ -404,6 +467,66 @@ public RedisRule redisRule = new RedisRule(newRemoteRedisConfiguration().host("1
 						method to set it. Note that host parameter must be specified in
 						this case.
 					</para>
+				</section>
+
+				<section>
+					<title>Shard Connection</title>
+					<para>Redis connection also be configured as shard using
+						ShardedJedis capabilities.
+					</para>
+					<example xml:id="program.shard_connection_redis_parameters">
+						<title>Redis with remote configuration</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.redis.RemoteRedisConfigurationBuilder.newRemoteRedisConfiguration;
+
+@Rule
+public RedisRule redisRule = new RedisRule(newShardedRedisConfiguration()
+				.shard(host("127.0.0.1"), port(ManagedRedis.DEFAULT_PORT))
+					.password("a")
+					.timeout(1000)
+					.weight(1000)
+				.shard(host("127.0.0.1"), port(ManagedRedis.DEFAULT_PORT + 1))
+					.password("b")
+					.timeout(3000)
+					.weight(3000)
+				.build(););]]></programlisting>
+					</example>
+
+					<para>
+						Note that only
+						<methodparam>host</methodparam>
+						and
+						<methodparam>port</methodparam>
+						is mandatory, the other ones uses default values.
+					</para>
+
+					<para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									<emphasis>password</emphasis>
+									:
+									In case repository is protected with password this attribute
+									is used as password. Default values is null.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>timeout</emphasis>
+									:
+									Timeout for shard. By default timeout is set to 2 seconds.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis>weight</emphasis>
+									:
+									The weight of that shard over the other ones. By default is 1.
+								</para>
+							</listitem>
+						</itemizedlist>
+					</para>
+
 				</section>
 
 			</section>
