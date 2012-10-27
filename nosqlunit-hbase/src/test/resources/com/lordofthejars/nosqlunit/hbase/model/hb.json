@@ -1,0 +1,23 @@
+{
+  "table": "a",
+  "columnFamilies": [
+    {
+      "name": "A",
+      "rows": [
+        {
+          "key": "key",
+          "columns": [
+            {
+              "name": "col1",
+              "value": "val1"
+            },
+            {
+              "name": "col2",
+              "value": "val2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
