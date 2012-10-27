@@ -20,7 +20,7 @@ public class WhenEmbeddedRedisLifecycleIsManaged {
 	
 	
 	@Test
-	public void neo4j_should_start_in_memory_and_working() throws Throwable {
+	public void redis_should_start_in_memory_and_working() throws Throwable {
 		
 		EmbeddedRedis embeddedRedis = newEmbeddedRedisRule().build();
 		
@@ -43,7 +43,7 @@ public class WhenEmbeddedRedisLifecycleIsManaged {
 	}
 	
 	@Test
-	public void simulataneous_neo4j_should_start_only_one_instance_for_location() throws Throwable {
+	public void simulataneous_redis_should_start_only_one_instance_for_location() throws Throwable {
 
 		EmbeddedRedis embeddedRedis = newEmbeddedRedisRule().build();
 		
