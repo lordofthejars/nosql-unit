@@ -5,15 +5,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HConstants;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +43,9 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(OperatingSystem.LINUX_OS);
 
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
-
+		HBaseUtils hBaseUtils = mock(HBaseUtils.class);
+		when(hBaseUtils.isConnectionPossible(any(Configuration.class))).thenReturn(true);
+		
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
 
@@ -52,7 +54,8 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		ManagedHBase managedHBase = newManagedHBaseServerRule().build();
 		
 		managedHBase.setCommandLineExecutor(commandLineExecutor);
-
+		managedHBase.setHBaseUtils(hBaseUtils);
+		
 		managedHBase.before();
 
 		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("127.0.0.1", HConstants.DEFAULT_MASTER_PORT),
@@ -74,7 +77,9 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(OperatingSystem.LINUX_OS);
 
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
-
+		HBaseUtils hBaseUtils = mock(HBaseUtils.class);
+		when(hBaseUtils.isConnectionPossible(any(Configuration.class))).thenReturn(true);
+		
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
 
@@ -83,7 +88,8 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		ManagedHBase managedHBase = newManagedHBaseServerRule().port(111).build();
 		
 		managedHBase.setCommandLineExecutor(commandLineExecutor);
-
+		managedHBase.setHBaseUtils(hBaseUtils);
+		
 		managedHBase.before();
 
 		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("127.0.0.1", 111),
@@ -106,13 +112,16 @@ public class WhenManagedHBaseLifecycleIsManaged {
 
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
 
+		HBaseUtils hBaseUtils = mock(HBaseUtils.class);
+		when(hBaseUtils.isConnectionPossible(any(Configuration.class))).thenReturn(true);
+		
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
 
 		when(commandLineExecutor.startProcessInDirectoryAndArguments(anyString(), anyList())).thenReturn(mockProcess);
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().port(111).build();
-		
+		managedHBase.setHBaseUtils(hBaseUtils);
 		managedHBase.setCommandLineExecutor(commandLineExecutor);
 
 		managedHBase.before();
@@ -133,7 +142,9 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(OperatingSystem.LINUX_OS);
 
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
-
+		HBaseUtils hBaseUtils = mock(HBaseUtils.class);
+		when(hBaseUtils.isConnectionPossible(any(Configuration.class))).thenReturn(true);
+		
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
 
@@ -142,7 +153,8 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		ManagedHBase managedHBase = newManagedHBaseServerRule().port(111).build();
 		
 		managedHBase.setCommandLineExecutor(commandLineExecutor);
-
+		managedHBase.setHBaseUtils(hBaseUtils);
+		
 		managedHBase.before();
 		managedHBase.after();
 		
@@ -160,6 +172,9 @@ public class WhenManagedHBaseLifecycleIsManaged {
 
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
 
+		HBaseUtils hBaseUtils = mock(HBaseUtils.class);
+		when(hBaseUtils.isConnectionPossible(any(Configuration.class))).thenReturn(true);
+		
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
 
@@ -168,7 +183,7 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		ManagedHBase managedHBase = newManagedHBaseServerRule().hBasePath("/opt/hbase").build();
 		
 		managedHBase.setCommandLineExecutor(commandLineExecutor);
-
+		managedHBase.setHBaseUtils(hBaseUtils);
 		managedHBase.before();
 		managedHBase.after();
 		
@@ -184,14 +199,15 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(OperatingSystem.WINDOWS_2003);
 
 		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
-
+		HBaseUtils hBaseUtils = mock(HBaseUtils.class);
+		when(hBaseUtils.isConnectionPossible(any(Configuration.class))).thenReturn(true);
 		Process mockProcess = mock(Process.class);
 		when(mockProcess.exitValue()).thenReturn(0);
 
 		when(commandLineExecutor.startProcessInDirectoryAndArguments(anyString(), anyList())).thenReturn(mockProcess);
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().hBasePath("/opt/hbase").build();
-		
+		managedHBase.setHBaseUtils(hBaseUtils);
 		managedHBase.setCommandLineExecutor(commandLineExecutor);
 		managedHBase.setOperatingSystemResolver(operatingSystemResolver);
 

@@ -40,6 +40,7 @@ public class ManagedHBase extends AbstractLifecycleManager {
 
 	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
+	private HBaseUtils hBaseUtils = new HBaseUtils();
 	
 	private String targetPath = DEFAULT_HBASE_TARGET_PATH;
 
@@ -166,13 +167,8 @@ public class ManagedHBase extends AbstractLifecycleManager {
 
 		for (int i = 0; i < NUM_RETRIES_TO_CHECK_SERVER_UP; i++) {
 	         
-            try {
-				HBaseAdmin.checkHBaseAvailable(config);
+			if(hBaseUtils.isConnectionPossible(config)) {
 				return true;
-			} catch (MasterNotRunningException e) {
-				
-			} catch (ZooKeeperConnectionException e) {
-				
 			}
 			
 
@@ -300,6 +296,10 @@ public class ManagedHBase extends AbstractLifecycleManager {
 	
 	protected void setCommandLineExecutor(CommandLineExecutor commandLineExecutor) {
 		this.commandLineExecutor = commandLineExecutor;
+	}
+	
+	protected void setHBaseUtils(HBaseUtils hBaseUtils) {
+		this.hBaseUtils = hBaseUtils;
 	}
 	
 }

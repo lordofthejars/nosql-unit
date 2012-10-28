@@ -471,7 +471,7 @@ public RedisRule redisRule = new RedisRule(newRemoteRedisConfiguration().host("1
 
 				<section>
 					<title>Shard Connection</title>
-					<para>Redis connection also be configured as shard using
+					<para>Redis connection can also be configured as shard using
 						ShardedJedis capabilities.
 					</para>
 					<example xml:id="program.shard_connection_redis_parameters">
@@ -489,7 +489,7 @@ public RedisRule redisRule = new RedisRule(newShardedRedisConfiguration()
 					.password("b")
 					.timeout(3000)
 					.weight(3000)
-				.build(););]]></programlisting>
+				.build());]]></programlisting>
 					</example>
 
 					<para>
