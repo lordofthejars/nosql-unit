@@ -71,6 +71,7 @@ public class WhenMongoDbIsRemoteManaged {
 				.targetPath(targetPath.toString()).mongodPath(MONGODB_LOCATION)
 				.build();
 
+		
 		managedMongoDb.setCommandLineExecutor(commandLineExecutor);
 		managedMongoDb.setOperatingSystemResolver(operatingSystemResolver);
 		managedMongoDb.setMongoDbLowLevelOps(mongoDbChecker);

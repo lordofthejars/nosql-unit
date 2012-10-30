@@ -2,9 +2,10 @@ package com.lordofthejars.nosqlunit.core;
 
 import org.junit.rules.ExternalResource;
 
+
 public abstract class AbstractLifecycleManager extends ExternalResource {
 
-	@Override
+
 	public void before() throws Throwable {
 
 		if (isServerNotStartedYet()) {
@@ -14,7 +15,7 @@ public abstract class AbstractLifecycleManager extends ExternalResource {
 		ConnectionManagement.getInstance().addConnection(getHost(), getPort());
 	}
 
-	@Override
+
 	public void after() {
 
 		int remainingConnections = ConnectionManagement.getInstance().removeConnection(getHost(), getPort());

@@ -5,7 +5,10 @@ import static com.lordofthejars.nosqlunit.core.IOUtils.deleteDir;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
@@ -20,37 +23,6 @@ import com.mongodb.DBPort;
  */
 public class ManagedMongoDb extends AbstractLifecycleManager {
 
-	private static final String LOCALHOST = "127.0.0.1";
-
-	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
-
-	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
-	protected static final String DBPATH_ARGUMENT_NAME = "--dbpath";
-	protected static final String PORT_ARGUMENT_NAME= "--port";
-	protected static final String DEFAULT_MONGO_LOGPATH = "logpath";
-	protected static final String DEFAULT_MONGO_DBPATH = "mongo-dbpath";
-	protected static final String DEFAULT_MONGO_TARGET_PATH = "target"
-			+ File.separatorChar + "mongo-temp";
-
-	protected static final String MONGODB_BINARY_DIRECTORY = "bin";
-
-	protected static final String MONGODB_EXECUTABLE_X = "mongod";
-	protected static final String MONGODB_EXECUTABLE_W = "mongod.exe";
-
-	private String mongodPath = System.getProperty("MONGO_HOME");
-	private int port = DBPort.PORT;
-	
-	private String targetPath = DEFAULT_MONGO_TARGET_PATH;
-	private String dbRelativePath = DEFAULT_MONGO_DBPATH;
-	private String logRelativePath = DEFAULT_MONGO_LOGPATH;
-
-	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
-	private List<String> singleCommandArguments = new ArrayList<String>();
-
-	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
-	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
-	private MongoDbLowLevelOps mongoDbLowLevelOps = new MongoDbLowLevelOps();
-
 	private ManagedMongoDb() {
 		super();
 	}
@@ -61,7 +33,7 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 	public static class MongoServerRuleBuilder {
 
 		private ManagedMongoDb managedMongoDb;
-
+		
 		private MongoServerRuleBuilder() {
 			this.managedMongoDb = new ManagedMongoDb();
 		}
@@ -115,9 +87,43 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 				throw new IllegalArgumentException(
 						"No Path to MongoDb is provided.");
 			}
+			
 			return this.managedMongoDb;
 		}
 	}
+
+	
+	
+	private static final String LOCALHOST = "127.0.0.1";
+
+	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
+
+	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
+	protected static final String DBPATH_ARGUMENT_NAME = "--dbpath";
+	protected static final String PORT_ARGUMENT_NAME= "--port";
+	protected static final String DEFAULT_MONGO_LOGPATH = "logpath";
+	protected static final String DEFAULT_MONGO_DBPATH = "mongo-dbpath";
+	protected static final String DEFAULT_MONGO_TARGET_PATH = "target"
+			+ File.separatorChar + "mongo-temp";
+
+	protected static final String MONGODB_BINARY_DIRECTORY = "bin";
+
+	protected static final String MONGODB_EXECUTABLE_X = "mongod";
+	protected static final String MONGODB_EXECUTABLE_W = "mongod.exe";
+
+	private String mongodPath = System.getProperty("MONGO_HOME");
+	private int port = DBPort.PORT;
+	
+	private String targetPath = DEFAULT_MONGO_TARGET_PATH;
+	private String dbRelativePath = DEFAULT_MONGO_DBPATH;
+	private String logRelativePath = DEFAULT_MONGO_LOGPATH;
+
+	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
+	private List<String> singleCommandArguments = new ArrayList<String>();
+
+	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
+	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
+	private MongoDbLowLevelOps mongoDbLowLevelOps = new MongoDbLowLevelOps();
 
 	@Override
 	protected String getHost() {
@@ -235,36 +241,36 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 		return dbPath;
 	}
 
-	private void setDbRelativePath(String dbRelativePath) {
+	public void setDbRelativePath(String dbRelativePath) {
 		this.dbRelativePath = dbRelativePath;
 	}
 
-	private void setLogRelativePath(String logRelativePath) {
+	public void setLogRelativePath(String logRelativePath) {
 		this.logRelativePath = logRelativePath;
 	}
 
-	private void setMongodPath(String mongodPath) {
+	public void setMongodPath(String mongodPath) {
 		this.mongodPath = mongodPath;
 	}
 
-	private void setTargetPath(String targetPath) {
+	public void setTargetPath(String targetPath) {
 		this.targetPath = targetPath;
 	}
 
-	private void addExtraCommandLineArgument(String argumentName,
+	public void addExtraCommandLineArgument(String argumentName,
 			String argumentValue) {
 		this.extraCommandArguments.put(argumentName, argumentValue);
 	}
 
-	private void addSingleCommandLineArgument(String argument) {
+	public void addSingleCommandLineArgument(String argument) {
 		this.singleCommandArguments.add(argument);
 	}
 
-	private void setPort(int port) {
+	public void setPort(int port) {
 		this.port = port;
 	}
 	
-	private String getMongodPath() {
+	protected String getMongodPath() {
 		return mongodPath;
 	}
 
@@ -339,4 +345,5 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
                             + e.getMessage());
         }
     }
+
 }
