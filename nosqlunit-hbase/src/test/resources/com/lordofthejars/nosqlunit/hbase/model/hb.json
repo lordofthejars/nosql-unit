@@ -1,5 +1,5 @@
 {
-  "table": "a",
+  "name": "a",
   "columnFamilies": [
     {
       "name": "A",

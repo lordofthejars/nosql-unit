@@ -72,7 +72,7 @@ public class WhenManagedHBaseOperationsAreRequired {
 	}
 	
 	@Test
-	public void insert_operation_should_delete_all_dataset_to_hbase() throws IOException {
+	public void delete_operation_should_delete_all_dataset_to_hbase() throws IOException {
 	
 		com.lordofthejars.nosqlunit.hbase.HBaseConfiguration hBaseConfiguration = newManagedHBaseConfiguration().build();
 		HBaseOperation hBaseOperation = new HBaseOperation(hBaseConfiguration.getConfiguration());
@@ -84,6 +84,20 @@ public class WhenManagedHBaseOperationsAreRequired {
 		HBaseAdmin hBaseAdmin = new HBaseAdmin(hBaseConfiguration.getConfiguration());
 		
 		assertThat(hBaseAdmin.tableExists("mytable"), is(false));
+		
+	}
+	
+	@Test
+	public void database_is_operation_should_compare_database() {
+		
+		com.lordofthejars.nosqlunit.hbase.HBaseConfiguration hBaseConfiguration = newManagedHBaseConfiguration().build();
+		HBaseOperation hBaseOperation = new HBaseOperation(hBaseConfiguration.getConfiguration());
+		
+		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
+		boolean result = hBaseOperation.databaseIs(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
+		hBaseOperation.deleteAll();
+		assertThat(result, is(true));
+		
 		
 	}
 }

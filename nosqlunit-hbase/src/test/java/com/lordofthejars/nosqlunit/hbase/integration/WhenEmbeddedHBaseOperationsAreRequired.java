@@ -80,5 +80,18 @@ public class WhenEmbeddedHBaseOperationsAreRequired {
 		
 	}
 	
+	@Test
+	public void database_is_operation_should_compare_database() throws IOException {
+		
+		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
+		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		
+		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
+		boolean result = hBaseOperation.databaseIs(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
+		hBaseOperation.deleteAll();
+		
+		assertThat(result, is(true));
+	}
+	
 	
 }
