@@ -3,11 +3,11 @@ package com.lordofthejars.nosqlunit.hbase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
 
-public class ManagedHBaseConfigurationBuilder {
+public class RemoteHBaseConfigurationBuilder {
 
 	private final HBaseConfiguration hBaseConfiguration;
-	
-	private ManagedHBaseConfigurationBuilder() {
+
+	private RemoteHBaseConfigurationBuilder() {
 		super();
 		this.hBaseConfiguration = new HBaseConfiguration();
 
@@ -16,23 +16,23 @@ public class ManagedHBaseConfigurationBuilder {
 				"org.apache.hadoop.hbase.coprocessor.AggregateImplementation");
 		this.hBaseConfiguration.setConfiguration(configuration);
 	}
-	
-	public static ManagedHBaseConfigurationBuilder newManagedHBaseConfiguration() {
-		return new ManagedHBaseConfigurationBuilder();
+
+	public static RemoteHBaseConfigurationBuilder newManagedHBaseConfiguration() {
+		return new RemoteHBaseConfigurationBuilder();
 	}
-	
-	public ManagedHBaseConfigurationBuilder connectionIdentifier(String connectionIdentifier) {
+
+	public RemoteHBaseConfigurationBuilder connectionIdentifier(String connectionIdentifier) {
 		this.hBaseConfiguration.setConnectionIdentifier(connectionIdentifier);
 		return this;
 	}
-	
-	public ManagedHBaseConfigurationBuilder setProperty(String name, String value) {
+
+	public RemoteHBaseConfigurationBuilder setProperty(String name, String value) {
 		this.hBaseConfiguration.getConfiguration().set(name, value);
 		return this;
 	}
-	
+
 	public HBaseConfiguration build() {
 		return this.hBaseConfiguration;
 	}
-	
+
 }

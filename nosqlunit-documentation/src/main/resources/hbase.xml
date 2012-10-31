@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="hbase" xmlns="http://docbook.org/ns/docbook"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook">
+
+	<title>HBase Engine</title>
+
+	<section>
+		<title>HBase</title>
+
+		<para>
+			<application>Apache HBase </application>
+			is an open-source, distributed, versioned, column-oriented store.
+		</para>
+
+		<para>
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			supports
+			<emphasis>HBase</emphasis>
+			by using next classes:
+		</para>
+		<para>
+			<table border="1">
+				<caption>Lifecycle Management Rules</caption>
+
+				<tr>
+					<td>Embedded</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.hbase.EmbeddedHBase
+						</classname>
+					</td>
+				</tr>
+
+				<tr>
+					<td>Managed</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.hbase.ManagedHBase
+						</classname>
+					</td>
+				</tr>
+			</table>
+		</para>
+		<para>
+			<table border="1">
+				<caption>Manager Rule</caption>
+
+				<tr>
+					<td>NoSQLUnit Management</td>
+
+					<td>
+						<classname>com.lordofthejars.nosqlunit.hbase.HBaseRule
+						</classname>
+					</td>
+				</tr>
+			</table>
+		</para>
+
+		<section>
+			<title>Maven Setup</title>
+
+			<para>
+				To use
+				<emphasis role="bold">NoSQLUnit</emphasis>
+				with
+				<application>HBase</application>
+				you only need to add next
+				dependency:
+			</para>
+
+			<example xml:id="conf.nosqlunit_cassandra_dep">
+				<title>NoSqlUnit Maven Repository</title>
+
+				<programlisting language="xml"><![CDATA[<dependency>
+	<groupId>com.lordofthejars</groupId>
+	<artifactId>nosqlunit-hbase</artifactId>
+	<version>${version.nosqlunit}</version>
+</dependency>]]></programlisting>
+			</example>
+		</section>
+
+		<section>
+			<title>Dataset Format</title>
+
+			<para>
+				Default dataset file format in
+				<emphasis>HBase</emphasis>
+				module is json. Dataset is HBase is the same used by
+				<application>
+					<link xlink:href="https://github.com/jsevellec/cassandra-unit/">Cassandra-Unit</link>
+				</application>
+				but not fields are supported. Only fields available in TSV HBase
+				application can be set into dataset.
+			</para>
+
+			<para>
+				So as summary datasets must have next
+				<link linkend="ex.hbase_dataset">
+					format
+				</link>
+				:
+			</para>
+
+			<example xml:id="ex.hbase_dataset">
+				<title>Example of HBase Dataset</title>
+
+				<programlisting language="json"><![CDATA[{
+    "name" : "tablename",
+    "columnFamilies" : [{
+        "name" : "columnFamilyName",
+        "rows" : [{
+            "key" : "key1",
+            "columns" : [{
+                "name" : "columnName",
+                "value" : "columnValue"
+            },
+            ...
+            ]
+        },
+        ...
+        ]
+    },
+    ...
+    ]
+}]]></programlisting>
+			</example>
+		</section>
+
+
+		<section>
+			<title>Getting Started</title>
+
+			<section>
+				<title>Lifecycle Management Strategy</title>
+
+				<para>
+					First step is defining which lifecycle management strategy is
+					required for your tests. Depending on kind of test you are
+					implementing (unit test, integration test, deployment test, ...)
+					you will require an embedded approach, managed approach or remote
+					approach.
+				</para>
+
+				<section>
+					<title>Embedded Lifecycle</title>
+					<para>
+						To configure
+						<emphasis role="bold">embedded</emphasis>
+						approach you should only instantiate next
+						<link linkend="program.hbase_embedded_conf">rule</link>
+						:
+					</para>
+
+					<example xml:id="program.hbase_embedded_conf">
+						<title>Embedded HBase</title>
+
+						<programlisting language="java"><![CDATA[@ClassRule
+public static EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().build();]]></programlisting>
+					</example>
+
+					<para>
+						By default embedded
+						<emphasis>Embedded</emphasis>
+						rule uses
+						<classname>HBaseTestingUtility</classname>
+						default values:
+					</para>
+
+					<table>
+						<caption>Default Embedded Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								This is the directory where
+								<emphasis>HBase</emphasis>
+								stores data and is
+								<constant>target/data</constant>
+								.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Host
+							</td>
+							<td>
+								localhost
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Port
+							</td>
+							<td>
+								By default port used is 60000.
+							</td>
+						</tr>
+						<tr>
+							<td>File Permissions</td>
+							<td>
+								Depending on your umask configuration,
+								<classname>HBaseTestingUtility</classname>
+								will create some directories that will not be accessible during
+								runtime. By default this value is set to 775, but depending on
+								your OS you may require a different value.
+							</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<title>Managed Lifecycle</title>
+					<para>
+						To configure
+						<emphasis role="bold">managed</emphasis>
+						approach you should only instantiate next
+						<link linkend="program.hbase_managed_conf">rule</link>
+						:
+					</para>
+
+					<example xml:id="program.hbase_managed_conf">
+						<title>Managed HBase</title>
+
+						<programlisting language="java"><![CDATA[@ClassRule
+public static ManagedHBase managedHBase = newManagedHBaseServerRule().build();]]></programlisting>
+					</example>
+
+					<para>
+						By default managed
+						<emphasis>HBase</emphasis>
+						rule uses next
+						default values but can be configured
+						programmatically:
+					</para>
+
+					<table>
+						<caption>Default Managed Values</caption>
+						<tr>
+							<td>
+								Target path
+							</td>
+							<td>
+								This is the directory where
+								<emphasis>HBase</emphasis>
+								server is started and is
+								<constant>target/hbase-temp</constant>
+								.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								CassandraPath
+							</td>
+							<td>
+								<emphasis>HBase</emphasis>
+								installation directory which by default is
+								retrieved from
+								<varname>HBASE_HOME</varname>
+								system environment
+								variable.
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Port
+							</td>
+							<td>
+								By default port used is 60000. If port is changed in
+								<emphasis>HBase</emphasis>
+								configuration file, this port should be configured too here.
+							</td>
+						</tr>
+					</table>
+					<warning>
+						To start
+						<emphasis>HBASE</emphasis> 
+						<varname>JAVA_HOME</varname>
+						must be set. Normally this variable is already configured, so you
+						would need to do nothing.
+					</warning>
+				</section>
+				<section>
+					<title>Remote Lifecycle</title>
+					<para>
+						Configuring
+						<emphasis role="bold">remote</emphasis>
+						approach
+						does not require any special rule because you (or System
+						like
+						<application>Maven</application>
+						) is the responsible of starting and
+						stopping the server. This mode
+						is used in deployment tests where you
+						are testing your application
+						on real environment.
+					</para>
+				</section>
+			</section>
+
+			<section>
+				<title>Configuring HBase Connection</title>
+
+				<para>
+					Next step is configuring
+					<emphasis role="bold">HBase</emphasis>
+					rule in charge of maintaining
+					<emphasis>HBase</emphasis>
+					columns into known state by inserting and deleting defined
+					datasets.
+					You must register
+					<classname>HBaseRule</classname>
+					<emphasis>JUnit</emphasis>
+					rule class, which
+					requires a configuration parameter with
+					some
+					information.
+				</para>
+
+				<para>To make developer's life easier and code more readable, a
+					fluent
+					interface can be used to create these configuration objects.
+					Three
+					different kind of configuration builders exist.
+				</para>
+				<section>
+					<title>Embedded Connection</title>
+					<para>
+						The first one is for configuring a connection to embedded
+						<emphasis>HBase</emphasis>
+						.
+					</para>
+
+					<example xml:id="program.embedded_connection_hbase_parameters">
+						<title>HBase with embedded configuration</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.hbase.EmbeddedHBase.EmbeddedHBaseRuleBuilder.newEmbeddedHBaseRule;
+
+@Rule
+public HBaseRule hBaseRule = newHBaseRule().defaultEmbeddedHBase();]]></programlisting>
+					</example>
+					<para>
+						Embedded HBase does not require any special parameter.
+						Configuration object is copied from Embedded rule directly to
+						HBaseRule.
+					</para>
+				</section>
+
+				<section>
+					<title>Managed Connection</title>
+					<para>
+						This is for configuring a connection to managed
+						<emphasis>HBase</emphasis>
+						.
+					</para>
+
+					<example xml:id="program.managed_connection_hbase_parameters">
+						<title>HBase with managed configuration</title>
+
+						<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.hbase.ManagedHBaseConfigurationBuilder.newManagedHBaseConfiguration;
+
+@Rule
+public HBaseRule hbaseRule = new HBaseRule(newManagedHBaseConfiguration().build());]]></programlisting>
+					</example>
+					<para>
+						By default configuration used is the one loaded by calling
+						HBaseConfiguration.create() method.
+						<link
+							xlink:href="http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/HBaseConfiguration.html#create()">HBaseConfiguration.create()</link>
+						which uses hbase-site.xml and hbase-default.xml classpath files.
+					</para>
+					<para>
+						But also a method
+						<function>setProperty</function>
+						method is provided to modify any parameter of generated
+						configuration object.
+					</para>
+				</section>
+
+				<section>
+					<title>Remote Connection</title>
+					<para>
+						Configuring a connection to remote
+						<emphasis>HBase</emphasis>
+						uses same approach like ManagedHBase configuration object but
+						using
+						<classname>com.lordofthejars.nosqlunit.hbase.RemoteHBaseConfigurationBuilder
+						</classname>
+						class instead of
+						com.lordofthejars.nosqlunit.hbase.ManagedHBaseConfigurationBuilder.
+						.
+					</para>
+
+				</section>
+
+				<warning>
+					<para>
+						Working with Apache HBase required a bit of knowledge about
+						how it works. For example your /etc/hosts file cannot contain a
+						reference to your host name with ip 127.0.1.1.
+					</para>
+					<para>
+						Moreover
+						<emphasis role="bold">NoSQLUnit</emphasis>
+						uses
+						<emphasis>HBase-0.94.1</emphasis>
+						and this version should be also installed in your computer to work
+						with managed or remote approach. If you install another version, you should
+						exclude these artifacts from
+						<emphasis role="bold">NoSQLUnit</emphasis>
+						dependencies, and add the new ones manually to your pom file.
+					</para>
+				</warning>
+
+
+			</section>
+
+			<section>
+				<title>Verifying Data</title>
+				<para>
+					<classname>@ShouldMatchDataSet</classname>
+					is also supported for
+					<emphasis>HBase</emphasis>
+					data but we should keep in mind some considerations.
+				</para>
+				<para>
+					If you plan to verify data with
+					<classname>@ShouldMatchDataSet</classname>
+					in Managed and Remote approach, you should enable Aggregate
+					coprocessor by editing hbase-site-xml file and adding next lines:
+				</para>
+				<example xml:id="program.coprocessor_hbase_parameters">
+						<title>HBase with coprocessor</title>
+
+						<programlisting language="xml"><![CDATA[<property>
+    <name>hbase.coprocessor.user.region.classes</name>
+    <value>org.apache.hadoop.hbase.coprocessor.AggregateImplementation</value>
+</property>]]></programlisting>
+					</example>
+
+
+			</section>
+
+			<section>
+				<title>Full Example</title>
+
+				<para>
+					To show how to use
+					<emphasis role="bold">NoSQLUnit</emphasis>
+					with
+					<emphasis>HBase</emphasis>
+					,
+					we are going to create a
+					very simple application.
+				</para>
+				<para>
+					<link linkend="program.person_hbase_manager">PersonManager</link>
+					is the business class responsible of getting and updating person's
+					car.
+				</para>
+				<example xml:id="program.person_hbase_manager">
+					<title>PersonCar cassandra with manager.</title>
+
+					<programlisting language="java"><![CDATA[public class PersonManager {
+
+	private Configuration configuration;
+	
+	public PersonManager(Configuration configuration) {
+		this.configuration = configuration;		
+	}
+	
+	public String getCarByPersonName(String personName) throws IOException {
+		HTable table = new HTable(configuration, "person");
+		Get get = new Get("john".getBytes());
+		Result result = table.get(get);
+		
+		return new String(result.getValue(toByteArray().convert("personFamilyName"), toByteArray().convert("car")));
+	}
+	
+	private Converter<String, byte[]> toByteArray() {
+		return new Converter<String, byte[]>() {
+
+			@Override
+			public byte[] convert(String element) {
+				return element.getBytes();
+			}
+		};
+	}
+	
+}]]></programlisting>
+				</example>
+
+				<para>
+					And now one unit test is written:
+				</para>
+				<para>
+					For
+					<link linkend="program.person_hbase_unit">unit</link>
+					test we are going to use embedded approach:
+				</para>
+				<example xml:id="program.person_hbase_unit">
+					<title>HBase with embedded configuration</title>
+
+					<programlisting language="java"><![CDATA[public class WhenPersonWantsToKnowItsCar {
+
+	@ClassRule
+	public static EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().build();
+	
+	@Rule
+	public HBaseRule hBaseRule = newHBaseRule().defaultEmbeddedHBase(this);
+	
+	@Inject
+	private Configuration configuration;
+	
+	
+	@Test
+	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	public void car_should_be_returned() throws IOException {
+
+		PersonManager personManager = new PersonManager(configuration);
+		String car = personManager.getCarByPersonName("john");
+		
+		assertThat(car, is("toyota"));		
+	}
+	
+}]]></programlisting>
+				</example>
+
+				<para>And dataset used is:
+				</para>
+				<example xml:id="program.expected_hbase_file">
+					<title>persons.json HBase file</title>
+
+					<programlisting language="json"><![CDATA[{
+    "name" : "person",
+    "columnFamilies" : [{
+        "name" : "personFamilyName",
+        "rows" : [{
+            "key" : "john",
+            "columns" : [{
+                "name" : "age",
+                "value" : "22"
+            },
+            {
+                "name" : "car",
+                "value" : "toyota"
+            }]
+        },
+        {
+            "key" : "mary",
+            "columns" : [{
+                "name" : "age",
+                "value" : "33"
+            },
+            {
+                "name" : "car",
+                "value" : "ford"
+            }]
+        }]
+    }]
+}]]></programlisting>
+				</example>
+
+			</section>
+
+
+		</section>
+
+	</section>
+
+
+</chapter>
