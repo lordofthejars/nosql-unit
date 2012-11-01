@@ -21,7 +21,7 @@ import com.lordofthejars.nosqlunit.redis.RedisRule;
 public class WhenYouFindABook {
 
 	static {
-		System.setProperty("REDIS_HOME", "/opt/redis-2.4.16");
+		System.setProperty("REDIS_HOME", "/opt/redis-2.4.17");
 	}
 
 	@ClassRule
