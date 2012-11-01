@@ -1938,9 +1938,9 @@ To use *NoSQLUnit* with HBase you only need to add next dependency:
 Dataset Format
 --------------
 
-Default dataset file format in *HBase* module is json. Dataset is HBase
+Default dataset file format in *HBase* module is json. Dataset in HBase
 is the same used by
-[Cassandra-Unit](https://github.com/jsevellec/cassandra-unit/) but not
+[Cassandra-Unit](https://github.com/jsevellec/cassandra-unit/) but not all
 fields are supported. Only fields available in TSV HBase application can
 be set into dataset.
 

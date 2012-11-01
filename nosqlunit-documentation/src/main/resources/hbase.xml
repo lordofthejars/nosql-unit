@@ -87,11 +87,11 @@
 			<para>
 				Default dataset file format in
 				<emphasis>HBase</emphasis>
-				module is json. Dataset is HBase is the same used by
+				module is json. Dataset in HBase is the same used by
 				<application>
 					<link xlink:href="https://github.com/jsevellec/cassandra-unit/">Cassandra-Unit</link>
 				</application>
-				but not fields are supported. Only fields available in TSV HBase
+				but not all fields are supported. Only fields available in TSV HBase
 				application can be set into dataset.
 			</para>
 
