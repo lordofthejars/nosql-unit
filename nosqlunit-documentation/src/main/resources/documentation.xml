@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book version="5.0" xmlns="http://docbook.org/ns/docbook"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook">
+
+	<bookinfo>
+		<title>NoSQLUnit Reference Manual</title>
+		<titleabbrev>NoSQLUnit ${version}</titleabbrev>
+		<productname>NoSQLUnit</productname>
+		<releaseinfo><?eval ${documentation}?>
+		</releaseinfo>
+
+		<authorgroup>
+			<author>
+				<personname>
+					<firstname>Alex</firstname>
+					<surname>Soto</surname>
+				</personname>
+
+				<affiliation>
+					<orgname>www.lordofthejars.com</orgname>
+				</affiliation>
+			</author>
+		</authorgroup>
+
+		<copyright>
+			<year>2012</year>
+			<holder>Alex Soto Bueno. Licensed under the Apache License, Version
+				2.0 (the "License");
+			</holder>
+		</copyright>
+
+	</bookinfo>
+
+	<toc></toc>
+
+<!-- 	<part id="whats-new-part"> -->
+<!-- 		<title>What's New?</title> -->
+<!-- 		<partintro id="whats-new-intro"> -->
+<!-- 			<para> -->
+<!-- 				For those who are already familiar with <emphasis role="bold">NoSQLUnit</emphasis>, this chapter -->
+<!-- 				provides a brief overview of the new features. In this section, only -->
+<!-- 				last 5 versions will be highlighted. -->
+<!-- 			</para> -->
+<!-- 		</partintro> -->
+<!-- 		<xi:include href="./whats-new.xml"/> -->
+<!-- 	</part> -->
+
+	<part id="nosqlunit-introduction-part">
+		<title>NoSQLUnit Core</title>
+		<partintro id="nosqlunit-intro">
+			<para>
+				This chapter provides an explanation of why <emphasis role="bold">NoSQLUnit</emphasis> should be used for testing applications that use <emphasis>NoSQL</emphasis> engines as databases. Also will provide an explanation of the main concepts of <emphasis role="bold">NoSQLUnit</emphasis>.
+			</para>
+		</partintro>
+		<xi:include href="./introduction.xml" />
+	</part>
+	
+	<part id="nosql-support-databases-part">
+		<title>Supported Engines</title>
+		<partintro id="nosql-support-databases-intro">
+			<para>
+				This chapter provides an overview of supported <emphasis>NoSQL</emphasis> databases, and how to write tests for them, using <emphasis role="bold">NoSQLUnit</emphasis>. 
+			</para>
+		</partintro>
+		<xi:include href="./mongodb.xml"/>
+		<xi:include href="./neo4j.xml"/>
+		<xi:include href="./cassandra.xml"/>
+		<xi:include href="./redis.xml"/>
+	</part>
+
+	<part id="advanced-usage-part">
+		<title>Advanced Usage</title>
+		<partintro id="advanced-usage-intro">
+			<para>
+				This chapter provides some examples of advanced features of <emphasis role="bold">NoSQLUnit</emphasis> not described in previous chapters.
+			</para>
+		</partintro>
+		<xi:include href="./advanced.xml"/>
+	</part>
+
+	<part id="stay-in-touch-part">
+		<title>Stay In Touch</title>
+		<partintro id="stay-in-touch-intro">
+			<para>
+				This chapter provides information about next releases and how to stay in touch with the project.
+			</para>
+		</partintro>
+		<xi:include href="./touch.xml"/>
+	</part>
+
+</book>
