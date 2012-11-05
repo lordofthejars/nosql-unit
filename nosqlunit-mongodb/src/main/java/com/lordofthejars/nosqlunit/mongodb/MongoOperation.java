@@ -20,7 +20,7 @@ import com.mongodb.util.JSON;
 public final class MongoOperation implements DatabaseOperation<Mongo> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
-	
+
 	private Mongo mongo;
 	private MongoDbConfiguration mongoDbConfiguration;
 
@@ -32,7 +32,6 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	@Override
 	public void insert(InputStream contentStream) {
 
-		
 		try {
 
 			String jsonData = loadContentFromInputStream(contentStream);
@@ -43,8 +42,7 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 			insertParsedData(parsedData, mongoDb);
 
 		} catch (IOException e) {
-			throw new IllegalArgumentException(
-					"Unexpected error reading data set file.", e);
+			throw new IllegalArgumentException("Unexpected error reading data set file.", e);
 		}
 
 	}
@@ -54,15 +52,14 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 
 		for (String collectionName : collectionaNames) {
 
-			BasicDBList dataObjects = (BasicDBList) parsedData
-					.get(collectionName);
+			BasicDBList dataObjects = (BasicDBList) parsedData.get(collectionName);
 
 			DBCollection dbCollection = mongoDb.getCollection(collectionName);
 
 			for (Object dataObject : dataObjects) {
-				
+
 				LOGGER.debug("Inserting {} To {}.", dataObject, dbCollection.getName());
-				
+
 				dbCollection.insert((DBObject) dataObject);
 			}
 
@@ -79,11 +76,11 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 		Set<String> collectionaNames = mongoDb.getCollectionNames();
 
 		for (String collectionName : collectionaNames) {
-			
-			if(isNotASystemCollection(collectionName)) {
-				
+
+			if (isNotASystemCollection(collectionName)) {
+
 				LOGGER.debug("Dropping Collection {}.", collectionName);
-				
+
 				DBCollection dbCollection = mongoDb.getCollection(collectionName);
 				dbCollection.drop();
 			}
@@ -99,20 +96,17 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 
 		try {
 			String expectedJsonData = loadContentFromInputStream(contentStream);
-			
+
 			DBObject parsedData = parseData(expectedJsonData);
 			MongoDbAssertion.strictAssertEquals(parsedData, getMongoDb());
-			
+
 			return true;
 		} catch (IOException e) {
-			throw new IllegalArgumentException(
-					"Unexpected error reading expected data set file.", e);
+			throw new IllegalArgumentException("Unexpected error reading expected data set file.", e);
 		}
 
 	}
 
-
-	
 	private DBObject parseData(String jsonData) throws IOException {
 		DBObject parsedData = (DBObject) JSON.parse(jsonData);
 		return parsedData;
@@ -122,14 +116,13 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 
 		DB db = mongo.getDB(this.mongoDbConfiguration.getDatabaseName());
 
-		if (this.mongoDbConfiguration.isAuthenticateParametersSet()) {
-			boolean authenticated = db.authenticate(
-					this.mongoDbConfiguration.getUsername(),
-					this.mongoDbConfiguration.getPassword().toCharArray());
+		if (this.mongoDbConfiguration.isAuthenticateParametersSet() && !db.isAuthenticated()) {
+
+			boolean authenticated = db.authenticate(this.mongoDbConfiguration.getUsername(), this.mongoDbConfiguration
+					.getPassword().toCharArray());
 
 			if (!authenticated) {
-				throw new IllegalArgumentException(
-						"Login/Password provided to connect to MongoDb are not valid");
+				throw new IllegalArgumentException("Login/Password provided to connect to MongoDb are not valid");
 			}
 
 		}
@@ -140,7 +133,7 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	private String loadContentFromInputStream(InputStream inputStreamContent) throws IOException {
 		return IOUtils.readFullStream(inputStreamContent);
 	}
-	
+
 	@Override
 	public Mongo connectionManager() {
 		return mongo;
