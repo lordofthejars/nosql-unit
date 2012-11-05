@@ -45,15 +45,6 @@
 				</tr>
 
 				<tr>
-					<td>Spring Embedded</td>
-
-					<td>
-						<classname>com.lordofthejars.nosqlunit.neo4j.SpringEmbeddedNeo4j
-						</classname>
-					</td>
-				</tr>
-
-				<tr>
 					<td>Managed Wrapping</td>
 
 					<td>
@@ -281,52 +272,7 @@ public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();]]></
 						</tr>
 					</table>
 				</section>
-				<section>
-					<title>Spring Embedded Lifecycle</title>
-					<para>
-						If you are using spring data neo4j project, probably you will use namespace
-						approach to create
-						<classname>GraphDatabaseService</classname>
-						(embedded or remote). If you are using remote, there is no
-						problem, but if you are using embedded approach, you would like
-						that
-						<emphasis role="bold"> NoSQLUnit</emphasis> uses that instance for populating data
-						. For this reason an special lifecycle class has been provided.
-					</para>
-					<para>
-						For example:
-					</para>
-					<example xml:id="program.neo_spring_embedded_context">
-						<title>Spring Neo4j Application Context</title>
-
-						<programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-        xmlns:context="http://www.springframework.org/schema/context"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
-        xsi:schemaLocation="
-            http://www.springframework.org/schema/beans
-            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-            http://www.springframework.org/schema/context
-            http://www.springframework.org/schema/context/spring-context-3.0.xsd
-            http://www.springframework.org/schema/data/neo4j
-            http://www.springframework.org/schema/data/neo4j/spring-neo4j-2.0.xsd">
-
-    <context:annotation-config/>
-    <neo4j:config storeDirectory="target/config-test"/>
-
-</beans>
-]]></programlisting>
-					</example>
-					<para>
-						Test look like:
-					</para>
-					<programlisting language="java"><![CDATA[@Autowired
-private ApplicationContext applicationContext;
-...
-SpringEmbeddedNeo4j springEmbeddedGds = newSpringEmbeddedNeo4jRule().beanFactory(applicationContext).build();
-]]></programlisting>
-				</section>
+				
 				<section>
 					<title>Managed Lifecycle</title>
 					<para>To configure managed way, two possible approaches can be

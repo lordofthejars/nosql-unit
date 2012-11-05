@@ -4,8 +4,8 @@
 Documentation
 =============
 
-Html: [View](http://lordofthejars.github.com/nosql-unit/index.html)
-Pdf: [Download](http://lordofthejars.github.com/nosql-unit/index.pdf)
+Html: [View](http://lordofthejars.github.com/nosql-unit/documentation.html)
+Pdf: [Download](http://lordofthejars.github.com/nosql-unit/documentation.pdf)
 
 
 NoSQLUnit Core
@@ -604,7 +604,6 @@ features of a mature and robust database.
   ------------------ ------------------------------------------------------------
   In Memory          com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j
   Embedded           com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j
-  Spring Embedded    com.lordofthejars.nosqlunit.neo4j.SpringEmbeddedNeo4j
   Managed Wrapping   com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer
   Managed            com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer
   ------------------ ------------------------------------------------------------
@@ -728,45 +727,7 @@ By default embedded *Neo4j* rule uses next default values:
 
   : Default Embedded Values
 
-#### Spring Embedded Lifecycle
 
-If you are using spring data neo4j project, probably you will use
-namespace approach to create GraphDatabaseService (embedded or remote).
-If you are using remote, there is no problem, but if you are using
-embedded approach, you would like that **NoSQLUnit** uses that instance
-for populating data . For this reason an special lifecycle class has
-been provided.
-
-For example:
-
-~~~~ {.xml}
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-        xmlns:context="http://www.springframework.org/schema/context"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
-        xsi:schemaLocation="
-            http://www.springframework.org/schema/beans
-            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-            http://www.springframework.org/schema/context
-            http://www.springframework.org/schema/context/spring-context-3.0.xsd
-            http://www.springframework.org/schema/data/neo4j
-            http://www.springframework.org/schema/data/neo4j/spring-neo4j-2.0.xsd">
-
-    <context:annotation-config/>
-    <neo4j:config storeDirectory="target/config-test"/>
-
-</beans>
-~~~~
-
-Test look like:
-
-~~~~ {.java}
-@Autowired
-private ApplicationContext applicationContext;
-...
-SpringEmbeddedNeo4j springEmbeddedGds = newSpringEmbeddedNeo4jRule().beanFactory(applicationContext).build();
-~~~~
 
 #### Managed Lifecycle
 
