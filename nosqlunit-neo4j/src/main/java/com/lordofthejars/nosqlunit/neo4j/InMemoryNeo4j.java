@@ -7,11 +7,15 @@ import java.util.Map;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.test.ImpermanentGraphDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 
 public class InMemoryNeo4j extends AbstractLifecycleManager {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryNeo4j.class); 
+	
 	protected static final String LOCALHOST = "127.0.0.1";
 	protected static final int PORT = Configurator.DEFAULT_WEBSERVER_PORT;
 
@@ -60,14 +64,24 @@ public class InMemoryNeo4j extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+		
+		LOGGER.info("Starting Embedded InMemory Neo4j instance.");
+		
 		createInMemoryGraphDatabaseService();
 		EmbeddedNeo4jInstances.getInstance().addGraphDatabaseService(graphDb, INMEMORY_NEO4J_TARGET_PATH);
+		
+		LOGGER.info("Started Embedded InMemory Neo4j instance.");
 	}
 
 	@Override
 	protected void doStop() {
+		
+		LOGGER.info("Stopping Embedded InMemory Neo4j instance.");
+		
 		this.graphDb.shutdown();
 		EmbeddedNeo4jInstances.getInstance().removeGraphDatabaseService(INMEMORY_NEO4J_TARGET_PATH);
+		
+		LOGGER.info("Stopped Embedded InMemory Neo4j instance.");
 	}
 
 	private void createInMemoryGraphDatabaseService() {

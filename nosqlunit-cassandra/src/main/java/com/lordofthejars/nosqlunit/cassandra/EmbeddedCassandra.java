@@ -5,11 +5,15 @@ import java.io.IOException;
 
 import org.apache.cassandra.config.ConfigurationException;
 import org.apache.thrift.transport.TTransportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 
 public class EmbeddedCassandra extends AbstractLifecycleManager {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedCassandra.class); 
+	
 	protected static final String DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION = "cu-cassandra.yaml";
 	
 	protected static final String LOCALHOST = "localhost";
@@ -77,12 +81,16 @@ public class EmbeddedCassandra extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+		LOGGER.info("Starting Embedded Cassandra instance.");
 		createEmbeddedCassandra();
+		LOGGER.info("Started Embedded Cassandra instance.");
 	}
 
 	@Override
 	protected void doStop() {
+		LOGGER.info("Stopping Embedded Cassandra instance.");
 		stopEmbeddedCassandra();
+		LOGGER.info("Stopped Embedded Cassandra instance.");
 	}
 
 	private void createEmbeddedCassandra() throws TTransportException, IOException, InterruptedException, ConfigurationException {

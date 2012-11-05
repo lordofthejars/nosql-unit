@@ -7,12 +7,16 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.coprocessor.CoprocessorHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.IOUtils;
 
 public class EmbeddedHBase extends AbstractLifecycleManager {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedHBase.class); 
+	
 	protected static final String LOCALHOST = "127.0.0.1";
 	protected static final int PORT = HConstants.DEFAULT_MASTER_PORT;
 	protected static final String TARGET_DIRECTORY = HBaseTestingUtility.DEFAULT_BASE_TEST_DIRECTORY;
@@ -64,9 +68,15 @@ public class EmbeddedHBase extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+		
+		LOGGER.info("Starting Embedded HBase instance.");
+		
 		Configuration config = configuration();
 		startMiniCluster(config);
 		EmbeddedHBaseInstances.getInstance().addHBaseConfiguration(this.configuration, LOCALHOST+PORT);
+		
+		LOGGER.info("Started Embedded HBase instance.");
+		
 	}
 
 	private void startMiniCluster(Configuration config) throws Exception {
@@ -84,9 +94,14 @@ public class EmbeddedHBase extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStop() {
+		
+		LOGGER.info("Stopping Embedded HBase instance.");
+		
 		EmbeddedHBaseInstances.getInstance().removeHBaseConfiguration(LOCALHOST+PORT);
 		shutdownMiniCluster();
 		cleanTargetDirectory();
+		
+		LOGGER.info("Stopped Embedded HBase instance.");
 	}
 
 	private void shutdownMiniCluster() {

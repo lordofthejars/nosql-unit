@@ -15,12 +15,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import me.prettyprint.cassandra.service.CassandraHost;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 
 public class ManagedCassandra extends AbstractLifecycleManager {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedCassandra.class);
 
 	private static final String MAXIUM_HEAP = "-Xmx1G";
 
@@ -109,7 +114,9 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 
 	@Override
 	public void doStart() throws Throwable {
+		LOGGER.info("Starting {} Cassandra instance.", cassandraPath);
 		startCassandra();
+		LOGGER.info("Started {} Cassandra instance.", cassandraPath);
 	}
 
 	private void startCassandra() throws AssertionError {
@@ -193,13 +200,16 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 
 	@Override
 	public void doStop() {
-			stopCassandra();
+		LOGGER.info("Stopping {} Cassandra instance.", cassandraPath);
+		
+		stopCassandra();
+		
+		LOGGER.info("Stopped {} Cassandra instance.", cassandraPath);
 	}
 
 	private void stopCassandra() {
 		pwd.destroy();
 	}
-
 
 	private File[] getCassandraJarLibraries() {
 		File cassandraLibDirectory = new File(cassandraPath + LIB_DIRECTORY);

@@ -7,13 +7,16 @@ import java.io.File;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.server.configuration.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
-import com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder;
 
 public class SpringEmbeddedNeo4j extends AbstractLifecycleManager {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpringEmbeddedNeo4j.class); 
 
 	protected static final String LOCALHOST = "127.0.0.1";
 	protected static final int PORT = Configurator.DEFAULT_WEBSERVER_PORT;
@@ -65,15 +68,30 @@ public class SpringEmbeddedNeo4j extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+		
+		LOGGER.info("Getting {} Neo4j instance from Spring Context.");
+		
 		setEmbeddedGraphDatabaseFromBeanFactory();
 		setTargetPath();
 		
 		EmbeddedNeo4jInstances.getInstance().addGraphDatabaseService(graphDb, targetPath);
 		registerShutdownHook(graphDb);
+		
+		LOGGER.info("Get Neo4j instance from Spring Context.");
+		
 	}
 
 	@Override
 	protected void doStop() {
+		
+		LOGGER.info("Stopping Spring Neo4j instance.");
+		
+		shutdownGraphDb();
+		
+		LOGGER.info("Stopping Spring Neo4j instance.");
+	}
+
+	private void shutdownGraphDb() {
 		try {
 			this.graphDb.shutdown();
 			EmbeddedNeo4jInstances.getInstance().removeGraphDatabaseService(targetPath);

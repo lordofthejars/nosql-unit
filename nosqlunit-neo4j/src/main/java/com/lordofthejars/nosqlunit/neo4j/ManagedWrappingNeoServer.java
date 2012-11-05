@@ -10,11 +10,15 @@ import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.EmbeddedServerConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 
 public class ManagedWrappingNeoServer extends AbstractLifecycleManager {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedWrappingNeoServer.class); 
+	
 	protected static final String LOCALHOST = "127.0.0.1";
 
 	protected static final String DEFAULT_NEO4J_TARGET_PATH = "target" + File.separatorChar + "neo4j-temp";
@@ -74,14 +78,29 @@ public class ManagedWrappingNeoServer extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+		
+		LOGGER.info("Starting {} wrapped Neo4j instance.", getHost()+getPort());
+		
 		cleanDb();
 		createWrappingEmbeddedGraphDatabaseService();
 		graphDb.start();
+		
+		LOGGER.info("Starting {} wrapped Neo4j instance.", getHost()+getPort());
 	}
 
 
 	@Override
 	protected void doStop() {
+		
+		LOGGER.info("Stopping {} wrapped Neo4j instance.", getHost()+getPort());
+
+		stopGraphDb();
+		
+		LOGGER.info("Stopped {} wrapped Neo4j instance.", getHost()+getPort());
+	}
+
+
+	private void stopGraphDb() {
 		try {
 			this.graphDb.stop();
 		} finally {

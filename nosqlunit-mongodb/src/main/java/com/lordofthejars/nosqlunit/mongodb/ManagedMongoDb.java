@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
@@ -23,6 +26,8 @@ import com.mongodb.DBPort;
  */
 public class ManagedMongoDb extends AbstractLifecycleManager {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.class); 
+	
 	private ManagedMongoDb() {
 		super();
 	}
@@ -137,6 +142,9 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+		
+		LOGGER.info("Starting {} MongoDb instance.", mongodPath);
+		
 		File dbPath = ensureDbPathDoesNotExitsAndReturnCompositePath();
 
 		if (dbPath.mkdirs()) {
@@ -154,15 +162,22 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 			throw new IllegalStateException("Db Path " + dbPath
 					+ " could not be created.");
 		}
+		
+		LOGGER.info("Started {} MongoDb instance.", mongodPath);
 	}
 
 	@Override
 	protected void doStop() {
+		
+		LOGGER.info("Stopping {} MongoDb instance.", mongodPath);
+		
 		try {
 			this.mongoDbLowLevelOps.shutdown(LOCALHOST, port);
 		} finally {
 			ensureDbPathDoesNotExitsAndReturnCompositePath();
 		}
+		
+		LOGGER.info("Stopped {} MongoDb instance.", mongodPath);
 	}
 	
 

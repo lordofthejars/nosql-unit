@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
@@ -21,6 +24,8 @@ import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResol
 
 public class ManagedRedis extends AbstractLifecycleManager {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class); 
+	
 	Process pwd;
 
 	private static final String LOCALHOST = "127.0.0.1";
@@ -112,6 +117,8 @@ public class ManagedRedis extends AbstractLifecycleManager {
 	@Override
 	protected void doStart() throws Throwable {
 
+		LOGGER.info("Starting {} Redis instance.", redisPath);
+		
 		if (isWindowsSystem()) {
 			throw new IllegalArgumentException(
 					"Windows System is not supported, because there is no official Redis server for Windows.");
@@ -124,6 +131,9 @@ public class ManagedRedis extends AbstractLifecycleManager {
 		} else {
 			throw new IllegalStateException("Target Path " + targetPathDirectory + " could not be created.");
 		}
+		
+		LOGGER.info("Started {} Redis instance.", redisPath);
+		
 	}
 
 	private void startRedisAsDaemon() throws AssertionError {
@@ -233,6 +243,9 @@ public class ManagedRedis extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStop() {
+		
+		LOGGER.info("Stopping {} Redis instance.", redisPath);
+		
 		try {
 			stopRedis();
 		} catch (InterruptedException e) {
@@ -240,6 +253,8 @@ public class ManagedRedis extends AbstractLifecycleManager {
 		} finally {
 			ensureTargetPathDoesNotExitsAndReturnCompositePath();
 		}
+		
+		LOGGER.info("Stopped {} Redis instance.", redisPath);
 	}
 
 	private void stopRedis() throws InterruptedException {

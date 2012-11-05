@@ -13,10 +13,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HConstants;
-import org.apache.hadoop.hbase.MasterNotRunningException;
-import org.apache.hadoop.hbase.ZooKeeperConnectionException;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
@@ -25,6 +23,8 @@ import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
 
 public class ManagedHBase extends AbstractLifecycleManager {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedHBase.class); 
 	
 	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
 	
@@ -109,6 +109,9 @@ public class ManagedHBase extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStart() throws Throwable {
+		
+		LOGGER.info("Starting {} HBase instance.", hBasePath);
+		
 		File targetPathDirectory = ensureTargetPathDoesNotExitsAndReturnCompositePath();
 
 		if (targetPathDirectory.mkdirs()) {
@@ -119,6 +122,8 @@ public class ManagedHBase extends AbstractLifecycleManager {
 			throw new IllegalStateException("Target Path " + targetPathDirectory
 					+ " could not be created.");
 		}
+		
+		LOGGER.info("Started {} HBase instance.", hBasePath);
 
 	}
 
@@ -134,6 +139,9 @@ public class ManagedHBase extends AbstractLifecycleManager {
 
 	@Override
 	protected void doStop() {
+		
+		LOGGER.info("Stopping {} HBase instance.", hBasePath);
+		
 		try {
 			stopHBase();			
 		} catch(InterruptedException e) {
@@ -141,6 +149,8 @@ public class ManagedHBase extends AbstractLifecycleManager {
 		} finally {
 			ensureTargetPathDoesNotExitsAndReturnCompositePath();
 		}
+		
+		LOGGER.info("Stopped {} HBase instance.", hBasePath);
 	}
 	
 	private List<String> startHBaseAsADaemon() throws InterruptedException {
