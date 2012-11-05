@@ -86,16 +86,17 @@ public class WhenManagedNeoServerLifecycleIsManaged {
 	
 	private long insertNode(GraphDatabaseService graphDatabaseService) {
 		Transaction tx = null;
+		Node  node;
 		try {
 			tx = graphDatabaseService.beginTx();
 		
-			Node node = graphDatabaseService.createNode();
-			return node.getId();
+			node = graphDatabaseService.createNode();
 			
 		} finally {
 			tx.success();
 			tx.finish();
 		}
+		return node.getId();
 	}
 	
 }
