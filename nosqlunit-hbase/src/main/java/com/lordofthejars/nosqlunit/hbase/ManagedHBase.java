@@ -21,6 +21,7 @@ import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
+import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
 
 public class ManagedHBase extends AbstractLifecycleManager {
 	
@@ -44,7 +45,7 @@ public class ManagedHBase extends AbstractLifecycleManager {
 	
 	private String targetPath = DEFAULT_HBASE_TARGET_PATH;
 
-	private String hBasePath = System.getProperty("HBASE_HOME");
+	private String hBasePath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("HBASE_HOME");
 
 	private int port = HConstants.DEFAULT_MASTER_PORT;
 	

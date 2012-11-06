@@ -17,6 +17,7 @@ import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
+import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
 
 public class ManagedNeoServer extends AbstractLifecycleManager {
 
@@ -39,7 +40,7 @@ public class ManagedNeoServer extends AbstractLifecycleManager {
 
 	private String targetPath = DEFAULT_NEO4J_TARGET_PATH;
 
-	private String neo4jPath = System.getProperty("NEO4J_HOME");
+	private String neo4jPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("NEO4J_HOME");
 
 	private int port = Configurator.DEFAULT_WEBSERVER_PORT;
 

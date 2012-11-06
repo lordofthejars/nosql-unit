@@ -19,6 +19,7 @@ import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
+import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
 import com.mongodb.DBPort;
 
 /**
@@ -116,7 +117,7 @@ public class ManagedMongoDb extends AbstractLifecycleManager {
 	protected static final String MONGODB_EXECUTABLE_X = "mongod";
 	protected static final String MONGODB_EXECUTABLE_W = "mongod.exe";
 
-	private String mongodPath = System.getProperty("MONGO_HOME");
+	private String mongodPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("MONGO_HOME");
 	private int port = DBPort.PORT;
 	
 	private String targetPath = DEFAULT_MONGO_TARGET_PATH;

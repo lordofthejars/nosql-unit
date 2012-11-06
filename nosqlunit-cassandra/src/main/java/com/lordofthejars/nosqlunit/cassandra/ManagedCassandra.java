@@ -22,6 +22,7 @@ import me.prettyprint.cassandra.service.CassandraHost;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
+import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
 
 public class ManagedCassandra extends AbstractLifecycleManager {
 
@@ -48,7 +49,7 @@ public class ManagedCassandra extends AbstractLifecycleManager {
 	protected String CASSANDRA_DAEMON_CLASS = "org.apache.cassandra.thrift.CassandraDaemon";
 
 	protected String javaHome = System.getProperty("java.home");
-	private String cassandraPath = System.getProperty("CASSANDRA_HOME");
+	private String cassandraPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("CASSANDRA_HOME");
 
 	protected static final String CASSANDRA_EXECUTABLE_X = "cassandra";
 	protected static final String CASSANDRA_EXECUTABLE_W = "cassandra.bat";

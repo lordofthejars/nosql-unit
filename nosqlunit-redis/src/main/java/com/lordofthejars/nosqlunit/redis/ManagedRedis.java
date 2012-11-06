@@ -21,6 +21,7 @@ import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemFamily;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
+import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
 
 public class ManagedRedis extends AbstractLifecycleManager {
 
@@ -37,7 +38,7 @@ public class ManagedRedis extends AbstractLifecycleManager {
 	protected static final String REDIS_EXECUTABLE_X = "redis-server";
 
 	private String targetPath = DEFAULT_REDIS_TARGET_PATH;
-	private String redisPath = System.getProperty("REDIS_HOME");
+	private String redisPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("REDIS_HOME");
 	private String configurationFilepath = null;
 	
 	private int port = DEFAULT_PORT;
