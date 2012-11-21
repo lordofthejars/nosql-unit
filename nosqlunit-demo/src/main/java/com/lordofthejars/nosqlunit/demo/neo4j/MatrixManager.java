@@ -45,7 +45,7 @@ public class MatrixManager {
 		}
 	}
 
-	private static Traverser getFriends(final Node person) {
+	private Traverser getFriends(final Node person) {
 		return person.traverse(Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, ReturnableEvaluator.ALL_BUT_START_NODE,
 				RelTypes.KNOWS, Direction.OUTGOING);
 	}
