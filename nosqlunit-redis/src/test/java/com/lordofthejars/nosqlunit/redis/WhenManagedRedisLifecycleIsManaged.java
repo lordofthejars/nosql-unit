@@ -56,15 +56,15 @@ public class WhenManagedRedisLifecycleIsManaged {
 		
 		ManagedRedis managedRedis = newManagedRedisRule().build();
 		
-		managedRedis.setCommandLineExecutor(commandLineExecutor);
-		managedRedis.setOperatingSystemResolver(operatingSystemResolver);
+		managedRedis.managedRedisLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedRedis.managedRedisLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedRedis.before();
 		
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("127.0.0.1", ManagedRedis.DEFAULT_PORT), is(true));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("127.0.0.1", ManagedRedisLifecycleManager.DEFAULT_PORT), is(true));
 
 		managedRedis.after();
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("127.0.0.1", ManagedRedis.DEFAULT_PORT), is(false));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("127.0.0.1", ManagedRedisLifecycleManager.DEFAULT_PORT), is(false));
 		
 		System.clearProperty("REDIS_HOME");
 		
@@ -91,8 +91,8 @@ public class WhenManagedRedisLifecycleIsManaged {
 		
 		ManagedRedis managedRedis = newManagedRedisRule().port(9191).build();
 		
-		managedRedis.setCommandLineExecutor(commandLineExecutor);
-		managedRedis.setOperatingSystemResolver(operatingSystemResolver);
+		managedRedis.managedRedisLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedRedis.managedRedisLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedRedis.before();
 		
@@ -126,18 +126,18 @@ public class WhenManagedRedisLifecycleIsManaged {
 		
 		ManagedRedis managedRedis = newManagedRedisRule().build();
 		
-		managedRedis.setCommandLineExecutor(commandLineExecutor);
-		managedRedis.setOperatingSystemResolver(operatingSystemResolver);
+		managedRedis.managedRedisLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedRedis.managedRedisLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedRedis.before();
 		
 		List<String> expectedCommand = new ArrayList<String>();
-		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedis.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedis.REDIS_EXECUTABLE_X);
+		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedisLifecycleManager.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedisLifecycleManager.REDIS_EXECUTABLE_X);
 		
 		managedRedis.after();
 
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				ManagedRedis.DEFAULT_REDIS_TARGET_PATH, expectedCommand);
+				ManagedRedisLifecycleManager.DEFAULT_REDIS_TARGET_PATH, expectedCommand);
 		
 		System.clearProperty("REDIS_HOME");
 		
@@ -162,18 +162,18 @@ public class WhenManagedRedisLifecycleIsManaged {
 		
 		ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/redis-2.4.16").build();
 		
-		managedRedis.setCommandLineExecutor(commandLineExecutor);
-		managedRedis.setOperatingSystemResolver(operatingSystemResolver);
+		managedRedis.managedRedisLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedRedis.managedRedisLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedRedis.before();
 		
 		List<String> expectedCommand = new ArrayList<String>();
-		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedis.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedis.REDIS_EXECUTABLE_X);
+		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedisLifecycleManager.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedisLifecycleManager.REDIS_EXECUTABLE_X);
 		
 		managedRedis.after();
 
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				ManagedRedis.DEFAULT_REDIS_TARGET_PATH, expectedCommand);
+				ManagedRedisLifecycleManager.DEFAULT_REDIS_TARGET_PATH, expectedCommand);
 		
 	}
 	
@@ -197,18 +197,18 @@ public class WhenManagedRedisLifecycleIsManaged {
 		
 		ManagedRedis managedRedis = newManagedRedisRule().build();
 		
-		managedRedis.setCommandLineExecutor(commandLineExecutor);
-		managedRedis.setOperatingSystemResolver(operatingSystemResolver);
+		managedRedis.managedRedisLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedRedis.managedRedisLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedRedis.before();
 		
 		List<String> expectedCommand = new ArrayList<String>();
-		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedis.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedis.REDIS_EXECUTABLE_X);
+		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedisLifecycleManager.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedisLifecycleManager.REDIS_EXECUTABLE_X);
 		
 		managedRedis.after();
 
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				ManagedRedis.DEFAULT_REDIS_TARGET_PATH, expectedCommand);
+				ManagedRedisLifecycleManager.DEFAULT_REDIS_TARGET_PATH, expectedCommand);
 		
 		System.clearProperty("REDIS_HOME");
 		
@@ -233,8 +233,8 @@ public class WhenManagedRedisLifecycleIsManaged {
 		
 		ManagedRedis managedRedis = newManagedRedisRule().redisPath("C:\\....").build();
 		
-		managedRedis.setCommandLineExecutor(commandLineExecutor);
-		managedRedis.setOperatingSystemResolver(operatingSystemResolver);
+		managedRedis.managedRedisLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedRedis.managedRedisLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedRedis.before();
 		managedRedis.after();

@@ -29,8 +29,8 @@ public class WhenShardedRedisConfigurationIsManaged {
 	public void only_host_and_port_should_be_mandatory() {
 
 		ShardedRedisConfiguration shardedRedisConfiguration = newShardedRedisConfiguration()
-				.shard(host("127.0.0.1"), port(ManagedRedis.DEFAULT_PORT))
-				.shard(host("127.0.0.1"), port(ManagedRedis.DEFAULT_PORT + 1)).build();
+				.shard(host("127.0.0.1"), port(ManagedRedisLifecycleManager.DEFAULT_PORT))
+				.shard(host("127.0.0.1"), port(ManagedRedisLifecycleManager.DEFAULT_PORT + 1)).build();
 		
 		DatabaseOperation<? extends BinaryJedisCommands> databaseOperation = shardedRedisConfiguration.getDatabaseOperation();
 		assertThat(databaseOperation, instanceOf(ShardedRedisOperation.class));
@@ -40,7 +40,7 @@ public class WhenShardedRedisConfigurationIsManaged {
 		ShardedJedis connectionManager = shardedRedisOperation.connectionManager();
 		Collection<JedisShardInfo> allShardInfo = connectionManager.getAllShardInfo();
 		
-		JedisShardInfo localhostFirstShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedis.DEFAULT_PORT)));
+		JedisShardInfo localhostFirstShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedisLifecycleManager.DEFAULT_PORT)));
 		
 		assertThat(localhostFirstShard, notNullValue());
 		assertThat(localhostFirstShard.getHost(), is("127.0.0.1"));
@@ -49,7 +49,7 @@ public class WhenShardedRedisConfigurationIsManaged {
 		assertThat(localhostFirstShard.getTimeout(), is(2000));
 		assertThat(localhostFirstShard.getWeight(), is(Sharded.DEFAULT_WEIGHT));
 		
-		JedisShardInfo localhostSecondShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedis.DEFAULT_PORT+1)));
+		JedisShardInfo localhostSecondShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedisLifecycleManager.DEFAULT_PORT+1)));
 		
 		assertThat(localhostSecondShard, notNullValue());
 		assertThat(localhostSecondShard.getHost(), is("127.0.0.1"));
@@ -63,11 +63,11 @@ public class WhenShardedRedisConfigurationIsManaged {
 	public void all_configuration_parameters_should_be_configurable() {
 		
 		ShardedRedisConfiguration shardedRedisConfiguration = newShardedRedisConfiguration()
-				.shard(host("127.0.0.1"), port(ManagedRedis.DEFAULT_PORT))
+				.shard(host("127.0.0.1"), port(ManagedRedisLifecycleManager.DEFAULT_PORT))
 					.password("a")
 					.timeout(1000)
 					.weight(1000)
-				.shard(host("127.0.0.1"), port(ManagedRedis.DEFAULT_PORT + 1))
+				.shard(host("127.0.0.1"), port(ManagedRedisLifecycleManager.DEFAULT_PORT + 1))
 					.password("b")
 					.timeout(3000)
 					.weight(3000)
@@ -81,7 +81,7 @@ public class WhenShardedRedisConfigurationIsManaged {
 		ShardedJedis connectionManager = shardedRedisOperation.connectionManager();
 		Collection<JedisShardInfo> allShardInfo = connectionManager.getAllShardInfo();
 		
-		JedisShardInfo localhostFirstShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedis.DEFAULT_PORT)));
+		JedisShardInfo localhostFirstShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedisLifecycleManager.DEFAULT_PORT)));
 		
 		assertThat(localhostFirstShard, notNullValue());
 		assertThat(localhostFirstShard.getHost(), is("127.0.0.1"));
@@ -89,7 +89,7 @@ public class WhenShardedRedisConfigurationIsManaged {
 		assertThat(localhostFirstShard.getTimeout(), is(1000));
 		assertThat(localhostFirstShard.getWeight(), is(1000));
 	
-		JedisShardInfo localhostSecondShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedis.DEFAULT_PORT+1)));
+		JedisShardInfo localhostSecondShard = selectFirst(allShardInfo, having(on(JedisShardInfo.class).getPort(), is(ManagedRedisLifecycleManager.DEFAULT_PORT+1)));
 		
 		assertThat(localhostSecondShard, notNullValue());
 		assertThat(localhostSecondShard.getHost(), is("127.0.0.1"));

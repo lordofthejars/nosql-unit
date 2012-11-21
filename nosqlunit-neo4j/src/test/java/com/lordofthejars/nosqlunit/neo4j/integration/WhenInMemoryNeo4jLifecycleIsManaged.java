@@ -14,11 +14,12 @@ import org.neo4j.server.configuration.Configurator;
 import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 import com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4jInstances;
 import com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j;
+import com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4jLifecycleManager;
 
 public class WhenInMemoryNeo4jLifecycleIsManaged {
 
 	
-	private static final String DEFAULT_NEO4J_TARGET_PATH = InMemoryNeo4j.INMEMORY_NEO4J_TARGET_PATH;
+	private static final String DEFAULT_NEO4J_TARGET_PATH = InMemoryNeo4jLifecycleManager.INMEMORY_NEO4J_TARGET_PATH;
 	private static final int PORT = Configurator.DEFAULT_WEBSERVER_PORT;
 	private static final String LOCALHOST = "127.0.0.1";
 	

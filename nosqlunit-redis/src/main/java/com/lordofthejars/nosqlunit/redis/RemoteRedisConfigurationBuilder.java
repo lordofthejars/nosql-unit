@@ -5,7 +5,7 @@ import redis.clients.jedis.Jedis;
 
 public class RemoteRedisConfigurationBuilder {
 
-	private static final int DEFAULT_PORT = ManagedRedis.DEFAULT_PORT;
+	private static final int DEFAULT_PORT = ManagedRedisLifecycleManager.DEFAULT_PORT;
 	
 	private RedisConfiguration redisConfiguration;
 	

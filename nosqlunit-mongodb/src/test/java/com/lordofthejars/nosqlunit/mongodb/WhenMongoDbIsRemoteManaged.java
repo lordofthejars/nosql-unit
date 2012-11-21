@@ -72,19 +72,19 @@ public class WhenMongoDbIsRemoteManaged {
 				.build();
 
 		
-		managedMongoDb.setCommandLineExecutor(commandLineExecutor);
-		managedMongoDb.setOperatingSystemResolver(operatingSystemResolver);
-		managedMongoDb.setMongoDbLowLevelOps(mongoDbChecker);
+		managedMongoDb.managedMongoDbLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedMongoDb.managedMongoDbLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
+		managedMongoDb.managedMongoDbLifecycleManager.setMongoDbLowLevelOps(mongoDbChecker);
 		
 		managedMongoDb.after();
-		File dbPath = new File(targetPath.toString() + File.separatorChar + ManagedMongoDb.DEFAULT_MONGO_DBPATH);
+		File dbPath = new File(targetPath.toString() + File.separatorChar + ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
 		assertThat(dbPath.exists(), is(false));
 		
 
 	}
 
 	private File createDbPathDirectory(File targetPath) {
-		File dataDirectory = new File(targetPath.toString() + File.separatorChar + ManagedMongoDb.DEFAULT_MONGO_DBPATH);
+		File dataDirectory = new File(targetPath.toString() + File.separatorChar + ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
 		dataDirectory.mkdirs();
 		return dataDirectory;
 	}
@@ -115,22 +115,22 @@ public class WhenMongoDbIsRemoteManaged {
 				.targetPath(targetPath.toString()).mongodPath(MONGODB_LOCATION)
 				.appendCommandLineArguments("myArgument", "myValue").build();
 
-		managedMongoDb.setCommandLineExecutor(commandLineExecutor);
-		managedMongoDb.setOperatingSystemResolver(operatingSystemResolver);
-		managedMongoDb.setMongoDbLowLevelOps(mongoDbChecker);
+		managedMongoDb.managedMongoDbLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedMongoDb.managedMongoDbLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
+		managedMongoDb.managedMongoDbLifecycleManager.setMongoDbLowLevelOps(mongoDbChecker);
 
 		managedMongoDb.before();
 
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add(MONGODB_LOCATION + File.separatorChar
-				+ ManagedMongoDb.MONGODB_BINARY_DIRECTORY + File.separatorChar
-				+ ManagedMongoDb.MONGODB_EXECUTABLE_W);
-		expectedCommand.add(ManagedMongoDb.DBPATH_ARGUMENT_NAME);
-		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
-		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
+				+ ManagedMongoDbLifecycleManager.MONGODB_BINARY_DIRECTORY + File.separatorChar
+				+ ManagedMongoDbLifecycleManager.MONGODB_EXECUTABLE_W);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DBPATH_ARGUMENT_NAME);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.PORT_ARGUMENT_NAME);
 		expectedCommand.add(DBPort.PORT+"");
-		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
-		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
@@ -167,22 +167,22 @@ public class WhenMongoDbIsRemoteManaged {
 				.targetPath(targetPath.toString()).mongodPath(MONGODB_LOCATION)
 				.appendCommandLineArguments("myArgument", "myValue").build();
 
-		managedMongoDb.setCommandLineExecutor(commandLineExecutor);
-		managedMongoDb.setOperatingSystemResolver(operatingSystemResolver);
-		managedMongoDb.setMongoDbLowLevelOps(mongoDbChecker);
+		managedMongoDb.managedMongoDbLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedMongoDb.managedMongoDbLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
+		managedMongoDb.managedMongoDbLifecycleManager.setMongoDbLowLevelOps(mongoDbChecker);
 
 		managedMongoDb.before();
 
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add(MONGODB_LOCATION + File.separatorChar
-				+ ManagedMongoDb.MONGODB_BINARY_DIRECTORY + File.separatorChar
-				+ ManagedMongoDb.MONGODB_EXECUTABLE_X);
-		expectedCommand.add(ManagedMongoDb.DBPATH_ARGUMENT_NAME);
-		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
-		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
+				+ ManagedMongoDbLifecycleManager.MONGODB_BINARY_DIRECTORY + File.separatorChar
+				+ ManagedMongoDbLifecycleManager.MONGODB_EXECUTABLE_X);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DBPATH_ARGUMENT_NAME);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.PORT_ARGUMENT_NAME);
 		expectedCommand.add(DBPort.PORT+"");
-		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
-		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
@@ -219,22 +219,22 @@ public class WhenMongoDbIsRemoteManaged {
 				.targetPath(targetPath.toString()).mongodPath(MONGODB_LOCATION)
 				.appendCommandLineArguments("myArgument", "myValue").build();
 
-		managedMongoDb.setCommandLineExecutor(commandLineExecutor);
-		managedMongoDb.setOperatingSystemResolver(operatingSystemResolver);
-		managedMongoDb.setMongoDbLowLevelOps(mongoDbChecker);
+		managedMongoDb.managedMongoDbLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedMongoDb.managedMongoDbLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
+		managedMongoDb.managedMongoDbLifecycleManager.setMongoDbLowLevelOps(mongoDbChecker);
 
 		managedMongoDb.before();
 
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add(MONGODB_LOCATION + File.separatorChar
-				+ ManagedMongoDb.MONGODB_BINARY_DIRECTORY + File.separatorChar
-				+ ManagedMongoDb.MONGODB_EXECUTABLE_X);
-		expectedCommand.add(ManagedMongoDb.DBPATH_ARGUMENT_NAME);
-		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_DBPATH);
-		expectedCommand.add(ManagedMongoDb.PORT_ARGUMENT_NAME);
+				+ ManagedMongoDbLifecycleManager.MONGODB_BINARY_DIRECTORY + File.separatorChar
+				+ ManagedMongoDbLifecycleManager.MONGODB_EXECUTABLE_X);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DBPATH_ARGUMENT_NAME);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.PORT_ARGUMENT_NAME);
 		expectedCommand.add(DBPort.PORT+"");
-		expectedCommand.add(ManagedMongoDb.LOGPATH_ARGUMENT_NAME);
-		expectedCommand.add(ManagedMongoDb.DEFAULT_MONGO_LOGPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 

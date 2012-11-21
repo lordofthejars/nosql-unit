@@ -14,8 +14,8 @@ import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 
 public class WhenEmbeddedRedisLifecycleIsManaged {
 	
-	private static final String DEFAULT_JEDIS_TARGET_PATH = EmbeddedRedis.INMEMORY_REDIS_TARGET_PATH;
-	private static final int PORT = ManagedRedis.DEFAULT_PORT;
+	private static final String DEFAULT_JEDIS_TARGET_PATH = EmbeddedRedisLifecycleManager.INMEMORY_REDIS_TARGET_PATH;
+	private static final int PORT = ManagedRedisLifecycleManager.DEFAULT_PORT;
 	private static final String LOCALHOST = "127.0.0.1";
 	
 	

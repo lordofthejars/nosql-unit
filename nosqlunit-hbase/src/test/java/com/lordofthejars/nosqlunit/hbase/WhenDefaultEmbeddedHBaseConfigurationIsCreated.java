@@ -13,9 +13,9 @@ public class WhenDefaultEmbeddedHBaseConfigurationIsCreated {
 		
 		EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().build();
 		
-		assertThat(embeddedHBase.getHost(), is("127.0.0.1"));
-		assertThat(embeddedHBase.getPort(), is(60000));
-		assertThat(embeddedHBase.getFilePermissions(), is("775"));
+		assertThat(embeddedHBase.embeddedHBaseLifecycleManager.getHost(), is("127.0.0.1"));
+		assertThat(embeddedHBase.embeddedHBaseLifecycleManager.getPort(), is(60000));
+		assertThat(embeddedHBase.embeddedHBaseLifecycleManager.getFilePermissions(), is("775"));
 		
 	}
 	
@@ -24,9 +24,9 @@ public class WhenDefaultEmbeddedHBaseConfigurationIsCreated {
 		
 		EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().dirPermissions("700").build();
 		
-		assertThat(embeddedHBase.getHost(), is("127.0.0.1"));
-		assertThat(embeddedHBase.getPort(), is(60000));
-		assertThat(embeddedHBase.getFilePermissions(), is("700"));
+		assertThat(embeddedHBase.embeddedHBaseLifecycleManager.getHost(), is("127.0.0.1"));
+		assertThat(embeddedHBase.embeddedHBaseLifecycleManager.getPort(), is(60000));
+		assertThat(embeddedHBase.embeddedHBaseLifecycleManager.getFilePermissions(), is("700"));
 		
 	}
 	

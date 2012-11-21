@@ -19,7 +19,7 @@ public class WhenCassandraRuleIsConfigured {
 		
 		assertThat(embeddedConfiguration.getClusterName(), is("test"));
 		assertThat(embeddedConfiguration.getHost(), is("127.0.0.1"));
-		assertThat(embeddedConfiguration.getPort(), is(EmbeddedCassandra.DEFAULT_PORT));
+		assertThat(embeddedConfiguration.getPort(), is(EmbeddedCassandraLifecycleManager.DEFAULT_PORT));
 		
 	}
 	

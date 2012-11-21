@@ -7,7 +7,7 @@ import redis.clients.jedis.Jedis;
 public class ManagedRedisConfigurationBuilder {
 
 	private static final String LOCALHOST = "127.0.0.1";
-	private static final int DEFAULT_PORT = ManagedRedis.DEFAULT_PORT;
+	private static final int DEFAULT_PORT = ManagedRedisLifecycleManager.DEFAULT_PORT;
 	
 	private RedisConfiguration redisConfiguration;
 	

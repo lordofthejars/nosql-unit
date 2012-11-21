@@ -36,7 +36,7 @@ public class WhenEmbeddedHBaseLifecycleIsManaged {
 		when(embeddedHBaseStarter.startSingleMiniCluster(any(Configuration.class))).thenReturn(hBaseTestingUtility);
 
 		EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().build();
-		embeddedHBase.setEmbeddedHBaseStarter(embeddedHBaseStarter);
+		embeddedHBase.embeddedHBaseLifecycleManager.setEmbeddedHBaseStarter(embeddedHBaseStarter);
 		
 		Statement noStatement = new Statement() {
 			
@@ -68,7 +68,7 @@ public class WhenEmbeddedHBaseLifecycleIsManaged {
 		when(embeddedHBaseStarter.startSingleMiniCluster(any(Configuration.class))).thenReturn(hBaseTestingUtility);
 		
 		EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().build();
-		embeddedHBase.setEmbeddedHBaseStarter(embeddedHBaseStarter);
+		embeddedHBase.embeddedHBaseLifecycleManager.setEmbeddedHBaseStarter(embeddedHBaseStarter);
 		
 		Statement noStatement = new Statement() {
 			
@@ -98,7 +98,7 @@ public class WhenEmbeddedHBaseLifecycleIsManaged {
 		when(embeddedHBaseStarter.startSingleMiniCluster(any(Configuration.class))).thenReturn(hBaseTestingUtility);
 		
 		EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().build();
-		embeddedHBase.setEmbeddedHBaseStarter(embeddedHBaseStarter);
+		embeddedHBase.embeddedHBaseLifecycleManager.setEmbeddedHBaseStarter(embeddedHBaseStarter);
 		
 		Statement noStatement = new Statement() {
 			
@@ -106,7 +106,7 @@ public class WhenEmbeddedHBaseLifecycleIsManaged {
 			public void evaluate() throws Throwable {
 			
 				EmbeddedHBase defaultEmbeddedHBase = newEmbeddedHBaseRule().build();
-				defaultEmbeddedHBase.setEmbeddedHBaseStarter(embeddedHBaseStarter);
+				defaultEmbeddedHBase.embeddedHBaseLifecycleManager.setEmbeddedHBaseStarter(embeddedHBaseStarter);
 				
 				Statement defaultNoStatement = new Statement() {
 					

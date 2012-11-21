@@ -16,7 +16,7 @@ public class WhenRemoteRedisConfigurationIsRequired {
 		RedisConfiguration remoteConfiguration = newRemoteRedisConfiguration().host("localhost").build();
 		
 		assertThat(remoteConfiguration.getHost(), is("localhost"));
-		assertThat(remoteConfiguration.getPort(), is(ManagedRedis.DEFAULT_PORT));
+		assertThat(remoteConfiguration.getPort(), is(ManagedRedisLifecycleManager.DEFAULT_PORT));
 		assertThat(remoteConfiguration.getDatabaseOperation(), notNullValue());
 		
 	}

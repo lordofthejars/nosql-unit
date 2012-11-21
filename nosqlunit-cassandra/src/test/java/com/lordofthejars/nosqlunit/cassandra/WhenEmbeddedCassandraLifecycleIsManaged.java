@@ -29,24 +29,24 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 	public void embedded_cassandra_should_be_registered_and_started_with_default_parameters() throws Throwable {
 		
 		EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().build();
-		cassandraRule.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
+		cassandraRule.embeddedCassandraLifecycleManager.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
 		
 		Statement noStatement = new Statement() {
 			
 			@Override
 			public void evaluate() throws Throwable {
 			
-				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
+				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandraLifecycleManager.LOCALHOST, EmbeddedCassandraLifecycleManager.DEFAULT_PORT), is(true));
 			}
 		};
 		
 		Statement decotedStatement = cassandraRule.apply(noStatement, Description.EMPTY);
 		decotedStatement.evaluate();
 		
-		verify(embeddedCassandraServerHelper).startEmbeddedCassandra(EmbeddedCassandra.DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION, EmbeddedCassandra.DEFAULT_CASSANDRA_TARGET_PATH);
+		verify(embeddedCassandraServerHelper).startEmbeddedCassandra(EmbeddedCassandraLifecycleManager.DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION, EmbeddedCassandraLifecycleManager.DEFAULT_CASSANDRA_TARGET_PATH);
 		verify(embeddedCassandraServerHelper).stopEmbeddedCassandra();
 		
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.DEFAULT_PORT), is(false));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandraLifecycleManager.LOCALHOST, EmbeddedCassandraLifecycleManager.DEFAULT_PORT), is(false));
 		
 	}
 	
@@ -54,14 +54,14 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 	public void embedded_cassandra_should_be_registered_and_started_with_custom_parameters() throws Throwable {
 		
 		EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().targetPath("tmp").cassandraConfigurationPath("my_cassandra.yaml").build();
-		cassandraRule.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
+		cassandraRule.embeddedCassandraLifecycleManager.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
 		
 		Statement noStatement = new Statement() {
 			
 			@Override
 			public void evaluate() throws Throwable {
 			
-				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
+				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandraLifecycleManager.LOCALHOST, EmbeddedCassandraLifecycleManager.DEFAULT_PORT), is(true));
 			}
 		};
 		
@@ -71,7 +71,7 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 		verify(embeddedCassandraServerHelper).startEmbeddedCassandra("my_cassandra.yaml", "tmp");
 		verify(embeddedCassandraServerHelper).stopEmbeddedCassandra();
 		
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.DEFAULT_PORT), is(false));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandraLifecycleManager.LOCALHOST, EmbeddedCassandraLifecycleManager.DEFAULT_PORT), is(false));
 		
 	}
 	
@@ -79,7 +79,7 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 	public void simulataneous_cassandra_should_start_only_one_instance() throws Throwable {
 
 		EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().build();
-		cassandraRule.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
+		cassandraRule.embeddedCassandraLifecycleManager.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
 		
 		Statement noStatement = new Statement() {
 			
@@ -87,19 +87,19 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 			public void evaluate() throws Throwable {
 			
 				EmbeddedCassandra defaultEmbeddedCassandra =newEmbeddedCassandraRule().build();
-				defaultEmbeddedCassandra.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
+				defaultEmbeddedCassandra.embeddedCassandraLifecycleManager.setEmbeddedCassandraServerHelper(embeddedCassandraServerHelper);
 				Statement defaultNoStatement = new Statement() {
 					
 					@Override
 					public void evaluate() throws Throwable {
-						assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
+						assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandraLifecycleManager.LOCALHOST, EmbeddedCassandraLifecycleManager.DEFAULT_PORT), is(true));
 					}
 				};
 				
 				Statement defaultStatement = defaultEmbeddedCassandra.apply(defaultNoStatement, Description.EMPTY);
 				defaultStatement.evaluate();
 				
-				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.DEFAULT_PORT), is(true));
+				assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandraLifecycleManager.LOCALHOST, EmbeddedCassandraLifecycleManager.DEFAULT_PORT), is(true));
 				
 			}
 		};
@@ -107,10 +107,10 @@ public class WhenEmbeddedCassandraLifecycleIsManaged {
 		Statement decotedStatement = cassandraRule.apply(noStatement, Description.EMPTY);
 		decotedStatement.evaluate();
 		
-		verify(embeddedCassandraServerHelper).startEmbeddedCassandra(EmbeddedCassandra.DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION, EmbeddedCassandra.DEFAULT_CASSANDRA_TARGET_PATH);
+		verify(embeddedCassandraServerHelper).startEmbeddedCassandra(EmbeddedCassandraLifecycleManager.DEFAULT_CASSANDRA_CONFIGURATION_FILE_LOCATION, EmbeddedCassandraLifecycleManager.DEFAULT_CASSANDRA_TARGET_PATH);
 		verify(embeddedCassandraServerHelper).stopEmbeddedCassandra();
 		
-		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandra.LOCALHOST, EmbeddedCassandra.DEFAULT_PORT), is(false));
+		assertThat(ConnectionManagement.getInstance().isConnectionRegistered(EmbeddedCassandraLifecycleManager.LOCALHOST, EmbeddedCassandraLifecycleManager.DEFAULT_PORT), is(false));
 		
 		
 	}

@@ -3,9 +3,9 @@ package com.lordofthejars.nosqlunit.hbase;
 import static com.lordofthejars.nosqlunit.hbase.ManagedHBase.HBaseRuleBuilder.newManagedHBaseServerRule;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,8 +53,8 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().build();
 		
-		managedHBase.setCommandLineExecutor(commandLineExecutor);
-		managedHBase.setHBaseUtils(hBaseUtils);
+		managedHBase.managedHBaseLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedHBase.managedHBaseLifecycleManager.setHBaseUtils(hBaseUtils);
 		
 		managedHBase.before();
 
@@ -87,8 +87,8 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().port(111).build();
 		
-		managedHBase.setCommandLineExecutor(commandLineExecutor);
-		managedHBase.setHBaseUtils(hBaseUtils);
+		managedHBase.managedHBaseLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedHBase.managedHBaseLifecycleManager.setHBaseUtils(hBaseUtils);
 		
 		managedHBase.before();
 
@@ -121,13 +121,13 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		when(commandLineExecutor.startProcessInDirectoryAndArguments(anyString(), anyList())).thenReturn(mockProcess);
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().port(111).build();
-		managedHBase.setHBaseUtils(hBaseUtils);
-		managedHBase.setCommandLineExecutor(commandLineExecutor);
+		managedHBase.managedHBaseLifecycleManager.setHBaseUtils(hBaseUtils);
+		managedHBase.managedHBaseLifecycleManager.setCommandLineExecutor(commandLineExecutor);
 
 		managedHBase.before();
 		managedHBase.after();
 		
-		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedHBase.DEFAULT_HBASE_TARGET_PATH,
+		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedHBaseLifecycleManager.DEFAULT_HBASE_TARGET_PATH,
 				getExpectedCommand());
 		
 		System.clearProperty("HBASE_HOME");
@@ -152,13 +152,13 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().port(111).build();
 		
-		managedHBase.setCommandLineExecutor(commandLineExecutor);
-		managedHBase.setHBaseUtils(hBaseUtils);
+		managedHBase.managedHBaseLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedHBase.managedHBaseLifecycleManager.setHBaseUtils(hBaseUtils);
 		
 		managedHBase.before();
 		managedHBase.after();
 		
-		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedHBase.DEFAULT_HBASE_TARGET_PATH,
+		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedHBaseLifecycleManager.DEFAULT_HBASE_TARGET_PATH,
 				getStopExpectedCommand());
 		
 		System.clearProperty("HBASE_HOME");
@@ -182,12 +182,12 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().hBasePath("/opt/hbase").build();
 		
-		managedHBase.setCommandLineExecutor(commandLineExecutor);
-		managedHBase.setHBaseUtils(hBaseUtils);
+		managedHBase.managedHBaseLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedHBase.managedHBaseLifecycleManager.setHBaseUtils(hBaseUtils);
 		managedHBase.before();
 		managedHBase.after();
 		
-		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedHBase.DEFAULT_HBASE_TARGET_PATH,
+		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedHBaseLifecycleManager.DEFAULT_HBASE_TARGET_PATH,
 				getExpectedCommand());
 		
 		
@@ -207,9 +207,9 @@ public class WhenManagedHBaseLifecycleIsManaged {
 		when(commandLineExecutor.startProcessInDirectoryAndArguments(anyString(), anyList())).thenReturn(mockProcess);
 		
 		ManagedHBase managedHBase = newManagedHBaseServerRule().hBasePath("/opt/hbase").build();
-		managedHBase.setHBaseUtils(hBaseUtils);
-		managedHBase.setCommandLineExecutor(commandLineExecutor);
-		managedHBase.setOperatingSystemResolver(operatingSystemResolver);
+		managedHBase.managedHBaseLifecycleManager.setHBaseUtils(hBaseUtils);
+		managedHBase.managedHBaseLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedHBase.managedHBaseLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 
 		managedHBase.before();
 		

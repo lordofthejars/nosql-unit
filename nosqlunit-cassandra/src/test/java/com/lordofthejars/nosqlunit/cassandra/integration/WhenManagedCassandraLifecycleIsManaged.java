@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.lordofthejars.nosqlunit.cassandra.ManagedCassandra;
+import com.lordofthejars.nosqlunit.cassandra.ManagedCassandraLifecycleManager;
 import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.ConnectionManagement;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
@@ -51,7 +52,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 		ManagedCassandra managedCassandra = newManagedCassandraRule().build();
 
-		managedCassandra.setCommandLineExecutor(commandLineExecutor);
+		managedCassandra.getManagedCassandraLifecycleManager().setCommandLineExecutor(commandLineExecutor);
 
 		managedCassandra.before();
 
@@ -82,7 +83,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 		ManagedCassandra managedCassandra = newManagedCassandraRule().port(9191).build();
 
-		managedCassandra.setCommandLineExecutor(commandLineExecutor);
+		managedCassandra.getManagedCassandraLifecycleManager().setCommandLineExecutor(commandLineExecutor);
 
 		managedCassandra.before();
 
@@ -111,7 +112,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 		ManagedCassandra managedCassandra = newManagedCassandraRule().port(9191).build();
 
-		managedCassandra.setCommandLineExecutor(commandLineExecutor);
+		managedCassandra.getManagedCassandraLifecycleManager().setCommandLineExecutor(commandLineExecutor);
 
 		managedCassandra.before();
 
@@ -119,7 +120,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 		ManagedCassandra managedCassandra2 = newManagedCassandraRule().port(9191).build();
 
-		managedCassandra2.setCommandLineExecutor(commandLineExecutor);
+		managedCassandra2.getManagedCassandraLifecycleManager().setCommandLineExecutor(commandLineExecutor);
 
 		managedCassandra2.before();
 
@@ -151,13 +152,13 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 		ManagedCassandra managedCassandra = newManagedCassandraRule().port(9191).build();
 
-		managedCassandra.setCommandLineExecutor(commandLineExecutor);
+		managedCassandra.getManagedCassandraLifecycleManager().setCommandLineExecutor(commandLineExecutor);
 
 		managedCassandra.before();
 
 		managedCassandra.after();
 
-		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedCassandra.DEFAULT_CASSANDRA_TARGET_PATH,
+		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedCassandraLifecycleManager.DEFAULT_CASSANDRA_TARGET_PATH,
 				getExpectedCommand());
 
 		System.clearProperty("CASSANDRA_HOME");
@@ -179,13 +180,13 @@ public class WhenManagedCassandraLifecycleIsManaged {
 		ManagedCassandra managedCassandra = newManagedCassandraRule().cassandraPath("/opt/cassandra").port(9191)
 				.build();
 
-		managedCassandra.setCommandLineExecutor(commandLineExecutor);
+		managedCassandra.getManagedCassandraLifecycleManager().setCommandLineExecutor(commandLineExecutor);
 
 		managedCassandra.before();
 
 		managedCassandra.after();
 
-		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedCassandra.DEFAULT_CASSANDRA_TARGET_PATH,
+		verify(commandLineExecutor).startProcessInDirectoryAndArguments(ManagedCassandraLifecycleManager.DEFAULT_CASSANDRA_TARGET_PATH,
 				getExpectedCommand());
 
 	}

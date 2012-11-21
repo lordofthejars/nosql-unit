@@ -58,19 +58,19 @@ public class WhenNeo4jIsRemoteManaged {
 								Collections.<String> emptyList());
 
 		ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().build();
-		managedNeoServer.setCommandLineExecutor(commandLineExecutor);
-		managedNeoServer.setOperatingSystemResolver(operatingSystemResolver);
+		managedNeoServer.managedNeoServerLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedNeoServer.managedNeoServerLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedNeoServer.before();
 		
 		List<String> expectedCommand = new ArrayList<String>();
-		expectedCommand.add("/opt/neo4j-community-1.7.2"+File.separatorChar+ManagedNeoServer.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServer.NEO4J_EXECUTABLE_W);
+		expectedCommand.add("/opt/neo4j-community-1.7.2"+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_EXECUTABLE_W);
 		expectedCommand.add("start");
 		
 		managedNeoServer.after();
 	
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				ManagedNeoServer.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
+				ManagedNeoServerLifecycleManager.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
 		
 		System.clearProperty("NEO4J_HOME");
 		
@@ -96,19 +96,19 @@ public class WhenNeo4jIsRemoteManaged {
 								Collections.<String> emptyList());
 
 		ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().neo4jPath(NEO4J_LOCATION).build();
-		managedNeoServer.setCommandLineExecutor(commandLineExecutor);
-		managedNeoServer.setOperatingSystemResolver(operatingSystemResolver);
+		managedNeoServer.managedNeoServerLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedNeoServer.managedNeoServerLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedNeoServer.before();
 		
 		List<String> expectedCommand = new ArrayList<String>();
-		expectedCommand.add(NEO4J_LOCATION+File.separatorChar+ManagedNeoServer.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServer.NEO4J_EXECUTABLE_W);
+		expectedCommand.add(NEO4J_LOCATION+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_EXECUTABLE_W);
 		expectedCommand.add("start");
 		
 		managedNeoServer.after();
 	
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				ManagedNeoServer.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
+				ManagedNeoServerLifecycleManager.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
 		
 	}
 	
@@ -132,19 +132,19 @@ public class WhenNeo4jIsRemoteManaged {
 								Collections.<String> emptyList());
 
 		ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().neo4jPath(NEO4J_LOCATION).build();
-		managedNeoServer.setCommandLineExecutor(commandLineExecutor);
-		managedNeoServer.setOperatingSystemResolver(operatingSystemResolver);
+		managedNeoServer.managedNeoServerLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedNeoServer.managedNeoServerLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedNeoServer.before();
 		
 		List<String> expectedCommand = new ArrayList<String>();
-		expectedCommand.add(NEO4J_LOCATION+File.separatorChar+ManagedNeoServer.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServer.NEO4J_EXECUTABLE_X);
+		expectedCommand.add(NEO4J_LOCATION+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_EXECUTABLE_X);
 		expectedCommand.add("start");
 		
 		managedNeoServer.after();
 	
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				ManagedNeoServer.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
+				ManagedNeoServerLifecycleManager.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
 		
 	}
 	
@@ -168,19 +168,19 @@ public class WhenNeo4jIsRemoteManaged {
 								Collections.<String> emptyList());
 
 		ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().neo4jPath(NEO4J_LOCATION).build();
-		managedNeoServer.setCommandLineExecutor(commandLineExecutor);
-		managedNeoServer.setOperatingSystemResolver(operatingSystemResolver);
+		managedNeoServer.managedNeoServerLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedNeoServer.managedNeoServerLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		
 		managedNeoServer.before();
 		
 		List<String> expectedCommand = new ArrayList<String>();
-		expectedCommand.add(NEO4J_LOCATION+File.separatorChar+ManagedNeoServer.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServer.NEO4J_EXECUTABLE_X);
+		expectedCommand.add(NEO4J_LOCATION+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_BINARY_DIRECTORY+File.separatorChar+ManagedNeoServerLifecycleManager.NEO4J_EXECUTABLE_X);
 		expectedCommand.add("start");
 		
 		managedNeoServer.after();
 	
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				ManagedNeoServer.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
+				ManagedNeoServerLifecycleManager.DEFAULT_NEO4J_TARGET_PATH, expectedCommand);
 		
 	}
 	

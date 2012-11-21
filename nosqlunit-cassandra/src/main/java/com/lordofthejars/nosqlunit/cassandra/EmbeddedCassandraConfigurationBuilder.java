@@ -3,7 +3,7 @@ package com.lordofthejars.nosqlunit.cassandra;
 public class EmbeddedCassandraConfigurationBuilder {
 
 	private static final String LOCALHOST = "127.0.0.1";
-	private static final int DEFAULT_PORT= EmbeddedCassandra.DEFAULT_PORT;
+	private static final int DEFAULT_PORT= EmbeddedCassandraLifecycleManager.DEFAULT_PORT;
 	
 	private CassandraConfiguration cassandraConfiguration;
 	

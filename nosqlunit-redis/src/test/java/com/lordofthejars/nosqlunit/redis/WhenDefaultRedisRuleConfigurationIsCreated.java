@@ -14,7 +14,7 @@ public class WhenDefaultRedisRuleConfigurationIsCreated {
 		RedisConfiguration redisConfiguration = newManagedRedisConfiguration().build();
 		
 		assertThat(redisConfiguration.getHost(), is("127.0.0.1"));
-		assertThat(redisConfiguration.getPort(), is(ManagedRedis.DEFAULT_PORT));
+		assertThat(redisConfiguration.getPort(), is(ManagedRedisLifecycleManager.DEFAULT_PORT));
 		assertThat(redisConfiguration.getDatabaseOperation(), notNullValue());
 		
 	}

@@ -4,6 +4,7 @@ package com.lordofthejars.nosqlunit.redis;
 
 import java.io.File;
 
+import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,30 +13,20 @@ import redis.clients.jedis.Jedis;
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.redis.embedded.EmbeddedRedisBuilder;
 
-public class EmbeddedRedis extends AbstractLifecycleManager {
+public class EmbeddedRedis extends ExternalResource {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedRedis.class); 
-	
-	protected static final String LOCALHOST = "127.0.0.1";
-	protected static final int PORT = ManagedRedis.DEFAULT_PORT;
-
-	public static final String INMEMORY_REDIS_TARGET_PATH = "target" + File.separatorChar + "redis-test-data"
-			+ File.separatorChar + "impermanent-db";
-	
-	private String targetPath = INMEMORY_REDIS_TARGET_PATH;
-	
-	private Jedis jedis;
-	
 	private EmbeddedRedis() {
 		super();
 	}
 	
+	protected EmbeddedRedisLifecycleManager embeddedRedisLifecycleManager;
+	
 	public static class EmbeddedRedisRuleBuilder {
 
-		private EmbeddedRedis embeddedRedis;
+		private EmbeddedRedisLifecycleManager embeddedRedisLifecycleManager;
 
 		private EmbeddedRedisRuleBuilder() {
-			this.embeddedRedis= new EmbeddedRedis();
+			this.embeddedRedisLifecycleManager= new EmbeddedRedisLifecycleManager();
 		}
 
 		public static EmbeddedRedisRuleBuilder newEmbeddedRedisRule() {
@@ -43,55 +34,33 @@ public class EmbeddedRedis extends AbstractLifecycleManager {
 		}
 
 		public EmbeddedRedisRuleBuilder targetPath(String targetPath) {
-			this.embeddedRedis.setTargetPath(targetPath);
+			this.embeddedRedisLifecycleManager.setTargetPath(targetPath);
 			return this;
 		}
 
 		public EmbeddedRedis build() {
-			if (this.embeddedRedis.getTargetPath() == null) {
+			
+			if (this.embeddedRedisLifecycleManager.getTargetPath() == null) {
 				throw new IllegalArgumentException("No Path to Embedded Redis is provided.");
 			}
-			return this.embeddedRedis;
+			
+			EmbeddedRedis embeddedRedis = new EmbeddedRedis();
+			embeddedRedis.embeddedRedisLifecycleManager = this.embeddedRedisLifecycleManager;
+			
+			return embeddedRedis;
 		}
 
 	}
-	
+
 	@Override
-	protected String getHost() {
-		return LOCALHOST+targetPath;
+	protected void before() throws Throwable {
+		this.embeddedRedisLifecycleManager.startEngine();
 	}
 
 	@Override
-	protected int getPort() {
-		return PORT;
-	}
-
-	@Override
-	protected void doStart() throws Throwable {
-		LOGGER.info("Starting Embedded InMemory Redis instance.");
-		jedis = createEmbeddedRedis();
-		EmbeddedRedisInstances.getInstance().addJedis(jedis, targetPath);
-		LOGGER.info("Started Embedded InMemory Redis instance.");
-	}
-
-	@Override
-	protected void doStop() {
-		LOGGER.info("Stopping Embedded InMemory Redis instance.");
-		EmbeddedRedisInstances.getInstance().removeJedis(targetPath);
-		LOGGER.info("Stopped Embedded InMemory Redis instance.");
-	}
-
-	private Jedis createEmbeddedRedis() {
-		EmbeddedRedisBuilder embeddedRedisBuilder = new EmbeddedRedisBuilder();
-		return  embeddedRedisBuilder.createEmbeddedJedis();	
+	protected void after() {
+		this.embeddedRedisLifecycleManager.stopEngine();
 	}
 	
-	public void setTargetPath(String targetPath) {
-		this.targetPath = targetPath;
-	}
-	
-	public String getTargetPath() {
-		return targetPath;
-	}
 	
 }
