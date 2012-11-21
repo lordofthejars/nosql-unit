@@ -11,13 +11,13 @@ public class WhenEngineLifecycleIsManaged {
 	public void connection_should_be_registered() throws Throwable {
 		
 		MockLifecycle mockLifecycle = new MockLifecycle();
-		mockLifecycle.before();
+		mockLifecycle.startEngine();
 		
 		
 		assertThat(mockLifecycle.number, is(1));
 		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("localhost", 0), is(true));
 		
-		mockLifecycle.after();
+		mockLifecycle.startEngine();
 		
 	}
 	
@@ -25,9 +25,9 @@ public class WhenEngineLifecycleIsManaged {
 	public void connection_should_be_unregistered_at_the_end() throws Throwable {
 		
 		MockLifecycle mockLifecycle = new MockLifecycle();
-		mockLifecycle.before();
+		mockLifecycle.startEngine();
 		
-		mockLifecycle.after();
+		mockLifecycle.startEngine();
 		
 		
 		assertThat(mockLifecycle.number, is(0));
@@ -39,18 +39,18 @@ public class WhenEngineLifecycleIsManaged {
 	public void start_server_should_be_only_called_once() throws Throwable {
 		
 		MockLifecycle mockLifecycle = new MockLifecycle();
-		mockLifecycle.before();
-		mockLifecycle.before();
+		mockLifecycle.startEngine();
+		mockLifecycle.startEngine();
 		
 		assertThat(mockLifecycle.number, is(1));
 		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("localhost", 0), is(true));
 		
-		mockLifecycle.after();
+		mockLifecycle.stopEngine();
 		
 		assertThat(mockLifecycle.number, is(1));
 		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("localhost", 0), is(true));
 		
-		mockLifecycle.after();
+		mockLifecycle.startEngine();
 		
 		
 		assertThat(mockLifecycle.number, is(0));

@@ -11,10 +11,12 @@ import static org.mockito.Matchers.any;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.Description;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -58,14 +60,14 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 	}
 
 	@Test
-	public void selective_annotations_should_load_not_load_data_of_not_identified_rules_but_global()
+	public void selective_annotations_should_not_load_data_of_not_identified_rules_but_global()
 			throws Throwable {
 		when(
 				loadStrategyFactory.getLoadStrategyInstance(
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
+		FrameworkMethod frameworkMethod = frameworkMethod(
 				MyGlobalAndSelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
@@ -83,7 +85,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyGlobalAndSelectiveClass()).evaluate();
 
 		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		
@@ -104,7 +106,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
+		FrameworkMethod frameworkMethod = frameworkMethod(
 				MyGlobalAndSelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
@@ -122,7 +124,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyGlobalAndSelectiveClass()).evaluate();
 
 		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 	
@@ -146,7 +148,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
+		FrameworkMethod frameworkMethod = frameworkMethod(
 				MySelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
@@ -166,7 +168,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MySelectiveClass()).evaluate();
 
 		verify(loadStrategyOperation, times(1)).executeScripts(
 				streamCaptor.capture());
@@ -183,7 +185,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
+		FrameworkMethod frameworkMethod = frameworkMethod(
 				MySelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
@@ -202,7 +204,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
 		
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MySelectiveClass()).evaluate();
 
 		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		
@@ -226,9 +228,8 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
-				MyTestClass.class, "my_unknown_test",
-				new ShouldMatchDataSetAnnotationTest());
+		FrameworkMethod frameworkMethod = frameworkMethod(
+				MyTestClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -244,7 +245,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestClass()).evaluate();
 
 		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
@@ -276,11 +277,9 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
-				WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class,
-				"my_unknown_test", new UsingDataSetAnnotationTest(
-						LoadStrategyEnum.INSERT),
-				new ShouldMatchDataSetAnnotationTest());
+		FrameworkMethod frameworkMethod = frameworkMethod(
+				MyTestMethodClass.class,
+				"my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -295,7 +294,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestMethodClass()).evaluate();
 
 		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
@@ -325,11 +324,9 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
-				WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations.class,
-				"my_first_test", new UsingDataSetAnnotationTest(
-						LoadStrategyEnum.INSERT),
-				new ShouldMatchDataSetAnnotationTest());
+		FrameworkMethod frameworkMethod = frameworkMethod(
+				MyTestMethodClass.class,
+				"my_method_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -344,7 +341,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestMethodClass()).evaluate();
 
 		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
@@ -374,12 +371,9 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
+		FrameworkMethod frameworkMethod = frameworkMethod(
 				DefaultClass.class,
-				"WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations",
-				new UsingDataSetAnnotationTest(new String[] { "test" },
-						LoadStrategyEnum.INSERT),
-				new ShouldMatchDataSetAnnotationTest("test"));
+				"my_method_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -393,7 +387,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
 
 		
 		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
@@ -425,10 +419,9 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
+		FrameworkMethod frameworkMethod = frameworkMethod(
 				DefaultClass.class,
-				"WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations",
-				new ShouldMatchDataSetAnnotationTest("test"));
+				"my_unknown_test_2");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -442,7 +435,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
 
 		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
@@ -472,9 +465,8 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
-				DefaultClass.class,
-				"WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations");
+		FrameworkMethod frameworkMethod = frameworkMethod(
+				DefaultClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -488,7 +480,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
 		
 		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
 		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
@@ -519,9 +511,8 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
-				SelectiveDefaultClass.class,
-				"WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations");
+		FrameworkMethod frameworkMethod = frameworkMethod(
+				SelectiveDefaultClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -537,7 +528,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveDefaultClass()).evaluate();
 
 		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 		
@@ -559,9 +550,8 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
-				SelectiveDefaultClass.class,
-				"WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations");
+		FrameworkMethod frameworkMethod = frameworkMethod(
+				SelectiveDefaultClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -578,7 +568,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveDefaultClass()).evaluate();
 
 	}
 
@@ -591,9 +581,8 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 						LoadStrategyEnum.INSERT, databaseOperation))
 				.thenReturn(loadStrategyOperation);
 
-		Description description = Description.createTestDescription(
-				SelectiveAndLocationClass.class,
-				"WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations");
+		FrameworkMethod frameworkMethod = frameworkMethod(
+				SelectiveAndLocationClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(
 				AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
@@ -609,7 +598,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		abstractNoSqlTestRule
 				.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, description).evaluate();
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveAndLocationClass()).evaluate();
 
 		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 		
@@ -620,40 +609,97 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		assertThat(scriptContent, is("Class Annotation"));
 		
 	}
+	
+	private FrameworkMethod frameworkMethod(Class<?> testClass, String methodName) {
+		
+		try {
+			Method method = testClass.getMethod(methodName);
+			return new FrameworkMethod(method);
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException(e);
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException(e);
+		}
+		
+	}
+	
 }
 
 @UsingDataSet(locations = "test2", withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.INSERT)
 class MyGlobalAndSelectiveClass {
 
+	@Test
+	public void my_unknown_test() {}
+	
 }
 
 @UsingDataSet(withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.INSERT)
 class MySelectiveClass {
 
+	@Test
+	public void my_unknown_test() {}
+	
 }
 
 @UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
 class MyTestClass {
 
+	@Test
+	@ShouldMatchDataSet()
+	public void my_unknown_test() {}
+	
+}
+
+class MyTestMethodClass {
+	@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
+	@Test
+	@ShouldMatchDataSet()
+	public void my_unknown_test() {}
+	
+	@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
+	@Test
+	@ShouldMatchDataSet()
+	public void my_method_test() {}
 }
 
 @UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
 class MyUknownClass {
 
+	@Test
+	public void my_unknown_test() {}
+	
 }
 
 @UsingDataSet(locations = "test2", loadStrategy = LoadStrategyEnum.INSERT)
 @ShouldMatchDataSet(location = "test2")
 class DefaultClass {
 
+	@Test
+	public void my_unknown_test() {}
+	
+	@Test
+	@ShouldMatchDataSet(location = "test")
+	public void my_unknown_test_2() {}
+	
+	@Test
+	@UsingDataSet(locations = "test", loadStrategy = LoadStrategyEnum.INSERT)
+	@ShouldMatchDataSet(location = "test")
+	public void my_method_test() {}
+	
 }
 
 @ShouldMatchDataSet(withSelectiveMatcher = { @SelectiveMatcher(identifier = "one", location = "test3") })
 class SelectiveDefaultClass {
 
+	@Test
+	public void my_unknown_test() {}
+	
 }
 
 @ShouldMatchDataSet(location = "test2", withSelectiveMatcher = { @SelectiveMatcher(identifier = "one", location = "test3") })
 class SelectiveAndLocationClass {
 
+	@Test
+	public void my_unknown_test() {}
+	
 }

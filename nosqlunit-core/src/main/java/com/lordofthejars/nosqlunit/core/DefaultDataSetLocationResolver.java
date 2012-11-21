@@ -3,7 +3,8 @@ package com.lordofthejars.nosqlunit.core;
 import static com.lordofthejars.nosqlunit.core.IOUtils.isFileAvailableOnClasspath;
 
 import java.lang.annotation.Annotation;
-import org.junit.runner.Description;
+
+import org.junit.runners.model.FrameworkMethod;
 
 
 public class DefaultDataSetLocationResolver {
@@ -20,17 +21,17 @@ public class DefaultDataSetLocationResolver {
 		return resourceBase;
 	}
 	
-	public String resolveDefaultDataSetLocation(Annotation annotation, Description description, String suffix) {
+	public String resolveDefaultDataSetLocation(Annotation annotation, FrameworkMethod method, String suffix) {
 		
 		
-		String testClassName = description.getClassName();
+		String testClassName = method.getMethod().getDeclaringClass().getName();
 		String defaultClassAnnotatedClasspath = "/"
 				+ testClassName.replace('.', '/');
 		
-		if(isMethodAnnotated(description, annotation)) {
+		if(isMethodAnnotated(method, annotation)) {
 			
 			String defaultMethodAnnotatedClasspathFile = buildRequiredFilepathForMethodAnnotatation(
-					description, defaultClassAnnotatedClasspath, suffix);
+					method, defaultClassAnnotatedClasspath, suffix);
 			
 			if (isFileAvailableOnClasspath(resourceBase,
 					defaultMethodAnnotatedClasspathFile)) {
@@ -68,9 +69,9 @@ public class DefaultDataSetLocationResolver {
 	}
 	
 	private String buildRequiredFilepathForMethodAnnotatation(
-			Description description,
+			FrameworkMethod method,
 			String defaultClassAnnotatedClasspath, String suffix) {
-		String testMethodName = description.getMethodName();
+		String testMethodName = method.getName();
 
 		String defaultMethodAnnotatedClasspathFile = defaultClassAnnotatedClasspath
 				+ METHOD_SEPARATOR
@@ -79,8 +80,8 @@ public class DefaultDataSetLocationResolver {
 		return defaultMethodAnnotatedClasspathFile;
 	}
 
-	private boolean isMethodAnnotated(Description description, Annotation annotation) {
-		return description.getAnnotation(annotation.annotationType()) != null;
+	private boolean isMethodAnnotated(FrameworkMethod method, Annotation annotation) {
+		return method.getAnnotation(annotation.annotationType()) != null;
 	}
 	
 }

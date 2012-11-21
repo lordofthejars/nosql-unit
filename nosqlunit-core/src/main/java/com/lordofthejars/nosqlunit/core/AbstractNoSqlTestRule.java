@@ -11,8 +11,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 import com.lordofthejars.nosqlunit.annotation.Selective;
@@ -20,14 +20,14 @@ import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 
-public abstract class AbstractNoSqlTestRule implements TestRule {
+public abstract class AbstractNoSqlTestRule implements MethodRule {
 
 	private static final String EXPECTED_RESERVED_WORD = "-expected";
 
 	/**
 	 * With JUnit 4.10 is impossible to get target from a Rule, it seems that
 	 * future versions will support it. For now constructor is apporach is the
-	 * only way.
+	 * only way. But JUnit 4.11 undeprecated the TestMethod so for maintaining back compatibility target is maintained. 
 	 */
 	private Object target;
 
@@ -50,23 +50,25 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 	public abstract String getWorkingExtension();
 
 	@Override
-	public Statement apply(final Statement base, final Description description) {
+	public Statement apply(final Statement base, final FrameworkMethod method, final Object testObject) {
 		return new Statement() {
 
 			@Override
 			public void evaluate() throws Throwable {
 
+				target = testObject;
+				
 				defaultDataSetLocationResolver = new DefaultDataSetLocationResolver(
-						description.getTestClass());
+						testObject.getClass());
 
 				UsingDataSet usingDataSet = getUsingDataSetAnnotation();
 
 				if (isTestAnnotatedWithDataSet(usingDataSet)) {
-					loadDataSet(usingDataSet, description);
+					loadDataSet(usingDataSet, method);
 				}
 
 				injectAnnotationProcessor.processInjectAnnotation(
-						description.getTestClass(), target,
+						testObject.getClass(), target,
 						getDatabaseOperation().connectionManager());
 
 				base.evaluate();
@@ -81,12 +83,12 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 			private ShouldMatchDataSet getShouldMatchDataSetAnnotation() {
 
-				ShouldMatchDataSet shouldMatchDataSet = description
+				ShouldMatchDataSet shouldMatchDataSet = method
 						.getAnnotation(ShouldMatchDataSet.class);
 
 				if (!isTestAnnotatedWithExpectedDataSet(shouldMatchDataSet)) {
 
-					Class<?> testClass = description.getTestClass();
+					Class<?> testClass = target.getClass();
 					shouldMatchDataSet = testClass
 							.getAnnotation(ShouldMatchDataSet.class);
 
@@ -97,12 +99,12 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 			private UsingDataSet getUsingDataSetAnnotation() {
 
-				UsingDataSet usingDataSet = description
+				UsingDataSet usingDataSet = method
 						.getAnnotation(UsingDataSet.class);
 
 				if (!isTestAnnotatedWithDataSet(usingDataSet)) {
 
-					Class<?> testClass = description.getTestClass();
+					Class<?> testClass = target.getClass();
 					usingDataSet = testClass.getAnnotation(UsingDataSet.class);
 
 				}
@@ -113,7 +115,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet)
 					throws IOException {
 
-				InputStream scriptContent = loadExpectedContentScript(description,
+				InputStream scriptContent = loadExpectedContentScript(method,
 						shouldMatchDataSet);
 
 				if (isNotEmptyStream(scriptContent)) {
@@ -127,7 +129,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			}
 
 			private InputStream loadExpectedContentScript(
-					final Description description,
+					final FrameworkMethod method,
 					ShouldMatchDataSet shouldMatchDataSet) throws IOException {
 				String location = shouldMatchDataSet.location();
 				InputStream scriptContent = null;
@@ -147,7 +149,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 						
 					} else {
 						scriptContent = loadExpectedResultFromDefaultLocation(
-								description, shouldMatchDataSet);
+								method, shouldMatchDataSet);
 					}
 				}
 				return scriptContent;
@@ -165,7 +167,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			}
 			
 			private InputStream loadExpectedResultFromDefaultLocation(
-					final Description description,
+					final FrameworkMethod method,
 					ShouldMatchDataSet shouldMatchDataSet)
 					throws IOException {
 				
@@ -173,7 +175,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 				
 				String defaultLocation = defaultDataSetLocationResolver
 						.resolveDefaultDataSetLocation(
-								shouldMatchDataSet, description,
+								shouldMatchDataSet, method,
 								EXPECTED_RESERVED_WORD + "."
 										+ getWorkingExtension());
 
@@ -193,14 +195,14 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			}
 
 			private void loadDataSet(UsingDataSet usingDataSet,
-					Description description) throws IOException {
+					FrameworkMethod method) throws IOException {
 
 				String[] locations = usingDataSet.locations();
 
 				List<InputStream> scriptContent = new ArrayList<InputStream>();
 
 				scriptContent.addAll(loadGlobalDataSets(usingDataSet,
-						description, locations));
+						method, locations));
 				scriptContent.addAll(loadSelectiveDataSets(usingDataSet));
 
 				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
@@ -242,7 +244,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 			}
 
 			private List<InputStream> loadGlobalDataSets(UsingDataSet usingDataSet,
-					Description description, String[] locations)
+					FrameworkMethod method, String[] locations)
 					throws IOException {
 
 				List<InputStream> scriptContent = new ArrayList<InputStream>();
@@ -258,7 +260,7 @@ public abstract class AbstractNoSqlTestRule implements TestRule {
 
 					String location = defaultDataSetLocationResolver
 							.resolveDefaultDataSetLocation(usingDataSet,
-									description, "." + getWorkingExtension());
+									method, "." + getWorkingExtension());
 
 					if (location != null) {
 						scriptContent.add(IOUtils
