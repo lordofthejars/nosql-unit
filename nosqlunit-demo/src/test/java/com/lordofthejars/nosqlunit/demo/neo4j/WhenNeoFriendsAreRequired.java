@@ -1,7 +1,6 @@
 package com.lordofthejars.nosqlunit.demo.neo4j;
 
 
-import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer.Neo4jServerRuleBuilder.newManagedNeo4jServerRule;
 import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
 import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
 import static org.hamcrest.CoreMatchers.is;
@@ -17,16 +16,15 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j;
-import com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jRule;
 
 public class WhenNeoFriendsAreRequired {
 
 	@ClassRule
-	public static ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().neo4jPath("/opt/neo4j-community-1.7.2").build();
+	public static EmbeddedNeo4j managedNeoServer = newEmbeddedNeo4jRule().build();
 	
 	@Rule
-	public Neo4jRule neo4jRule = newNeo4jRule().defaultManagedNeo4j(this);
+	public Neo4jRule neo4jRule = newNeo4jRule().defaultEmbeddedNeo4j();
 	
 	@Inject
 	private GraphDatabaseService graphDatabaseService;

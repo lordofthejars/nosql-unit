@@ -17,7 +17,7 @@ public class WhenEngineLifecycleIsManaged {
 		assertThat(mockLifecycle.number, is(1));
 		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("localhost", 0), is(true));
 		
-		mockLifecycle.startEngine();
+		mockLifecycle.stopEngine();
 		
 	}
 	
@@ -27,7 +27,7 @@ public class WhenEngineLifecycleIsManaged {
 		MockLifecycle mockLifecycle = new MockLifecycle();
 		mockLifecycle.startEngine();
 		
-		mockLifecycle.startEngine();
+		mockLifecycle.stopEngine();
 		
 		
 		assertThat(mockLifecycle.number, is(0));
@@ -50,7 +50,7 @@ public class WhenEngineLifecycleIsManaged {
 		assertThat(mockLifecycle.number, is(1));
 		assertThat(ConnectionManagement.getInstance().isConnectionRegistered("localhost", 0), is(true));
 		
-		mockLifecycle.startEngine();
+		mockLifecycle.stopEngine();
 		
 		
 		assertThat(mockLifecycle.number, is(0));
