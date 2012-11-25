@@ -67,14 +67,14 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 	
 	public Neo4jRule(Neo4jConfiguration neo4jConfiguration) {
 		super(neo4jConfiguration.getConnectionIdentifier());
-		this.databaseOperation = new Neo4jOperation(neo4jConfiguration.getGraphDatabaseService());
+		this.databaseOperation = new Neo4jOperation(neo4jConfiguration);
 	}
 
 	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/
 	public Neo4jRule(Neo4jConfiguration neo4jConfiguration, Object target) {
 		super(neo4jConfiguration.getConnectionIdentifier());
 		setTarget(target);
-		this.databaseOperation = new Neo4jOperation(neo4jConfiguration.getGraphDatabaseService());
+		this.databaseOperation = new Neo4jOperation(neo4jConfiguration);
 	}
 	
 	@Override

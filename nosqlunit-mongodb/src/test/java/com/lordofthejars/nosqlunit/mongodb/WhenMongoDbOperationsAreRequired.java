@@ -23,6 +23,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
+import com.lordofthejars.nosqlunit.mongodb.MongoOperation;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;

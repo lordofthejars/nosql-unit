@@ -67,14 +67,14 @@ public class HBaseRule extends AbstractNoSqlTestRule {
 	
 	public HBaseRule(HBaseConfiguration hBaseConfiguration) {
 		super(hBaseConfiguration.getConnectionIdentifier());
-		this.databaseOperation = new HBaseOperation(hBaseConfiguration.getConfiguration());
+		this.databaseOperation = new HBaseOperation(hBaseConfiguration);
 	}
 
 	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/
 	public HBaseRule(HBaseConfiguration hBaseConfiguration, Object target) {
 		super(hBaseConfiguration.getConnectionIdentifier());
 		setTarget(target);
-		this.databaseOperation = new HBaseOperation(hBaseConfiguration.getConfiguration());
+		this.databaseOperation = new HBaseOperation(hBaseConfiguration);
 	}
 	
 	@Override

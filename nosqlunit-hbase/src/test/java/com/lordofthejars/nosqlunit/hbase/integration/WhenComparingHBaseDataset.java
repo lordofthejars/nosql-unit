@@ -14,6 +14,7 @@ import org.junit.Test;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.hbase.EmbeddedHBase;
 import com.lordofthejars.nosqlunit.hbase.EmbeddedHBaseInstances;
+import com.lordofthejars.nosqlunit.hbase.HBaseConfiguration;
 import com.lordofthejars.nosqlunit.hbase.HBaseOperation;
 
 public class WhenComparingHBaseDataset {
@@ -267,15 +268,18 @@ public class WhenComparingHBaseDataset {
 	@After
 	public void cleanUp() {
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
+		
 		hBaseOperation.deleteAll();
 	}
+
 	
 	@Test
 	public void no_exception_should_be_thrown_if_data_is_expected() throws Throwable {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		boolean result = hBaseOperation.databaseIs(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
@@ -286,7 +290,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_table_name_is_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -300,7 +304,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_number_of_column_families_are_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -314,7 +318,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_column_family_name_is_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -328,7 +332,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_number_of_rows_are_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -342,7 +346,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_key_names_are_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -356,7 +360,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_number_of_columns_are_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -370,7 +374,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_column_name_is_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -384,7 +388,7 @@ public class WhenComparingHBaseDataset {
 	public void exception_should_be_thrown_if_value_column_is_different() {
 		
 		Configuration configuration = EmbeddedHBaseInstances.getInstance().getDefaultConfiguration();
-		HBaseOperation hBaseOperation = new HBaseOperation(configuration);
+		HBaseOperation hBaseOperation = hBaseOperation(configuration);
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		try {
@@ -392,6 +396,13 @@ public class WhenComparingHBaseDataset {
 		}catch(NoSqlAssertionError e) {
 			assertThat(e.getMessage(), is("Expected column are not found. Encountered column with name col1 and value val1 is not found."));
 		}
+	}
+	
+	private HBaseOperation hBaseOperation(Configuration configuration) {
+		HBaseConfiguration hBaseConfiguration = new HBaseConfiguration();
+		hBaseConfiguration.setConfiguration(configuration);
+		HBaseOperation hBaseOperation = new HBaseOperation(hBaseConfiguration);
+		return hBaseOperation;
 	}
 	
 }

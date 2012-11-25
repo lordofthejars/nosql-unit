@@ -69,9 +69,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	public MongoDbRule(MongoDbConfiguration mongoDbConfiguration) {
 		super(mongoDbConfiguration.getConnectionIdentifier());
 		try {
-			databaseOperation = new MongoOperation(new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort()), mongoDbConfiguration);
-		} catch (UnknownHostException e) {
-			throw new IllegalArgumentException(e);
+			databaseOperation = new MongoOperation(mongoDbConfiguration);
 		} catch (MongoException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -82,9 +80,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 		super(mongoDbConfiguration.getConnectionIdentifier());
 		try {
 			setTarget(target);
-			databaseOperation = new MongoOperation(new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort()), mongoDbConfiguration);
-		} catch (UnknownHostException e) {
-			throw new IllegalArgumentException(e);
+			databaseOperation = new MongoOperation(mongoDbConfiguration);
 		} catch (MongoException e) {
 			throw new IllegalArgumentException(e);
 		}

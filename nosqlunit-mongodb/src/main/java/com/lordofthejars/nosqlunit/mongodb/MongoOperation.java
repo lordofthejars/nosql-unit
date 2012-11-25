@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
 import com.mongodb.util.JSON;
 
@@ -24,9 +26,20 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	private Mongo mongo;
 	private MongoDbConfiguration mongoDbConfiguration;
 
-	public MongoOperation(Mongo mongo, MongoDbConfiguration mongoDbConfiguration) {
-		this.mongo = mongo;
-		this.mongoDbConfiguration = mongoDbConfiguration;
+	protected MongoOperation(Mongo mongo, MongoDbConfiguration mongoDbConfiguration) {
+			this.mongo = mongo;
+			this.mongoDbConfiguration = mongoDbConfiguration;
+	}
+	
+	public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
+		try {
+			this.mongo = new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort());
+			this.mongoDbConfiguration = mongoDbConfiguration;
+		} catch (UnknownHostException e) {
+			throw new IllegalArgumentException(e);
+		} catch (MongoException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	@Override

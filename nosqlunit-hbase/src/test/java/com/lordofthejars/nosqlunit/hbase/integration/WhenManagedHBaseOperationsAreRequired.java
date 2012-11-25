@@ -8,6 +8,7 @@ import static org.junit.Assert.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HTable;
@@ -15,6 +16,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import com.lordofthejars.nosqlunit.hbase.HBaseConfiguration;
 import com.lordofthejars.nosqlunit.hbase.HBaseOperation;
 import com.lordofthejars.nosqlunit.hbase.ManagedHBase;
 
@@ -59,7 +61,7 @@ public class WhenManagedHBaseOperationsAreRequired {
 	public void insert_operation_should_add_all_dataset_to_hbase() throws IOException {
 	
 		com.lordofthejars.nosqlunit.hbase.HBaseConfiguration hBaseConfiguration = newManagedHBaseConfiguration().build();
-		HBaseOperation hBaseOperation = new HBaseOperation(hBaseConfiguration.getConfiguration());
+		HBaseOperation hBaseOperation = hBaseOperation(hBaseConfiguration.getConfiguration());
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		
@@ -75,7 +77,7 @@ public class WhenManagedHBaseOperationsAreRequired {
 	public void delete_operation_should_delete_all_dataset_to_hbase() throws IOException {
 	
 		com.lordofthejars.nosqlunit.hbase.HBaseConfiguration hBaseConfiguration = newManagedHBaseConfiguration().build();
-		HBaseOperation hBaseOperation = new HBaseOperation(hBaseConfiguration.getConfiguration());
+		HBaseOperation hBaseOperation = hBaseOperation(hBaseConfiguration.getConfiguration());
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		
@@ -91,13 +93,19 @@ public class WhenManagedHBaseOperationsAreRequired {
 	public void database_is_operation_should_compare_database() {
 		
 		com.lordofthejars.nosqlunit.hbase.HBaseConfiguration hBaseConfiguration = newManagedHBaseConfiguration().build();
-		HBaseOperation hBaseOperation = new HBaseOperation(hBaseConfiguration.getConfiguration());
+		HBaseOperation hBaseOperation = hBaseOperation(hBaseConfiguration.getConfiguration());
 		
 		hBaseOperation.insert(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		boolean result = hBaseOperation.databaseIs(new ByteArrayInputStream(HBASE_DATASET.getBytes()));
 		hBaseOperation.deleteAll();
 		assertThat(result, is(true));
 		
-		
+	}
+	
+	private HBaseOperation hBaseOperation(Configuration configuration) {
+		HBaseConfiguration hBaseConfiguration = new HBaseConfiguration();
+		hBaseConfiguration.setConfiguration(configuration);
+		HBaseOperation hBaseOperation = new HBaseOperation(hBaseConfiguration);
+		return hBaseOperation;
 	}
 }

@@ -14,12 +14,10 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -37,9 +35,9 @@ public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
 	private GraphMLReader graphMLReader;
 	private GraphMLWriter graphMLWriter;
 
-	public Neo4jOperation(GraphDatabaseService graphDatabaseService) {
+	public Neo4jOperation(Neo4jConfiguration configuration) {
 		super();
-		this.graphDatabaseService = graphDatabaseService;
+		this.graphDatabaseService = configuration.getGraphDatabaseService();
 		this.graphMLReader = new GraphMLReader(this.graphDatabaseService);
 		this.graphMLWriter = new GraphMLWriter(this.graphDatabaseService);
 	}

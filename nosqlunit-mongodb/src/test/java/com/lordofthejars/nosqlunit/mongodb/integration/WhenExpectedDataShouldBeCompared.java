@@ -35,11 +35,11 @@ public class WhenExpectedDataShouldBeCompared {
 	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo")
 			.build();
 	
-	private static Mongo mongo;
+	private static MongoOperation mongoOperation;
 	
 	@BeforeClass
-	public static void initialize() throws UnknownHostException, MongoException {
-		mongo = new Mongo("localhost");
+	public static final void startUp() throws UnknownHostException, MongoException {
+		mongoOperation = new MongoOperation(mongoDb().databaseName("test").build());
 	}
 	
 	@Before
@@ -51,7 +51,6 @@ public class WhenExpectedDataShouldBeCompared {
 	@Test
 	public void empty_database_and_empty_expectation_should_be_equals() {
 		
-		MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		boolean isEquals = mongoOperation.databaseIs(new ByteArrayInputStream("{}".getBytes()));
 		
 		assertThat(isEquals, is(true));
@@ -62,7 +61,6 @@ public class WhenExpectedDataShouldBeCompared {
 		try {
 		
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[]}".getBytes("UTF-8")));
 			fail();
@@ -75,7 +73,6 @@ public class WhenExpectedDataShouldBeCompared {
 	@Test
 	public void empty_expected_collection_and_empty_database_collection_should_be_equal() throws UnsupportedEncodingException {
 		
-		MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		createCollection(getMongoDB(), "col1");
 		
 		boolean isEquals = mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[]}".getBytes("UTF-8")));
@@ -85,7 +82,6 @@ public class WhenExpectedDataShouldBeCompared {
 	@Test
 	public void empty_expected_collection_and_empty_database_should_fail() throws UnsupportedEncodingException {
 		try {
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[]}".getBytes("UTF-8")));
 			fail();
@@ -98,7 +94,6 @@ public class WhenExpectedDataShouldBeCompared {
 	@Test
 	public void empty_expectation_and_empty_database_collection_should_fail() throws UnsupportedEncodingException {
 		try {
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 			createCollection(getMongoDB(), "col1");
 			mongoOperation.databaseIs(new ByteArrayInputStream("{}".getBytes("UTF-8")));
 			fail();
@@ -111,7 +106,6 @@ public class WhenExpectedDataShouldBeCompared {
 	@Test
 	public void empty_expected_collection_and_empty_database_collection_with_different_names_should_fail() throws UnsupportedEncodingException {
 		try {
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 			createCollection(getMongoDB(), "col1");
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col2\":[]}".getBytes("UTF-8")));
@@ -126,7 +120,6 @@ public class WhenExpectedDataShouldBeCompared {
 	public void expected_collection_and_database_collection_with_same_content_should_be_equals() throws UnsupportedEncodingException {
 		
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			boolean isEquals = mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			assertThat(isEquals, is(true));
@@ -137,7 +130,6 @@ public class WhenExpectedDataShouldBeCompared {
 	public void expected_collection_and_database_collection_with_different_content_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
@@ -152,7 +144,6 @@ public class WhenExpectedDataShouldBeCompared {
 		
 		try {
 			createCollection(getMongoDB(), "col1");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
@@ -166,7 +157,6 @@ public class WhenExpectedDataShouldBeCompared {
 	public void expected_collection_and_database_collection_with_different_names_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col2\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
@@ -181,7 +171,6 @@ public class WhenExpectedDataShouldBeCompared {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
 			addCollectionWithData(getMongoDB(), "col3", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
@@ -195,7 +184,6 @@ public class WhenExpectedDataShouldBeCompared {
 	public void expected_collection_has_some_items_different_than_database_collection_items_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}, {\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
@@ -210,7 +198,6 @@ public class WhenExpectedDataShouldBeCompared {
 		try {
 			//Inserted one element
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			//Expected with two elements
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}".getBytes("UTF-8")));
@@ -225,7 +212,6 @@ public class WhenExpectedDataShouldBeCompared {
 		try {
 			//Inserted one element
 			addCollectionWithTwoData(getMongoDB(), "col1", "name", "Alex","surname", "Sot");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			//Expected with two elements
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}".getBytes("UTF-8")));
@@ -241,7 +227,6 @@ public class WhenExpectedDataShouldBeCompared {
 		try {
 			//Inserted one element
 			addCollectionWithTwoData(getMongoDB(), "col1", "name", "Alex","surname", "Soto");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			//Expected with two elements
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
@@ -257,7 +242,6 @@ public class WhenExpectedDataShouldBeCompared {
 	public void expected_collection_has_all_items_different_than_database_collection_items_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
@@ -272,7 +256,6 @@ public class WhenExpectedDataShouldBeCompared {
 	public void more_expected_collection_than_database_collection_should_fail() throws UnsupportedEncodingException {
 		try {
 			addCollectionWithData(getMongoDB(), "col1", "name", "Alex");
-			MongoOperation mongoOperation = new MongoOperation(mongo, mongoDb().databaseName("test").build());
 		
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}], \"col3\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
@@ -307,7 +290,7 @@ public class WhenExpectedDataShouldBeCompared {
 	}
 	
 	private DB getMongoDB() {
-		return mongo.getDB("test");
+		return mongoOperation.connectionManager().getDB("test");
 	}
 	
 }

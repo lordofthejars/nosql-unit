@@ -22,8 +22,8 @@ public class HBaseOperation implements DatabaseOperation<Configuration> {
 	private DataLoader dataLoader;
 	private Configuration configuration;
 	
-	public HBaseOperation(Configuration configuration) {
-		this.configuration = configuration;
+	public HBaseOperation(HBaseConfiguration configuration) {
+		this.configuration = configuration.getConfiguration();
 		this.dataLoader = new DataLoader(this.configuration);
 	}
 	

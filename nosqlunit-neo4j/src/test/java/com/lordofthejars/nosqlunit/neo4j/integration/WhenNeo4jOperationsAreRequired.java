@@ -29,6 +29,7 @@ import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import com.lordofthejars.nosqlunit.neo4j.Neo4jConfiguration;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jLowLevelOps;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jOperation;
 
@@ -107,7 +108,11 @@ public class WhenNeo4jOperationsAreRequired {
 	public void insert_opertation_should_add_data_into_graph()  {
 		
 		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
 		
 		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH.getBytes()));
 		
@@ -139,7 +144,11 @@ public class WhenNeo4jOperationsAreRequired {
 	public void delete_all_operation_should_remove_all_data_from_graph_except_reference_node() {
 		
 		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
 		
 		createNodes(newEmbeddedDatabase);
 		
@@ -167,7 +176,11 @@ public class WhenNeo4jOperationsAreRequired {
 		graphDb.start();
 		
 		RestGraphDatabase graphDatabaseService = new RestGraphDatabase("http://localhost:7474/db/data");
-		Neo4jOperation neo4jOperation = new Neo4jOperation(graphDatabaseService);
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(graphDatabaseService);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
 		
 		createNodes(graphDatabaseService);
 		
@@ -189,7 +202,11 @@ public class WhenNeo4jOperationsAreRequired {
 	public void should_assert_same_expected_data_and_inserted_data() {
 		
 		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
 		
 		createNodes(newEmbeddedDatabase);
 		
@@ -203,7 +220,11 @@ public class WhenNeo4jOperationsAreRequired {
 	public void should_throw_exception_same_expected_data_and_inserted_data() {
 		
 		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
 		
 		createNodes(newEmbeddedDatabase);
 		
