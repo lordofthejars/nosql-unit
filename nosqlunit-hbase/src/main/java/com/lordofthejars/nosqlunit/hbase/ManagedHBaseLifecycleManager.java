@@ -25,7 +25,7 @@ import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
 
 public class ManagedHBaseLifecycleManager extends AbstractLifecycleManager {
 
-private static final Logger LOGGER = LoggerFactory.getLogger(ManagedHBase.class); 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedHBaseLifecycleManager.class); 
 	
 	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
 	
