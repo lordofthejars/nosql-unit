@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -60,10 +61,17 @@
 		<hbase.version>0.94.1</hbase.version>
 		<hadoop.version>1.1.0</hadoop.version>
 		<jackson.version>1.8.8</jackson.version>
+		<ektorp.couchdb.version>1.3.0</ektorp.couchdb.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>org.ektorp</groupId>
+				<artifactId>org.ektorp</artifactId>
+				<version>${ektorp.couchdb.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.codehaus.jackson</groupId>
@@ -290,6 +298,7 @@
 		<module>nosqlunit-cassandra</module>
 		<module>nosqlunit-redis</module>
 		<module>nosqlunit-hbase</module>
+		<module>nosqlunit-couchdb</module>
 	</modules>
 
 	<build>
