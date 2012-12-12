@@ -26,7 +26,7 @@ public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 			executeInsert(contentDataset);
 		} else {
 			throw new IllegalArgumentException(
-					"File specified in locations attribute are not present, or no files matching default name are found.");
+					"File specified in locations property are not present, or no files matching default name are found.");
 		}
 	}
 

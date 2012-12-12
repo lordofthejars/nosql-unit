@@ -6,11 +6,11 @@ import java.lang.annotation.Annotation;
 
 import org.junit.runners.model.FrameworkMethod;
 
+import com.lordofthejars.nosqlunit.util.DefaultClasspathLocationBuilder;
+
 
 public class DefaultDataSetLocationResolver {
 
-	private static final String METHOD_SEPARATOR = "#";
-	
 	private Class<?> resourceBase;
 	
 	public DefaultDataSetLocationResolver(Class<?> resourceBase) {
@@ -23,14 +23,11 @@ public class DefaultDataSetLocationResolver {
 	
 	public String resolveDefaultDataSetLocation(Annotation annotation, FrameworkMethod method, String suffix) {
 		
-		
-		String testClassName = method.getMethod().getDeclaringClass().getName();
-		String defaultClassAnnotatedClasspath = "/"
-				+ testClassName.replace('.', '/');
+		String defaultClassAnnotatedClasspath = DefaultClasspathLocationBuilder.defaultClassAnnotatedClasspathLocation(method);
 		
 		if(isMethodAnnotated(method, annotation)) {
 			
-			String defaultMethodAnnotatedClasspathFile = buildRequiredFilepathForMethodAnnotatation(
+			String defaultMethodAnnotatedClasspathFile = DefaultClasspathLocationBuilder.defaultMethodAnnotatedClasspathLocation(
 					method, defaultClassAnnotatedClasspath, suffix);
 			
 			if (isFileAvailableOnClasspath(resourceBase,
@@ -66,18 +63,6 @@ public class DefaultDataSetLocationResolver {
 		}
 		
 		return null;
-	}
-	
-	private String buildRequiredFilepathForMethodAnnotatation(
-			FrameworkMethod method,
-			String defaultClassAnnotatedClasspath, String suffix) {
-		String testMethodName = method.getName();
-
-		String defaultMethodAnnotatedClasspathFile = defaultClassAnnotatedClasspath
-				+ METHOD_SEPARATOR
-				+ testMethodName
-				+ suffix;
-		return defaultMethodAnnotatedClasspathFile;
 	}
 
 	private boolean isMethodAnnotated(FrameworkMethod method, Annotation annotation) {

@@ -19,6 +19,7 @@ import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.util.DefaultClasspathLocationBuilder;
 
 public abstract class AbstractNoSqlTestRule implements MethodRule {
 
@@ -27,7 +28,8 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 	/**
 	 * With JUnit 4.10 is impossible to get target from a Rule, it seems that
 	 * future versions will support it. For now constructor is apporach is the
-	 * only way. But JUnit 4.11 undeprecated the TestMethod so for maintaining back compatibility target is maintained. 
+	 * only way. But JUnit 4.11 undeprecated the TestMethod so for maintaining
+	 * back compatibility target is maintained.
 	 */
 	private Object target;
 
@@ -41,8 +43,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
 	public AbstractNoSqlTestRule(String identifier) {
 		this.identifier = identifier;
-		this.injectAnnotationProcessor = new InjectAnnotationProcessor(
-				this.identifier);
+		this.injectAnnotationProcessor = new InjectAnnotationProcessor(this.identifier);
 	}
 
 	public abstract DatabaseOperation getDatabaseOperation();
@@ -57,9 +58,8 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 			public void evaluate() throws Throwable {
 
 				target = testObject;
-				
-				defaultDataSetLocationResolver = new DefaultDataSetLocationResolver(
-						testObject.getClass());
+
+				defaultDataSetLocationResolver = new DefaultDataSetLocationResolver(testObject.getClass());
 
 				UsingDataSet usingDataSet = getUsingDataSetAnnotation();
 
@@ -67,9 +67,8 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 					loadDataSet(usingDataSet, method);
 				}
 
-				injectAnnotationProcessor.processInjectAnnotation(
-						testObject.getClass(), target,
-						getDatabaseOperation().connectionManager());
+				injectAnnotationProcessor.processInjectAnnotation(testObject.getClass(), target, getDatabaseOperation()
+						.connectionManager());
 
 				base.evaluate();
 
@@ -83,14 +82,12 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
 			private ShouldMatchDataSet getShouldMatchDataSetAnnotation() {
 
-				ShouldMatchDataSet shouldMatchDataSet = method
-						.getAnnotation(ShouldMatchDataSet.class);
+				ShouldMatchDataSet shouldMatchDataSet = method.getAnnotation(ShouldMatchDataSet.class);
 
 				if (!isTestAnnotatedWithExpectedDataSet(shouldMatchDataSet)) {
 
 					Class<?> testClass = target.getClass();
-					shouldMatchDataSet = testClass
-							.getAnnotation(ShouldMatchDataSet.class);
+					shouldMatchDataSet = testClass.getAnnotation(ShouldMatchDataSet.class);
 
 				}
 
@@ -99,8 +96,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
 			private UsingDataSet getUsingDataSetAnnotation() {
 
-				UsingDataSet usingDataSet = method
-						.getAnnotation(UsingDataSet.class);
+				UsingDataSet usingDataSet = method.getAnnotation(UsingDataSet.class);
 
 				if (!isTestAnnotatedWithDataSet(usingDataSet)) {
 
@@ -112,24 +108,29 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return usingDataSet;
 			}
 
-			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet)
-					throws IOException {
+			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet) throws IOException {
 
-				InputStream scriptContent = loadExpectedContentScript(method,
-						shouldMatchDataSet);
+				InputStream scriptContent = loadExpectedContentScript(method, shouldMatchDataSet);
 
 				if (isNotEmptyStream(scriptContent)) {
 					getDatabaseOperation().databaseIs(scriptContent);
 				} else {
+
+					final String suffix = EXPECTED_RESERVED_WORD + "." + getWorkingExtension();
+					final String defaultClassLocation = DefaultClasspathLocationBuilder
+							.defaultClassAnnotatedClasspathLocation(method);
+					final String defaultMethodLocation = DefaultClasspathLocationBuilder
+							.defaultMethodAnnotatedClasspathLocation(method, defaultClassLocation, suffix);
+
 					throw new IllegalArgumentException(
-							"File specified in location or selective matcher attribute "
-									+ " of ShouldMatchDataSet is not present, or no files matching default location.");
+							"File specified in location or selective matcher property "
+									+ " of ShouldMatchDataSet is not present, or no files matching default location. Valid default locations are: "
+									+ defaultClassLocation + suffix + " or " + defaultMethodLocation);
 				}
 
 			}
 
-			private InputStream loadExpectedContentScript(
-					final FrameworkMethod method,
+			private InputStream loadExpectedContentScript(final FrameworkMethod method,
 					ShouldMatchDataSet shouldMatchDataSet) throws IOException {
 				String location = shouldMatchDataSet.location();
 				InputStream scriptContent = null;
@@ -138,46 +139,39 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 					scriptContent = loadExpectedResultFromLocationAttribute(location);
 				} else {
 
-					SelectiveMatcher[] selectiveMatchers = shouldMatchDataSet
-							.withSelectiveMatcher();
+					SelectiveMatcher[] selectiveMatchers = shouldMatchDataSet.withSelectiveMatcher();
 
 					SelectiveMatcher requiredSelectiveMatcher = findSelectiveMatcherByConnectionIdentifier(selectiveMatchers);
-					
+
 					if (isSelectiveMatchersDefined(requiredSelectiveMatcher)) {
 
 						scriptContent = loadExpectedResultFromLocationAttribute(requiredSelectiveMatcher.location());
-						
+
 					} else {
-						scriptContent = loadExpectedResultFromDefaultLocation(
-								method, shouldMatchDataSet);
+						scriptContent = loadExpectedResultFromDefaultLocation(method, shouldMatchDataSet);
 					}
 				}
 				return scriptContent;
 			}
 
-			private boolean isSelectiveMatchersDefined(
-					SelectiveMatcher requiredSelectiveMatcher) {
+			private boolean isSelectiveMatchersDefined(SelectiveMatcher requiredSelectiveMatcher) {
 				return requiredSelectiveMatcher != null;
 			}
 
 			private SelectiveMatcher findSelectiveMatcherByConnectionIdentifier(SelectiveMatcher[] selectiveMatchers) {
-				return selectFirst(selectiveMatchers, 
+				return selectFirst(
+						selectiveMatchers,
 						having(on(SelectiveMatcher.class).identifier(), equalTo(identifier)).and(
-						having(on(SelectiveMatcher.class).location(), notNullValue())));
+								having(on(SelectiveMatcher.class).location(), notNullValue())));
 			}
-			
-			private InputStream loadExpectedResultFromDefaultLocation(
-					final FrameworkMethod method,
-					ShouldMatchDataSet shouldMatchDataSet)
-					throws IOException {
-				
+
+			private InputStream loadExpectedResultFromDefaultLocation(final FrameworkMethod method,
+					ShouldMatchDataSet shouldMatchDataSet) throws IOException {
+
 				InputStream scriptContent = null;
-				
-				String defaultLocation = defaultDataSetLocationResolver
-						.resolveDefaultDataSetLocation(
-								shouldMatchDataSet, method,
-								EXPECTED_RESERVED_WORD + "."
-										+ getWorkingExtension());
+
+				String defaultLocation = defaultDataSetLocationResolver.resolveDefaultDataSetLocation(
+						shouldMatchDataSet, method, EXPECTED_RESERVED_WORD + "." + getWorkingExtension());
 
 				if (defaultLocation != null) {
 					scriptContent = loadExpectedResultFromLocationAttribute(defaultLocation);
@@ -185,56 +179,66 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return scriptContent;
 			}
 
-			private InputStream loadExpectedResultFromLocationAttribute(
-					String location) throws IOException {
+			private InputStream loadExpectedResultFromLocationAttribute(String location) throws IOException {
 				InputStream scriptContent;
 				scriptContent = IOUtils.getStreamFromClasspathBaseResource(
-						defaultDataSetLocationResolver.getResourceBase(),
-						location);
+						defaultDataSetLocationResolver.getResourceBase(), location);
 				return scriptContent;
 			}
 
-			private void loadDataSet(UsingDataSet usingDataSet,
-					FrameworkMethod method) throws IOException {
+			private void loadDataSet(UsingDataSet usingDataSet, FrameworkMethod method) throws IOException {
 
+				List<InputStream> scriptContent = loadDatasets(usingDataSet, method);
+				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
+
+				if (areDatasetsRequired(loadStrategyEnum) && emptyDataset(scriptContent)) {
+					final String suffix = "." + getWorkingExtension();
+					final String defaultClassLocation = DefaultClasspathLocationBuilder
+							.defaultClassAnnotatedClasspathLocation(method);
+					final String defaultMethodLocation = DefaultClasspathLocationBuilder
+							.defaultMethodAnnotatedClasspathLocation(method, defaultClassLocation, suffix);
+					throw new IllegalArgumentException(
+							"File specified in locations property are not present in classpath, or no files matching default name are found. Valid default locations are: "
+									+ defaultClassLocation + suffix + " or " + defaultMethodLocation);
+				}
+
+				LoadStrategyOperation loadStrategyOperation = loadStrategyFactory.getLoadStrategyInstance(
+						loadStrategyEnum, getDatabaseOperation());
+				loadStrategyOperation.executeScripts(scriptContent.toArray(new InputStream[scriptContent.size()]));
+
+			}
+
+			private boolean emptyDataset(List<InputStream> scriptContent) {
+				return scriptContent.size() == 0;
+			}
+
+			private boolean areDatasetsRequired(LoadStrategyEnum loadStrategyEnum) {
+				return LoadStrategyEnum.DELETE_ALL != loadStrategyEnum;
+			}
+
+			private List<InputStream> loadDatasets(UsingDataSet usingDataSet, FrameworkMethod method)
+					throws IOException {
 				String[] locations = usingDataSet.locations();
 
 				List<InputStream> scriptContent = new ArrayList<InputStream>();
 
-				scriptContent.addAll(loadGlobalDataSets(usingDataSet,
-						method, locations));
+				scriptContent.addAll(loadGlobalDataSets(usingDataSet, method, locations));
 				scriptContent.addAll(loadSelectiveDataSets(usingDataSet));
-
-				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
-				LoadStrategyOperation loadStrategyOperation = loadStrategyFactory
-						.getLoadStrategyInstance(loadStrategyEnum,
-								getDatabaseOperation());
-				loadStrategyOperation.executeScripts(scriptContent
-						.toArray(new InputStream[scriptContent.size()]));
-
+				return scriptContent;
 			}
 
-			private List<InputStream> loadSelectiveDataSets(UsingDataSet usingDataSet)
-					throws IOException {
+			private List<InputStream> loadSelectiveDataSets(UsingDataSet usingDataSet) throws IOException {
 
 				List<InputStream> scriptContent = new ArrayList<InputStream>();
 
 				if (isSelectiveLocationsAttributeSpecified(usingDataSet)) {
-					Selective[] selectiveLocations = usingDataSet
-							.withSelectiveLocations();
-					if (selectiveLocations != null
-							&& selectiveLocations.length > 0) {
+					Selective[] selectiveLocations = usingDataSet.withSelectiveLocations();
+					if (selectiveLocations != null && selectiveLocations.length > 0) {
 						for (Selective selective : selectiveLocations) {
-							if (identifier
-									.equals(selective.identifier().trim())
-									&& isLocationsAttributeSpecified(selective
-											.locations())) {
-								scriptContent
-										.addAll(IOUtils
-												.getAllStreamsFromClasspathBaseResource(
-														defaultDataSetLocationResolver
-																.getResourceBase(),
-														selective.locations()));
+							if (identifier.equals(selective.identifier().trim())
+									&& isLocationsAttributeSpecified(selective.locations())) {
+								scriptContent.addAll(IOUtils.getAllStreamsFromClasspathBaseResource(
+										defaultDataSetLocationResolver.getResourceBase(), selective.locations()));
 							}
 						}
 					}
@@ -243,30 +247,24 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return scriptContent;
 			}
 
-			private List<InputStream> loadGlobalDataSets(UsingDataSet usingDataSet,
-					FrameworkMethod method, String[] locations)
-					throws IOException {
+			private List<InputStream> loadGlobalDataSets(UsingDataSet usingDataSet, FrameworkMethod method,
+					String[] locations) throws IOException {
 
 				List<InputStream> scriptContent = new ArrayList<InputStream>();
 
 				if (isLocationsAttributeSpecified(locations)) {
 
-					scriptContent.addAll(IOUtils
-							.getAllStreamsFromClasspathBaseResource(
-									defaultDataSetLocationResolver
-											.getResourceBase(), locations));
+					scriptContent.addAll(IOUtils.getAllStreamsFromClasspathBaseResource(
+							defaultDataSetLocationResolver.getResourceBase(), locations));
 
 				} else {
 
-					String location = defaultDataSetLocationResolver
-							.resolveDefaultDataSetLocation(usingDataSet,
-									method, "." + getWorkingExtension());
+					String location = defaultDataSetLocationResolver.resolveDefaultDataSetLocation(usingDataSet,
+							method, "." + getWorkingExtension());
 
 					if (location != null) {
-						scriptContent.add(IOUtils
-								.getStreamFromClasspathBaseResource(
-										defaultDataSetLocationResolver
-												.getResourceBase(), location));
+						scriptContent.add(IOUtils.getStreamFromClasspathBaseResource(
+								defaultDataSetLocationResolver.getResourceBase(), location));
 					}
 
 				}
@@ -274,15 +272,12 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return scriptContent;
 			}
 
-			private boolean isSelectiveLocationsAttributeSpecified(
-					UsingDataSet usingDataSet) {
-				Selective[] selectiveLocations = usingDataSet
-						.withSelectiveLocations();
+			private boolean isSelectiveLocationsAttributeSpecified(UsingDataSet usingDataSet) {
+				Selective[] selectiveLocations = usingDataSet.withSelectiveLocations();
 				if (selectiveLocations != null && selectiveLocations.length > 0) {
 					for (Selective selective : selectiveLocations) {
 						if (identifier.equals(selective.identifier().trim())
-								&& isLocationsAttributeSpecified(selective
-										.locations())) {
+								&& isLocationsAttributeSpecified(selective.locations())) {
 							return true;
 						}
 					}
@@ -294,7 +289,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 			private boolean isNotEmptyStream(InputStream inputStream) {
 				return inputStream != null;
 			}
-			
+
 			private boolean isNotEmptyString(String location) {
 				return location != null && !"".equals(location.trim());
 			}
@@ -303,8 +298,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return locations != null && locations.length > 0;
 			}
 
-			private boolean isTestAnnotatedWithExpectedDataSet(
-					ShouldMatchDataSet shouldMatchDataSet) {
+			private boolean isTestAnnotatedWithExpectedDataSet(ShouldMatchDataSet shouldMatchDataSet) {
 				return shouldMatchDataSet != null;
 			}
 
@@ -318,8 +312,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 		this.loadStrategyFactory = loadStrategyFactory;
 	}
 
-	public void setInjectAnnotationProcessor(
-			InjectAnnotationProcessor injectAnnotationProcessor) {
+	public void setInjectAnnotationProcessor(InjectAnnotationProcessor injectAnnotationProcessor) {
 		this.injectAnnotationProcessor = injectAnnotationProcessor;
 	}
 
