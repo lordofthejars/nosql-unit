@@ -32,8 +32,8 @@ public class ManagedCouchDb extends ExternalResource {
 			return this;
 		}
 
-		public ManagedCouchDbRuleBuilder couchDbPath(String redisPath) {
-			this.managedCouchDbLifecycleManager.setCouchDbPath(redisPath);
+		public ManagedCouchDbRuleBuilder couchDbPath(String couchPath) {
+			this.managedCouchDbLifecycleManager.setCouchDbPath(couchPath);
 			return this;
 		}
 		
