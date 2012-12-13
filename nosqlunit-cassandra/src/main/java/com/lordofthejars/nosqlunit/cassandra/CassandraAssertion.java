@@ -17,12 +17,14 @@ import me.prettyprint.cassandra.serializers.StringSerializer;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
 import me.prettyprint.hector.api.beans.HColumn;
+import me.prettyprint.hector.api.beans.HCounterColumn;
 import me.prettyprint.hector.api.beans.HSuperColumn;
 import me.prettyprint.hector.api.ddl.ColumnFamilyDefinition;
 import me.prettyprint.hector.api.ddl.ColumnType;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.query.ColumnQuery;
+import me.prettyprint.hector.api.query.CounterQuery;
 import me.prettyprint.hector.api.query.QueryResult;
 import me.prettyprint.hector.api.query.SuperColumnQuery;
 
@@ -74,7 +76,7 @@ public class CassandraAssertion {
 			if (ColumnType.STANDARD == columnType) {
 
 				for (RowModel expectedRowModel : expectedRows) {
-					checkStandardColumns(keyspace, expectedColumnFamilyName, expectedRowModel);
+					checkStandardColumns(keyspace, expectedColumnFamilyModel, expectedRowModel);
 				}
 
 			} else {
@@ -83,7 +85,7 @@ public class CassandraAssertion {
 					for (RowModel expectedRowModel : expectedRows) {
 						List<ColumnModel> expectedColumns = expectedRowModel.getColumns();
 						checkNotStandardColumnsInSuperColumns(expectedRowModel, expectedColumns.size());
-						checkSuperColumns(keyspace, expectedColumnFamilyName, expectedRowModel);
+						checkSuperColumns(keyspace, expectedColumnFamilyModel, expectedRowModel);
 					}
 
 				} else {
@@ -96,48 +98,49 @@ public class CassandraAssertion {
 	}
 
 	private static void checkNotStandardColumnsInSuperColumns(RowModel expectedRowModel, int size) throws Error {
-		if(size > 0) {
-			throw FailureHandler.createFailure("Standard columns for key %s are not allowed because is defined as super column.",
+		if (size > 0) {
+			throw FailureHandler.createFailure(
+					"Standard columns for key %s are not allowed because is defined as super column.",
 					asString(expectedRowModel.getKey()));
 		}
 	}
 
-	private static void checkSuperColumns(Keyspace keyspace, String expectedColumnFamilyName, RowModel expectedRowModel)
+	private static void checkSuperColumns(Keyspace keyspace, ColumnFamilyModel expectedColumnFamilyModel, RowModel expectedRowModel)
 			throws Error {
+		
+		String expectedColumnFamilyName = expectedColumnFamilyModel.getName();
+		
 		List<SuperColumnModel> expectedSuperColumns = expectedRowModel.getSuperColumns();
-		checkNumberOfSuperColumns(keyspace, expectedColumnFamilyName, expectedRowModel,
-				expectedSuperColumns.size());
+		checkNumberOfSuperColumns(keyspace, expectedColumnFamilyName, expectedRowModel, expectedSuperColumns.size());
 
 		for (SuperColumnModel expectedSuperColumnModel : expectedSuperColumns) {
 			GenericType expectedSuperColumnName = expectedSuperColumnModel.getName();
 
-			SuperColumnQuery<byte[], byte[], byte[], byte[]> createSuperColumnQuery = HFactory
-					.createSuperColumnQuery(keyspace, BytesArraySerializer.get(),
-							BytesArraySerializer.get(), BytesArraySerializer.get(),
-							BytesArraySerializer.get());
+			SuperColumnQuery<byte[], byte[], byte[], byte[]> createSuperColumnQuery = HFactory.createSuperColumnQuery(
+					keyspace, BytesArraySerializer.get(), BytesArraySerializer.get(), BytesArraySerializer.get(),
+					BytesArraySerializer.get());
 			createSuperColumnQuery.setColumnFamily(expectedColumnFamilyName);
 			createSuperColumnQuery.setKey(getBytes(expectedRowModel.getKey()));
 			createSuperColumnQuery.setSuperName(getBytes(expectedSuperColumnName));
-			QueryResult<HSuperColumn<byte[], byte[], byte[]>> supercolumn = createSuperColumnQuery
-					.execute();
+			QueryResult<HSuperColumn<byte[], byte[], byte[]>> supercolumn = createSuperColumnQuery.execute();
 
 			List<ColumnModel> expectedColumns = expectedSuperColumnModel.getColumns();
 			HSuperColumn<byte[], byte[], byte[]> hSuperColumn = supercolumn.get();
-			
+
 			checkSuperColumnNameAndKey(expectedSuperColumnName, hSuperColumn);
-			
+
 			List<HColumn<byte[], byte[]>> columns = hSuperColumn.getColumns();
-			
-			checkNumberOfColumnsInsideSuperColumn( expectedSuperColumnModel.getName().getValue(), expectedRowModel.getKey().getValue(), expectedColumns.size(), columns.size());
-			checkColumnsOfSuperColumn(expectedRowModel, expectedSuperColumnModel, expectedColumns,
-					columns);
-			
+
+			checkNumberOfColumnsInsideSuperColumn(expectedSuperColumnModel.getName().getValue(), expectedRowModel
+					.getKey().getValue(), expectedColumns.size(), columns.size());
+			checkColumnsOfSuperColumn(expectedRowModel, expectedSuperColumnModel, expectedColumns, columns);
+
 		}
 	}
 
 	private static void checkSuperColumnNameAndKey(GenericType expectedSuperColumnName,
 			HSuperColumn<byte[], byte[], byte[]> hSuperColumn) throws Error {
-		if(hSuperColumn == null) {
+		if (hSuperColumn == null) {
 			throw FailureHandler.createFailure("Supercolumn %s is not found into database.",
 					expectedSuperColumnName.getValue());
 		}
@@ -146,9 +149,10 @@ public class CassandraAssertion {
 	private static void checkColumnsOfSuperColumn(RowModel expectedRowModel, SuperColumnModel expectedSuperColumnModel,
 			List<ColumnModel> expectedColumns, List<HColumn<byte[], byte[]>> columns) throws Error {
 		for (HColumn<byte[], byte[]> hColumn : columns) {
-			if(!areLoadValuesOnExpectedList(expectedColumns, hColumn.getName(), hColumn.getValue())){
-				throw FailureHandler.createFailure("Row with key %s and supercolumn %s does not contain expected column.",
-						asString(expectedRowModel.getKey()),expectedSuperColumnModel.getName().getValue());
+			if (!areLoadValuesOnExpectedList(expectedColumns, hColumn.getName(), hColumn.getValue())) {
+				throw FailureHandler.createFailure(
+						"Row with key %s and supercolumn %s does not contain expected column.",
+						asString(expectedRowModel.getKey()), expectedSuperColumnModel.getName().getValue());
 			}
 		}
 	}
@@ -173,8 +177,10 @@ public class CassandraAssertion {
 		}
 	}
 
-	private static void checkStandardColumns(Keyspace keyspace, String expectedColumnFamilyName,
+	private static void checkStandardColumns(Keyspace keyspace, ColumnFamilyModel expectedColumnFamilyModel,
 			RowModel expectedRowModel) throws Error {
+
+		String expectedColumnFamilyName = expectedColumnFamilyModel.getName();
 
 		checkNumberOfColumns(keyspace, expectedColumnFamilyName, expectedRowModel);
 
@@ -182,21 +188,66 @@ public class CassandraAssertion {
 
 		for (ColumnModel expectedColumnModel : expectedColumns) {
 
-			ColumnQuery<byte[], byte[], byte[]> columnQuery = HFactory.createColumnQuery(keyspace,
-					BytesArraySerializer.get(), BytesArraySerializer.get(), BytesArraySerializer.get());
-			columnQuery.setColumnFamily(expectedColumnFamilyName).setKey(getBytes(expectedRowModel.getKey()))
-					.setName(getBytes(expectedColumnModel.getName()));
-			QueryResult<HColumn<byte[], byte[]>> result = columnQuery.execute();
+			if (expectedColumnFamilyModel.isCounter()) {
+				checkCounterColumn(keyspace, expectedRowModel, expectedColumnFamilyName, expectedColumnModel);
+			} else {
+				checkColumn(keyspace, expectedRowModel, expectedColumnFamilyName, expectedColumnModel);
+			}
 
-			HColumn<byte[], byte[]> hColumn = result.get();
-			
-			checkColumnName(expectedColumnModel, hColumn);
-			checkColumnValue(expectedRowModel, hColumn);
 		}
 	}
 
+	private static void checkColumn(Keyspace keyspace, RowModel expectedRowModel, String expectedColumnFamilyName,
+			ColumnModel expectedColumnModel) throws Error {
+		ColumnQuery<byte[], byte[], byte[]> columnQuery = HFactory.createColumnQuery(keyspace,
+				BytesArraySerializer.get(), BytesArraySerializer.get(), BytesArraySerializer.get());
+		columnQuery.setColumnFamily(expectedColumnFamilyName).setKey(getBytes(expectedRowModel.getKey()))
+				.setName(getBytes(expectedColumnModel.getName()));
+		QueryResult<HColumn<byte[], byte[]>> result = columnQuery.execute();
+
+		HColumn<byte[], byte[]> hColumn = result.get();
+
+		checkColumnName(expectedColumnModel, hColumn);
+		checkColumnValue(expectedRowModel, hColumn);
+	}
+
+	private static void checkCounterColumn(Keyspace keyspace, RowModel expectedRowModel,
+			String expectedColumnFamilyName, ColumnModel expectedColumnModel) throws Error {
+		CounterQuery<byte[], byte[]> counterColumnQuery = HFactory.createCounterColumnQuery(keyspace,
+				BytesArraySerializer.get(), BytesArraySerializer.get());
+		counterColumnQuery.setColumnFamily(expectedColumnFamilyName)
+				.setKey(getBytes(expectedRowModel.getKey())).setName(getBytes(expectedColumnModel.getName()));
+		
+		QueryResult<HCounterColumn<byte[]>> result = counterColumnQuery.execute();
+
+		HCounterColumn<byte[]> hColumn = result.get();
+
+		checkCounterColumnName(expectedColumnModel, hColumn);
+		checkCounterColumnValue(expectedRowModel, hColumn);
+	}
+	
+	private static void checkCounterColumnValue(RowModel expectedRowModel, HCounterColumn<byte[]> hColumn) throws Error {
+		byte[] expectedColumnName = hColumn.getName();
+		Long expectedColumnValue = hColumn.getValue();
+
+		byte[] expectedColumnValueBytes = getBytes(new GenericType(Long.toString(expectedColumnValue), GenericTypeEnum.LONG_TYPE));
+		
+		if (!areLoadValuesOnExpectedList(expectedRowModel.getColumns(), expectedColumnName, expectedColumnValueBytes)) {
+			throw FailureHandler.createFailure("Row with key %s does not contain column with name %s and value %s.",
+					asString(expectedRowModel.getKey()), new String(expectedColumnName),
+					expectedColumnValue);
+		}
+	}
+
+	private static void checkCounterColumnName(ColumnModel expectedColumnModel, HCounterColumn<byte[]> hColumn) throws Error {
+		if (hColumn == null) {
+			throw FailureHandler.createFailure("Expected name of column is %s but was not found.",
+					asString(expectedColumnModel.getName()));
+		}
+	}
+	
 	private static void checkColumnName(ColumnModel expectedColumnModel, HColumn<byte[], byte[]> hColumn) throws Error {
-		if(hColumn == null) {
+		if (hColumn == null) {
 			throw FailureHandler.createFailure("Expected name of column is %s but was not found.",
 					asString(expectedColumnModel.getName()));
 		}
@@ -204,7 +255,6 @@ public class CassandraAssertion {
 
 	private static byte[] getBytes(GenericType genericType) {
 
-		
 		return GenericTypeSerializer.get().toBytes(genericType);
 
 	}
@@ -215,8 +265,8 @@ public class CassandraAssertion {
 
 		if (!areLoadValuesOnExpectedList(expectedRowModel.getColumns(), expectedColumnName, expectedColumnValue)) {
 			throw FailureHandler.createFailure("Row with key %s does not contain column with name %s and value %s.",
-					asString(expectedRowModel.getKey()), new String(expectedColumnName), new String(
-							expectedColumnValue));
+					asString(expectedRowModel.getKey()), new String(expectedColumnName),
+					new String(expectedColumnValue));
 		}
 	}
 
@@ -252,12 +302,11 @@ public class CassandraAssertion {
 		}
 	}
 
-	
-	
 	// change to bytearray instead of string
 	private static int countNumberOfColumnsByKey(Keyspace keyspace, String expectedColumnFamilyName,
 			RowModel expectedRowModel) {
-		QueryResult<Integer> qr = HFactory.createCountQuery(keyspace, GenericTypeSerializer.get(), StringSerializer.get())
+		QueryResult<Integer> qr = HFactory
+				.createCountQuery(keyspace, GenericTypeSerializer.get(), StringSerializer.get())
 				.setColumnFamily(expectedColumnFamilyName).setKey(expectedRowModel.getKey())
 				.setRange(null, null, 1000000000).execute();
 
@@ -330,13 +379,13 @@ public class CassandraAssertion {
 	}
 
 	private static String asString(GenericType genericType) {
-		
-		if(genericType.getType() == GenericTypeEnum.COMPOSITE_TYPE) {
-			return "<"+join(genericType.getCompositeValues())+">";
+
+		if (genericType.getType() == GenericTypeEnum.COMPOSITE_TYPE) {
+			return "<" + join(genericType.getCompositeValues()) + ">";
 		}
-		
+
 		return genericType.getValue();
-		
+
 	}
-	
+
 }
