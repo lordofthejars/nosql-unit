@@ -10,9 +10,12 @@
 		<title xml:id="advanced.redis_embedded.section">Embedded In-Memory Redis</title>
 
 		<para>
-			When you are writing unit tests you should keep in mind that they must run fast, which implies, among other
-			things, no interaction with IO subsystem (disk, network, ...). To
-			avoid this interaction in database unit tests, there are embedded
+			When you are writing unit tests you should keep in mind that they
+			must run fast, which implies, among other
+			things, no interaction with
+			IO subsystem (disk, network, ...). To
+			avoid this interaction in
+			database unit tests, there are embedded
 			in-memory databases like
 			<emphasis>H2</emphasis>
 			,
@@ -51,7 +54,7 @@
 		<para>
 			But also can be used outside umbrella of
 			<emphasis role="bold">NoSQLUnit</emphasis>
-			, by instantiating manually, as described in next 
+			, by instantiating manually, as described in next
 			<link linkend="advanced.instantiate-embedded-redis">example:</link>
 		</para>
 		<example xml:id="advanced.instantiate-embedded-redis">
@@ -63,7 +66,8 @@ Jedis jedis = embeddedRedisBuilder.createEmbeddedJedis();
 		</example>
 
 		<para>Notice that Jedis class is the main class defined by Jedis
-			project but proxied to use in-memory data instead of sending requests to remote server.
+			project but proxied to use in-memory data instead of sending requests
+			to remote server.
 		</para>
 
 		<para>
@@ -77,7 +81,8 @@ Jedis jedis = embeddedRedisBuilder.createEmbeddedJedis();
 					<para>
 						Connection commands do nothing, they do not throw any
 						exception but neither do any action. In fact would not have
-						sense that they do something.
+						sense
+						that they do something.
 					</para>
 				</listitem>
 				<listitem>
@@ -91,7 +96,8 @@ Jedis jedis = embeddedRedisBuilder.createEmbeddedJedis();
 					<para>
 						Transaction commands are not supported, but they do not throw
 						any exception, simply returns a null value
-						and in cases of List return type, an empty list is returned.
+						and in cases of List
+						return type, an empty list is returned.
 					</para>
 				</listitem>
 				<listitem>
@@ -416,7 +422,9 @@ private Mongo mongo;]]></programlisting>
 				<link linkend="advanced.injection">example</link>
 				we are setting
 				<varname>this</varname>
-				as second parameter to the Rule.
+				as second parameter to the Rule. This is only required in versions
+				of JUnit prior to 4.11. In new versions is no longer required
+				passing the this parameter.
 			</para>
 		</warning>
 

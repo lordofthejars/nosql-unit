@@ -70,7 +70,7 @@
 				dependency:
 			</para>
 
-			<example xml:id="conf.nosqlunit_cassandra_dep">
+			<example xml:id="conf.nosqlunit_hbase_dep">
 				<title>NoSqlUnit Maven Repository</title>
 
 				<programlisting language="xml"><![CDATA[<dependency>

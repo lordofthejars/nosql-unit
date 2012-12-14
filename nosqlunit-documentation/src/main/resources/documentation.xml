@@ -68,6 +68,8 @@
 		<xi:include href="./neo4j.xml"/>
 		<xi:include href="./cassandra.xml"/>
 		<xi:include href="./redis.xml"/>
+		<xi:include href="./hbase.xml"/>
+		<xi:include href="./couchdb.xml"/>
 	</part>
 
 	<part id="advanced-usage-part">

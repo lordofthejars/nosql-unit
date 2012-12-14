@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="couchdb" xmlns="http://docbook.org/ns/docbook"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:svg="http://www.w3.org/2000/svg" xmlns:m="http://www.w3.org/1998/Math/MathML"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:db="http://docbook.org/ns/docbook">
+    
+    <title>CouchDB Engine</title>
+	
+	<section>
+		<title>CouchDB</title>
+
+		<para>
+			<application>CouchDB</application>
+			is a
+			<emphasis>NoSQL</emphasis>
+			database that stores structured data as
+			<emphasis>JSON-like</emphasis>
+			documents with dynamic schemas.
+		</para>
+
+		<para>
+			<emphasis role="bold">NoSQLUnit</emphasis>
+			supports
+			<emphasis>CouchDB</emphasis>
+			by using next classes:
+		</para>
+		<para>
+		<table border="1">
+			<caption>Lifecycle Management Rules</caption>
+			<tr>
+				<td>Managed</td>
+
+				<td>
+					<classname>com.lordofthejars.nosqlunit.couchdb.ManagedCouchDb
+					</classname>
+				</td>
+			</tr>
+		</table>
+		</para>
+		<para>
+		<table border="1">
+			<caption>Manager Rule</caption>
+
+			<tr>
+				<td>NoSQLUnit Management</td>
+
+				<td>
+					<classname>com.lordofthejars.nosqlunit.couchdb.CouchDbRule
+					</classname>
+				</td>
+			</tr>
+		</table>
+		</para>
+		<section>
+			<title>Maven Setup</title>
+
+			<para>
+				To use
+				<emphasis role="bold">NoSQLUnit</emphasis>
+				with
+				<application>CouchDB</application>
+				you only need to add next
+				dependency:
+			</para>
+
+			<example xml:id="conf.couchdb_nosqlunit_dep">
+				<title>NoSqlUnit Maven Repository</title>
+
+				<programlisting language="xml"><![CDATA[<dependency>
+	<groupId>com.lordofthejars</groupId>
+	<artifactId>nosqlunit-couchdb</artifactId>
+	<version>${version.nosqlunit}</version>
+</dependency>]]></programlisting>
+			</example>
+		</section>
+
+		<section>
+			<title>Dataset Format</title>
+
+			<para>
+				Default dataset file format in
+				<emphasis>CouchDB</emphasis>
+				module
+				is
+				<emphasis>json</emphasis>
+				.
+			</para>
+
+			<para>
+				Datasets must have next
+				<link linkend="ex.couchdb_dataset">
+					format
+				</link>
+				:
+			</para>
+
+			<example xml:id="ex.couchdb_dataset">
+				<title>Example of CouchDB Dataset</title>
+
+				<programlisting language="json"><![CDATA[{
+	"data":
+			[
+				{"attribute1":"value1", "atribute2":"value2", ...},
+				{...}
+			]
+}]]></programlisting>
+			</example>
+
+			<para>Notice that if attributes value are integers, double quotes are
+				not required.
+			</para>
+		</section>
+
+		<section>
+			<title>Getting Started</title>
+
+			<section>
+				<title>Lifecycle Management Strategy</title>
+
+				<para>
+					First step is defining which lifecycle management strategy is
+					required for your tests. Depending on kind of test you are
+					implementing (unit test, integration test, deployment test, ...)
+					you
+					will require an
+					<emphasis role="bold">managed</emphasis>
+					approach or
+					<emphasis role="bold">remote</emphasis>
+					approach.
+				</para>
+
+				<para>
+				There is no <emphasis>CouchDB</emphasis> inmemory instance, so only managed or remote lifecycle can be used.
+				</para>
+
+				<para>
+					To configure the
+					<emphasis role="bold">managed</emphasis>
+					way,
+					you should use
+					<classname>ManagedCouchDb</classname>
+					rule and may
+					require some <link linkend="program.couchdb_managed_conf">configuration</link> parameters.
+				</para>
+
+				<example xml:id="program.couchdb_managed_conf">
+					<title>Managed CouchDB</title>
+
+					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.couchdb.ManagedCouchDb.ManagedCouchDbRuleBuilder.newManagedCouchDbRule;
+
+@ClassRule
+public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build(); ]]></programlisting>
+				</example>
+
+				<para>
+					By default managed
+					<emphasis>CouchDB</emphasis>
+					rule uses next
+					default values:
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis>CouchDB</emphasis>
+							installation directory is
+							retrieved from
+							<varname>COUCHDB_HOME</varname>
+							system environment
+							variable.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							Target path, that is the directory where
+							<emphasis>CouchDB</emphasis>
+							server is started, is
+							<constant>target/couchdb-temp</constant>
+							.
+						</para>
+					</listitem>
+					
+					<listitem>
+						<para>
+							Port where <emphasis>CouchDB</emphasis> will be started. Note that this parameter is used only as information, if you change port from configuration file you should change this parameter too.
+							By default<emphasis>CouchDB</emphasis>
+							server is started at
+							<constant>5984</constant>
+							.
+						</para>
+					</listitem>
+
+				</itemizedlist>
+
+								<para>
+					Configuring
+					<emphasis role="bold">remote</emphasis>
+					approach
+					does not require any special rule because you (or System like
+					<application>Maven</application>
+					) is the responsible of starting and
+					stopping the server. This mode is used in deployment tests where you
+					are testing your application on real environment.
+				</para>
+			</section>
+
+			<section>
+				<title>Configuring CouchDB Connection</title>
+
+				<para>
+					Next step is configuring
+					<emphasis>
+						<emphasis role="bold">CouchDB</emphasis>
+					</emphasis>
+					rule in charge of
+					maintaining
+					<emphasis>CouchDB</emphasis>
+					database into known state by
+					inserting and deleting defined datasets. You must register
+					<classname>CouchDbRule</classname>
+					<emphasis>JUnit</emphasis>
+					rule
+					class, which requires a configuration parameter with information like
+					host, port or database name.
+				</para>
+
+				<para>To make developer's life easier and code more readable, a
+					fluent
+					interface can be used to create these configuration objects.
+				</para>
+
+				<table border="1">
+					<caption>Default Managed Configuration Values</caption>
+
+					<tr>
+						<td>URI</td>
+
+						<td>http://localhost5984</td>
+					</tr>
+					<tr>
+						<td>Authentication</td>
+
+						<td>No authentication parameters.</td>
+					</tr>
+					<tr>
+						<td>Enable SSL</td>
+
+						<td>false.</td>
+					</tr>
+					<tr>
+						<td>Relaxed SSL Settings</td>
+
+						<td>false.</td>
+					</tr>
+					<tr>
+						<td>Caching</td>
+
+						<td>True.</td>
+					</tr>
+				</table>
+
+				<example xml:id="program.couchdb_managed_connection_parameters">
+					<title>CouchDBRule with managed configuration</title>
+
+					<programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.couchdb.CouchDbRule.CouchDbRuleBuilder.newCouchDbRule;
+
+@Rule
+public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedMongoDb("books");]]></programlisting>
+				</example>
+
+			</section>
+
+			<section>
+				<title>Complete Example</title>
+
+				<para>
+					Consider a library application, which apart from multiple
+					operations, it allow us to add new books to system. Our
+					<link linkend="example.couchdb_book_model">model</link>
+					is as simple as:
+				</para>
+
+				<example xml:id="example.couchdb_book_model">
+					<title>Book POJO</title>
+
+					<programlisting language="java"><![CDATA[public class Book {
+
+	private String title;
+
+	private int numberOfPages;
+
+	public Book(String title, int numberOfPages) {
+		super();
+		this.title = title;
+		this.numberOfPages = numberOfPages;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setNumberOfPages(int numberOfPages) {
+		this.numberOfPages = numberOfPages;
+	}
+
+
+	public String getTitle() {
+		return title;
+	}
+
+	public int getNumberOfPages() {
+		return numberOfPages;
+	}
+}]]></programlisting>
+				</example>
+
+				<para>
+					Next business
+					<link linkend="example.couchdb_book_manager">class</link>
+					is the responsible of managing access to
+					<emphasis>CouchDB</emphasis>
+					server:
+				</para>
+
+				<example xml:id="example.couchdb_book_manager">
+					<title>Book POJO</title>
+
+					<programlisting language="java"><![CDATA[private CouchDbConnector connector;
+	
+	public BookManager(CouchDbConnector connector)  {
+		this.connector = connector;
+	}
+	
+	public void create(Book book) {
+		connector.create(MapBookConverter.toMap(book));
+	}
+
+	public Book findBookById(String id) {
+		Map<String, Object> map = connector.get(Map.class, id);
+		return MapBookConverter.toBook(map);
+	}]]></programlisting>
+				</example>
+
+				<para>
+					And now it is time for testing. In next
+					<link linkend="example.couchdb_test_find_book">test</link>
+					we are going to
+					validate that a book is found into database.
+				</para>
+
+				<example xml:id="example.couchdb_test_find_book">
+					<title>Test with Managed Connection</title>
+
+					<programlisting language="java"><![CDATA[public class WhenYouFindBooksById {
+
+	@ClassRule
+	public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build(); 
+	
+	@Rule
+	public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedMongoDb("books");
+	
+	@Inject
+	private CouchDbConnector couchDbConnector;
+	
+	@Test
+	@UsingDataSet(locations="books.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	public void identified_book_should_be_returned() {
+		
+		BookManager bookManager = new BookManager(couchDbConnector);
+		Book book = bookManager.findBookById("1");
+		
+		assertThat(book.getTitle(), is("The Hobbit"));
+		assertThat(book.getNumberOfPages(), is(293));
+		
+	}
+	
+}]]></programlisting>
+				</example>
+
+				<example xml:id="example.couchdb_dataset_book">
+					<title>Initial Dataset</title>
+
+					<programlisting language="json"><![CDATA[{
+	"data":
+			[
+				{"_id":"1", "title":"The Hobbit","numberOfPages":"293"}
+			]
+}]]></programlisting>
+				</example>
+
+				<para>
+					You can watch full example at
+					<link
+						xlink:href="https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo">github</link>
+					.
+				</para>
+			</section>
+		</section>
+	</section>
+
+</chapter>
