@@ -34,12 +34,4 @@ public class WhenInsertOperationIsExecuted {
 		
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void insert_operation_should_throw_an_exception_is_no_data_available() {
-		
-		InsertLoadStrategyOperation insertLoadStrategyOperation = new InsertLoadStrategyOperation(databaseOperation);
-		InputStream[] contents = new InputStream[]{};
-		insertLoadStrategyOperation.executeScripts(contents);
-	}
-	
 }
