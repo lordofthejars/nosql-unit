@@ -81,6 +81,7 @@ public class WhenManagedCouchDbOperationsAreRequired {
 		CouchDbOperation couchDbOperation = couchDbOperation();
 		couchDbOperation.insert(new ByteArrayInputStream(COUCHDB_DATASET.getBytes()));
 		boolean result = couchDbOperation.databaseIs(new ByteArrayInputStream(COUCHDB_DATASET.getBytes()));
+		couchDbOperation.deleteAll();
 		assertThat(result, is(true));
 	}
 	
