@@ -22,10 +22,7 @@ public class InsertLoadStrategyOperation implements LoadStrategyOperation {
 		LOGGER.debug("Calling Insert Load Strategy.");
 		if (contentDataset.length > 0) {
 			executeInsert(contentDataset);
-		} else {
-			throw new IllegalArgumentException(
-					"File specified in locations attribute are not present, or no files matching default name are found.");
-		}
+		} 
 	}
 
 	private void executeInsert(InputStream[] contentDataset) {

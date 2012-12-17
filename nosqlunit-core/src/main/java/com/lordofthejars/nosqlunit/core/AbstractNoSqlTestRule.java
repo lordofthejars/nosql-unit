@@ -191,7 +191,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				List<InputStream> scriptContent = loadDatasets(usingDataSet, method);
 				LoadStrategyEnum loadStrategyEnum = usingDataSet.loadStrategy();
 
-				if (areDatasetsRequired(loadStrategyEnum) && emptyDataset(scriptContent)) {
+				if (areDatasetsRequired(loadStrategyEnum) && emptyDataset(scriptContent) && notSelectiveAnnotation(usingDataSet.withSelectiveLocations())) {
 					final String suffix = "." + getWorkingExtension();
 					final String defaultClassLocation = DefaultClasspathLocationBuilder
 							.defaultClassAnnotatedClasspathLocation(method);
@@ -206,6 +206,10 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 						loadStrategyEnum, getDatabaseOperation());
 				loadStrategyOperation.executeScripts(scriptContent.toArray(new InputStream[scriptContent.size()]));
 
+			}
+
+			private boolean notSelectiveAnnotation(Selective[] withSelectiveLocations) {
+				return withSelectiveLocations.length == 0;
 			}
 
 			private boolean emptyDataset(List<InputStream> scriptContent) {

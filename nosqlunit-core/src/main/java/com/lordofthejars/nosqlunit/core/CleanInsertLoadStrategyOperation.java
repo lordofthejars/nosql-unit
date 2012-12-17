@@ -21,13 +21,11 @@ public class CleanInsertLoadStrategyOperation implements LoadStrategyOperation {
 
 		LOGGER.debug("Calling Clean and Insert Load Strategy.");
 
+		executeClean();
+		
 		if (contentDataset.length > 0) {
-			executeClean();
 			executeInsert(contentDataset);
-		} else {
-			throw new IllegalArgumentException(
-					"File specified in locations property are not present, or no files matching default name are found.");
-		}
+		} 
 	}
 
 	private void executeInsert(InputStream[] contentDataset) {

@@ -36,6 +36,11 @@ public class ManagedRedisConfigurationBuilder {
 		return this;
 	}
 	
+	public ManagedRedisConfigurationBuilder slaveOf(String masterHost, int masterPort) {
+		this.redisConfiguration.salveOf(masterHost, masterPort);
+		return this;
+	}
+	
 	public RedisConfiguration build() {
 		
 		Jedis jedis = new Jedis(this.redisConfiguration.getHost(), this.redisConfiguration.getPort());
@@ -47,6 +52,10 @@ public class ManagedRedisConfigurationBuilder {
 				throw new IllegalStateException("Password is not valid and Redis access cannot be accept commands.");
 			}
 			
+		}
+		
+		if(this.redisConfiguration.isSlave()) {
+			jedis.slaveof(this.redisConfiguration.getMasterHost(), this.redisConfiguration.getMasterPort());
 		}
 		
 		this.redisConfiguration.setDatabaseOperation(new RedisOperation(jedis));
