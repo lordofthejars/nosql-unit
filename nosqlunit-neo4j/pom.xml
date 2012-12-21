@@ -10,7 +10,7 @@
 
 	<properties>
 		<blueprints.tinkerpop.version>2.0.0</blueprints.tinkerpop.version>
-		<spring.data.neo4j.version>2.1.0.RC3</spring.data.neo4j.version>
+		<spring.data.neo4j.version>2.1.0.RELEASE</spring.data.neo4j.version>
 	</properties>
 
 	<dependencies>

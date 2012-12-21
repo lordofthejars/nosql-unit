@@ -9,7 +9,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.server.configuration.Configurator;
-import org.neo4j.server.configuration.EmbeddedServerConfigurator;
+import org.neo4j.server.configuration.ServerConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +82,7 @@ public class ManagedWrappingNeoServerLifecycleManager extends AbstractLifecycleM
 		
 		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(this.targetPath).newGraphDatabase();
 		
-		Configurator embeddedServerConfigurator = new EmbeddedServerConfigurator((GraphDatabaseAPI) newEmbeddedDatabase);
+		Configurator embeddedServerConfigurator = new ServerConfigurator((GraphDatabaseAPI) newEmbeddedDatabase);
 		embeddedServerConfigurator.configuration().setProperty(Configurator.WEBSERVER_PORT_PROPERTY_KEY, getPort());
 		
 		graphDb = new WrappingNeoServerBootstrapper((GraphDatabaseAPI) newEmbeddedDatabase, embeddedServerConfigurator);

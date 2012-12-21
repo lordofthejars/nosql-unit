@@ -112,7 +112,7 @@ public class WhenNeo4jOperationsAreRequired {
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
-		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
+		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
 		
 		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH.getBytes()));
 		
@@ -148,7 +148,7 @@ public class WhenNeo4jOperationsAreRequired {
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
-		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
+		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
 		
 		createNodes(newEmbeddedDatabase);
 		
@@ -180,7 +180,7 @@ public class WhenNeo4jOperationsAreRequired {
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(graphDatabaseService);
 		
-		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
+		Neo4jOperation neo4jOperation = new Neo4jOperation(graphDatabaseService);
 		
 		createNodes(graphDatabaseService);
 		
@@ -206,7 +206,7 @@ public class WhenNeo4jOperationsAreRequired {
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
-		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
+		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
 		
 		createNodes(newEmbeddedDatabase);
 		
@@ -224,7 +224,7 @@ public class WhenNeo4jOperationsAreRequired {
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
-		Neo4jOperation neo4jOperation = new Neo4jOperation(neo4jConfiguration);
+		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
 		
 		createNodes(newEmbeddedDatabase);
 		

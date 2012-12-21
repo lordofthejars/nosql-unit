@@ -35,9 +35,9 @@ public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
 	private GraphMLReader graphMLReader;
 	private GraphMLWriter graphMLWriter;
 
-	public Neo4jOperation(Neo4jConfiguration configuration) {
+	public Neo4jOperation(GraphDatabaseService graphDatabaseService) {
 		super();
-		this.graphDatabaseService = configuration.getGraphDatabaseService();
+		this.graphDatabaseService = graphDatabaseService;
 		this.graphMLReader = new GraphMLReader(this.graphDatabaseService);
 		this.graphMLWriter = new GraphMLWriter(this.graphDatabaseService);
 	}

@@ -12,7 +12,7 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 
 	private static final String EXTENSION = "xml";
 	
-	private DatabaseOperation<GraphDatabaseService> databaseOperation;
+	protected DatabaseOperation<GraphDatabaseService> databaseOperation;
 	
 	public static class Neo4jRuleBuilder {
 		
@@ -35,6 +35,11 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 		public Neo4jRuleBuilder unitInstance(Object target) {
 			this.target = target;
 			return this;
+		}
+		
+		
+		public Neo4jRule defaultSpringEmbeddedNeo4j() {
+			return new SpringEmbeddedNeo4jRule(new Neo4jConfiguration());
 		}
 		
 		public Neo4jRule defaultEmbeddedNeo4j() {
@@ -67,14 +72,14 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 	
 	public Neo4jRule(Neo4jConfiguration neo4jConfiguration) {
 		super(neo4jConfiguration.getConnectionIdentifier());
-		this.databaseOperation = new Neo4jOperation(neo4jConfiguration);
+		this.databaseOperation = new Neo4jOperation(neo4jConfiguration.getGraphDatabaseService());
 	}
 
 	/*With JUnit 10 is impossible to get target from a Rule, it seems that future versions will support it. For now constructor is apporach is the only way.*/
 	public Neo4jRule(Neo4jConfiguration neo4jConfiguration, Object target) {
 		super(neo4jConfiguration.getConnectionIdentifier());
 		setTarget(target);
-		this.databaseOperation = new Neo4jOperation(neo4jConfiguration);
+		this.databaseOperation = new Neo4jOperation(neo4jConfiguration.getGraphDatabaseService());
 	}
 	
 	@Override
