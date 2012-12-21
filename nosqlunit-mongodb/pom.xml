@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>nosqlunit</artifactId>
 		<groupId>com.lordofthejars</groupId>
-		<version>0.7.2-SNAPSHOT</version>
+		<version>0.7.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>nosqlunit-mongodb</artifactId>
