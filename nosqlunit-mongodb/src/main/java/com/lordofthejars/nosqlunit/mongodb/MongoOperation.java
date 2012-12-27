@@ -17,6 +17,7 @@ import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
+import com.mongodb.WriteConcern;
 import com.mongodb.util.JSON;
 
 public final class MongoOperation implements DatabaseOperation<Mongo> {
@@ -34,6 +35,7 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
 		try {
 			this.mongo = new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort());
+			this.mongo.setWriteConcern(WriteConcern.SAFE);
 			this.mongoDbConfiguration = mongoDbConfiguration;
 		} catch (UnknownHostException e) {
 			throw new IllegalArgumentException(e);
