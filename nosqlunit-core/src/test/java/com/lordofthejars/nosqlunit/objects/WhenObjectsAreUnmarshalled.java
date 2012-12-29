@@ -1,10 +1,9 @@
 package com.lordofthejars.nosqlunit.objects;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -94,12 +93,28 @@ public class WhenObjectsAreUnmarshalled {
 			"		]\n" + 
 			"}";
 	
+
+	private static final String SIMPLE_DATA_WITH_COMPLEX_KEY = "{\n" + 
+			"	\"data\": [\n" + 
+			"			{\n" + 
+			"				\"implementationKey\":\"com.lordofthejars.nosqlunit.objects.User\",\n"+
+			"				\"key\":{\n" + 
+			"							\"login\":\"alex\", \n" + 
+			"							\"password\":\"soto\" \n" + 
+			"						}," + 
+			"				\"value\":\"alex\"			\n" + 
+			"			}\n" + 
+			"		]\n" + 
+			"}\n" + 
+			"";
+	
+	
 	@Test
 	public void native_data_should_be_read() throws JsonParseException, IOException, ClassNotFoundException {
 
 		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
 		
-		Map<String, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(SIMPLE_DATA.getBytes()));
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(SIMPLE_DATA.getBytes()));
 		String readElement = (String) elements.get("key1");
 		assertThat(readElement, is("alex"));
 	}
@@ -109,7 +124,7 @@ public class WhenObjectsAreUnmarshalled {
 
 		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
 		
-		Map<String, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(SIMPLE_DATA_INTEGER.getBytes()));
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(SIMPLE_DATA_INTEGER.getBytes()));
 		Integer readElement = (Integer) elements.get("key1");
 		assertThat(readElement, is(1));
 	}
@@ -119,7 +134,7 @@ public class WhenObjectsAreUnmarshalled {
 		
 		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
 		
-		Map<String, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(OBJECT_DATA.getBytes()));
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(OBJECT_DATA.getBytes()));
 		
 		User readElement = (User)elements.get("key1");
 		assertThat(readElement, is(new User("alex", "soto")));
@@ -131,7 +146,7 @@ public class WhenObjectsAreUnmarshalled {
 	
 		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
 		
-		Map<String, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(ARRAY_DATA.getBytes()));
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(ARRAY_DATA.getBytes()));
 		List<String> readElements = (List<String>) elements.get("key1");
 		
 		assertThat(readElements, instanceOf(ArrayList.class));
@@ -144,7 +159,7 @@ public class WhenObjectsAreUnmarshalled {
 
 		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
 		
-		Map<String, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(SET_DATA.getBytes()));
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(SET_DATA.getBytes()));
 		Set<String> readElements = (Set<String>) elements.get("key1");
 		
 		assertThat(readElements, instanceOf(HashSet.class));
@@ -156,19 +171,30 @@ public class WhenObjectsAreUnmarshalled {
 		
 		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
 		
-		Map<String, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(ARRAY_OF_OBJECTS_DATA.getBytes()));
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(ARRAY_OF_OBJECTS_DATA.getBytes()));
 		Set<User> readElements = (Set<User>) elements.get("key1");
 		
 		assertThat(readElements, containsInAnyOrder(new User("alex", "soto"), new User("ALEX", "SOTO")));
 		
 	}
 
+	@Test
+	public void complex_objects_should_be_candidate_as_keys() {
+		
+		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
+		
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(SIMPLE_DATA_WITH_COMPLEX_KEY.getBytes()));
+		String readElement = (String) elements.get(new User("alex", "soto"));
+		
+		assertThat(readElement, is("alex"));
+	}
+	
 	@Test(expected=IllegalArgumentException.class)
 	public void an_exception_should_be_thrown_if_no_implementation_is_provided_in_objects() {
 		
 		KeyValueObjectMapper keyValueObjectMapper = new KeyValueObjectMapper();
 		
-		Map<String, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(OBJECT_DATA_WITHOUT_IMPLEMENTATION.getBytes()));
+		Map<Object, Object> elements = keyValueObjectMapper.readValues(new ByteArrayInputStream(OBJECT_DATA_WITHOUT_IMPLEMENTATION.getBytes()));
 	}
 	
 }

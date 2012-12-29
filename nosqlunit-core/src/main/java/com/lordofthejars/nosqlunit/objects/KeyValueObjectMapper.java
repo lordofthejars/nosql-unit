@@ -20,9 +20,9 @@ public class KeyValueObjectMapper {
 	private static final String NO_IMPLEMENTATION_PROVIDED = "";
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public Map<String, Object> readValues(InputStream dataStream) {
+	public Map<Object, Object> readValues(InputStream dataStream) {
 
-		Map<String, Object> objects = new HashMap<String, Object>();
+		Map<Object, Object> objects = new HashMap<Object, Object>();
 
 		try {
 
@@ -44,15 +44,15 @@ public class KeyValueObjectMapper {
 
 	}
 
-	private Map<String, Object> readElements(Iterator<JsonNode> elements) throws IOException,
+	private Map<Object, Object> readElements(Iterator<JsonNode> elements) throws IOException,
 			JsonParseException, JsonMappingException, ClassNotFoundException {
 		
-		Map<String, Object> objects = new HashMap<String, Object>();
+		Map<Object, Object> objects = new HashMap<Object, Object>();
 		
 		while (elements.hasNext()) {
 			JsonNode element = elements.next();
 			
-			String keyValue = keyValue(element);
+			Object keyValue = keyValue(element);
 			Object readValue = readValue(element);
 			
 			objects.put(keyValue, readValue);
@@ -64,17 +64,23 @@ public class KeyValueObjectMapper {
 	private Object readValue(JsonNode element) throws IOException, JsonParseException, JsonMappingException,
 			ClassNotFoundException {
 
-		Object readObject = null;
 
 		JsonNode value = valueNode(element);
 		String implementationValue = implementationClass(element);
 
+		Object readObject = readElement(value, implementationValue);
+
+		return readObject;
+	}
+
+	private Object readElement(JsonNode value, String implementationValue) throws IOException, JsonParseException,
+			JsonMappingException, ClassNotFoundException {
+		Object readObject = null;
 		if (value.isArray()) {
 			readObject = readArray(value, implementationValue);
 		} else {
 			readObject = readObject(value, implementationValue);
 		}
-
 		return readObject;
 	}
 
@@ -115,6 +121,15 @@ public class KeyValueObjectMapper {
 		return readObject;
 	}
 
+	private String implementationKeyClass(JsonNode element) {
+		String implementationValue = NO_IMPLEMENTATION_PROVIDED;
+
+		if (element.has(KeyValueTokens.IMPLEMENTATION_KEY_TOKEN)) {
+			implementationValue = element.path(KeyValueTokens.IMPLEMENTATION_KEY_TOKEN).getTextValue();
+		}
+		return implementationValue.trim();
+	}
+	
 	private String implementationClass(JsonNode element) {
 		String implementationValue = NO_IMPLEMENTATION_PROVIDED;
 
@@ -163,10 +178,11 @@ public class KeyValueObjectMapper {
 		}
 	}
 	
-	private String keyValue(JsonNode element) {
-		String keyValue = "";
+	private Object keyValue(JsonNode element) throws JsonParseException, JsonMappingException, IOException, ClassNotFoundException {
+		Object keyValue;
 		if (element.has(KeyValueTokens.KEY_TOKEN)) {
-			keyValue = element.path(KeyValueTokens.KEY_TOKEN).getTextValue();
+			String implementationKey = implementationKeyClass(element);
+			keyValue = readElement(element.path(KeyValueTokens.KEY_TOKEN), implementationKey);
 		} else {
 			throw new IllegalArgumentException("Given dataset does not contain "+KeyValueTokens.KEY_TOKEN+" token.");
 		}

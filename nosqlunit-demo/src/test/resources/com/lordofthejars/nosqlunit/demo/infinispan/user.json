@@ -1,0 +1,12 @@
+{ 
+	"data": [
+				{
+					"key":"alex", 
+					"implementation":"com.lordofthejars.nosqlunit.demo.infinispan.User", 
+					"value": {
+								"name":"alex",
+								"age":32
+							 } 
+				}
+			] 
+}

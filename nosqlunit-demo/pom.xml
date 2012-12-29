@@ -44,6 +44,13 @@
 			<version>${jackson.version}</version>
 		</dependency>
 
+		
+		<dependency>
+			<artifactId>nosqlunit-infinispan</artifactId>
+			<groupId>com.lordofthejars</groupId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<artifactId>nosqlunit-couchdb</artifactId>
 			<groupId>com.lordofthejars</groupId>
