@@ -38,8 +38,8 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 		}
 		
 		
-		public Neo4jRule defaultSpringEmbeddedNeo4j() {
-			return new SpringEmbeddedNeo4jRule(new Neo4jConfiguration());
+		public Neo4jRule defaultSpringGraphDatabaseServiceNeo4j() {
+			return new SpringGraphDatabaseServiceNeo4jRule(new Neo4jConfiguration());
 		}
 		
 		public Neo4jRule defaultEmbeddedNeo4j() {

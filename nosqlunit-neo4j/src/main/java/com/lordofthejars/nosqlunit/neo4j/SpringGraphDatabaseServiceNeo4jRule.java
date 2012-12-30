@@ -7,15 +7,15 @@ import org.springframework.context.ApplicationContext;
 
 import com.lordofthejars.nosqlunit.core.PropertyGetter;
 
-class SpringEmbeddedNeo4jRule extends Neo4jRule {
+class SpringGraphDatabaseServiceNeo4jRule extends Neo4jRule {
 
 	private PropertyGetter<ApplicationContext> propertyGetter = new PropertyGetter<ApplicationContext>();
 	
-	public SpringEmbeddedNeo4jRule(Neo4jConfiguration neo4jConfiguration) {
+	public SpringGraphDatabaseServiceNeo4jRule(Neo4jConfiguration neo4jConfiguration) {
 		super(neo4jConfiguration);
 	}
 
-	public SpringEmbeddedNeo4jRule(Neo4jConfiguration neo4jConfiguration, Object object) {
+	public SpringGraphDatabaseServiceNeo4jRule(Neo4jConfiguration neo4jConfiguration, Object object) {
 		super(neo4jConfiguration, object);
 	}
 

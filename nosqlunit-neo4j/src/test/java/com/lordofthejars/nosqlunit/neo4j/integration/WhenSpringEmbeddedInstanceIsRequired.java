@@ -27,7 +27,7 @@ public class WhenSpringEmbeddedInstanceIsRequired {
 	private GraphDatabaseService graphDatabaseService;
 	
 	@Rule
-	public Neo4jRule neo4jRule = newNeo4jRule().defaultSpringEmbeddedNeo4j();
+	public Neo4jRule neo4jRule = newNeo4jRule().defaultSpringGraphDatabaseServiceNeo4j();
 
 	@Test
 	public void connection_manager_should_be_the_one_defined_in_application_context() {
