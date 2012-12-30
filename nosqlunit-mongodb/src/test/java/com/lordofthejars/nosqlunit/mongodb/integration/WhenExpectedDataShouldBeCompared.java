@@ -1,12 +1,11 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
 
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
-import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
@@ -21,12 +20,12 @@ import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
 import com.lordofthejars.nosqlunit.mongodb.MongoOperation;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 public class WhenExpectedDataShouldBeCompared {
@@ -39,7 +38,8 @@ public class WhenExpectedDataShouldBeCompared {
 	
 	@BeforeClass
 	public static final void startUp() throws UnknownHostException, MongoException {
-		mongoOperation = new MongoOperation(mongoDb().databaseName("test").build());
+		MongoDbConfiguration mongoConfiguration = mongoDb().databaseName("test").build();
+		mongoOperation = new MongoOperation(mongoConfiguration);
 	}
 	
 	@Before

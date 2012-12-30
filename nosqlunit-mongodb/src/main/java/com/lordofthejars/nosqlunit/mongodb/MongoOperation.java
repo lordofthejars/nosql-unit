@@ -2,7 +2,6 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -34,11 +33,9 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	
 	public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
 		try {
-			this.mongo = new Mongo(mongoDbConfiguration.getHost(), mongoDbConfiguration.getPort());
+			this.mongo = mongoDbConfiguration.getMongo();
 			this.mongo.setWriteConcern(WriteConcern.SAFE);
 			this.mongoDbConfiguration = mongoDbConfiguration;
-		} catch (UnknownHostException e) {
-			throw new IllegalArgumentException(e);
 		} catch (MongoException e) {
 			throw new IllegalArgumentException(e);
 		}

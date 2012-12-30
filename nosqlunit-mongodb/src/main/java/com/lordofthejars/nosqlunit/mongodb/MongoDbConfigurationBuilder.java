@@ -1,5 +1,9 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
+import java.net.UnknownHostException;
+
+import com.mongodb.Mongo;
+
 
 public class MongoDbConfigurationBuilder {
 
@@ -14,6 +18,14 @@ public class MongoDbConfigurationBuilder {
 	}
 	
 	public MongoDbConfiguration build() {
+		
+		try {
+			Mongo mongo = new Mongo(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort());
+			this.mongoDbConfiguration.setMongo(mongo);
+		} catch (UnknownHostException e) {
+			throw new IllegalStateException(e);
+		}
+		
 		return mongoDbConfiguration;
 	}
 	

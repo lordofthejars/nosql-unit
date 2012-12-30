@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
 import com.mongodb.DBPort;
+import com.mongodb.Mongo;
 
 public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	
@@ -14,6 +15,8 @@ public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	
 	private String host = DEFAULT_HOST;
 	private int port = DBPort.PORT;
+	
+	private Mongo mongo;
 	
 	public MongoDbConfiguration() {
 		super();
@@ -76,6 +79,14 @@ public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	
 	public void setHost(String host) {
 		this.host = host;
+	}
+	
+	public void setMongo(Mongo mongo) {
+		this.mongo = mongo;
+	}
+	
+	public Mongo getMongo() {
+		return mongo;
 	}
 	
 }
