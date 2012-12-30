@@ -37,8 +37,6 @@ public class BookManager {
 		List<Book> books = new ArrayList<Book>();
 		DBCursor findAll = booksCollection.find();
 		
-		LOGGER.debug("Size found "+findAll.count());
-		
 		while(findAll.hasNext()) {
 			books.add(DB_OBJECT_BOOK_CONVERTER.convert(findAll.next()));
 		}
