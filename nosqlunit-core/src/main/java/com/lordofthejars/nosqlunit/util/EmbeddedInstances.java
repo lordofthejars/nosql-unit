@@ -9,35 +9,24 @@ import java.util.Map;
 
 public class EmbeddedInstances<T> {
 	
-	private Map<String, ThreadLocal<T>> instances = new HashMap<String, ThreadLocal<T>>();
+	private Map<String, T> instances = new HashMap<String, T>();
 	
 	public EmbeddedInstances() {
 		super();
 	}
 	
 	public void addEmbeddedInstance(T embeddedInstance, String targetPath) {
-		
-		if(!instances.containsKey(targetPath)) {
-			this.instances.put(targetPath, new ThreadLocal<T>());
-		}
-		
-		ThreadLocal<T> currentThreadLocal = this.instances.get(targetPath);
-		currentThreadLocal.set(embeddedInstance);
-		
-		this.instances.put(targetPath, currentThreadLocal);
+		this.instances.put(targetPath, embeddedInstance);
 	}
 	
 	public void removeEmbeddedInstance(String targetPath) {
-		
-		if(instances.containsKey(targetPath)) {
-			this.instances.get(targetPath).remove();
-		}
+		this.instances.remove(targetPath);
 	}
 	
 	public T getEmbeddedByTargetPath(String targetPath) {
 		
 		if(this.instances.containsKey(targetPath)) {
-			return this.instances.get(targetPath).get();
+			return this.instances.get(targetPath);
 		}
 
 		return null;
@@ -45,13 +34,8 @@ public class EmbeddedInstances<T> {
 	}
 	
 	public T getDefaultEmbeddedInstance() {
-		ThreadLocal<T>  currentThreadLocal = with(this.instances).values().first(anything());
-		
-		if(currentThreadLocal != null) {
-			return currentThreadLocal.get();
-		}
-		
-		return null;
+		T  element = with(this.instances).values().first(anything());
+		return element;
 	}
 	
 }
