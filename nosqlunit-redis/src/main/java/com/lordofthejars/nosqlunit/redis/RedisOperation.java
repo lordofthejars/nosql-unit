@@ -4,24 +4,51 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import redis.clients.jedis.BinaryJedisCommands;
 import redis.clients.jedis.Jedis;
 
-import com.lordofthejars.nosqlunit.core.DatabaseOperation;
-import com.lordofthejars.nosqlunit.redis.parser.DataReader;
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 
-public class RedisOperation implements DatabaseOperation<Jedis> {
+public class RedisOperation extends AbstractCustomizableDatabaseOperation<RedisConnectionCallback, Jedis> {
 
 	private Jedis jedis;
-	private DataReader dataReader;
 	
 	public RedisOperation(Jedis jedis) {
 		this.jedis = jedis;
-		this.dataReader = new DataReader(jedis);
+		setInsertationStrategy(new DefaultRedisInsertationStrategy());
+		setComparisionStrategy(new DefaultRedisComparisionStrategy());
 	}
+	
 	
 	@Override
 	public void insert(InputStream dataScript) {
-		this.dataReader.read(dataScript);
+		insertData(dataScript);
+	}
+
+
+	private void insertData(InputStream dataScript) {
+		try {
+			executeInsertation(new RedisConnectionCallback() {
+				
+				@Override
+				public List<Jedis> getAllJedis() {
+					return Arrays.asList(jedis);
+				}
+				
+				@Override
+				public Jedis getActiveJedis(byte[] key) {
+					return jedis;
+				}
+
+				@Override
+				public BinaryJedisCommands insertationJedis() {
+					return jedis;
+				}
+			}, dataScript);
+		} catch (Throwable e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	@Override
@@ -31,19 +58,34 @@ public class RedisOperation implements DatabaseOperation<Jedis> {
 
 	@Override
 	public boolean databaseIs(InputStream expectedData) {
-		RedisAssertion.strictAssertEquals(new RedisConnectionCallback() {
-			
-			@Override
-			public List<Jedis> getAllJedis() {
-				return Arrays.asList(jedis);
-			}
-			
-			@Override
-			public Jedis getActiveJedis(byte[] key) {
-				return jedis;
-			}
-		}, expectedData);
-		return true;
+		return compareData(expectedData);
+	}
+
+
+	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
+		try {
+			return executeComparision(new RedisConnectionCallback() {
+					
+					@Override
+					public List<Jedis> getAllJedis() {
+						return Arrays.asList(jedis);
+					}
+					
+					@Override
+					public Jedis getActiveJedis(byte[] key) {
+						return jedis;
+					}
+
+					@Override
+					public BinaryJedisCommands insertationJedis() {
+						return jedis;
+					}
+				}, expectedData);
+		} catch (NoSqlAssertionError e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override

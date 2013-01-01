@@ -1,17 +1,6 @@
 package com.lordofthejars.nosqlunit.redis;
 
-
-
-import java.io.File;
-
 import org.junit.rules.ExternalResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-
-import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
-import com.lordofthejars.nosqlunit.redis.embedded.EmbeddedRedisBuilder;
 
 public class EmbeddedRedis extends ExternalResource {
 

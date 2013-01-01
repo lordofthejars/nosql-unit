@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -22,14 +23,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.lordofthejars.nosqlunit.annotation.CustomComparisionStrategy;
+import com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy;
 import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
+import com.lordofthejars.nosqlunit.core.ComparisionStrategy;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.lordofthejars.nosqlunit.core.InjectAnnotationProcessor;
+import com.lordofthejars.nosqlunit.core.InsertationStrategy;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.LoadStrategyFactory;
 import com.lordofthejars.nosqlunit.core.LoadStrategyOperation;
@@ -45,6 +51,9 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 	@Mock
 	public DatabaseOperation databaseOperation;
 
+	@Mock
+	public AbstractCustomizableDatabaseOperation abstractCustomizableDatabaseOperation;
+	
 	@Mock
 	public LoadStrategyOperation loadStrategyOperation;
 
@@ -176,6 +185,8 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 	}
 
+	
+	
 	@Test
 	public void annotated_class_without_locations_should_use_class_name_approach() throws Throwable {
 
@@ -250,6 +261,50 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 	}
 
+	@Test
+	public void customized_comparision_test_classes_should_insert_data_using_customized_approach() throws Throwable {
+		
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, abstractCustomizableDatabaseOperation)).thenReturn(
+				loadStrategyOperation);
+		
+		FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomComparisionStrategy.class, "my_unknown_test");
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(abstractCustomizableDatabaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomComparisionStrategy()).evaluate();
+		
+		verify(abstractCustomizableDatabaseOperation, times(1)).setComparisionStrategy(any(ComparisionStrategy.class));
+		
+	}
+	
+	@Test
+	public void customized_insertation_test_classes_should_insert_data_using_customized_approach() throws Throwable {
+		
+		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, abstractCustomizableDatabaseOperation)).thenReturn(
+				loadStrategyOperation);
+		
+		FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomInsertStrategy.class, "my_unknown_test");
+		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		
+		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+		doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(abstractCustomizableDatabaseOperation);
+		
+		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+
+		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomInsertStrategy()).evaluate();
+		
+		verify(abstractCustomizableDatabaseOperation, times(1)).setInsertationStrategy(any(InsertationStrategy.class));
+		
+	}
+	
 	@Test
 	public void annotated_methods_without_locations_should_use_method_name_approach() throws Throwable {
 
@@ -517,6 +572,27 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 	}
 
+}
+
+@UsingDataSet(locations = "test2", loadStrategy=LoadStrategyEnum.INSERT)
+@ShouldMatchDataSet(location = "test2")
+@CustomComparisionStrategy(comparisionStrategy=MyCustomComparision.class)
+class MyTestWithCustomComparisionStrategy {
+	
+	@Test
+	public void my_unknown_test() {
+		
+	}
+}
+
+@UsingDataSet(locations = "test2", loadStrategy=LoadStrategyEnum.INSERT)
+@CustomInsertationStrategy(insertationStrategy=MyCustomInsertation.class)
+class MyTestWithCustomInsertStrategy {
+	
+	@Test
+	public void my_unknown_test() {
+		
+	}
 }
 
 @UsingDataSet(locations = "test2", withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.INSERT)

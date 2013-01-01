@@ -5,6 +5,7 @@ import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.joor.Reflect.on;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +16,8 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
+import com.lordofthejars.nosqlunit.annotation.CustomComparisionStrategy;
+import com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy;
 import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
@@ -64,6 +67,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				UsingDataSet usingDataSet = getUsingDataSetAnnotation();
 
 				if (isTestAnnotatedWithDataSet(usingDataSet)) {
+					createCustomInsertationStrategyIfPresent();
 					loadDataSet(usingDataSet, method);
 				}
 
@@ -75,9 +79,61 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				ShouldMatchDataSet shouldMatchDataSet = getShouldMatchDataSetAnnotation();
 
 				if (isTestAnnotatedWithExpectedDataSet(shouldMatchDataSet)) {
+					createCustomComparisionStrategyIfPresent();
 					assertExpectation(shouldMatchDataSet);
 				}
 
+			}
+
+			private void createCustomComparisionStrategyIfPresent() {
+				CustomComparisionStrategy customComparisionStrategy = getCustomComparisionStrategy();
+				
+				if(isTestAnnotatedWithCustomComparisionStrategy(customComparisionStrategy)) {
+					DatabaseOperation<?> databaseOperation = getDatabaseOperation();
+					
+					if (isDatabaseOperationCustomizable(databaseOperation)) {
+						Class<? extends ComparisionStrategy<?>> comparisionStrategy = customComparisionStrategy.comparisionStrategy();
+						ComparisionStrategy<?> comparisionStrategyObject = org.joor.Reflect.on(comparisionStrategy).create().get();
+						
+						overrideComparisionStrategy(databaseOperation, comparisionStrategyObject);
+						
+					} else {
+						throw new IllegalArgumentException("Custom Insertation Strategy can only be used in DatabaseOperations that extends from AbstractCustomizableDatabaseOperation");
+					}
+				}
+			}
+
+			private void createCustomInsertationStrategyIfPresent() {
+				CustomInsertationStrategy customInsertationStrategy = getCustomInsertationStrategy();
+				
+				if(isTestAnnotatedWithCustomInsertationStrategy(customInsertationStrategy)) {
+					DatabaseOperation<?> databaseOperation = getDatabaseOperation();
+					
+					if (isDatabaseOperationCustomizable(databaseOperation)) {
+						Class<? extends InsertationStrategy<?>> insertationStrategy = customInsertationStrategy.insertationStrategy();
+						InsertationStrategy<?> insertationStrategyObject = org.joor.Reflect.on(insertationStrategy).create().get();
+						overrideInsertationStrategy(databaseOperation, insertationStrategyObject);
+					} else {
+						throw new IllegalArgumentException("Custom Insertation Strategy can only be used in DatabaseOperations that extends from AbstractCustomizableDatabaseOperation");
+					}
+					
+				} 
+			}
+
+			private void overrideComparisionStrategy(DatabaseOperation<?> databaseOperation,
+					ComparisionStrategy<?> comparisionStrategyObject) {
+				AbstractCustomizableDatabaseOperation customizableDatabaseOperation = (AbstractCustomizableDatabaseOperation) databaseOperation;
+				customizableDatabaseOperation.setComparisionStrategy(comparisionStrategyObject);
+			}
+			
+			private void overrideInsertationStrategy(DatabaseOperation<?> databaseOperation,
+					InsertationStrategy<?> insertationStrategyObject) {
+				AbstractCustomizableDatabaseOperation customizableDatabaseOperation = (AbstractCustomizableDatabaseOperation) databaseOperation;
+				customizableDatabaseOperation.setInsertationStrategy(insertationStrategyObject);
+			}
+
+			private boolean isDatabaseOperationCustomizable(DatabaseOperation databaseOperation) {
+				return databaseOperation instanceof AbstractCustomizableDatabaseOperation;
 			}
 
 			private ShouldMatchDataSet getShouldMatchDataSetAnnotation() {
@@ -108,6 +164,17 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return usingDataSet;
 			}
 
+			private CustomComparisionStrategy getCustomComparisionStrategy() {
+				Class<?> testClass = target.getClass();
+				return testClass.getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomComparisionStrategy.class);
+			}
+			
+			private com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy getCustomInsertationStrategy() {
+			
+				Class<?> testClass = target.getClass();
+				return testClass.getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy.class);
+			}
+			
 			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet) throws IOException {
 
 				InputStream scriptContent = loadExpectedContentScript(method, shouldMatchDataSet);
@@ -302,6 +369,14 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return locations != null && locations.length > 0;
 			}
 
+			private boolean isTestAnnotatedWithCustomComparisionStrategy(CustomComparisionStrategy customComparisionStrategy) {
+				return customComparisionStrategy != null;
+			}
+			
+			private boolean isTestAnnotatedWithCustomInsertationStrategy(CustomInsertationStrategy customInsertationStrategy) {
+				return customInsertationStrategy != null;
+			}
+			
 			private boolean isTestAnnotatedWithExpectedDataSet(ShouldMatchDataSet shouldMatchDataSet) {
 				return shouldMatchDataSet != null;
 			}

@@ -6,25 +6,36 @@ import org.ektorp.CouchDbConnector;
 import org.ektorp.http.HttpClient;
 import org.ektorp.http.RestTemplate;
 
-import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 
-public class CouchDbOperation implements DatabaseOperation<CouchDbConnector> {
+public class CouchDbOperation extends AbstractCustomizableDatabaseOperation<CouchDbConnectionCallback, CouchDbConnector> {
 
 	private CouchDbConnector couchDbConnector;
-	private DataLoader dataLoader;
 	
 	public CouchDbOperation(CouchDbConnector couchDbConnector) {
 		this.couchDbConnector = couchDbConnector;
-		this.dataLoader = new DataLoader(this.couchDbConnector);
+		setInsertationStrategy(new DefaultCouchDbInsertationStrategy());
+		setComparisionStrategy(new DefaultCouchDbComparisionStrategy());
 	}
 	
 	@Override
 	public void insert(InputStream dataScript) {
-		insertDocuments(dataScript);
+		insertData(dataScript);
 	}
 
-	private void insertDocuments(InputStream dataScript) {
-		this.dataLoader.load(dataScript);
+	private void insertData(InputStream dataScript) {
+		try {
+			executeInsertation(new CouchDbConnectionCallback() {
+				
+				@Override
+				public CouchDbConnector couchDbConnector() {
+					return couchDbConnector;
+				}
+			}, dataScript);
+		} catch (Throwable e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override
@@ -42,8 +53,23 @@ public class CouchDbOperation implements DatabaseOperation<CouchDbConnector> {
 
 	@Override
 	public boolean databaseIs(InputStream expectedData) {
-		CouchDbAssertion.strictAssertEquals(expectedData, couchDbConnector);
-		return true;
+		return compareData(expectedData);
+	}
+
+	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
+		try {
+			return executeComparision(new CouchDbConnectionCallback() {
+				
+				@Override
+				public CouchDbConnector couchDbConnector() {
+					return couchDbConnector;
+				}
+			}, expectedData);
+		} catch (NoSqlAssertionError e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override

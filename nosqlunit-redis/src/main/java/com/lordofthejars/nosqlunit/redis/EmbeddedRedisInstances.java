@@ -3,10 +3,8 @@ package com.lordofthejars.nosqlunit.redis;
 import static ch.lambdaj.collection.LambdaCollections.with;
 import static org.hamcrest.CoreMatchers.anything;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 
 import redis.clients.jedis.Jedis;
 

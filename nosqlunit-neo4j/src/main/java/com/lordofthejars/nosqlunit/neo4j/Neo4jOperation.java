@@ -1,59 +1,44 @@
 package com.lordofthejars.nosqlunit.neo4j;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.List;
 
-import javax.xml.stream.XMLStreamException;
-
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
-import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import com.lordofthejars.nosqlunit.core.DatabaseOperation;
-import com.lordofthejars.nosqlunit.core.FailureHandler;
-import com.lordofthejars.nosqlunit.graph.parser.GraphMLReader;
-import com.lordofthejars.nosqlunit.graph.parser.GraphMLWriter;
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 
-public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
-
-	private static String EOL = System.getProperty("line.separator");
+public class Neo4jOperation extends AbstractCustomizableDatabaseOperation<Neo4jConnectionCallback, GraphDatabaseService> {
 
 	private GraphDatabaseService graphDatabaseService;
-
-	private GraphMLReader graphMLReader;
-	private GraphMLWriter graphMLWriter;
 
 	public Neo4jOperation(GraphDatabaseService graphDatabaseService) {
 		super();
 		this.graphDatabaseService = graphDatabaseService;
-		this.graphMLReader = new GraphMLReader(this.graphDatabaseService);
-		this.graphMLWriter = new GraphMLWriter(this.graphDatabaseService);
+		setInsertationStrategy(new DefaultNeo4jInsertationStrategy());
+		setComparisionStrategy(new DefaultNeo4jComparisionStrategy());
 	}
 
 	@Override
 	public void insert(InputStream dataScript) {
+		insertData(dataScript);
+	}
 
-		Transaction tx = this.graphDatabaseService.beginTx();
-
+	private void insertData(InputStream dataScript) {
 		try {
-			this.graphMLReader.read(dataScript);
-			tx.success();
-		} finally {
-			tx.finish();
+			executeInsertation(new Neo4jConnectionCallback() {
+				
+				@Override
+				public GraphDatabaseService graphDatabaseService() {
+					return graphDatabaseService;
+				}
+			}, dataScript);
+		} catch (Throwable e) {
+			throw new IllegalArgumentException(e);
 		}
-
 	}
 
 	@Override
@@ -96,87 +81,23 @@ public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
 
 	@Override
 	public boolean databaseIs(InputStream expectedData) {
-
-		ByteArrayInputStream neo4jGraphMlRepresentation = getNeo4jContent();
-		return compareContents(expectedData, neo4jGraphMlRepresentation);
-
+		return compareData(expectedData);
 	}
 
-	private boolean compareContents(InputStream expectedData, ByteArrayInputStream neo4jGraphMlRepresentation) {
+	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			configureXmlUnit();
-
-			Diff diff = new Diff(new InputSource(neo4jGraphMlRepresentation), new InputSource(expectedData));
-			diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
-
-			if (diff.similar()) {
-				return true;
-			} else {
-				String differenceMessage = buildDifferenceMessage(diff);
-				throw FailureHandler.createFailure(differenceMessage);
-			}
-
-		} catch (SAXException e) {
-			throw new IllegalArgumentException(e);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e);
+			return executeComparision(new Neo4jConnectionCallback() {
+				
+				@Override
+				public GraphDatabaseService graphDatabaseService() {
+					return graphDatabaseService;
+				}
+			}, expectedData);
+		} catch (NoSqlAssertionError e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new IllegalStateException(e);
 		}
-	}
-
-	private ByteArrayInputStream getNeo4jContent() {
-		Transaction tx = this.graphDatabaseService.beginTx();
-
-		ByteArrayInputStream neo4jGraphMlRepresentation = null;
-
-		try {
-			neo4jGraphMlRepresentation = readNeo4jData();
-			tx.success();
-		} finally {
-			tx.finish();
-		}
-		return neo4jGraphMlRepresentation;
-	}
-
-	private String buildDifferenceMessage(Diff diff) {
-		DetailedDiff detailedDiff = new DetailedDiff(diff);
-		@SuppressWarnings("unchecked")
-		List<Difference> differences = detailedDiff.getAllDifferences();
-		StringBuilder message = new StringBuilder(
-				"Some differences has been found between database data and expected data:");
-		message.append(EOL);
-
-		for (Difference difference : differences) {
-			message.append("************************");
-			message.append(difference);
-			message.append("************************");
-		}
-
-		String differenceMessage = message.toString();
-		return differenceMessage;
-	}
-
-	private void configureXmlUnit() {
-		XMLUnit.setIgnoreComments(true);
-		XMLUnit.setIgnoreWhitespace(true);
-		XMLUnit.setNormalizeWhitespace(true);
-		XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true);
-		XMLUnit.setCompareUnmatched(false);
-		XMLUnit.setIgnoreAttributeOrder(true);
-	}
-
-	private ByteArrayInputStream readNeo4jData() {
-
-		ByteArrayInputStream neo4jGraphMlRepresentation;
-
-		try {
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			this.graphMLWriter.write(byteArrayOutputStream);
-			neo4jGraphMlRepresentation = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-		} catch (XMLStreamException e) {
-			throw new IllegalArgumentException(e);
-		}
-
-		return neo4jGraphMlRepresentation;
 	}
 
 
@@ -185,12 +106,5 @@ public class Neo4jOperation implements DatabaseOperation<GraphDatabaseService> {
 		return this.graphDatabaseService;
 	}
 
-	public void setGraphMLReader(GraphMLReader graphMLReader) {
-		this.graphMLReader = graphMLReader;
-	}
-
-	public void setGraphMLWriter(GraphMLWriter graphMLWriter) {
-		this.graphMLWriter = graphMLWriter;
-	}
 
 }

@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 
 import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 
 public class UsingDataSetAnnotationTest implements Annotation, com.lordofthejars.nosqlunit.annotation.UsingDataSet {
 

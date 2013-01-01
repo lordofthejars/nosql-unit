@@ -3,8 +3,6 @@ package com.lordofthejars.nosqlunit.mongodb;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBuilder.inMemoryMongoDb;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 
-import java.net.UnknownHostException;
-
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.mongodb.Mongo;

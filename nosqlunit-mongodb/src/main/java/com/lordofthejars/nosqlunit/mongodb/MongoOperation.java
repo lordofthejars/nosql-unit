@@ -1,25 +1,21 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lordofthejars.nosqlunit.core.DatabaseOperation;
-import com.lordofthejars.nosqlunit.core.IOUtils;
-import com.mongodb.BasicDBList;
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
 import com.mongodb.WriteConcern;
-import com.mongodb.util.JSON;
 
-public final class MongoOperation implements DatabaseOperation<Mongo> {
+public final class MongoOperation extends AbstractCustomizableDatabaseOperation<MongoDbConnectionCallback, Mongo> {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
 
@@ -29,6 +25,8 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	protected MongoOperation(Mongo mongo, MongoDbConfiguration mongoDbConfiguration) {
 			this.mongo = mongo;
 			this.mongoDbConfiguration = mongoDbConfiguration;
+			this.setInsertationStrategy(new DefaultInsertationStrategy());
+			this.setComparisionStrategy(new DefaultComparisionStrategy());
 	}
 	
 	public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
@@ -36,6 +34,8 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 			this.mongo = mongoDbConfiguration.getMongo();
 			this.mongo.setWriteConcern(WriteConcern.SAFE);
 			this.mongoDbConfiguration = mongoDbConfiguration;
+			this.setInsertationStrategy(new DefaultInsertationStrategy());
+			this.setComparisionStrategy(new DefaultComparisionStrategy());
 		} catch (MongoException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -44,39 +44,27 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	@Override
 	public void insert(InputStream contentStream) {
 
+		insertData(contentStream);
+
+	}
+
+	private void insertData(InputStream contentStream) {
 		try {
 
-			String jsonData = loadContentFromInputStream(contentStream);
+			final DB mongoDb = getMongoDb();
+			executeInsertation(new MongoDbConnectionCallback() {
+				
+				@Override
+				public DB db() {
+					return mongoDb;
+				}
+			}, contentStream);
 
-			DBObject parsedData = parseData(jsonData);
-			DB mongoDb = getMongoDb();
-
-			insertParsedData(parsedData, mongoDb);
-
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			throw new IllegalArgumentException("Unexpected error reading data set file.", e);
 		}
-
 	}
 
-	private void insertParsedData(DBObject parsedData, DB mongoDb) {
-		Set<String> collectionaNames = parsedData.keySet();
-
-		for (String collectionName : collectionaNames) {
-
-			BasicDBList dataObjects = (BasicDBList) parsedData.get(collectionName);
-
-			DBCollection dbCollection = mongoDb.getCollection(collectionName);
-
-			for (Object dataObject : dataObjects) {
-
-				LOGGER.debug("Inserting {} To {}.", dataObject, dbCollection.getName());
-
-				dbCollection.insert((DBObject) dataObject);
-			}
-
-		}
-	}
 
 	@Override
 	public void deleteAll() {
@@ -106,22 +94,26 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 	@Override
 	public boolean databaseIs(InputStream contentStream) {
 
-		try {
-			String expectedJsonData = loadContentFromInputStream(contentStream);
-
-			DBObject parsedData = parseData(expectedJsonData);
-			MongoDbAssertion.strictAssertEquals(parsedData, getMongoDb());
-
-			return true;
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Unexpected error reading expected data set file.", e);
-		}
+		return compareData(contentStream);
 
 	}
 
-	private DBObject parseData(String jsonData) throws IOException {
-		DBObject parsedData = (DBObject) JSON.parse(jsonData);
-		return parsedData;
+	private boolean compareData(InputStream contentStream) throws NoSqlAssertionError {
+		try {
+			final DB mongoDb = getMongoDb();
+			executeComparision(new MongoDbConnectionCallback() {
+				
+				@Override
+				public DB db() {
+					return mongoDb;
+				}
+			}, contentStream);
+			return true;
+		} catch (NoSqlAssertionError e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new IllegalArgumentException("Unexpected error reading expected data set file.", e);
+		}
 	}
 
 	private DB getMongoDb() {
@@ -140,10 +132,6 @@ public final class MongoOperation implements DatabaseOperation<Mongo> {
 		}
 
 		return db;
-	}
-
-	private String loadContentFromInputStream(InputStream inputStreamContent) throws IOException {
-		return IOUtils.readFullStream(inputStreamContent);
 	}
 
 	@Override

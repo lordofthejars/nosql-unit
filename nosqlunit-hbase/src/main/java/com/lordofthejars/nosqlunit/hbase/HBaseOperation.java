@@ -11,30 +11,35 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 
-import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
-import com.lordofthejars.nosqlunit.hbase.model.DataSetParser;
-import com.lordofthejars.nosqlunit.hbase.model.JsonDataSetParser;
-import com.lordofthejars.nosqlunit.hbase.model.ParsedDataModel;
 
-public class HBaseOperation implements DatabaseOperation<Configuration> {
+public class HBaseOperation extends AbstractCustomizableDatabaseOperation<HBaseConnectionCallback, Configuration> {
 
-	private DataLoader dataLoader;
 	private Configuration configuration;
 	
 	public HBaseOperation(HBaseConfiguration configuration) {
 		this.configuration = configuration.getConfiguration();
-		this.dataLoader = new DataLoader(this.configuration);
+		setInsertationStrategy(new DefaultHBaseInsertationStrategy());
+		setComparisionStrategy(new DefaultHBaseComparisionStrategy());
 	}
 	
 	@Override
 	public void insert(InputStream dataScript) {
 		
-		DataSetParser dataSetParser = new JsonDataSetParser();
-		ParsedDataModel parsedDataset = dataSetParser.parse(dataScript);
+		insertData(dataScript);
+	}
+
+	private void insertData(InputStream dataScript) {
 		try {
-			dataLoader.load(parsedDataset);
-		} catch (IOException e) {
+			executeInsertation(new HBaseConnectionCallback() {
+				
+				@Override
+				public Configuration configuration() {
+					return configuration;
+				}
+			}, dataScript);
+		} catch (Throwable e) {
 			throw new IllegalArgumentException(
 					"Unexpected error reading data set file.", e);
 		}
@@ -63,9 +68,23 @@ public class HBaseOperation implements DatabaseOperation<Configuration> {
 
 	@Override
 	public boolean databaseIs(InputStream expectedData) {
-		HConnection connection = connection();
-		assertData(connection, expectedData);
-		return true;
+		return compareData(expectedData);
+	}
+
+	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
+		try {
+			return executeComparision(new HBaseConnectionCallback() {
+				
+				@Override
+				public Configuration configuration() {
+					return configuration;
+				}
+			}, expectedData);
+		} catch (NoSqlAssertionError e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new java.lang.IllegalStateException(e);
+		}
 	}
 
 	@Override
@@ -73,15 +92,6 @@ public class HBaseOperation implements DatabaseOperation<Configuration> {
 		return configuration;
 	}
 	
-	private void assertData(HConnection connection, InputStream expectedData) {
-		try {
-			HBaseAssertion.strictAssertEquals(connection, expectedData);
-		} catch(NoSqlAssertionError e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
 	
 	private HBaseAdmin hBaseAdmin(HConnection connection) {
 		try {
