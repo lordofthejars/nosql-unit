@@ -5,7 +5,6 @@ import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.joor.Reflect.on;
 
 import java.io.IOException;
 import java.io.InputStream;
