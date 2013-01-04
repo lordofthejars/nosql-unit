@@ -20,8 +20,8 @@ public class HBaseOperation extends AbstractCustomizableDatabaseOperation<HBaseC
 	
 	public HBaseOperation(HBaseConfiguration configuration) {
 		this.configuration = configuration.getConfiguration();
-		setInsertationStrategy(new DefaultHBaseInsertationStrategy());
-		setComparisionStrategy(new DefaultHBaseComparisionStrategy());
+		setInsertionStrategy(new DefaultHBaseInsertionStrategy());
+		setComparisonStrategy(new DefaultHBaseComparisonStrategy());
 	}
 	
 	@Override
@@ -32,7 +32,7 @@ public class HBaseOperation extends AbstractCustomizableDatabaseOperation<HBaseC
 
 	private void insertData(InputStream dataScript) {
 		try {
-			executeInsertation(new HBaseConnectionCallback() {
+			executeInsertion(new HBaseConnectionCallback() {
 				
 				@Override
 				public Configuration configuration() {
@@ -73,7 +73,7 @@ public class HBaseOperation extends AbstractCustomizableDatabaseOperation<HBaseC
 
 	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			return executeComparision(new HBaseConnectionCallback() {
+			return executeComparison(new HBaseConnectionCallback() {
 				
 				@Override
 				public Configuration configuration() {

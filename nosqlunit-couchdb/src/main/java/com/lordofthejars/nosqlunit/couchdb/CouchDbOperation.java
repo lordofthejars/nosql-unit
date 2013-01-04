@@ -15,8 +15,8 @@ public class CouchDbOperation extends AbstractCustomizableDatabaseOperation<Couc
 	
 	public CouchDbOperation(CouchDbConnector couchDbConnector) {
 		this.couchDbConnector = couchDbConnector;
-		setInsertationStrategy(new DefaultCouchDbInsertationStrategy());
-		setComparisionStrategy(new DefaultCouchDbComparisionStrategy());
+		setInsertionStrategy(new DefaultCouchDbInsertionStrategy());
+		setComparisonStrategy(new DefaultCouchDbComparisonStrategy());
 	}
 	
 	@Override
@@ -26,7 +26,7 @@ public class CouchDbOperation extends AbstractCustomizableDatabaseOperation<Couc
 
 	private void insertData(InputStream dataScript) {
 		try {
-			executeInsertation(new CouchDbConnectionCallback() {
+			executeInsertion(new CouchDbConnectionCallback() {
 				
 				@Override
 				public CouchDbConnector couchDbConnector() {
@@ -58,7 +58,7 @@ public class CouchDbOperation extends AbstractCustomizableDatabaseOperation<Couc
 
 	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			return executeComparision(new CouchDbConnectionCallback() {
+			return executeComparison(new CouchDbConnectionCallback() {
 				
 				@Override
 				public CouchDbConnector couchDbConnector() {

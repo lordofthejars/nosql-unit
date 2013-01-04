@@ -22,25 +22,25 @@ public class CassandraOperation extends AbstractCustomizableDatabaseOperation<Ca
 	public CassandraOperation(CassandraConfiguration cassandraConfiguration) {
 		this.cassandraConfiguration = cassandraConfiguration;
 		cluster = HFactory.getOrCreateCluster(cassandraConfiguration.getClusterName(), getFullHost());
-		setInsertationStrategy(new DefaultCassandraInsertationStrategy());
-		setComparisionStrategy(new DefaultCassandraComparisionStrategy());
+		setInsertionStrategy(new DefaultCassandraInsertionStrategy());
+		setComparisonStrategy(new DefaultCassandraComparisonStrategy());
 	}
 
 	@Override
 	public void insert(InputStream dataScript) {
 
-		if (this.insertationStrategy instanceof CassandraInsertationStrategy) {
+		if (this.insertionStrategy instanceof CassandraInsertionStrategy) {
 			insertData(dataScript);
 		} else {
 			throw new IllegalArgumentException(
-					"Cassandra insertation strategy must implements CassandraInsertationStrategy interface.");
+					"Cassandra insertation strategy must implements CassandraInsertionStrategy interface.");
 		}
 
 	}
 
 	private void insertData(InputStream dataScript) {
 		try {
-			executeInsertation(new CassandraConnectionCallback() {
+			executeInsertion(new CassandraConnectionCallback() {
 
 				@Override
 				public Keyspace keyspace() {
@@ -57,8 +57,8 @@ public class CassandraOperation extends AbstractCustomizableDatabaseOperation<Ca
 					return cassandraConfiguration;
 				}
 			}, dataScript);
-			CassandraInsertationStrategy cassandraInsertationStrategy = (CassandraInsertationStrategy) this.insertationStrategy;
-			keyspace = HFactory.createKeyspace(cassandraInsertationStrategy.getKeyspaceName(), cluster);
+			CassandraInsertionStrategy cassandraInsertionStrategy = (CassandraInsertionStrategy) this.insertionStrategy;
+			keyspace = HFactory.createKeyspace(cassandraInsertionStrategy.getKeyspaceName(), cluster);
 		} catch (Throwable e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -97,7 +97,7 @@ public class CassandraOperation extends AbstractCustomizableDatabaseOperation<Ca
 
 	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			return executeComparision(new CassandraConnectionCallback() {
+			return executeComparison(new CassandraConnectionCallback() {
 				
 				@Override
 				public Keyspace keyspace() {

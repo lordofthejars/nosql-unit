@@ -4,22 +4,22 @@ import java.io.InputStream;
 
 public abstract class AbstractCustomizableDatabaseOperation<S,T> implements DatabaseOperation<T> {
 
-	protected InsertationStrategy<S> insertationStrategy;
-	protected ComparisionStrategy<S> comparisionStrategy;
+	protected InsertionStrategy<S> insertionStrategy;
+	protected ComparisonStrategy<S> comparisonStrategy;
 	
-	public void setComparisionStrategy(ComparisionStrategy<S> comparisionStrategy) {
-		this.comparisionStrategy = comparisionStrategy;
+	public void setComparisonStrategy(ComparisonStrategy<S> comparisionStrategy) {
+		this.comparisonStrategy = comparisionStrategy;
 	}
 	
-	public boolean executeComparision(S connection, InputStream dataset) throws NoSqlAssertionError, Throwable {
-		return comparisionStrategy.compare(connection, dataset);
+	public boolean executeComparison(S connection, InputStream dataset) throws NoSqlAssertionError, Throwable {
+		return comparisonStrategy.compare(connection, dataset);
 	}
 	
-	public void setInsertationStrategy(InsertationStrategy<S> insertationStrategy) {
-		this.insertationStrategy = insertationStrategy;
+	public void setInsertionStrategy(InsertionStrategy<S> insertationStrategy) {
+		this.insertionStrategy = insertationStrategy;
 	}
 	
-	public void executeInsertation(S connection, InputStream dataset) throws Throwable {
-		insertationStrategy.insert(connection, dataset);
+	public void executeInsertion(S connection, InputStream dataset) throws Throwable {
+		insertionStrategy.insert(connection, dataset);
 	}
 }

@@ -14,8 +14,8 @@ public class InfinispanOperation extends AbstractCustomizableDatabaseOperation<I
 	
 	public InfinispanOperation(BasicCache<Object, Object> cache) {
 		this.cache = cache;
-		setInsertationStrategy(new DefaultInfinispanInsertationStrategy());
-		setComparisionStrategy(new DefaultInfinispanComparisionStrategy());
+		setInsertionStrategy(new DefaultInfinispanInsertionStrategy());
+		setComparisonStrategy(new DefaultInfinispanComparisonStrategy());
 	}
 	
 	@Override
@@ -25,7 +25,7 @@ public class InfinispanOperation extends AbstractCustomizableDatabaseOperation<I
 
 	private void insertData(InputStream dataScript) {
 		try {
-			executeInsertation(new InfinispanConnectionCallback() {
+			executeInsertion(new InfinispanConnectionCallback() {
 				
 				@Override
 				public BasicCache<Object, Object> basicCache() {
@@ -49,7 +49,7 @@ public class InfinispanOperation extends AbstractCustomizableDatabaseOperation<I
 
 	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			return executeComparision(new InfinispanConnectionCallback() {
+			return executeComparison(new InfinispanConnectionCallback() {
 				
 				@Override
 				public BasicCache<Object, Object> basicCache() {

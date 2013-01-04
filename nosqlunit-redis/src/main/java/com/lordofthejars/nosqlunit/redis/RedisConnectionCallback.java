@@ -7,7 +7,7 @@ import redis.clients.jedis.Jedis;
 
 public interface RedisConnectionCallback {
 
-	BinaryJedisCommands insertationJedis();
+	BinaryJedisCommands insertionJedis();
 	
 	Jedis getActiveJedis(byte[] key);
 	

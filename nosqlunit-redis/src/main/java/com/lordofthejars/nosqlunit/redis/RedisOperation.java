@@ -16,8 +16,8 @@ public class RedisOperation extends AbstractCustomizableDatabaseOperation<RedisC
 	
 	public RedisOperation(Jedis jedis) {
 		this.jedis = jedis;
-		setInsertationStrategy(new DefaultRedisInsertationStrategy());
-		setComparisionStrategy(new DefaultRedisComparisionStrategy());
+		setInsertionStrategy(new DefaultRedisInsertionStrategy());
+		setComparisonStrategy(new DefaultRedisComparisonStrategy());
 	}
 	
 	
@@ -29,7 +29,7 @@ public class RedisOperation extends AbstractCustomizableDatabaseOperation<RedisC
 
 	private void insertData(InputStream dataScript) {
 		try {
-			executeInsertation(new RedisConnectionCallback() {
+			executeInsertion(new RedisConnectionCallback() {
 				
 				@Override
 				public List<Jedis> getAllJedis() {
@@ -42,7 +42,7 @@ public class RedisOperation extends AbstractCustomizableDatabaseOperation<RedisC
 				}
 
 				@Override
-				public BinaryJedisCommands insertationJedis() {
+				public BinaryJedisCommands insertionJedis() {
 					return jedis;
 				}
 			}, dataScript);
@@ -64,7 +64,7 @@ public class RedisOperation extends AbstractCustomizableDatabaseOperation<RedisC
 
 	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			return executeComparision(new RedisConnectionCallback() {
+			return executeComparison(new RedisConnectionCallback() {
 					
 					@Override
 					public List<Jedis> getAllJedis() {
@@ -77,7 +77,7 @@ public class RedisOperation extends AbstractCustomizableDatabaseOperation<RedisC
 					}
 
 					@Override
-					public BinaryJedisCommands insertationJedis() {
+					public BinaryJedisCommands insertionJedis() {
 						return jedis;
 					}
 				}, expectedData);

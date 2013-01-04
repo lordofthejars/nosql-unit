@@ -25,8 +25,8 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 	protected MongoOperation(Mongo mongo, MongoDbConfiguration mongoDbConfiguration) {
 			this.mongo = mongo;
 			this.mongoDbConfiguration = mongoDbConfiguration;
-			this.setInsertationStrategy(new DefaultInsertationStrategy());
-			this.setComparisionStrategy(new DefaultComparisionStrategy());
+			this.setInsertionStrategy(new DefaultInsertionStrategy());
+			this.setComparisonStrategy(new DefaultComparisonStrategy());
 	}
 	
 	public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
@@ -34,8 +34,8 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 			this.mongo = mongoDbConfiguration.getMongo();
 			this.mongo.setWriteConcern(WriteConcern.SAFE);
 			this.mongoDbConfiguration = mongoDbConfiguration;
-			this.setInsertationStrategy(new DefaultInsertationStrategy());
-			this.setComparisionStrategy(new DefaultComparisionStrategy());
+			this.setInsertionStrategy(new DefaultInsertionStrategy());
+			this.setComparisonStrategy(new DefaultComparisonStrategy());
 		} catch (MongoException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -52,7 +52,7 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 		try {
 
 			final DB mongoDb = getMongoDb();
-			executeInsertation(new MongoDbConnectionCallback() {
+			executeInsertion(new MongoDbConnectionCallback() {
 				
 				@Override
 				public DB db() {
@@ -101,7 +101,7 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 	private boolean compareData(InputStream contentStream) throws NoSqlAssertionError {
 		try {
 			final DB mongoDb = getMongoDb();
-			executeComparision(new MongoDbConnectionCallback() {
+			executeComparison(new MongoDbConnectionCallback() {
 				
 				@Override
 				public DB db() {

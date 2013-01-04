@@ -18,8 +18,8 @@ public class Neo4jOperation extends AbstractCustomizableDatabaseOperation<Neo4jC
 	public Neo4jOperation(GraphDatabaseService graphDatabaseService) {
 		super();
 		this.graphDatabaseService = graphDatabaseService;
-		setInsertationStrategy(new DefaultNeo4jInsertationStrategy());
-		setComparisionStrategy(new DefaultNeo4jComparisionStrategy());
+		setInsertionStrategy(new DefaultNeo4jInsertionStrategy());
+		setComparisonStrategy(new DefaultNeo4jComparisonStrategy());
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class Neo4jOperation extends AbstractCustomizableDatabaseOperation<Neo4jC
 
 	private void insertData(InputStream dataScript) {
 		try {
-			executeInsertation(new Neo4jConnectionCallback() {
+			executeInsertion(new Neo4jConnectionCallback() {
 				
 				@Override
 				public GraphDatabaseService graphDatabaseService() {
@@ -86,7 +86,7 @@ public class Neo4jOperation extends AbstractCustomizableDatabaseOperation<Neo4jC
 
 	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			return executeComparision(new Neo4jConnectionCallback() {
+			return executeComparison(new Neo4jConnectionCallback() {
 				
 				@Override
 				public GraphDatabaseService graphDatabaseService() {

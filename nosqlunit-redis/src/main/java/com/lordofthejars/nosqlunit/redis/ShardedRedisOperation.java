@@ -18,8 +18,8 @@ public class ShardedRedisOperation extends AbstractCustomizableDatabaseOperation
 	
 	public ShardedRedisOperation(ShardedJedis shardedJedis) {
 		this.shardedJedis = shardedJedis;
-		setInsertationStrategy(new DefaultRedisInsertationStrategy());
-		setComparisionStrategy(new DefaultRedisComparisionStrategy());
+		setInsertionStrategy(new DefaultRedisInsertionStrategy());
+		setComparisonStrategy(new DefaultRedisComparisonStrategy());
 	}
 	
 	@Override
@@ -29,7 +29,7 @@ public class ShardedRedisOperation extends AbstractCustomizableDatabaseOperation
 
 	private void insertData(InputStream dataScript) {
 		try {
-			executeInsertation(new RedisConnectionCallback() {
+			executeInsertion(new RedisConnectionCallback() {
 				
 				@Override
 				public Collection<Jedis> getAllJedis() {
@@ -42,7 +42,7 @@ public class ShardedRedisOperation extends AbstractCustomizableDatabaseOperation
 				}
 
 				@Override
-				public BinaryJedisCommands insertationJedis() {
+				public BinaryJedisCommands insertionJedis() {
 					return shardedJedis;
 				}
 			}, dataScript);
@@ -63,7 +63,7 @@ public class ShardedRedisOperation extends AbstractCustomizableDatabaseOperation
 
 	private boolean compareData(InputStream expectedData) throws NoSqlAssertionError {
 		try {
-			return executeComparision(new RedisConnectionCallback() {
+			return executeComparison(new RedisConnectionCallback() {
 				
 				@Override
 				public Collection<Jedis> getAllJedis() {
@@ -76,7 +76,7 @@ public class ShardedRedisOperation extends AbstractCustomizableDatabaseOperation
 				}
 
 				@Override
-				public BinaryJedisCommands insertationJedis() {
+				public BinaryJedisCommands insertionJedis() {
 					return shardedJedis;
 				}
 			}, expectedData);

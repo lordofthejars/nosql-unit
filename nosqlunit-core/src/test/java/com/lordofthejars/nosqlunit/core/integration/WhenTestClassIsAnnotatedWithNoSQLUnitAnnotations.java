@@ -23,19 +23,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import com.lordofthejars.nosqlunit.annotation.CustomComparisionStrategy;
-import com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy;
+import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
+import com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy;
 import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
-import com.lordofthejars.nosqlunit.core.ComparisionStrategy;
+import com.lordofthejars.nosqlunit.core.ComparisonStrategy;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.lordofthejars.nosqlunit.core.InjectAnnotationProcessor;
-import com.lordofthejars.nosqlunit.core.InsertationStrategy;
+import com.lordofthejars.nosqlunit.core.InsertionStrategy;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.LoadStrategyFactory;
 import com.lordofthejars.nosqlunit.core.LoadStrategyOperation;
@@ -279,7 +279,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomComparisionStrategy()).evaluate();
 		
-		verify(abstractCustomizableDatabaseOperation, times(1)).setComparisionStrategy(any(ComparisionStrategy.class));
+		verify(abstractCustomizableDatabaseOperation, times(1)).setComparisonStrategy(any(ComparisonStrategy.class));
 		
 	}
 	
@@ -301,7 +301,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomInsertStrategy()).evaluate();
 		
-		verify(abstractCustomizableDatabaseOperation, times(1)).setInsertationStrategy(any(InsertationStrategy.class));
+		verify(abstractCustomizableDatabaseOperation, times(1)).setInsertionStrategy(any(InsertionStrategy.class));
 		
 	}
 	
@@ -576,7 +576,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
 @UsingDataSet(locations = "test2", loadStrategy=LoadStrategyEnum.INSERT)
 @ShouldMatchDataSet(location = "test2")
-@CustomComparisionStrategy(comparisionStrategy=MyCustomComparision.class)
+@CustomComparisonStrategy(comparisonStrategy=MyCustomComparision.class)
 class MyTestWithCustomComparisionStrategy {
 	
 	@Test
@@ -586,7 +586,7 @@ class MyTestWithCustomComparisionStrategy {
 }
 
 @UsingDataSet(locations = "test2", loadStrategy=LoadStrategyEnum.INSERT)
-@CustomInsertationStrategy(insertationStrategy=MyCustomInsertation.class)
+@CustomInsertionStrategy(insertionStrategy=MyCustomInsertation.class)
 class MyTestWithCustomInsertStrategy {
 	
 	@Test
