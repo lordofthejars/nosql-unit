@@ -4,10 +4,6 @@
 Documentation
 =============
 
-Html: [View](http://lordofthejars.github.com/nosql-unit/documentation.html)
-Pdf: [Download](http://lordofthejars.github.com/nosql-unit/documentation.pdf)
-
-
 NoSQLUnit Core
 ==============
 
@@ -175,16 +171,16 @@ An example of usage:
 @ShouldMatchDataSet(location="my_expected_data_set.json")
 ~~~~
 
-MongoDb Engine
+MongoDB Engine
 ==============
 
-MongoDb
+MongoDB
 =======
 
-MongoDb is a *NoSQL* database that stores structured data as *JSON-like*
+MongoDB is a *NoSQL* database that stores structured data as *JSON-like*
 documents with dynamic schemas.
 
-**NoSQLUnit** supports *MongoDb* by using next classes:
+**NoSQLUnit** supports *MongoDB* by using next classes:
 
   ----------- -----------------------------------------------------
   In Memory   com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb
@@ -214,45 +210,13 @@ To use **NoSQLUnit** with MongoDb you only need to add next dependency:
 
 Note that if you are plannig to use **in-memory** approach an extra
 dependency is required. **In-memory** mode is implemented using
-*jmockmongo* . *JMockmongo* is a new project that help with unit testing
-Java-based MongoDb Applications by starting an in-process *Netty* server
-that speaks the *MongoDb* protocol and maintains databases and
-collections in JVM memory. It is not a true embedded mode becuase it
-will starts a server, but in fact for now it is the best way to write
-MongoDb unit tests. As his author says it is an incomplete tool and will
-be improved every time a new feature is required.
-
-> **Warning**
->
-> During development of this documentation, current *jmockmongo* version
-> was 0.0.2-SNAPSHOT. Author is imporoving version often so before using
-> one specific version, take a look at its
-> [website](https://github.com/thiloplanz/jmockmongo) .
-
-To install add next [repository](#conf.jmockmongo_repo) and
-[dependency](#conf.jmockmongo_dep) :
-
-~~~~ {.xml}
-<repositories>
-    <repository>
-        <id>thiloplanz-snapshot</id>
-        <url>http://repository-thiloplanz.forge.cloudbees.com/snapshot/</url>
-    </repository>
-</repositories>
-~~~~
-
-~~~~ {.xml}
-<dependency>
-    <groupId>jmockmongo</groupId>
-    <artifactId>jmockmongo</artifactId>
-    <version>${mongomock.version}</version>
-</dependency>
-~~~~
+*Fongo* . *Fongo* is a new project that help with unit testing
+Java-based MongoDb Applications. [Fongo](http://graphml.graphdrawing.org/)
 
 Dataset Format
 --------------
 
-Default dataset file format in *MongoDb* module is *json* .
+Default dataset file format in *MongoDB* module is *json* .
 
 Datasets must have next [format](#ex.mongodb_dataset) :
 
@@ -306,9 +270,9 @@ import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRule
 public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().build();
 ~~~~
 
-By default managed *MongoDb* rule uses next default values:
+By default managed *MongoDB* rule uses next default values:
 
--   *MongoDb* installation directory is retrieved from `MONGO_HOME`
+-   *MongoDB* installation directory is retrieved from `MONGO_HOME`
     system environment variable.
 
 -   Target path, that is the directory where *MongoDb* server is
@@ -341,7 +305,7 @@ newManagedMongoDbRule().mongodPath("/opt/mongo").appendSingleCommandLineArgument
 
 In [example](#program.managed_specific_conf) we are overriding
 `MONGO_HOME` variable (in case has been set) and set mongo home at
-`/opt/mongo` . Moreover we are appending a single argument to *MongoDb*
+`/opt/mongo` . Moreover we are appending a single argument to *MongoDB*
 executable, in this case setting log level to number 3 (-vvv). Also you
 can append *property=value* arguments using
 `appendCommandLineArguments(String argumentName, String
@@ -353,8 +317,8 @@ can append *property=value* arguments using
 > when you are specifying command line arguments, remember to add slash
 > (-) and double slash (--) where is necessary.
 
-To stop *MongoDb* instance, **NoSQLUnit** sends a `shutdown` command to
-server using *Java Mongo AP* I. When this command is sent, the server is
+To stop *MongoDB* instance, **NoSQLUnit** sends a `shutdown` command to
+server using *Java Mongo API*. When this command is sent, the server is
 stopped and because connection is lost, *Java Mongo API* logs
 automatically an exception (read
 [here](https://groups.google.com/group/mongodb-user/browse_thread/thread/ac9a4c9ea13f3e81)
@@ -408,10 +372,10 @@ because you (or System like Maven ) is the responsible of starting and
 stopping the server. This mode is used in deployment tests where you are
 testing your application on real environment.
 
-### Configuring MongoDb Connection
+### Configuring MongoDB Connection
 
-Next step is configuring ***Mongodb*** rule in charge of maintaining
-*MongoDb* database into known state by inserting and deleting defined
+Next step is configuring ***MongoDB*** rule in charge of maintaining
+*MongoDB* database into known state by inserting and deleting defined
 datasets. You must register MongoDbRule *JUnit* rule class, which
 requires a configuration parameter with information like host, port or
 database name.
@@ -420,28 +384,17 @@ To make developer's life easier and code more readable, a fluent
 interface can be used to create these configuration objects. Two
 different kind of configuration builders exist.
 
-The first one is for configuring a connection to in-memory *jmockmongo*
-server. Default connection values are:
-
-  ------ ---------
-  Host   0.0.0.0
-  Port   2307
-  ------ ---------
-
-  : Default In-Memory Configuration Values
-
-Notice that these values are the default ones of *jmockmongo* project,
-so if you are thinking to use *jmockmongo* , no modifications are
-required.
+The first one is for configuring a connection to in-memory *Fongo*
+server. For almost all cases default parameters are enough.
 
 ~~~~ {.java}
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBuilder.inMemoryMongoDb;
 
 @Rule
-public MongoDbRule remoteMongoDbRule = new MongoDbRule(inMemoryMongoDb().databaseName("test").build());
+public MongoDbRule embeddedMongoDbRule = newMongoDbRule().defaultEmbeddedMongoDb("test");
 ~~~~
 
-The second one is for configuring a connection to remote *MongoDb*
+The second one is for configuring a connection to managed/remote *MongoDB*
 server. Default values are:
 
   ---------------- -------------------------------
@@ -559,7 +512,7 @@ public class WhenANewBookIsCreated {
 ~~~~
 
 In [previous](#example.test_insert_book) test we have defined that
-*MongoDb* will be managed by test by starting an instance of server
+*MongoDB* will be managed by test by starting an instance of server
 located at `/opt/mongo` . Moreover we are setting an
 [initial](#example.dataset_book) dataset in file `initialData.json`
 located at classpath
@@ -1865,7 +1818,7 @@ HBase Engine
 HBase
 =====
 
-Apache HBase is an open-source, distributed, versioned, column-oriented
+*Apache HBase* is an open-source, distributed, versioned, column-oriented
 store.
 
 *NoSQLUnit* supports *HBase* by using next classes:
@@ -1976,7 +1929,7 @@ configured programmatically:
 
   --------------- ---------------------------------------------------------------------------------------------------------------------------
   Target path     This is the directory where *HBase* server is started and is `target/hbase-temp` .
-  CassandraPath   *HBase* installation directory which by default is retrieved from `HBASE_HOME` system environment variable.
+  HBasePath       *HBase* installation directory which by default is retrieved from `HBASE_HOME` system environment variable.
   Port            By default port used is 60000. If port is changed in *HBase* configuration file, this port should be configured too here.
   --------------- ---------------------------------------------------------------------------------------------------------------------------
 
@@ -2185,7 +2138,7 @@ CouchDB Engine
 CouchDB
 =======
 
-CouchDB is a *NoSQL* database that stores structured data as *JSON-like*
+*CouchDB* is a *NoSQL* database that stores structured data as *JSON-like*
 documents with dynamic schemas.
 
 **NoSQLUnit** supports *CouchDB* by using next classes:
@@ -2407,8 +2360,370 @@ You can watch full example at
 [github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo)
 .
 
+Infinispan Engine
+============
+
+Infinispan
+=====
+
+Infinispan is an open-source transactional in-memory key/value NoSQL datastore & Data Grid.
+
+*NoSQLUnit* supports *Infinispan* by using next classes:
+
+  ---------- -------------------------------------------------
+  Embedded   com.lordofthejars.nosqlunit.infinispan.EmbeddedInfinispan
+  Managed    com.lordofthejars.nosqlunit.infinispan.ManagedInfinispan
+  ---------- -------------------------------------------------
+
+  : Lifecycle Management Rules
+
+  ---------------------- ---------------------------------------------
+  NoSQLUnit Management   com.lordofthejars.nosqlunit.infinispan.InfinispanRule
+  ---------------------- ---------------------------------------------
+
+  : Manager Rule
+
+Maven Setup
+-----------
+
+To use *NoSQLUnit* with HBase you only need to add next dependency:
+
+~~~~ {.xml}
+<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-infinispan</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+~~~~
+
+Dataset Format
+--------------
+
+Default dataset file format in *Infinispan* module is json. With this dataset you can define the key and the value that will be inserted into *Infinispan*. Value can be a simple types like Integer, String, ..., collection types, like set and list implementations or objects (using default Jackson rules (no annotations required). 
+
+So as summary datasets must have next [format](#ex.infinispan_dataset) :
+
+~~~~ {.json}
+{ 
+	"data": [
+				{
+					"key":"alex", 
+					"implementation":"com.lordofthejars.nosqlunit.demo.infinispan.User", 
+					"value": {
+								"name":"alex",
+								"age":32
+							 } 
+				},
+				{ 
+					"key":"key1", 
+					"value":1 
+				},
+				{ 
+					"key":"key2",  
+					"implementation":"java.util.HashSet", 
+					"value": [{"value":"a"},{"value":"b"}]
+				}
+
+			] 
+}
+~~~~
+
+Note that first key is inserting an object. You should set its implementation, and set the object properties in json format so Jackson can create the required object. User object only contains getter and setters of properties. 
+The second key is a simple key, in this case an integer.
+The third one is a set of strings. See that we must provide the implementation of collection or an *ArrayList* will be used as default. Also you can define objects instead of simple types.
+
+Getting Started
+---------------
+
+### Lifecycle Management Strategy
+
+First step is defining which lifecycle management strategy is required
+for your tests. Depending on kind of test you are implementing (unit
+test, integration test, deployment test, ...) you will require an
+embedded approach, managed approach or remote approach.
+
+#### Embedded Lifecycle
+
+To configure *embedded* approach you should only instantiate next
+[rule](#program.infinispan_embedded_conf) :
+
+~~~~ {.java}
+@ClassRule
+	public static final EmbeddedInfinispan EMBEDDED_INFINISPAN = newEmbeddedInfinispanRule().build();
+~~~~
+
+By default embedded *Embedded* rule uses EmbeddedCacheManager with default
+values:
+
+  ------------------ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Target path        This is the directory used for starting Embedded Infinispan and by default is target/infinispan-test-data/impermanent-db,  .
+  Configuration File Configuration file used by Infinispan for configuring the grid. By default no configuration file is provided and default *Infinispan* internal values are used. 
+  ------------------ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  : Default Embedded Values
+
+#### Managed Lifecycle
+
+To configure *managed* approach you should only instantiate next
+[rule](#program.infinispan_managed_conf) :
+
+~~~~ {.java}
+@ClassRule
+	public static ManagedInfinispan managedInfinispan = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build(); 
+~~~~
+
+By default managed *Infinispan* rule uses next default values but can be
+configured programmatically:
+
+  --------------- ---------------------------------------------------------------------------------------------------------------------------
+  Target path     This is the directory where *Infinispan* server is started and is `target/infinispan-temp` .
+  InfinispanPath  *Infinispan* installation directory which by default is retrieved from `INFINISPAN_HOME` system environment variable.
+  Port            By default port used is 11222.
+  Protocol		  By default hotrod is used and internally **NoSQLUnit** uses hotrod too, so it should be desirable to no change it.
+  --------------- ---------------------------------------------------------------------------------------------------------------------------
+
+#### Remote Lifecycle
+
+Configuring *remote* approach does not require any special rule because
+you (or System like Maven ) is the responsible of starting and stopping
+the server. This mode is used in deployment tests where you are testing
+your application on real environment.
+
+### Configuring Infinispan Connection
+
+Next step is configuring *Infinispan* rule in charge of maintaining *Infinispan*
+columns into known state by inserting and deleting defined datasets. You
+must register InfinispanRule *JUnit* rule class, which requires a
+configuration parameter with some information.
+
+To make developer's life easier and code more readable, a fluent
+interface can be used to create these configuration objects. Three
+different kind of configuration builders exist.
+
+#### Embedded Connection
+
+The first one is for configuring a connection to embedded *Infinispan* .
+
+~~~~ {.java}
+com.lordofthejars.nosqlunit.infinispan.InfinispanRule.InfinispanRuleBuilder.newInfinispanRule;
+
+@Rule
+public InfinispanRule infinispanRule = newInfinispanRule().defaultEmbeddedInfinispan();
+~~~~
+
+Embedded Infinispan does not require any special parameter. But you can use com.lordofthejars.nosqlunit.infinispan.EmbeddedInfinispanConfigurationBuilder class for creatinga  custom configuration object for setting cache name.
+
+#### Managed Connection
+
+This is for configuring a connection to managed *Infinispan* .
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.infinispan.ManagedInfinispanConfigurationBuilder.newManagedInfinispanConfiguration;
+
+@Rule
+public InfinispanRule infinispanRule = newInfinispanRule.configure(newManagedHBaseConfiguration().build()).build();
+~~~~
+
+By default the port used is the 11222, and configuration is used the default ones provided by *Infinispan*. You can also set the configuration properties (used by hotrod client) and cache name.
+
+#### Remote Connection
+
+Configuring a connection to remote *Infinispan* uses same approach like
+ManagedInfinispan configuration object but using
+com.lordofthejars.nosqlunit.infinispan.RemoteInfinispanConfigurationBuilder class. .
+
+### Verifying Data
+
+@ShouldMatchDataSet is also supported for *Infinispan* data but we should
+keep in mind some considerations.
+
+If you plan to verify data with @ShouldMatchDataSet and POJO objects *equals* method is used, so implements it accordantly.
+
+
+### Full Example
+
+To show how to use *NoSQLUnit* with *Infinispan* , we are going to create a
+very simple application.
+
+[UserManager](#program.user_infinispan_manager) is the business class
+responsible of getting and addinga user to the system.
+
+~~~~ {.java}
+public class UserManager {
+
+	private BasicCache<String, User> cache;
+	
+	public UserManager(BasicCache<String, User> cache) {
+		this.cache = cache;
+	}
+	
+	public void addUser(User user) {
+		this.cache.put(user.getName(), user);
+	}
+	
+	public User getUser(String name) {
+		return this.cache.get(name);
+	}
+	
+}
+~~~~
+
+And now one unit test is written:
+
+For [unit](#program.user_infinispan_unit) test we are going to use embedded
+approach:
+
+~~~~ {.java}
+public class WhenUserIsFoundByName {
+
+	@ClassRule
+	public static final EmbeddedInfinispan EMBEDDED_INFINISPAN = newEmbeddedInfinispanRule().build();
+	
+	@Rule
+	public final InfinispanRule infinispanRule = newInfinispanRule().defaultEmbeddedInfinispan();
+	
+	@Inject
+	private BasicCache<String, User> embeddedCache;
+	
+	@Test
+	@UsingDataSet(locations="user.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	public void user_should_be_returned() {
+		
+		UserManager userManager = new UserManager(embeddedCache);
+		User user = userManager.getUser("alex");
+		
+		assertThat(user, is(new User("alex", 32)));
+	}
+	
+	
+}
+~~~~
+
+And dataset used is:
+
+~~~~ {.json}
+{ 
+	"data": [
+				{
+					"key":"alex", 
+					"implementation":"com.lordofthejars.nosqlunit.demo.infinispan.User", 
+					"value": {
+								"name":"alex",
+								"age":32
+							 } 
+				}
+			] 
+}
+~~~~
+
+And one integration test is written:
+
+For [integration](#program.user_infinispan_integration) test we are going to use managed
+approach:
+
+~~~~ {.java}
+public class WhenUserIsInserted {
+
+	@ClassRule
+	public static final ManagedInfinispan MANAGED_INFINISPAN = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build();
+	
+	@Rule
+	public final InfinispanRule infinispanRule = newInfinispanRule().defaultManagedInfinispan();
+	
+	@Inject
+	private BasicCache<String, User> remoteCache;
+	
+	@UsingDataSet(loadStrategy=LoadStrategyEnum.DELETE_ALL)
+	@ShouldMatchDataSet(location="user.json")
+	@Test
+	public void user_should_be_available_in_cache() {
+		
+		UserManager userManager = new UserManager(remoteCache);
+		userManager.addUser(new User("alex", 32));
+	}
+	
+}
+~~~~
+
 Advanced Usage
 ==============
+
+Customizing Insertion and Comparation strategy
+================================================
+
+**NoSQLUnit** provides a default dataset format, for example in case of *Neo4j* 
+we are providing a *GraphML* format, or in case of *Cassandra* we are offering *cassandra-unit* format. 
+But because you may have already written datasets in another format, or because you feel more comfortable with another format, 
+**NoSQLUnit** provides a way to extend the behaviour of insertion and comparation action.
+
+To create an extension, each engine offers two interfaces (one for insertion and one comparation). They are called with the form:
+
+\<engine\>ComparisonStrategy and \<engine\>InsertionStrategy. For example CassandraComparisonStrategy or Neo4jInsertionStrategy.
+
+They provide a method for insert/compare data with inputstream of defined dataset file, and a callback interface with all connection objects.
+
+Apart of that, each engine has a default implementation Default\<engine\>ComparisonStrategy and Default\<engine\>InsertionStrategy that can be used as a guide for developing your own extensions.
+
+To register each strategy we must use *@CustomInsertionStrategy* and *@CustomComparisonStrategy* annotations.
+
+Let's see a very simple example where we are defining an alternative insertation strategy of *Redis* system by using properties file instead of json.
+
+~~~~ {.java}
+public class PropertiesCustomInsertion implements RedisInsertionStrategy {
+
+	@Override
+	public void insert(RedisConnectionCallback connection, InputStream dataset) throws Throwable {
+		Properties properties = new Properties();
+		properties.load(dataset);
+
+		BinaryJedisCommands insertionJedis = connection.insertionJedis();
+		
+		Set<Entry<Object, Object>> entrySet = properties.entrySet();
+		
+		for (Entry<Object, Object> entry : entrySet) {
+			String key = (String) entry.getKey();
+			String value = (String) entry.getValue();
+			insertionJedis.set(key.getBytes(), value.getBytes());
+		}
+		
+	}
+
+}
+~~~~
+
+And test:
+
+~~~~ {.java}
+@CustomInsertionStrategy(insertionStrategy = PropertiesCustomInsertion.class)
+public class WhenPropertiesCustomInsertionStrategyIsRegistered {
+
+	@ClassRule
+	public static EmbeddedRedis embeddedRedis = newEmbeddedRedisRule().build();
+
+	@Rule
+	public RedisRule redisRule = newRedisRule().defaultEmbeddedRedis();
+	
+	@Inject
+	public Jedis jedis;
+	
+	@Test
+	@UsingDataSet(locations="data.properties", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	public void data_should_be_inserted_from_properties_file() {
+		String name = jedis.get("name");
+		String surname = jedis.get("surname");
+		
+		assertThat(name, is("alex"));
+		assertThat(surname, is("soto"));
+	}
+	
+}
+~~~~
+
+> **Warning**
+>
+> Custom annotations are only valid on type scope. The custom strategy will be applied to whole test.
+>
+> When using custom strategies for inserting and comparing data, *location* attribute of *@UsingDataSet* and *@ShouldMatchDataSet* must be specified.
 
 Embedded In-Memory Redis
 ========================
@@ -2679,6 +2994,14 @@ private Mongo mongo1;
 private Mongo mongo2;
 ~~~~
 
+There are some situations (mostly if using *Arquillian*) that you want to inject the value managed by container instead of the one managed by **NoSQLUnit**. To avoid an injection conflict **NoSQLUnit** provides an special annotation called *@ByContainer*. By using it, the injector processor will leave the field unttouched.
+
+~~~~ {.java}
+@Inject
+@ByContainer
+private Mongo mongo2;
+~~~~
+ 
 
 Stay In Touch
 =============
