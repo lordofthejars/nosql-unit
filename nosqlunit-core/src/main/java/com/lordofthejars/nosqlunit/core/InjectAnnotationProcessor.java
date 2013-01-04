@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.lordofthejars.nosqlunit.annotation.ByContainer;
+
 public class InjectAnnotationProcessor {
 
 	private String identifier;
@@ -21,7 +23,8 @@ public class InjectAnnotationProcessor {
 			Field[] fields = clazz.getDeclaredFields();
 			for (Field field : fields) {
 				Annotation injectAnnotation = field.getAnnotation(Inject.class);
-				if (injectAnnotation != null) {
+				Annotation byContainerAnnotation = field.getAnnotation(ByContainer.class);
+				if (isInjectedAndNotExternallyManaged(injectAnnotation, byContainerAnnotation)) {
 					Annotation namedAnnotation = field
 							.getAnnotation(Named.class);
 
@@ -36,6 +39,10 @@ public class InjectAnnotationProcessor {
 				}
 			}
 		}
+	}
+
+	private boolean isInjectedAndNotExternallyManaged(Annotation injectAnnotation, Annotation byContainerAnnotation) {
+		return injectAnnotation != null && byContainerAnnotation == null;
 	}
 
 	private boolean isIdentifierValueInNamedAnnotation(

@@ -9,6 +9,8 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
+import com.lordofthejars.nosqlunit.annotation.ByContainer;
+
 public class WhenFieldIsInjected {
 
 	@Test
@@ -68,6 +70,29 @@ public class WhenFieldIsInjected {
 		injectAnnotationProcessor.processInjectAnnotation(TestWithFieldInjection.class, testInstance, new Integer(0));
 		
 		assertThat(testInstance.getMyInjection(), nullValue());
+	}
+	
+	@Test
+	public void by_container_object_should_Not_be_injected() {
+		
+		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor("1");
+		TestWithInjectionByContainer testInstance = new TestWithInjectionByContainer();
+		
+		injectAnnotationProcessor.processInjectAnnotation(TestWithInjectionByContainer.class, testInstance, "Hello");
+		assertThat(testInstance.getMyInjection(), is(nullValue()));
+		
+	}
+	
+}
+
+class TestWithInjectionByContainer {
+	
+	@Inject
+	@ByContainer
+	private String myInjection;
+	
+	public String getMyInjection() {
+		return myInjection;
 	}
 	
 }

@@ -15,8 +15,8 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
-import com.lordofthejars.nosqlunit.annotation.CustomComparisionStrategy;
-import com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy;
+import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
+import com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy;
 import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
@@ -85,14 +85,14 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 			}
 
 			private void createCustomComparisionStrategyIfPresent() {
-				CustomComparisionStrategy customComparisionStrategy = getCustomComparisionStrategy();
+				CustomComparisonStrategy customComparisonStrategy = getCustomComparisionStrategy();
 				
-				if(isTestAnnotatedWithCustomComparisionStrategy(customComparisionStrategy)) {
+				if(isTestAnnotatedWithCustomComparisionStrategy(customComparisonStrategy)) {
 					DatabaseOperation<?> databaseOperation = getDatabaseOperation();
 					
 					if (isDatabaseOperationCustomizable(databaseOperation)) {
-						Class<? extends ComparisionStrategy<?>> comparisionStrategy = customComparisionStrategy.comparisionStrategy();
-						ComparisionStrategy<?> comparisionStrategyObject = org.joor.Reflect.on(comparisionStrategy).create().get();
+						Class<? extends ComparisonStrategy<?>> comparisionStrategy = customComparisonStrategy.comparisonStrategy();
+						ComparisonStrategy<?> comparisionStrategyObject = org.joor.Reflect.on(comparisionStrategy).create().get();
 						
 						overrideComparisionStrategy(databaseOperation, comparisionStrategyObject);
 						
@@ -103,14 +103,14 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 			}
 
 			private void createCustomInsertationStrategyIfPresent() {
-				CustomInsertationStrategy customInsertationStrategy = getCustomInsertationStrategy();
+				CustomInsertionStrategy customInsertionStrategy = getCustomInsertationStrategy();
 				
-				if(isTestAnnotatedWithCustomInsertationStrategy(customInsertationStrategy)) {
+				if(isTestAnnotatedWithCustomInsertationStrategy(customInsertionStrategy)) {
 					DatabaseOperation<?> databaseOperation = getDatabaseOperation();
 					
 					if (isDatabaseOperationCustomizable(databaseOperation)) {
-						Class<? extends InsertationStrategy<?>> insertationStrategy = customInsertationStrategy.insertationStrategy();
-						InsertationStrategy<?> insertationStrategyObject = org.joor.Reflect.on(insertationStrategy).create().get();
+						Class<? extends InsertionStrategy<?>> insertationStrategy = customInsertionStrategy.insertionStrategy();
+						InsertionStrategy<?> insertationStrategyObject = org.joor.Reflect.on(insertationStrategy).create().get();
 						overrideInsertationStrategy(databaseOperation, insertationStrategyObject);
 					} else {
 						throw new IllegalArgumentException("Custom Insertation Strategy can only be used in DatabaseOperations that extends from AbstractCustomizableDatabaseOperation");
@@ -120,15 +120,15 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 			}
 
 			private void overrideComparisionStrategy(DatabaseOperation<?> databaseOperation,
-					ComparisionStrategy<?> comparisionStrategyObject) {
+					ComparisonStrategy<?> comparisionStrategyObject) {
 				AbstractCustomizableDatabaseOperation customizableDatabaseOperation = (AbstractCustomizableDatabaseOperation) databaseOperation;
-				customizableDatabaseOperation.setComparisionStrategy(comparisionStrategyObject);
+				customizableDatabaseOperation.setComparisonStrategy(comparisionStrategyObject);
 			}
 			
 			private void overrideInsertationStrategy(DatabaseOperation<?> databaseOperation,
-					InsertationStrategy<?> insertationStrategyObject) {
+					InsertionStrategy<?> insertationStrategyObject) {
 				AbstractCustomizableDatabaseOperation customizableDatabaseOperation = (AbstractCustomizableDatabaseOperation) databaseOperation;
-				customizableDatabaseOperation.setInsertationStrategy(insertationStrategyObject);
+				customizableDatabaseOperation.setInsertionStrategy(insertationStrategyObject);
 			}
 
 			private boolean isDatabaseOperationCustomizable(DatabaseOperation databaseOperation) {
@@ -163,15 +163,15 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return usingDataSet;
 			}
 
-			private CustomComparisionStrategy getCustomComparisionStrategy() {
+			private CustomComparisonStrategy getCustomComparisionStrategy() {
 				Class<?> testClass = target.getClass();
-				return testClass.getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomComparisionStrategy.class);
+				return testClass.getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy.class);
 			}
 			
-			private com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy getCustomInsertationStrategy() {
+			private com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy getCustomInsertationStrategy() {
 			
 				Class<?> testClass = target.getClass();
-				return testClass.getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomInsertationStrategy.class);
+				return testClass.getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy.class);
 			}
 			
 			private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet) throws IOException {
@@ -368,12 +368,12 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 				return locations != null && locations.length > 0;
 			}
 
-			private boolean isTestAnnotatedWithCustomComparisionStrategy(CustomComparisionStrategy customComparisionStrategy) {
-				return customComparisionStrategy != null;
+			private boolean isTestAnnotatedWithCustomComparisionStrategy(CustomComparisonStrategy customComparisonStrategy) {
+				return customComparisonStrategy != null;
 			}
 			
-			private boolean isTestAnnotatedWithCustomInsertationStrategy(CustomInsertationStrategy customInsertationStrategy) {
-				return customInsertationStrategy != null;
+			private boolean isTestAnnotatedWithCustomInsertationStrategy(CustomInsertionStrategy customInsertionStrategy) {
+				return customInsertionStrategy != null;
 			}
 			
 			private boolean isTestAnnotatedWithExpectedDataSet(ShouldMatchDataSet shouldMatchDataSet) {
