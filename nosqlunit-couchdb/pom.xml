@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.lordofthejars</groupId>
 		<artifactId>nosqlunit</artifactId>
-		<version>0.7.3</version>
+		<version>0.7.4-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>nosqlunit-couchdb</artifactId>
