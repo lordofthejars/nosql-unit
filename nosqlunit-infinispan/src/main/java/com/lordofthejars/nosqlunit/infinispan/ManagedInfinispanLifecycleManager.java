@@ -56,17 +56,17 @@ public class ManagedInfinispanLifecycleManager extends AbstractLifecycleManager 
 	private boolean closing = false;
 	
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return port;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		
 		LOGGER.info("Starting {} Infinispan instance.", infinispanPath);
 		
@@ -190,7 +190,7 @@ public class ManagedInfinispanLifecycleManager extends AbstractLifecycleManager 
 	}
 	
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		
 		LOGGER.info("Stopping {} Infinispan instance.", infinispanPath);
 		

@@ -30,17 +30,19 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		super();
 	}
 	
-	private static final String LOCALHOST = "127.0.0.1";
+	private static final String LOCALHOST = "localhost";
 
 	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
 
 	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
 	protected static final String DBPATH_ARGUMENT_NAME = "--dbpath";
+	protected static final String REPLICA_SET_ARGUMENT_NAME = "--replSet";
 	protected static final String PORT_ARGUMENT_NAME= "--port";
 	protected static final String DEFAULT_MONGO_LOGPATH = "logpath";
 	protected static final String DEFAULT_MONGO_DBPATH = "mongo-dbpath";
 	protected static final String DEFAULT_MONGO_TARGET_PATH = "target"
 			+ File.separatorChar + "mongo-temp";
+	protected static final String DEFAULT_MONGO_REPLICA_SET_NAME = "";
 
 	protected static final String MONGODB_BINARY_DIRECTORY = "bin";
 
@@ -53,7 +55,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	private String targetPath = DEFAULT_MONGO_TARGET_PATH;
 	private String dbRelativePath = DEFAULT_MONGO_DBPATH;
 	private String logRelativePath = DEFAULT_MONGO_LOGPATH;
-
+	private String replicaSetName = DEFAULT_MONGO_REPLICA_SET_NAME;
+	
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
 	private List<String> singleCommandArguments = new ArrayList<String>();
 
@@ -62,17 +65,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	private MongoDbLowLevelOps mongoDbLowLevelOps = new MongoDbLowLevelOps();
 
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return this.port;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		
 		LOGGER.info("Starting {} MongoDb instance.", mongodPath);
 		
@@ -98,7 +101,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		
 		LOGGER.info("Stopping {} MongoDb instance.", mongodPath);
 		
@@ -135,6 +138,12 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		List<String> programAndArguments = new ArrayList<String>();
 
 		programAndArguments.add(getExecutablePath());
+		
+		if(isReplicaSetNameSet()) {
+			programAndArguments.add(REPLICA_SET_ARGUMENT_NAME);
+			programAndArguments.add(this.replicaSetName);
+		}
+		
 		programAndArguments.add(DBPATH_ARGUMENT_NAME);
 		programAndArguments.add(dbRelativePath);
 		programAndArguments.add(PORT_ARGUMENT_NAME);
@@ -154,6 +163,10 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 		return programAndArguments;
 
+	}
+
+	public boolean isReplicaSetNameSet() {
+		return this.replicaSetName != DEFAULT_MONGO_REPLICA_SET_NAME;
 	}
 
 	private String getExecutablePath() {
@@ -199,6 +212,10 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		this.mongodPath = mongodPath;
 	}
 
+	public void setReplicaSetName(String replicaSetName) {
+		this.replicaSetName = replicaSetName;
+	}
+	
 	public void setTargetPath(String targetPath) {
 		this.targetPath = targetPath;
 	}

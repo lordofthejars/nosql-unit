@@ -33,24 +33,24 @@ private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedCassandra.c
 	
 	
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return port;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		LOGGER.info("Starting Embedded Cassandra instance.");
 		createEmbeddedCassandra();
 		LOGGER.info("Started Embedded Cassandra instance.");
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		LOGGER.info("Stopping Embedded Cassandra instance.");
 		stopEmbeddedCassandra();
 		LOGGER.info("Stopped Embedded Cassandra instance.");

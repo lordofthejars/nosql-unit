@@ -30,17 +30,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryNeo4j.class
 	}
 
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST + INMEMORY_NEO4J_TARGET_PATH;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return PORT;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		
 		LOGGER.info("Starting Embedded InMemory Neo4j instance.");
 		
@@ -51,7 +51,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryNeo4j.class
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		
 		LOGGER.info("Stopping Embedded InMemory Neo4j instance.");
 		

@@ -22,17 +22,17 @@ public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 	private String targetPath = INMEMORY_MONGO_TARGET_PATH;
 	
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST+targetPath;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return PORT;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 
 		LOGGER.info("Starting EmbeddedInMemory MongoDb instance.");
 		EmbeddedMongoInstancesFactory.getInstance().addEmbeddedInstance(fongo(targetPath), targetPath);
@@ -46,7 +46,7 @@ public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 	}
 	
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		
 		LOGGER.info("Stopping EmbeddedInMemory MongoDb instance.");
 		

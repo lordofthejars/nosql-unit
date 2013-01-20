@@ -54,17 +54,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 	}
 
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return port;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 
 		LOGGER.info("Starting {} Redis instance.", redisPath);
 		
@@ -191,7 +191,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		
 		LOGGER.info("Stopping {} Redis instance.", redisPath);
 		

@@ -13,7 +13,7 @@ public class RemoteCouchDbConfigurationBuilder {
 		this.couchDbConfiguration = new CouchDbConfiguration();
 	}
 	
-	public static RemoteCouchDbConfigurationBuilder newManagedCouchDbConfiguration() {
+	public static RemoteCouchDbConfigurationBuilder newRemoteCouchDbConfiguration() {
 		return new RemoteCouchDbConfigurationBuilder();
 	}
 	

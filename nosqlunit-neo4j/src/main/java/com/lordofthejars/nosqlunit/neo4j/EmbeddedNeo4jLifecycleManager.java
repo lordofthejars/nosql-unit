@@ -30,17 +30,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedNeo4j.class
 
 	
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST+targetPath;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return PORT;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		LOGGER.info("Starting Embedded Neo4j instance.");
 		
 		cleanDb();
@@ -53,7 +53,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedNeo4j.class
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		LOGGER.info("Stopping Embedded Neo4j instance.");
 		
 		shutdownGraphDb();

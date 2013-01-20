@@ -35,12 +35,12 @@ public abstract class AbstractLifecycleManager implements LifecycleManager {
 		return !ConnectionManagement.getInstance().isConnectionRegistered(getHost(), getPort());
 	}
 
-	protected abstract String getHost();
+	public abstract String getHost();
 
-	protected abstract int getPort();
+	public abstract int getPort();
 
-	protected abstract void doStart() throws Throwable;
+	public abstract void doStart() throws Throwable;
 
-	protected abstract void doStop();
+	public abstract void doStop();
 
 }

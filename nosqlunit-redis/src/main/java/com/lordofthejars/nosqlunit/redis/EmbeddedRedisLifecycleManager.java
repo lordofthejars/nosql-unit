@@ -29,17 +29,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedRedis.class
 	}
 	
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST+targetPath;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return PORT;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		LOGGER.info("Starting Embedded InMemory Redis instance.");
 		jedis = createEmbeddedRedis();
 		EmbeddedRedisInstances.getInstance().addJedis(jedis, targetPath);
@@ -47,7 +47,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedRedis.class
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		LOGGER.info("Stopping Embedded InMemory Redis instance.");
 		EmbeddedRedisInstances.getInstance().removeJedis(targetPath);
 		LOGGER.info("Stopped Embedded InMemory Redis instance.");

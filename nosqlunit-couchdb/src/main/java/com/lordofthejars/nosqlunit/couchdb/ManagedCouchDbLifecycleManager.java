@@ -54,17 +54,17 @@ public class ManagedCouchDbLifecycleManager extends AbstractLifecycleManager {
 	private List<String> singleCommandArguments = new ArrayList<String>();
 
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return port;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 
 		LOGGER.info("Starting {} CouchDb instance.", couchDbPath);
 
@@ -174,7 +174,7 @@ public class ManagedCouchDbLifecycleManager extends AbstractLifecycleManager {
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		LOGGER.info("Stopping {} HBase instance.", couchDbPath);
 
 		try {

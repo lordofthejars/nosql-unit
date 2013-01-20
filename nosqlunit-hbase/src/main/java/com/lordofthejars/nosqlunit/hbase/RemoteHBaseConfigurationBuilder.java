@@ -17,7 +17,7 @@ public class RemoteHBaseConfigurationBuilder {
 		this.hBaseConfiguration.setConfiguration(configuration);
 	}
 
-	public static RemoteHBaseConfigurationBuilder newManagedHBaseConfiguration() {
+	public static RemoteHBaseConfigurationBuilder newRemoteHBaseConfiguration() {
 		return new RemoteHBaseConfigurationBuilder();
 	}
 

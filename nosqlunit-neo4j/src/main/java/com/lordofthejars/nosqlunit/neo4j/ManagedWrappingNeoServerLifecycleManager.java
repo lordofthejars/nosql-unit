@@ -34,19 +34,19 @@ public class ManagedWrappingNeoServerLifecycleManager extends AbstractLifecycleM
 	
 	
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST;
 	}
 
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return port;
 	}
 
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		
 		LOGGER.info("Starting {} wrapped Neo4j instance.", getHost()+getPort());
 		
@@ -59,7 +59,7 @@ public class ManagedWrappingNeoServerLifecycleManager extends AbstractLifecycleM
 
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		
 		LOGGER.info("Stopping {} wrapped Neo4j instance.", getHost()+getPort());
 

@@ -223,12 +223,12 @@ public class ManagedCassandraLifecycleManager extends AbstractLifecycleManager {
 	}
 
 	@Override
-	protected String getHost() {
+	public String getHost() {
 		return LOCALHOST;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return this.port;
 	}
 

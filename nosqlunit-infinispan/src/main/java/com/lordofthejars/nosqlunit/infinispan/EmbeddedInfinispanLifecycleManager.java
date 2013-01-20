@@ -25,17 +25,17 @@ public class EmbeddedInfinispanLifecycleManager extends AbstractLifecycleManager
 	private String configurationFile = null;
 	
 	@Override
-	protected String getHost() {
+	public String getHost() {
 			return LOCALHOST+targetPath;
 	}
 
 	@Override
-	protected int getPort() {
+	public int getPort() {
 		return PORT;
 	}
 
 	@Override
-	protected void doStart() throws Throwable {
+	public void doStart() throws Throwable {
 		LOGGER.info("Starting Embedded Infinispan instance.");
 		
 		EmbeddedCacheManager embeddedCacheManager = embeddedCacheManager();
@@ -45,7 +45,7 @@ public class EmbeddedInfinispanLifecycleManager extends AbstractLifecycleManager
 	}
 
 	@Override
-	protected void doStop() {
+	public void doStop() {
 		LOGGER.info("Stopping Embedded InMemory Redis instance.");
 		EmbeddedInfinispanInstancesFactory.getInstance().removeEmbeddedInstance(targetPath);
 		LOGGER.info("Stopped Embedded InMemory Redis instance.");

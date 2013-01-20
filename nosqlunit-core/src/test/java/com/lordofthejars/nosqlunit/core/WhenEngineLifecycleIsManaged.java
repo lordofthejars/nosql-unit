@@ -63,22 +63,22 @@ public class WhenEngineLifecycleIsManaged {
 		int number;
 		
 		@Override
-		protected String getHost() {
+		public String getHost() {
 			return "localhost";
 		}
 
 		@Override
-		protected int getPort() {
+		public int getPort() {
 			return 0;
 		}
 
 		@Override
-		protected void doStart() throws Throwable {
+		public void doStart() throws Throwable {
 			number++;
 		}
 
 		@Override
-		protected void doStop() {
+		public void doStop() {
 			number--;
 		}
 		
