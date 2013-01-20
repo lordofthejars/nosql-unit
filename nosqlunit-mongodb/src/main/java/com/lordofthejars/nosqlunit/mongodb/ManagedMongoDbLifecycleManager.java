@@ -64,6 +64,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
 	private MongoDbLowLevelOps mongoDbLowLevelOps = new MongoDbLowLevelOps();
 
+	private boolean ready = false;
+	
 	@Override
 	public String getHost() {
 		return LOCALHOST;
@@ -78,6 +80,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	public void doStart() throws Throwable {
 		
 		LOGGER.info("Starting {} MongoDb instance.", mongodPath);
+		
+		ready = true;
 		
 		File dbPath = ensureDbPathDoesNotExitsAndReturnCompositePath();
 
@@ -105,6 +109,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		
 		LOGGER.info("Stopping {} MongoDb instance.", mongodPath);
 		
+		ready = false;
+
 		try {
 			this.mongoDbLowLevelOps.shutdown(LOCALHOST, port);
 		} finally {
@@ -113,7 +119,10 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		
 		LOGGER.info("Stopped {} MongoDb instance.", mongodPath);
 	}
-	
+
+	public boolean isReady() {
+		return this.ready;
+	}
 
 	private List<String> startMongoDBAsADaemon() throws InterruptedException {
         CountDownLatch processIsReady = new CountDownLatch(1);

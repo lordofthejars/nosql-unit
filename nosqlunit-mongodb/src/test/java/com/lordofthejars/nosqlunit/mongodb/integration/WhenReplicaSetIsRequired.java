@@ -1,31 +1,22 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.hamcrest.CoreMatchers.is;
-
-import java.awt.image.DataBufferShort;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
+import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetConfigurationBuilder.replicaSetConfiguration;
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManagerBuilder.newManagedMongoDbLifecycle;
+import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.net.UnknownHostException;
 
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.MongoDBCommands;
+import com.lordofthejars.nosqlunit.mongodb.replicaset.ConfigurationDocument;
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
 import com.mongodb.util.JSON;
 
 public class WhenReplicaSetIsRequired {
@@ -37,13 +28,13 @@ public class WhenReplicaSetIsRequired {
 	@ClassRule
 	public static ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs-test")
 																		.eligible(
-																					newManagedMongoDbLifecycle().port(27017).dbRelativePath("rs-0").get()
+																					newManagedMongoDbLifecycle().port(27017).dbRelativePath("rs-0").logRelativePath("log-0").get()
 																				 )
 																		.eligible(
-																					newManagedMongoDbLifecycle().port(27018).dbRelativePath("rs-1").get()
+																					newManagedMongoDbLifecycle().port(27018).dbRelativePath("rs-1").logRelativePath("log-1").get()
 																				 )
 																		.eligible(
-																					newManagedMongoDbLifecycle().port(27019).dbRelativePath("rs-2").get()
+																					newManagedMongoDbLifecycle().port(27019).dbRelativePath("rs-2").logRelativePath("log-2").get()
 																				 )
 																	  .get();
 	
@@ -58,6 +49,11 @@ public class WhenReplicaSetIsRequired {
 		
 	}
 
+	@Test
+	public void servers_should_be_reconfigured() throws UnknownHostException {
+		
+	}
+	
 	private int countSecondaries(DBObject configuration) {
 		return countStates(configuration, "SECONDARY");
 	}
