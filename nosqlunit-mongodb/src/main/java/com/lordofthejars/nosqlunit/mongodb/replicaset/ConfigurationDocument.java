@@ -1,17 +1,17 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
-import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 public class ConfigurationDocument {
 
-	private BasicDBObject configuration;
+	private DBObject configuration;
 	
-	public ConfigurationDocument(BasicDBObject configuration) {
+	public ConfigurationDocument(DBObject configuration) {
 		this.configuration = configuration;
 	}
 	
-	public BasicDBObject getConfiguration() {
-		return configuration;
+	public DBObject getConfiguration() {
+		return this.configuration;
 	}
 	
 }

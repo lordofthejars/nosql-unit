@@ -5,7 +5,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
-import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.SettingsBuilder.settings;
+import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetConfigurationBuilder.SettingsBuilder.settings;
 
 import java.util.concurrent.TimeUnit;
 

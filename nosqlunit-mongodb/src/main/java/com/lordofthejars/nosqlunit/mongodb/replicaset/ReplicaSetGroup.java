@@ -13,6 +13,9 @@ public class ReplicaSetGroup {
 	private List<ManagedMongoDbLifecycleManager> servers = new LinkedList<ManagedMongoDbLifecycleManager>();
 	private ConfigurationDocument configurationDocument;
 	
+	private String username;
+	private String password;
+	
 	private int connectionIndex = DEFAULT_DEFAULT_CONNECTION_INDEX;
 	
 	public void setConfigurationDocument(ConfigurationDocument configurationDocument) {
@@ -37,5 +40,25 @@ public class ReplicaSetGroup {
 	
 	public void setConnectionIndex(int connectionIndex) {
 		this.connectionIndex = connectionIndex;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public boolean isAuthenticationSet() {
+		return this.username != null && this.password != null;
 	}
 }
