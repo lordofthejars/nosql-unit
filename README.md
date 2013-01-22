@@ -291,6 +291,8 @@ By default managed *MongoDB* rule uses next default values:
 -   In *Windows* systems executable should be found as `bin/mongod.exe`
     meanwhile in *MAC OS* and *\*nix* should be found as `bin/mongod` .
 
+-   No journaling.
+
 ManagedMongoDb can be created from scratch, but for making life easier,
 a *DSL* is provided using MongoServerRuleBuilder class. For
 [example](#program.managed_specific_conf) :
