@@ -39,6 +39,11 @@ public class ManagedMongoDb extends ExternalResource {
 			return this;
 		}
 
+		public MongoServerRuleBuilder journaling() {
+			this.managedMongoDbLifecycleManager.setJournaling(true);
+			return this;
+		}
+		
 		public MongoServerRuleBuilder targetPath(String targetPath) {
 			this.managedMongoDbLifecycleManager.setTargetPath(targetPath);
 			return this;
