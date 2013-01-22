@@ -247,6 +247,10 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		this.port = port;
 	}
 	
+	public void setJournaling(boolean journaling) {
+		this.journaling = journaling;
+	}
+	
 	protected String getMongodPath() {
 		return mongodPath;
 	}
