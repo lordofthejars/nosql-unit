@@ -34,6 +34,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
 
+	protected static final String JOURNALING_ENABLED = "--journal";
+	protected static final String NONE_JOURNALING_ENABLED = "--nojournal";
 	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
 	protected static final String DBPATH_ARGUMENT_NAME = "--dbpath";
 	protected static final String REPLICA_SET_ARGUMENT_NAME = "--replSet";
@@ -56,6 +58,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	private String dbRelativePath = DEFAULT_MONGO_DBPATH;
 	private String logRelativePath = DEFAULT_MONGO_LOGPATH;
 	private String replicaSetName = DEFAULT_MONGO_REPLICA_SET_NAME;
+	
+	private boolean journaling = false;
 	
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
 	private List<String> singleCommandArguments = new ArrayList<String>();
@@ -159,7 +163,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		programAndArguments.add(Integer.toString(port));
 		programAndArguments.add(LOGPATH_ARGUMENT_NAME);
 		programAndArguments.add(logRelativePath);
-
+		programAndArguments.add(journalingArgument());
+		
 		for (String argument : this.singleCommandArguments) {
 			programAndArguments.add(argument);
 		}
@@ -260,6 +265,9 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		this.mongoDbLowLevelOps = mongoDbLowLevelOps;
 	}
 
+	protected String journalingArgument() {
+		return this.journaling ? JOURNALING_ENABLED : NONE_JOURNALING_ENABLED;
+	}
 
     public class ProcessRunnable implements Runnable {
 
