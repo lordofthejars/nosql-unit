@@ -28,6 +28,11 @@ public class ManagedMongoDbLifecycleManagerBuilder {
 			return this;
 		}
 
+		public ManagedMongoDbLifecycleManagerBuilder journaling() {
+			this.managedMongoDbLifecycleManager.setJournaling(true);
+			return this;
+		}
+		
 		public ManagedMongoDbLifecycleManagerBuilder targetPath(String targetPath) {
 			this.managedMongoDbLifecycleManager.setTargetPath(targetPath);
 			return this;
