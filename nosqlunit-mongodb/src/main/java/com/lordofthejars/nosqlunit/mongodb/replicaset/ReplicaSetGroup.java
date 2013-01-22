@@ -1,5 +1,10 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static ch.lambdaj.Lambda.selectFirst;
+import static org.hamcrest.CoreMatchers.is;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,5 +65,28 @@ public class ReplicaSetGroup {
 	
 	public boolean isAuthenticationSet() {
 		return this.username != null && this.password != null;
+	}
+	
+	public ManagedMongoDbLifecycleManager getStoppingServer(int port) {
+		return selectFirst(
+				this.servers,
+				having(on(ManagedMongoDbLifecycleManager.class).getPort(),
+						is(port)).and(having(on(ManagedMongoDbLifecycleManager.class).isReady(), is(true))));
+	}
+	
+	public int numberOfStartedServers() {
+		return this.servers.size() - numberOfStoppedServers();
+	}
+	
+	public int numberOfStoppedServers() {
+		int numberOfStoppedServers = 0;
+		
+		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : this.servers) {
+			if(!managedMongoDbLifecycleManager.isReady()) {
+				numberOfStoppedServers++;
+			}
+		}
+		
+		return numberOfStoppedServers;
 	}
 }

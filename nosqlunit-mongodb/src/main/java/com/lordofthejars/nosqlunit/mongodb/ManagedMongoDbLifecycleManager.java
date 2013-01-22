@@ -66,7 +66,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
-	private MongoDbLowLevelOps mongoDbLowLevelOps = new MongoDbLowLevelOps();
+	private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDBLowLevelOpsFactory.getSingletonInstance();
 
 	private boolean ready = false;
 	

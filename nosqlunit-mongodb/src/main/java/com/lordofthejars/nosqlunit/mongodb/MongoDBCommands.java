@@ -5,7 +5,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBObject;
+import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
 
 public class MongoDBCommands {
 
@@ -55,5 +57,22 @@ public class MongoDBCommands {
 		BasicDBObject command = new BasicDBObject(RECONFIG_COMMAND,
 				configurationDocument.getConfiguration());
 		return adminDb.command(command);
+	}
+	
+	public static void shutdown(String host, int port) {
+		Mongo mongo = null;
+		try {
+			mongo = new Mongo(host, port);
+			DB db = mongo.getDB("admin");
+			CommandResult shutdownResult = db.command(new BasicDBObject(
+					"shutdown", 1));
+			shutdownResult.throwOnError();
+		} catch (MongoException.Network e) {
+			//It is ok because response could not be returned because network connection is closed.
+		} catch (Throwable e) {
+			throw new IllegalStateException("Mongodb could not be shutdown.", e);
+		} finally {
+			mongo.close();
+		}
 	}
 }

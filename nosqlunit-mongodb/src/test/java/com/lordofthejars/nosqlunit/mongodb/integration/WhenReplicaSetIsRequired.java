@@ -1,6 +1,5 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
-import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetConfigurationBuilder.replicaSetConfiguration;
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManagerBuilder.newManagedMongoDbLifecycle;
 import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,12 +11,10 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.mongodb.MongoDBCommands;
-import com.lordofthejars.nosqlunit.mongodb.replicaset.ConfigurationDocument;
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.util.JSON;
 
 public class WhenReplicaSetIsRequired {
 
@@ -47,10 +44,23 @@ public class WhenReplicaSetIsRequired {
 		assertThat(countPrimary(replicaSetGetStatus), is(1));
 		assertThat(countSecondaries(replicaSetGetStatus), is(2));
 		
+		mongoClient.close();
+		
 	}
 
 	@Test
-	public void servers_should_be_reconfigured() throws UnknownHostException {
+	public void server_should_be_able_to_stopped_programmatically() throws UnknownHostException {
+		
+		replicaSetManagedMongoDb.shutdownServer(27017);
+		replicaSetManagedMongoDb.waitUntilReplicaSetBecomeStable();
+		
+		MongoClient mongoClient = new MongoClient("localhost", 27018);
+		DBObject replicaSetGetStatus = MongoDBCommands.replicaSetGetStatus(mongoClient);
+		
+		assertThat(countPrimary(replicaSetGetStatus), is(1));
+		assertThat(countSecondaries(replicaSetGetStatus), is(1));
+		
+		mongoClient.close();
 		
 	}
 	
