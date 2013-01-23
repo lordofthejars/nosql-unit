@@ -91,7 +91,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 		if (dbPath.mkdirs()) {
 			startMongoDBAsADaemon();
-			boolean isServerUp = assertThatConnectionToMongoDbIsPossible(NUM_RETRIES_TO_CHECK_SERVER_UP);
+			boolean isServerUp = assertThatConnectionToMongoDbIsPossible();
 
 			if (!isServerUp) {
 				throw new IllegalStateException(
@@ -201,9 +201,9 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 	}
 
-	private boolean assertThatConnectionToMongoDbIsPossible(int retries)
+	private boolean assertThatConnectionToMongoDbIsPossible()
 			throws InterruptedException, UnknownHostException {
-		return this.mongoDbLowLevelOps.assertThatConnectionIsPossible(LOCALHOST, port, retries);
+		return this.mongoDbLowLevelOps.assertThatConnectionIsPossible(LOCALHOST, port);
 	}
 
 	private File ensureDbPathDoesNotExitsAndReturnCompositePath() {
@@ -297,7 +297,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
             try {
                 pwd.waitFor();
                 if (pwd.exitValue() != 0) {
-                    throw new IllegalStateException(
+                    LOGGER.info(
                             "Mongodb ["
                                     + mongodPath
                                     + DBPATH_ARGUMENT_NAME
@@ -306,7 +306,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
                                     + port
                                     + LOGPATH_ARGUMENT_NAME
                                     + logRelativePath
-                                    + "] could not be started. Next console message was thrown: "
+                                    + "] console output is: "
                                     + consoleOutput);
                 }
             } catch (InterruptedException ie) {

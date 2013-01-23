@@ -121,8 +121,7 @@ public class MongoDbLowLevelOps {
 		return MongoDBCommands.replicaSetGetStatus(mongoClient);
 	}
 
-	public boolean assertThatConnectionIsPossible(String host, int port,
-			int retries) throws InterruptedException, UnknownHostException,
+	public boolean assertThatConnectionIsPossible(String host, int port) throws InterruptedException, UnknownHostException,
 			MongoException {
 
 		int currentRetry = 0;
@@ -131,7 +130,7 @@ public class MongoDbLowLevelOps {
 		Mongo server = null;
 		try {
 			do {
-				TimeUnit.SECONDS.sleep(3);
+				TimeUnit.SECONDS.sleep(WAIT_TIME);
 				server = new Mongo(host, port);
 				DB db = server.getDB("admin");
 				try {
@@ -140,7 +139,7 @@ public class MongoDbLowLevelOps {
 				} catch (MongoException e) {
 					currentRetry++;
 				}
-			} while (!connectionIsPossible && currentRetry <= retries);
+			} while (!connectionIsPossible && currentRetry <= MAX_RETRIES);
 		} finally {
 			server.close();
 		}

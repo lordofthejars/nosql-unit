@@ -1,14 +1,14 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
-import static org.mockito.Matchers.anyList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,7 +93,7 @@ public class WhenMongoDbIsRemoteManaged {
 	public void mongodb_should_start_mongodb_instance_in_Windows() throws Throwable {
 
 		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
-		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt(), anyInt())).thenReturn(true);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt())).thenReturn(true);
 		
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.WINDOWS_7);
@@ -131,6 +131,7 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(DBPort.PORT+"");
 		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.NONE_JOURNALING_ENABLED);
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
@@ -145,7 +146,7 @@ public class WhenMongoDbIsRemoteManaged {
 	public void mongodb_should_start_mongodb_instance_in_Linux() throws Throwable {
 
 		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
-		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt(), anyInt())).thenReturn(true);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt())).thenReturn(true);
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.LINUX_OS);
 		
@@ -183,6 +184,7 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(DBPort.PORT+"");
 		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.NONE_JOURNALING_ENABLED);
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
@@ -197,7 +199,7 @@ public class WhenMongoDbIsRemoteManaged {
 	public void mongodb_should_start_mongodb_instance_in_Mac() throws Throwable {
 		
 		MongoDbLowLevelOps mongoDbChecker = mock(MongoDbLowLevelOps.class);
-		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt(), anyInt())).thenReturn(true);
+		when(mongoDbChecker.assertThatConnectionIsPossible(anyString(), anyInt())).thenReturn(true);
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
 				OperatingSystem.MAC_OSX);
 		
@@ -235,6 +237,7 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(DBPort.PORT+"");
 		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
+		expectedCommand.add(ManagedMongoDbLifecycleManager.NONE_JOURNALING_ENABLED);
 		expectedCommand.add("myArgument");
 		expectedCommand.add("myValue");
 
