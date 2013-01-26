@@ -66,9 +66,11 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
-	private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDBLowLevelOpsFactory.getSingletonInstance();
+	private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDbLowLevelOpsFactory.getSingletonInstance();
 
 	private boolean ready = false;
+	
+	private ProcessRunnable processRunnable;
 	
 	@Override
 	public String getHost() {
@@ -116,7 +118,9 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		ready = false;
 
 		try {
-			this.mongoDbLowLevelOps.shutdown(LOCALHOST, port);
+			if(this.processRunnable != null) {
+				this.processRunnable.destroyProcess();
+			}
 		} finally {
 			ensureDbPathDoesNotExitsAndReturnCompositePath();
 		}
@@ -130,21 +134,13 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 	private List<String> startMongoDBAsADaemon() throws InterruptedException {
         CountDownLatch processIsReady = new CountDownLatch(1);
-        ProcessRunnable processRunnable = new ProcessRunnable(processIsReady);
+        processRunnable = new ProcessRunnable(processIsReady);
         Thread thread = new Thread(processRunnable);
         thread.start();
         processIsReady.await();
         return processRunnable.consoleOutput;
 	}
 
-	private Process startProcess() throws IOException {
-		return this.commandLineExecutor.startProcessInDirectoryAndArguments(
-				targetPath, buildOperationSystemProgramAndArguments());
-	}
-
-	private List<String> getConsoleOutput(Process pwd) throws IOException {
-		return this.commandLineExecutor.getConsoleOutput(pwd);
-	}
 
 	private List<String> buildOperationSystemProgramAndArguments() {
 
@@ -278,16 +274,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
         private CountDownLatch processIsReady;
         private List<String> consoleOutput;
 
+        private Process process;
+        
         public ProcessRunnable(CountDownLatch processIsReady) {
             this.processIsReady = processIsReady;
         }
 
         @Override
         public void run() {
-            Process pwd;
             try {
-                pwd = startProcess();
-                consoleOutput = getConsoleOutput(pwd);
+            	process = startProcess();
+                consoleOutput = getConsoleOutput(process);
             } catch (IOException e) {
                 throw prepareException(e);
             } finally {
@@ -295,8 +292,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
             }
 
             try {
-                pwd.waitFor();
-                if (pwd.exitValue() != 0) {
+            	process.waitFor();
+                if (process.exitValue() != 0) {
                     LOGGER.info(
                             "Mongodb ["
                                     + mongodPath
@@ -315,6 +312,12 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
         }
 
+        public void destroyProcess() {
+        	if(this.process != null) {
+        		this.process.destroy();
+        	}
+        }
+        
         private IllegalStateException prepareException(Exception e) {
             return new IllegalStateException(
                     "Mongodb ["
@@ -328,6 +331,15 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
                             + "] could not be started. Next console message was thrown: "
                             + e.getMessage());
         }
+        
+        private Process startProcess() throws IOException {
+    		return commandLineExecutor.startProcessInDirectoryAndArguments(
+    				targetPath, buildOperationSystemProgramAndArguments());
+    	}
+        
+        private List<String> getConsoleOutput(Process pwd) throws IOException {
+    		return commandLineExecutor.getConsoleOutput(pwd);
+    	}
     }
 
 }

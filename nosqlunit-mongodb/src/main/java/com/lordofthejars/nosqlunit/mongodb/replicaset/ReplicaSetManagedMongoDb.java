@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
-import com.lordofthejars.nosqlunit.mongodb.MongoDBCommands;
-import com.lordofthejars.nosqlunit.mongodb.MongoDBLowLevelOpsFactory;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOpsFactory;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
 import com.mongodb.CommandResult;
 import com.mongodb.MongoClient;
@@ -30,7 +30,7 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 
 	private ReplicaSetGroup replicaSetGroup;
 
-	private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDBLowLevelOpsFactory.getSingletonInstance();
+	private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDbLowLevelOpsFactory.getSingletonInstance();
 	
 	protected ReplicaSetManagedMongoDb(ReplicaSetGroup replicaSetGroup) {
 		this.replicaSetGroup = replicaSetGroup;
@@ -130,12 +130,12 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 
 		CommandResult commandResult = null;
 		if (this.replicaSetGroup.isAuthenticationSet()) {
-			commandResult = MongoDBCommands.replicaSetInitiate(mongoClient, cmd,
+			commandResult = MongoDbCommands.replicaSetInitiate(mongoClient, cmd,
 					this.replicaSetGroup.getUsername(),
 					this.replicaSetGroup.getPassword());
 			
 		} else {
-			commandResult = MongoDBCommands.replicaSetInitiate(mongoClient, cmd);
+			commandResult = MongoDbCommands.replicaSetInitiate(mongoClient, cmd);
 		}
 		
 		mongoClient.close();

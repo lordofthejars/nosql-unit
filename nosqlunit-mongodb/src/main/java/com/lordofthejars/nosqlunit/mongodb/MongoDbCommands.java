@@ -9,13 +9,13 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 
-public class MongoDBCommands {
+public class MongoDbCommands {
 
 	private static final String REPL_SET_GET_STATUS_COMMAND = "replSetGetStatus";
 	private static final String REPL_SET_INITIATE_COMMAND = "replSetInitiate";
 	private static final String RECONFIG_COMMAND = "replSetReconfig";	
 	
-	private MongoDBCommands() {
+	private MongoDbCommands() {
 		super();
 	}
 	

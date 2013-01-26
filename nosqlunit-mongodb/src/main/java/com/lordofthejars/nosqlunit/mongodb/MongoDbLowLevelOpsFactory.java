@@ -1,6 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-public class MongoDBLowLevelOpsFactory {
+public class MongoDbLowLevelOpsFactory {
 
 	private static MongoDbLowLevelOps mongoDbLowLevelOps = null;
 	

@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.mongodb.MongoDBCommands;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
@@ -40,7 +40,7 @@ public class WhenReplicaSetIsRequired {
 		
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
 		
-		DBObject replicaSetGetStatus = MongoDBCommands.replicaSetGetStatus(mongoClient);
+		DBObject replicaSetGetStatus = MongoDbCommands.replicaSetGetStatus(mongoClient);
 		assertThat(countPrimary(replicaSetGetStatus), is(1));
 		assertThat(countSecondaries(replicaSetGetStatus), is(2));
 		
@@ -55,7 +55,7 @@ public class WhenReplicaSetIsRequired {
 		replicaSetManagedMongoDb.waitUntilReplicaSetBecomeStable();
 		
 		MongoClient mongoClient = new MongoClient("localhost", 27018);
-		DBObject replicaSetGetStatus = MongoDBCommands.replicaSetGetStatus(mongoClient);
+		DBObject replicaSetGetStatus = MongoDbCommands.replicaSetGetStatus(mongoClient);
 		
 		assertThat(countPrimary(replicaSetGetStatus), is(1));
 		assertThat(countSecondaries(replicaSetGetStatus), is(1));

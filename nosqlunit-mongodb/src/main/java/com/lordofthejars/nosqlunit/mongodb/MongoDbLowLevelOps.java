@@ -113,12 +113,12 @@ public class MongoDbLowLevelOps {
 
 	private DBObject getMongosStatus(MongoClient mongoClient, String username,
 			String password) {
-		return MongoDBCommands.replicaSetGetStatus(mongoClient, username,
+		return MongoDbCommands.replicaSetGetStatus(mongoClient, username,
 				password);
 	}
 
 	private DBObject getMongosStatus(MongoClient mongoClient) {
-		return MongoDBCommands.replicaSetGetStatus(mongoClient);
+		return MongoDbCommands.replicaSetGetStatus(mongoClient);
 	}
 
 	public boolean assertThatConnectionIsPossible(String host, int port) throws InterruptedException, UnknownHostException,
@@ -148,7 +148,7 @@ public class MongoDbLowLevelOps {
 	}
 
 	public void shutdown(String host, int port) {
-		MongoDBCommands.shutdown(host, port);
+		MongoDbCommands.shutdown(host, port);
 	}
 
 }
