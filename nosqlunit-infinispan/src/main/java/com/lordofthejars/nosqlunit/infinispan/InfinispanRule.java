@@ -41,6 +41,12 @@ public class InfinispanRule extends AbstractNoSqlTestRule {
 			return new InfinispanRule(newEmbeddedInfinispanConfiguration().build());
 		}
 		
+		/**
+		 * We can use defaultEmbeddedInfinispan().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public InfinispanRule defaultEmbeddedInfinispan(Object target) {
 			return new InfinispanRule(newEmbeddedInfinispanConfiguration().build(), target);
 		}
@@ -49,6 +55,16 @@ public class InfinispanRule extends AbstractNoSqlTestRule {
 			return new InfinispanRule(newManagedInfinispanConfiguration().build());
 		}
 		
+		public InfinispanRule defaultManagedInfinispan(int port) {
+			return new InfinispanRule(newManagedInfinispanConfiguration().port(port).build());
+		}
+		
+		/**
+		 * We can use defaultManagedInfinispan().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public InfinispanRule defaultManagedInfinispan(Object target) {
 			return new InfinispanRule(newManagedInfinispanConfiguration().build(), target);
 		}

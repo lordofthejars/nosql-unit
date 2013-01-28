@@ -41,6 +41,13 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 			return new MongoDbRule(inMemoryMongoDb().databaseName(databaseName).build());
 		}
 		
+		/**
+		 * We can use defaultEmbeddedMongoDb(String databaseName).
+		 * @param databaseName
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public MongoDbRule defaultEmbeddedMongoDb(String databaseName, Object target) {
 			return new MongoDbRule(inMemoryMongoDb().databaseName(databaseName).build(), target);
 		}
@@ -49,6 +56,17 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 			return new MongoDbRule(mongoDb().databaseName(databaseName).build());
 		}
 		
+		public MongoDbRule defaultManagedMongoDb(String databaseName, int port) {
+			return new MongoDbRule(mongoDb().databaseName(databaseName).port(port).build());
+		}
+		
+		/**
+		 * We can use defaultManagedMongoDb(String databaseName).
+		 * @param databaseName
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public MongoDbRule defaultManagedMongoDb(String databaseName, Object target) {
 			return new MongoDbRule(mongoDb().databaseName(databaseName).build(), target);
 		}

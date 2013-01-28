@@ -1,9 +1,9 @@
 package com.lordofthejars.nosqlunit.demo.couchdb;
 
-import static com.lordofthejars.nosqlunit.couchdb.ManagedCouchDb.ManagedCouchDbRuleBuilder.newManagedCouchDbRule;
 import static com.lordofthejars.nosqlunit.couchdb.CouchDbRule.CouchDbRuleBuilder.newCouchDbRule;
-import static org.junit.Assert.assertThat;
+import static com.lordofthejars.nosqlunit.couchdb.ManagedCouchDb.ManagedCouchDbRuleBuilder.newManagedCouchDbRule;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import javax.inject.Inject;
 
@@ -24,7 +24,7 @@ public class WhenYouFindBooksById {
 	public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build(); 
 	
 	@Rule
-	public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedMongoDb("books");
+	public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedCouchDb("books");
 	
 	@Inject
 	private CouchDbConnector couchDbConnector;

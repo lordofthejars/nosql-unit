@@ -40,6 +40,16 @@ public class RedisRule extends AbstractNoSqlTestRule {
 			return new RedisRule(newManagedRedisConfiguration().build());
 		}
 		
+		public RedisRule defaultManagedRedis(int port) {
+			return new RedisRule(newManagedRedisConfiguration().port(port).build());
+		}
+		
+		/**
+		 * We can use defaultManagedRedis().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public RedisRule defaultManagedRedis(Object target) {
 			return new RedisRule(newManagedRedisConfiguration().build(), target);
 		}
@@ -48,6 +58,12 @@ public class RedisRule extends AbstractNoSqlTestRule {
 			return new RedisRule(newEmbeddedRedisConfiguration().build());
 		}
 		
+		/**
+		 * We can use defaultEmbeddedRedis().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public RedisRule defaultEmbeddedRedis(Object target) {
 			return new RedisRule(newEmbeddedRedisConfiguration().build(), target);
 		}

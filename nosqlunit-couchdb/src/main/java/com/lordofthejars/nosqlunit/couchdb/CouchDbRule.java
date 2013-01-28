@@ -38,11 +38,22 @@ public class CouchDbRule extends AbstractNoSqlTestRule {
 		}
 		
 		
-		public CouchDbRule defaultManagedMongoDb(String databaseName) {
+		public CouchDbRule defaultManagedCouchDb(String databaseName) {
 			return new CouchDbRule(newManagedCouchDbConfiguration().databaseName(databaseName).build());
 		}
+	
+		public CouchDbRule defaultManagedCouchDb(String databaseName, String url) {
+			return new CouchDbRule(newManagedCouchDbConfiguration().databaseName(databaseName).url(url).build());
+		}
 		
-		public CouchDbRule defaultManagedMongoDb(String databaseName, Object target) {
+		/**
+		 * We can use defaultManagedCouchDb(String databaseName).
+		 * @param databaseName
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
+		public CouchDbRule defaultManagedCouchDb(String databaseName, Object target) {
 			return new CouchDbRule(newManagedCouchDbConfiguration().databaseName(databaseName).build(), target);
 		}
 		

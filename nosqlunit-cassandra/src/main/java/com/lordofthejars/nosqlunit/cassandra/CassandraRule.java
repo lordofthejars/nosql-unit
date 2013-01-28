@@ -41,6 +41,13 @@ public class CassandraRule extends AbstractNoSqlTestRule {
 			return new CassandraRule(newEmbeddedCassandraConfiguration().clusterName(clusterName).build());
 		}
 		
+		/**
+		 * We can use defaultEmbeddedCassandra(String cluster).
+		 * @param clusterName
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public CassandraRule defaultEmbeddedCassandra(String clusterName, Object target) {
 			return new CassandraRule(newEmbeddedCassandraConfiguration().clusterName(clusterName).build(), target);
 		}
@@ -49,6 +56,17 @@ public class CassandraRule extends AbstractNoSqlTestRule {
 			return new CassandraRule(newManagedCassandraConfiguration().clusterName(clusterName).build());
 		}
 		
+		public CassandraRule defaultManagedCassandra(String clusterName, int port) {
+			return new CassandraRule(newManagedCassandraConfiguration().clusterName(clusterName).port(port).build());
+		}
+		
+		/**
+		 * We can use defaultManagedCassandra(String cluster).
+		 * @param clusterName
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public CassandraRule defaultManagedCassandra(String clusterName, Object target) {
 			return new CassandraRule(newManagedCassandraConfiguration().clusterName(clusterName).build(), target);
 		}

@@ -46,6 +46,12 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 			return new Neo4jRule(newEmbeddedNeoServerConfiguration().build());
 		}
 		
+		/**
+		 * We can use defaultEmbeddedNeo4j().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public Neo4jRule defaultEmbeddedNeo4j(Object target) {
 			return new Neo4jRule(newEmbeddedNeoServerConfiguration().build(), target);
 		}
@@ -54,6 +60,16 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 			return new Neo4jRule(newManagedNeoServerConfiguration().build());
 		}
 		
+		public Neo4jRule defaultManagedNeo4j(String uri) {
+			return new Neo4jRule(newManagedNeoServerConfiguration().uri(uri).build());
+		}
+		
+		/**
+		 * We can use defaultManagedNeo4j().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public Neo4jRule defaultManagedNeo4j(Object target) {
 			return new Neo4jRule(newManagedNeoServerConfiguration().build(), target);
 		}

@@ -76,6 +76,8 @@ lifecycle; there are two for each supported backend.
     stopping it. This will typically used during integration testing
     execution.
 
+You can add them in Test Suites and/or Tests Classes, *NoSQLUnit* takes care of only starting database once.
+
 Second set of *Rules* are those responsible of maintaining database into
 known state. Each supported backend will have its own, and can be
 understood as a connection to defined database which will be used to
@@ -2257,7 +2259,7 @@ interface can be used to create these configuration objects.
 import static com.lordofthejars.nosqlunit.couchdb.CouchDbRule.CouchDbRuleBuilder.newCouchDbRule;
 
 @Rule
-public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedMongoDb("books");
+public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedCouchDb("books");
 ~~~~
 
 ### Complete Example
@@ -2329,7 +2331,7 @@ public class WhenYouFindBooksById {
     public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build(); 
     
     @Rule
-    public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedMongoDb("books");
+    public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedCouchDb("books");
     
     @Inject
     private CouchDbConnector couchDbConnector;

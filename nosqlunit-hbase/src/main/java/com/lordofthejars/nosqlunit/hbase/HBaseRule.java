@@ -41,6 +41,12 @@ public class HBaseRule extends AbstractNoSqlTestRule {
 			return new HBaseRule(newEmbeddedHBaseConfiguration().build());
 		}
 		
+		/**
+		 * We can use defaultEmbeddedHBase().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public HBaseRule defaultEmbeddedHBase(Object target) {
 			return new HBaseRule(newEmbeddedHBaseConfiguration().build(), target);
 		}
@@ -49,6 +55,12 @@ public class HBaseRule extends AbstractNoSqlTestRule {
 			return new HBaseRule(newManagedHBaseConfiguration().build());
 		}
 		
+		/**
+		 * We can use defaultManagedHBase().
+		 * @param target
+		 * @return
+		 */
+		@Deprecated
 		public HBaseRule defaultManagedHBase(Object target) {
 			return new HBaseRule(newManagedHBaseConfiguration().build(), target);
 		}
