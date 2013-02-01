@@ -4,11 +4,13 @@ package com.lordofthejars.nosqlunit.core;
 
 public abstract class AbstractLifecycleManager implements LifecycleManager {
 
+	private boolean ready = false;
 
 	@Override
 	public void startEngine() throws Throwable {
 
 		if (isServerNotStartedYet()) {
+			ready = true;
 			doStart();
 		}
 
@@ -22,11 +24,16 @@ public abstract class AbstractLifecycleManager implements LifecycleManager {
 		int remainingConnections = ConnectionManagement.getInstance().removeConnection(getHost(), getPort());
 
 		if (noMoreConnectionsToManage(remainingConnections)) {
+			ready = false;
 			doStop();
 		}
 
 	}
 
+	public boolean isReady() {
+		return this.ready;
+	}
+	
 	private boolean noMoreConnectionsToManage(int remainingConnections) {
 		return remainingConnections < 1;
 	}

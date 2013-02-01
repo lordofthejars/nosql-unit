@@ -1,9 +1,9 @@
 package com.lordofthejars.nosqlunit.demo.mongodb;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManagerBuilder.newManagedMongoDbLifecycle;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
 import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicationMongoDbConfigurationBuilder.replicationMongoDbConfiguration;
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIn.isIn;
 import static org.junit.Assert.assertThat;
@@ -19,13 +19,10 @@ import org.junit.Test;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.demo.model.Book;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.util.JSON;
 
 public class WhenYouFindAllBooksInReplicaSet {
 
@@ -47,7 +44,8 @@ public class WhenYouFindAllBooksInReplicaSet {
 			.arbiter(
 					newManagedMongoDbLifecycle().port(27019)
 							.dbRelativePath("rs-2").logRelativePath("log-2")
-							.get()).get();
+							.get())
+			.get();
 
 	@Rule
 	public MongoDbRule mongoDbRule = newMongoDbRule().configure(

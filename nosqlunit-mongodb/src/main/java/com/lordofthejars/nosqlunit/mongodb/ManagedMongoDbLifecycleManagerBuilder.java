@@ -48,7 +48,16 @@ public class ManagedMongoDbLifecycleManagerBuilder {
 			return this;
 		}
 
-
+		public ManagedMongoDbLifecycleManagerBuilder shardServer() {
+			this.managedMongoDbLifecycleManager.setShardServer(true);
+			return this;
+		}
+		
+		public ManagedMongoDbLifecycleManagerBuilder configServer() {
+			this.managedMongoDbLifecycleManager.setConfigServer(true);
+			return this;
+		}
+		
 		public ManagedMongoDbLifecycleManagerBuilder appendCommandLineArguments(
 				String argumentName, String argumentValue) {
 			this.managedMongoDbLifecycleManager.addExtraCommandLineArgument(argumentName,

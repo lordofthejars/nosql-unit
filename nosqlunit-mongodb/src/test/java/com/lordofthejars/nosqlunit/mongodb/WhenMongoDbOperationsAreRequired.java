@@ -2,7 +2,6 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +23,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.util.JSON;
 
 public class WhenMongoDbOperationsAreRequired {
 
@@ -41,19 +41,51 @@ public class WhenMongoDbOperationsAreRequired {
 			"	]" +
 			"}";
 	
+	private static final String DATA_SHARD = "" +
+			"{" +
+			"\"collection1\": {" +
+			"  \"shard-key-pattern\":[\"id\",\"code\"],"+
+			"	\"data\":"+
+			"				[" +
+			"					{\"id\":1,\"code\":\"JSON dataset\",}," +
+			"					{\"id\":2,\"code\":\"Another row\",}" +
+			"				]"+
+			"   }"+
+			"}";
+	
 	private static final String[] EXPECTED_COLLECTION_1 = new String[]{"{ \"id\" : 1 , \"code\" : \"JSON dataset\"}", "{ \"id\" : 2 , \"code\" : \"Another row\"}"};
 	private static final String[] EXPECTED_COLLECTION_2 = new String[]{"{ \"id\" : 3 , \"code\" : \"JSON dataset 2\"}" , "{ \"id\" : 4 , \"code\" : \"Another row 2\"}"};
 	
 	@Mock private Mongo mongo;
 	@Mock private DB db;
+	@Mock private DB dbAdmin;
 	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		
-		when(mongo.getDB(anyString())).thenReturn(db);
+		when(mongo.getDB("admin")).thenReturn(dbAdmin);
+		when(mongo.getDB("test")).thenReturn(db);
 	}
 	
+	
+	@Test
+	public void insert_opertation_with_shards_should_add_data_into_collections() throws UnsupportedEncodingException {
+	
+		DBCollection collection1 = mock(DBCollection.class);
+		DBCollection collection2 = mock(DBCollection.class);
+		
+		when(db.getName()).thenReturn("test");
+		when(db.getMongo()).thenReturn(mongo);
+		when(db.getCollection("collection1")).thenReturn(collection1);
+		when(db.getCollection("collection2")).thenReturn(collection2);
+		
+		MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost","test"));
+		mongoOperation.insert(new ByteArrayInputStream(DATA_SHARD.getBytes("UTF-8")));
+		
+		verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
+		verifyEnableShardingCommand("{ \"shardcollection\" : \"test.collection1\" , \"key\" : { \"id\" : 1 , \"code\" : 1}}", dbAdmin);
+	}
 	
 	@Test
 	public void insert_opertation_should_add_data_into_collections() throws UnsupportedEncodingException {
@@ -131,6 +163,19 @@ public class WhenMongoDbOperationsAreRequired {
 		boolean equal = mongoOperation.compareExpectedData(DATA);
 		assertThat(equal, is(false));
 	}*/
+	
+	private void verifyEnableShardingCommand(String expectedCommand, DB mockDb) {
+		
+		final ArgumentCaptor<DBObject> enableShardingCommandCaptor = ArgumentCaptor
+                .forClass(DBObject.class);
+		verify(mockDb, times(1)).command(enableShardingCommandCaptor.capture());
+		
+		DBObject command = enableShardingCommandCaptor.getValue();
+
+		String commandDocument = JSON.serialize(command);
+		assertThat(commandDocument, is(expectedCommand));
+		
+	}
 	
 	private void verifyInsertedData(String[] expectedData, DBCollection mockCollection) {
 		

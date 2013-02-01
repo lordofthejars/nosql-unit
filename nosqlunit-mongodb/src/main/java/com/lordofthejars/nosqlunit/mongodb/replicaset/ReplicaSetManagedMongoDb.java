@@ -143,21 +143,37 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 	}
 
 	private void shutdownServers() {
+		
+		LOGGER.info("Stopping Replica Set servers");
+		
 		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
 				.getServers()) {
-			managedMongoDbLifecycleManager.stopEngine();
+			if(isServerStarted(managedMongoDbLifecycleManager)) {
+				managedMongoDbLifecycleManager.stopEngine();
+			}
 		}
+		
+		LOGGER.info("Stopped Replica Set servers");
 	}
 
 	private void wakeUpServers() throws Throwable {
+		
+		LOGGER.info("Starting Replica Set servers");
+		
 		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
 				.getServers()) {
 			if (isServerStopped(managedMongoDbLifecycleManager)) {
 				managedMongoDbLifecycleManager.startEngine();
 			}
 		}
+		
+		LOGGER.info("Started Replica Set servers");
 	}
 
+	private boolean isServerStarted(ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager) {
+		return managedMongoDbLifecycleManager.isReady();
+	}
+	
 	private boolean isServerStopped(
 			ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager) {
 		return !managedMongoDbLifecycleManager.isReady();

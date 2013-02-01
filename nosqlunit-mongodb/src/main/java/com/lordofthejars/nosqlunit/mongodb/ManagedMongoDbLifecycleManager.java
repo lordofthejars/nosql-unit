@@ -24,7 +24,7 @@ import com.mongodb.DBPort;
 
 public class ManagedMongoDbLifecycleManager extends AbstractLifecycleManager {
 
-private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.class); 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDbLifecycleManager.class); 
 	
 	public ManagedMongoDbLifecycleManager() {
 		super();
@@ -32,8 +32,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	
 	private static final String LOCALHOST = "localhost";
 
-	private static final int NUM_RETRIES_TO_CHECK_SERVER_UP = 3;
-
+	protected static final String CONFIG_SERVER_ENABLED = "--configsvr";
+	protected static final String SHARD_SERVER_ENABLED = "--shardsvr";
 	protected static final String JOURNALING_ENABLED = "--journal";
 	protected static final String NONE_JOURNALING_ENABLED = "--nojournal";
 	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
@@ -45,6 +45,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	protected static final String DEFAULT_MONGO_TARGET_PATH = "target"
 			+ File.separatorChar + "mongo-temp";
 	protected static final String DEFAULT_MONGO_REPLICA_SET_NAME = "";
+	protected static final boolean DEFAULT_MONGO_SHARD_SERVER = false;
+	protected static final boolean DEFAULT_MONGO_CONFIG_SERVER = false;
 
 	protected static final String MONGODB_BINARY_DIRECTORY = "bin";
 
@@ -59,6 +61,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	private String logRelativePath = DEFAULT_MONGO_LOGPATH;
 	private String replicaSetName = DEFAULT_MONGO_REPLICA_SET_NAME;
 	
+	private boolean shardServer = DEFAULT_MONGO_SHARD_SERVER;
+	private boolean configServer = DEFAULT_MONGO_CONFIG_SERVER;
 	private boolean journaling = false;
 	
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
@@ -68,8 +72,6 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
 	private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDbLowLevelOpsFactory.getSingletonInstance();
 
-	private boolean ready = false;
-	
 	private ProcessRunnable processRunnable;
 	
 	@Override
@@ -86,8 +88,6 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	public void doStart() throws Throwable {
 		
 		LOGGER.info("Starting {} MongoDb instance.", mongodPath);
-		
-		ready = true;
 		
 		File dbPath = ensureDbPathDoesNotExitsAndReturnCompositePath();
 
@@ -115,8 +115,6 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		
 		LOGGER.info("Stopping {} MongoDb instance.", mongodPath);
 		
-		ready = false;
-
 		try {
 			if(this.processRunnable != null) {
 				this.processRunnable.destroyProcess();
@@ -128,9 +126,6 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		LOGGER.info("Stopped {} MongoDb instance.", mongodPath);
 	}
 
-	public boolean isReady() {
-		return this.ready;
-	}
 
 	private List<String> startMongoDBAsADaemon() throws InterruptedException {
         CountDownLatch processIsReady = new CountDownLatch(1);
@@ -152,7 +147,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 			programAndArguments.add(REPLICA_SET_ARGUMENT_NAME);
 			programAndArguments.add(this.replicaSetName);
 		}
-		
+
 		programAndArguments.add(DBPATH_ARGUMENT_NAME);
 		programAndArguments.add(dbRelativePath);
 		programAndArguments.add(PORT_ARGUMENT_NAME);
@@ -160,6 +155,14 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 		programAndArguments.add(LOGPATH_ARGUMENT_NAME);
 		programAndArguments.add(logRelativePath);
 		programAndArguments.add(journalingArgument());
+		
+		if(isShardServerConfigured()) {
+			programAndArguments.add(SHARD_SERVER_ENABLED);
+		}
+		
+		if(isConfigServerConfigured()) {
+			programAndArguments.add(CONFIG_SERVER_ENABLED);
+		}
 		
 		for (String argument : this.singleCommandArguments) {
 			programAndArguments.add(argument);
@@ -173,6 +176,14 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 
 		return programAndArguments;
 
+	}
+
+	private boolean isConfigServerConfigured() {
+		return this.configServer;
+	}
+
+	private boolean isShardServerConfigured() {
+		return this.shardServer;
 	}
 
 	public boolean isReplicaSetNameSet() {
@@ -245,6 +256,14 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDb.clas
 	
 	public void setJournaling(boolean journaling) {
 		this.journaling = journaling;
+	}
+	
+	public void setShardServer(boolean shardServer) {
+		this.shardServer = shardServer;
+	}
+	
+	public void setConfigServer(boolean configServer) {
+		this.configServer = configServer;
 	}
 	
 	protected String getMongodPath() {
