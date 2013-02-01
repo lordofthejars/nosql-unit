@@ -1,0 +1,9 @@
+{
+	"Book": {
+				"shard-key-pattern": ["title"],
+				"data": 
+						[
+							{"title":"The Hobbit","numberOfPages":293}
+						]
+			}
+}
