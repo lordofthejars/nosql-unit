@@ -47,7 +47,7 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 		
 	}
 
-	public void waitUntilReplicaSetBecomeStable() {
+	public void waitUntilReplicaSetBecomesStable() {
 		MongoClient mongoClient;
 		try {
 			mongoClient = getAvailableServersMongoClient();
