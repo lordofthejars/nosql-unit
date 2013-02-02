@@ -52,7 +52,7 @@ public class WhenReplicaSetIsRequired {
 	public void server_should_be_able_to_stopped_programmatically() throws UnknownHostException {
 		
 		replicaSetManagedMongoDb.shutdownServer(27017);
-		replicaSetManagedMongoDb.waitUntilReplicaSetBecomeStable();
+		replicaSetManagedMongoDb.waitUntilReplicaSetBecomesStable();
 		
 		MongoClient mongoClient = new MongoClient("localhost", 27018);
 		DBObject replicaSetGetStatus = MongoDbCommands.replicaSetGetStatus(mongoClient);
