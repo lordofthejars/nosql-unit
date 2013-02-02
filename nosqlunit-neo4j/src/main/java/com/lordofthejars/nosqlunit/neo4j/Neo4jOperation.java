@@ -7,6 +7,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.index.IndexManager;
 
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
@@ -53,9 +54,36 @@ public class Neo4jOperation extends AbstractCustomizableDatabaseOperation<Neo4jC
 			removeAllRelationships(allRelationships);
 			removeAllNodes(allNodes);
 
+			removeAllIndexes();
+			
 			tx.success();
 		} finally {
 			tx.finish();
+		}
+	}
+
+	private void removeAllIndexes() {
+		
+		IndexManager indexManager = this.graphDatabaseService.index();
+
+		deleteNodeIndexes(indexManager);
+		deleteRelationshipIndexes(indexManager);
+		
+	}
+
+	private void deleteRelationshipIndexes(IndexManager indexManager) {
+		String[] relationshipIndexNames = indexManager.relationshipIndexNames();
+		
+		for (String relationshipIndexName : relationshipIndexNames) {
+			indexManager.forRelationships(relationshipIndexName).delete();
+		}
+	}
+
+	private void deleteNodeIndexes(IndexManager indexManager) {
+		String[] nodeIndexNames = indexManager.nodeIndexNames();
+		
+		for (String nodeIndexName : nodeIndexNames) {
+			indexManager.forNodes(nodeIndexName).delete();
 		}
 	}
 
@@ -69,6 +97,7 @@ public class Neo4jOperation extends AbstractCustomizableDatabaseOperation<Neo4jC
 		}
 	}
 
+	
 	private boolean isNotReferenceNode(Node node) {
 		return node.getId() != 0;
 	}

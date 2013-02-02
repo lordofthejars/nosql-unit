@@ -6,6 +6,8 @@ import static ch.lambdaj.Lambda.selectFirst;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
+import static org.hamcrest.collection.IsArrayWithSize.emptyArray;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +29,8 @@ import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import scala.actors.threadpool.Arrays;
+
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jConfiguration;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jLowLevelOps;
@@ -47,6 +51,34 @@ public class WhenNeo4jOperationsAreRequired {
 			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
 			"        <node id=\"15\">\n" + 
 			"            <data key=\"name\">I</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"15\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.5</data>\n" + 
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
+	
+	private static final String WELL_FORMED_GRAPH_WITH_MANUAL_INDEX = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" +
+			"			 <index name=\"myindex\" key=\"mykey\">myvalue</index>"+
 			"        </node>\n" + 
 			"        <node id=\"25\">\n" + 
 			"            <data key=\"name\">you</data>\n" + 
@@ -101,6 +133,65 @@ public class WhenNeo4jOperationsAreRequired {
 	@Before
 	public void setUp() {
 		clearDb();
+	}
+	
+	@Test
+	public void insert_opertation_should_add_data_and_indexes_into_graph()  {
+		
+		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
+		
+		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_MANUAL_INDEX.getBytes()));
+		
+		GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(newEmbeddedDatabase);
+		Iterable<Node> allNodes = globalGraphOperations.getAllNodes();
+		Iterable<Relationship> allRelationships = globalGraphOperations.getAllRelationships();
+		
+		Node firstNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("I")));
+		assertThat(firstNode, notNullValue());
+		
+		Node secondNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("you")));
+		assertThat(secondNode, notNullValue());
+		
+		Node thirdNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("him")));
+		assertThat(thirdNode, notNullValue());
+		
+		Relationship firstRelationship = selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.5"))));
+		assertThat(firstRelationship, notNullValue());
+		
+		Relationship secondRelationship = selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.8"))));
+		assertThat(secondRelationship, notNullValue());
+		
+		String[] nodeIndexNames = newEmbeddedDatabase.index().nodeIndexNames();
+		
+		assertThat(nodeIndexNames, arrayContainingInAnyOrder("myindex"));
+		
+		newEmbeddedDatabase.shutdown();
+	}
+	
+	@Test
+	public void delete_opertation_should_remove_indexes_of_graph()  {
+		
+		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
+		
+		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_MANUAL_INDEX.getBytes()));
+		
+		
+		neo4jOperation.deleteAll();
+		
+		String[] nodeIndexNames = newEmbeddedDatabase.index().nodeIndexNames();
+		assertThat(nodeIndexNames, emptyArray());
+		
+		newEmbeddedDatabase.shutdown();
 	}
 	
 	@Test
@@ -165,6 +256,28 @@ public class WhenNeo4jOperationsAreRequired {
 		
 		newEmbeddedDatabase.shutdown();
 		
+	}
+	
+	@Test
+	public void insert_opertation_should_add_indexes_into_remote_graph()  {
+		
+		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
+		WrappingNeoServerBootstrapper graphDb = new WrappingNeoServerBootstrapper((GraphDatabaseAPI) newEmbeddedDatabase);
+		graphDb.start();
+		
+		RestGraphDatabase graphDatabaseService = new RestGraphDatabase("http://localhost:7474/db/data");
+		
+		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
+		neo4jConfiguration.setGraphDatabaseService(graphDatabaseService);
+		
+		Neo4jOperation neo4jOperation = new Neo4jOperation(graphDatabaseService);
+		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_MANUAL_INDEX.getBytes()));
+		
+		String[] nodeIndexNames = graphDatabaseService.index().nodeIndexNames();
+		
+		assertThat(nodeIndexNames, arrayContainingInAnyOrder("myindex"));
+		
+		newEmbeddedDatabase.shutdown();
 	}
 	
 	@Test

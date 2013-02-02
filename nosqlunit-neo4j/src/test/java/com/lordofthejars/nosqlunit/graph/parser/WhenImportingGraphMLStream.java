@@ -1,19 +1,22 @@
 package com.lordofthejars.nosqlunit.graph.parser;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -21,8 +24,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-
-import com.lordofthejars.nosqlunit.graph.parser.GraphMLReader;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexManager;
+import org.neo4j.graphdb.index.RelationshipIndex;
 
 public class WhenImportingGraphMLStream {
 
@@ -248,7 +252,142 @@ public class WhenImportingGraphMLStream {
 			"    </graph>\n" + 
 			"</graphml>";
 	
+	private static final String WELL_FORMED_GRAPH_WITH_NODE_INDEX = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.autoindexName=\"names\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"15\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.5</data>\n" + 
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
 	
+	private static final String WELL_FORMED_GRAPH_WITH_RELATIONSHIP_INDEX = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.autoindexName=\"weights\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"15\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.5</data>\n" + 
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
+	
+	private static final String GRAPH_WITH_EDGES_WITH_A_NODE_TYPE_DATA = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"15\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"name\">0.5</data>\n" + 
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
+	
+	private static final String WELL_FORMED_GRAPH_WITH_MANUAL_INDEX_IN_NODE = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" + 
+			"			 <index name=\"myindex\" key=\"mykey\">myvalue</index>"+
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"15\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.5</data>\n" + 
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
+	
+	private static final String WELL_FORMED_GRAPH_WITH_MANUAL_INDEX_IN_EDGES = "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" + 
+			"         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
+			"         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" + 
+			"        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n" + 
+			"    <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"float\"/>\n" + 
+			"    <key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/>\n" + 
+			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
+			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
+			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
+			"        <node id=\"15\">\n" + 
+			"            <data key=\"name\">I</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"25\">\n" + 
+			"            <data key=\"name\">you</data>\n" + 
+			"        </node>\n" + 
+			"        <node id=\"3\">\n" + 
+			"            <data key=\"name\">him</data>\n" + 
+			"        </node>\n" + 
+			"        <edge id=\"1\" source=\"15\" target=\"25\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.5</data>\n" + 
+			"			 <index name=\"myindex\" key=\"mykey\">myvalue</index>"+
+			"        </edge>\n" + 
+			"        <edge id=\"2\" source=\"15\" target=\"3\" label=\"know\">\n" + 
+			"            <data key=\"weight\">0.8</data>\n" + 
+			"        </edge>\n" + 
+			"    </graph>\n" + 
+			"</graphml>";
 	
 	@Mock
 	private GraphDatabaseService graphDatabaseService;
@@ -258,6 +397,187 @@ public class WhenImportingGraphMLStream {
 		MockitoAnnotations.initMocks(this);
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void parser_should_throw_an_exception_for_data_types_not_decalred_of_the_same_type() {
+		
+		Node node15 = mock(Node.class);
+		Node node25 = mock(Node.class);
+		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
+
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+
+		Relationship relationship1 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
+
+		Relationship relationship2 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node3), any(RelationshipType.class))).thenReturn(relationship2);
+
+		GraphMLReader graphMLReader = new GraphMLReader(graphDatabaseService);
+		graphMLReader.read(new ByteArrayInputStream(GRAPH_WITH_EDGES_WITH_A_NODE_TYPE_DATA.getBytes()));
+		
+	}
+	
+	@Test
+	public void parser_should_create_manual_indexes_for_nodes() {
+		
+		Node node15 = mock(Node.class);
+		Node node25 = mock(Node.class);
+		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
+		IndexManager indexManager = mock(IndexManager.class);
+		Index<Node> index = mock(Index.class);
+		
+		when(indexManager.forNodes("myindex")).thenReturn(index);
+		when(graphDatabaseService.index()).thenReturn(indexManager);
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+
+		Relationship relationship1 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
+
+		Relationship relationship2 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node3), any(RelationshipType.class))).thenReturn(relationship2);
+
+		GraphMLReader graphMLReader = new GraphMLReader(graphDatabaseService);
+		graphMLReader.read(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_MANUAL_INDEX_IN_NODE.getBytes()));
+
+		verify(graphDatabaseService, times(3)).createNode();
+
+		verify(node15, times(1)).createRelationshipTo(eq(node25), any(DynamicRelationshipType.class));
+		verify(node15, times(1)).createRelationshipTo(eq(node3), any(DynamicRelationshipType.class));
+
+		verify(node15).setProperty("name", "I");
+		verify(node25).setProperty("name", "you");
+		verify(node3).setProperty("name", "him");
+
+		verify(relationship1, times(1)).setProperty("weight", (Float) 0.5f);
+		verify(relationship2, times(1)).setProperty("weight", (Float) 0.8f);
+		
+		verify(index, times(1)).add(node15, "mykey", "myvalue");
+		
+	}
+	
+	@Test
+	public void parser_should_create_manual_indexes_for_relationships() {
+		
+		Node node15 = mock(Node.class);
+		Node node25 = mock(Node.class);
+		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
+		IndexManager indexManager = mock(IndexManager.class);
+		RelationshipIndex index = mock(RelationshipIndex.class);
+		
+		when(indexManager.forRelationships("myindex")).thenReturn(index);
+		when(graphDatabaseService.index()).thenReturn(indexManager);
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+
+		Relationship relationship1 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
+
+		Relationship relationship2 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node3), any(RelationshipType.class))).thenReturn(relationship2);
+
+		GraphMLReader graphMLReader = new GraphMLReader(graphDatabaseService);
+		graphMLReader.read(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_MANUAL_INDEX_IN_EDGES.getBytes()));
+
+		verify(graphDatabaseService, times(3)).createNode();
+
+		verify(node15, times(1)).createRelationshipTo(eq(node25), any(DynamicRelationshipType.class));
+		verify(node15, times(1)).createRelationshipTo(eq(node3), any(DynamicRelationshipType.class));
+
+		verify(node15).setProperty("name", "I");
+		verify(node25).setProperty("name", "you");
+		verify(node3).setProperty("name", "him");
+
+		verify(relationship1, times(1)).setProperty("weight", (Float) 0.5f);
+		verify(relationship2, times(1)).setProperty("weight", (Float) 0.8f);
+		
+		verify(index, times(1)).add(relationship1, "mykey", "myvalue");
+		
+	}
+	
+	@Test
+	public void parser_should_create_autoindexes_for_nodes() {
+		
+		Node node15 = mock(Node.class);
+		Node node25 = mock(Node.class);
+		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
+		IndexManager indexManager = mock(IndexManager.class);
+		Index<Node> index = mock(Index.class);
+		
+		when(indexManager.forNodes("names")).thenReturn(index);
+		when(graphDatabaseService.index()).thenReturn(indexManager);
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+
+		Relationship relationship1 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
+
+		Relationship relationship2 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node3), any(RelationshipType.class))).thenReturn(relationship2);
+
+		GraphMLReader graphMLReader = new GraphMLReader(graphDatabaseService);
+		graphMLReader.read(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_NODE_INDEX.getBytes()));
+
+		verify(graphDatabaseService, times(3)).createNode();
+
+		verify(node15, times(1)).createRelationshipTo(eq(node25), any(DynamicRelationshipType.class));
+		verify(node15, times(1)).createRelationshipTo(eq(node3), any(DynamicRelationshipType.class));
+
+		verify(node15).setProperty("name", "I");
+		verify(node25).setProperty("name", "you");
+		verify(node3).setProperty("name", "him");
+
+		verify(relationship1, times(1)).setProperty("weight", (Float) 0.5f);
+		verify(relationship2, times(1)).setProperty("weight", (Float) 0.8f);
+		
+		verify(index, times(3)).add(any(Node.class), any(String.class), any(Object.class));
+		
+	}
+	
+	@Test
+	public void parser_should_create_autoindexes_for_relationships() {
+		
+		Node node15 = mock(Node.class);
+		Node node25 = mock(Node.class);
+		Node node3 = mock(Node.class);
+		Node referenceNode = mock(Node.class);
+		IndexManager indexManager = mock(IndexManager.class);
+		RelationshipIndex index = mock(RelationshipIndex.class);
+		
+		when(indexManager.forRelationships("weights")).thenReturn(index);
+		when(graphDatabaseService.index()).thenReturn(indexManager);
+		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+
+		Relationship relationship1 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
+
+		Relationship relationship2 = mock(Relationship.class);
+		when(node15.createRelationshipTo(eq(node3), any(RelationshipType.class))).thenReturn(relationship2);
+
+		GraphMLReader graphMLReader = new GraphMLReader(graphDatabaseService);
+		graphMLReader.read(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_RELATIONSHIP_INDEX.getBytes()));
+
+		verify(graphDatabaseService, times(3)).createNode();
+
+		verify(node15, times(1)).createRelationshipTo(eq(node25), any(DynamicRelationshipType.class));
+		verify(node15, times(1)).createRelationshipTo(eq(node3), any(DynamicRelationshipType.class));
+
+		verify(node15).setProperty("name", "I");
+		verify(node25).setProperty("name", "you");
+		verify(node3).setProperty("name", "him");
+
+		verify(relationship1, times(1)).setProperty("weight", (Float) 0.5f);
+		verify(relationship2, times(1)).setProperty("weight", (Float) 0.8f);
+		
+		verify(index, times(2)).add(any(Relationship.class), any(String.class), any(Object.class));
+		
+	}
 	@Test
 	public void parser_should_insert_data_into_neo4j() throws FileNotFoundException {
 

@@ -16,6 +16,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 public class GraphMLReader {
 
@@ -33,7 +34,10 @@ public class GraphMLReader {
 			XMLStreamReader reader = inputFactory.createXMLStreamReader(stream);
 
 			Map<String, String> keyIdMap = new HashMap<String, String>();
-			Map<String, String> keyTypes = new HashMap<String, String>();
+			Map<String, String> keyTypesForNodes = new HashMap<String, String>();
+			Map<String, String> keyTypesForEdges = new HashMap<String, String>();
+			Map<String, String> keyAutoindexesForNodes = new HashMap<String, String>();
+			Map<String, String> keyAutoindexesForEdges = new HashMap<String, String>();
 
 			Map<String, Node> nodes = new HashMap<String, Node>();
 			List<Edge> orphanEdges = new ArrayList<Edge>();
@@ -60,8 +64,30 @@ public class GraphMLReader {
 						String id = reader.getAttributeValue(null, GraphMLTokens.ID);
 						String attributeName = reader.getAttributeValue(null, GraphMLTokens.ATTR_NAME);
 						String attributeType = reader.getAttributeValue(null, GraphMLTokens.ATTR_TYPE);
+						String attributeAutoindexName = reader.getAttributeValue(null, GraphMLTokens.ATTR_AUTOINDEX);
+
+						String attributeFor = reader.getAttributeValue(null, GraphMLTokens.FOR);
+
 						keyIdMap.put(id, attributeName);
-						keyTypes.put(attributeName, attributeType);
+
+						if (GraphMLTokens.NODE.equalsIgnoreCase(attributeFor)) {
+
+							keyTypesForNodes.put(attributeName, attributeType);
+
+							if (attributeAutoindexName != null) {
+								keyAutoindexesForNodes.put(attributeName, attributeAutoindexName);
+							}
+
+						} else {
+							if (GraphMLTokens.EDGE.equalsIgnoreCase(attributeFor)) {
+
+								keyTypesForEdges.put(attributeName, attributeType);
+
+								if (attributeAutoindexName != null) {
+									keyAutoindexesForEdges.put(attributeName, attributeAutoindexName);
+								}
+							}
+						}
 
 					} else if (elementName.equals(GraphMLTokens.NODE) && isRootGraph(graphDepth)) {
 
@@ -91,13 +117,14 @@ public class GraphMLReader {
 
 					} else if (elementName.equals(GraphMLTokens.DATA) && isRootGraph(graphDepth)) {
 
-						String key = reader.getAttributeValue(null, GraphMLTokens.KEY);
-						String attributeName = keyIdMap.get(key);
+						String attributeName = reader.getAttributeValue(null, GraphMLTokens.KEY);
 
-						if (attributeName != null) {
-							String value = reader.getElementText();
+						if (isInsideNodeTag(inVertex)) {
 
-							if (isInsideNodeTag(inVertex)) {
+							if (keyTypesForNodes.containsKey(attributeName)) {
+
+								String value = reader.getElementText();
+								Object typeCastValue = typeCastValue(attributeName, value, keyTypesForNodes);
 
 								if (GraphMLTokens.ID.equals(attributeName)) {
 									throw new IllegalArgumentException(
@@ -107,12 +134,28 @@ public class GraphMLReader {
 
 								if (currentNode != null) {
 									// inserted directly to neo4j
-									currentNode.setProperty(key, typeCastValue(key, value, keyTypes));
+									currentNode.setProperty(attributeName, typeCastValue);
+
+									if (keyAutoindexesForNodes.containsKey(attributeName)) {
+										String autoindexName = keyAutoindexesForNodes.get(attributeName);
+										this.graphDatabaseService.index().forNodes(autoindexName)
+												.add(currentNode, attributeName, typeCastValue);
+									}
+
 								}
-
 							} else {
+								throw new IllegalArgumentException("Attribute key: " + attributeName
+										+ " is not declared.");
+							}
 
-								if (isInsideEdgeTag(inEdge)) {
+						} else {
+
+							if (isInsideEdgeTag(inEdge)) {
+
+								if (keyTypesForEdges.containsKey(attributeName)) {
+
+									String value = reader.getElementText();
+									Object typeCastValue = typeCastValue(attributeName, value, keyTypesForEdges);
 
 									if (GraphMLTokens.LABEL.equals(attributeName)) {
 										throw new IllegalArgumentException(
@@ -122,15 +165,40 @@ public class GraphMLReader {
 
 									if (currentEdge != null) {
 										// saved inmemory edge
-										currentEdge.putData(key, typeCastValue(key, value, keyTypes));
+										currentEdge.putData(attributeName, typeCastValue);
 									}
+								} else {
+									throw new IllegalArgumentException("Attribute key: " + attributeName
+											+ " is not declared.");
 								}
 							}
+						}
+
+					} else if (elementName.equals(GraphMLTokens.INDEX) && isRootGraph(graphDepth)) {
+						
+						if (isInsideNodeTag(inVertex)) {
+							//add custom index over currentNode
+							String indexName = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_NAME);
+							String indexKey = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_KEY);
+							String indexData = reader.getElementText();
+							
+							this.graphDatabaseService.index().forNodes(indexName).add(currentNode, indexKey, indexData);
+							
 						} else {
-							throw new IllegalArgumentException("Attribute key: " + key + " is not declared.");
+							if (isInsideEdgeTag(inEdge)) {
+								//add custom index over currentEdge
+								
+								String indexName = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_NAME);
+								String indexKey = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_KEY);
+								String indexData = reader.getElementText();
+								
+								currentEdge.putManualIndex(indexName, indexKey, indexData);
+								
+							}
 						}
 						
-					} else if (elementName.equals(GraphMLTokens.GRAPH)) {
+						
+					} else if(elementName.equals(GraphMLTokens.GRAPH)) {
 						nodes.put("0", this.graphDatabaseService.getReferenceNode());
 						graphDepth++;
 					}
@@ -149,15 +217,15 @@ public class GraphMLReader {
 
 						} else if (elementName.equals(GraphMLTokens.EDGE) && isRootGraph(graphDepth)) {
 
-							addEdge(nodes, orphanEdges, currentEdge);
+							addEdge(nodes, orphanEdges, currentEdge, keyAutoindexesForEdges);
 
 							currentEdge = null;
 							currentEdgeId = null;
 							inEdge = false;
 
 						} else if (elementName.equals(GraphMLTokens.GRAPHML)) {
-							addOrphanEdgesWithNewParents(nodes, orphanEdges);
-						}else if (elementName.equals(GraphMLTokens.GRAPH)) {
+							addOrphanEdgesWithNewParents(nodes, orphanEdges, keyAutoindexesForEdges);
+						} else if (elementName.equals(GraphMLTokens.GRAPH)) {
 							graphDepth--;
 						}
 					}
@@ -176,27 +244,48 @@ public class GraphMLReader {
 	private boolean isRootGraph(int graphDepth) {
 		return graphDepth == 1;
 	}
-	
-	private void addOrphanEdgesWithNewParents(Map<String, Node> nodes, List<Edge> edgesWithoutNodeDefined) {
+
+	private void addOrphanEdgesWithNewParents(Map<String, Node> nodes, List<Edge> edgesWithoutNodeDefined,
+			Map<String, String> indexes) {
 		for (Edge edge : edgesWithoutNodeDefined) {
 			if (isEdgeInsertable(edge, nodes)) {
-				edge.createLink(nodes);
+				Relationship relationship = edge.createLink(nodes);
+				
+				edge.createManualIndexes(graphDatabaseService, relationship);
+				
+				createRelationshipAutoIndexes(relationship, edge.getProps(), indexes);
 			} else {
 				throw new IllegalArgumentException("Next edge's nodes has not been declared. " + edge);
 			}
 		}
 	}
 
-	private void addEdge(Map<String, Node> nodes, List<Edge> edgesWithoutNodeDefinedPreviously, Edge currentEdge) {
+	private void addEdge(Map<String, Node> nodes, List<Edge> edgesWithoutNodeDefinedPreviously, Edge currentEdge,
+			Map<String, String> indexes) {
 		if (currentEdge != null && isEdgeInsertable(currentEdge, nodes)) {
 
-			currentEdge.createLink(nodes);
+			Relationship relationship = currentEdge.createLink(nodes);
+			currentEdge.createManualIndexes(graphDatabaseService, relationship);
+			
+			createRelationshipAutoIndexes(relationship, currentEdge.getProps(), indexes);
 
 		} else {
 			if (currentEdge != null) {
 				edgesWithoutNodeDefinedPreviously.add(currentEdge);
 			}
 		}
+	}
+
+	private void createRelationshipAutoIndexes(Relationship relationship, Map<String, Object> props,
+			Map<String, String> indexes) {
+
+		for (String prop : props.keySet()) {
+			if (indexes.containsKey(prop)) {
+				String indexName = indexes.get(prop);
+				this.graphDatabaseService.index().forRelationships(indexName).add(relationship, prop, props.get(prop));
+			}
+		}
+
 	}
 
 	private boolean isEdgeInsertable(Edge edge, Map<String, Node> nodes) {

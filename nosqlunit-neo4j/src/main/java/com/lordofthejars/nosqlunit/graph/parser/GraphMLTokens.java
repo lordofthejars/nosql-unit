@@ -16,6 +16,10 @@ public class GraphMLTokens {
     public static final String ID = "id";
     public static final String ATTR_NAME = "attr.name";
     public static final String ATTR_TYPE = "attr.type";
+    public static final String ATTR_AUTOINDEX = "attr.autoindexName";
+    public static final String ATTR_INDEX_NAME = "name";
+    public static final String ATTR_INDEX_KEY = "key";
+    public static final String INDEX = "index";
     public static final String GRAPH = "graph";
     public static final String NODE = "node";
     public static final String EDGE = "edge";
