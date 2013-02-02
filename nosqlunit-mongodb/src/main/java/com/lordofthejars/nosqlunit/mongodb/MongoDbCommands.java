@@ -25,11 +25,11 @@ public class MongoDbCommands {
 	}
 	
 	
-	public static DBObject replicaSetGetStatus(MongoClient mongoClient) {
+	public static DBObject replicaSetGetStatus(Mongo mongoClient) {
 		return mongoClient.getDB("admin").command(new BasicDBObject(REPL_SET_GET_STATUS_COMMAND, 1));
 	}
 	
-	public static DBObject replicaSetGetStatus(MongoClient mongoClient, String username, String password) {
+	public static DBObject replicaSetGetStatus(Mongo mongoClient, String username, String password) {
 		DB adminDb = getAdminDatabase(mongoClient);
 		adminDb.authenticate(username, password.toCharArray());
 		return adminDb.command(new BasicDBObject(REPL_SET_GET_STATUS_COMMAND, 1));
