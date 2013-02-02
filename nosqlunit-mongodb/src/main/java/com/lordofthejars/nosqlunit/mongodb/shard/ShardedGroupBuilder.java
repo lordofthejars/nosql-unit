@@ -22,11 +22,13 @@ public class ShardedGroupBuilder {
 	}
 	
 	public ShardedGroupBuilder shard(ManagedMongoDbLifecycleManager shard) {
+		shard.setShardServer(true);
 		this.shardedGroup.addShard(shard);
 		return this;
 	}
 	
 	public ShardedGroupBuilder config(ManagedMongoDbLifecycleManager config) {
+		config.setConfigServer(true);
 		this.shardedGroup.addConfig(config);
 		return this;
 	}
