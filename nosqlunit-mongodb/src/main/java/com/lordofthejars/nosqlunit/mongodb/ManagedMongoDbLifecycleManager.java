@@ -288,6 +288,10 @@ public class ManagedMongoDbLifecycleManager extends AbstractLifecycleManager {
 		return this.journaling ? JOURNALING_ENABLED : NONE_JOURNALING_ENABLED;
 	}
 
+	public String getReplicaSetName() {
+		return replicaSetName;
+	}
+	
     public class ProcessRunnable implements Runnable {
 
         private CountDownLatch processIsReady;

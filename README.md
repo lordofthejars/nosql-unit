@@ -322,54 +322,7 @@ can append *property=value* arguments using
 > (-) and double slash (--) where is necessary.
 
 To stop *MongoDB* instance, **NoSQLUnit** sends a `shutdown` command to
-server using *Java Mongo API*. When this command is sent, the server is
-stopped and because connection is lost, *Java Mongo API* logs
-automatically an exception (read
-[here](https://groups.google.com/group/mongodb-user/browse_thread/thread/ac9a4c9ea13f3e81)
-information about the problem and how to "resolve" it). Do not confuse
-with a testing failure. You will see something like:
-
-    java.io.EOFException
-        at org.bson.io.Bits.readFully(Bits.java:37)
-        at org.bson.io.Bits.readFully(Bits.java:28)
-        at com.mongodb.Response.<init>;(Response.java:39)
-        at com.mongodb.DBPort.go(DBPort.java:128)
-        at com.mongodb.DBPort.call(DBPort.java:79)
-        at com.mongodb.DBTCPConnector.call(DBTCPConnector.java:218)
-        at com.mongodb.DBApiLayer$MyCollection.__find(DBApiLayer.java:305)
-        at com.mongodb.DB.command(DB.java:160)
-        at com.mongodb.DB.command(DB.java:183)
-        at com.mongodb.DB.command(DB.java:144)
-        at
-        com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps.shutdown(MongoDbLowLevelOps.java:44)
-        at
-        com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.after(ManagedMongoDb.java:157)
-        at
-        org.junit.rules.ExternalResource$1.evaluate(ExternalResource.java:48)
-        at org.junit.rules.RunRules.evaluate(RunRules.java:18)
-        at org.junit.runners.ParentRunner.run(ParentRunner.java:300)
-        at
-        org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:236)
-        at
-        org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:134)
-        at
-        org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:113)
-        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-        at
-        sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-        at
-        sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-        at java.lang.reflect.Method.invoke(Method.java:616)
-        at
-        org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
-        at
-        org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
-        at
-        org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
-        at
-        org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
-        at
-        org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+server using *Java Mongo API*.
 
 Configuring **remote** approach does not require any special rule
 because you (or System like Maven ) is the responsible of starting and
@@ -547,6 +500,152 @@ You can watch full example at
 [github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo)
 .
 
+Replica Set
+-----------
+### Introduction
+
+Database replication in **MongoDB** adds redundancy and high availability of the data. 
+In case of **MongoDB** instead of having traditional master-slave pattern architecture, it implements _Replica Set_ architecture, 
+which can be understood as more sophisticated maste-slave replication. For more information about _Replica Set_ read
+[mongoDB](http://docs.mongodb.org/manual/core/replication/)
+
+### Set up and Start Replica Set architecture
+
+In **NoSQLUnit** we can define a replica set architecture and starting it up, so our tests are executed against a replica set servers instead of a single server. Due the nature of replica set system, we can only create a replica set of managed servers.
+
+So let's see how to define an architecture and starting all related servers. The main class is *ReplicaSetManagedMongoDb* which manages lifecycle of all servers involved in replica set. To build a *ReplicaSetManagedMongoDb* class, *ReplicaSetBuilder* builder class is provided and it will allows us to define the replica set architecture. Using it we can set the eligible servers (those that can be primaries or secondaries), the only secondaries servers, the arbiters, the hidden ones, and configure all of them with the attributes like priority, voters, or setting tags.
+
+So let's see an example where we are defining two eligible servers and one arbiter in a replica set called rs-test.
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
+
+@ClassRule
+public static ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet(
+			"rs-test")
+			.eligible(
+					newManagedMongoDbLifecycle().port(27017)
+							.dbRelativePath("rs-0").logRelativePath("log-0")
+							.get())
+			.eligible(
+					newManagedMongoDbLifecycle().port(27018)
+							.dbRelativePath("rs-1").logRelativePath("log-1")
+							.get())
+			.arbiter(
+					newManagedMongoDbLifecycle().port(27019)
+							.dbRelativePath("rs-2").logRelativePath("log-2")
+							.get())
+			.get();
+~~~~
+
+Notice that you must define different port for each server and also a different database path. Also note that *ReplicaSetManagedMongoDb* won't let start executing tests until all replica set becomes stable (this can take some minutes).
+
+Then we only have to create a _MongoDbRule_ as usually which will populate defined data into replica set servers. For this case a new configuration builder is provided that  allows us to define the mongo servers location and the write concern used during seeding phase. By default _Aknownledge_ write concern is used.
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicationMongoDbConfigurationBuilder.replicationMongoDbConfiguration;
+
+@Rule
+public MongoDbRule mongoDbRule = newMongoDbRule().configure(
+						replicationMongoDbConfiguration().databaseName("test")
+							.seed("localhost", 27017)
+							.seed("localhost", 27018)
+							.configure())
+						.build();
+~~~~
+
+Now we have configured and deployed a replica set and populated them with the dataset.
+
+But **NoSQLUnit** also provides an utility method to cause server failures. It is as easy as calling _shutdownServer_ method.
+
+~~~~ {.java}
+replicaSetManagedMongoDb.shutdownServer(27017);
+~~~~
+
+Keep in mind two aspects of using this method:
+
+-   Because  _@ClassRule_ is used, we are responsible for restarting the system by calling _startServer_.
+-   System may become unstable and Mongo driver can throw many exceptions (that's normal because of MonitorThread) and even do some test fails. If you want to wait until all servers become stable again (in real life you won't have this possibility), you can use next call:
+
+~~~~ {.java}
+replicaSetManagedMongoDb.waitUntilReplicaSetBecomesStable();
+~~~~
+
+Also you can use **NoSQLUnit** to test your replica set deployment of remote servers. You can use MongoDbCommands to retrieve replica set configuration.
+
+~~~~ {.java}
+DBObject replicaSetGetStatus = MongoDbCommands.replicaSetGetStatus(mongoClient);
+~~~~
+
+And in previous case replicaSetGetStatus contains a json document with the format described in [MongoDB](http://docs.mongodb.org/manual/reference/replica-status/).
+
+You can watch full example in [github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-demo).
+
+Sharding
+--------
+
+### Introduction
+
+Sharding is another way of replication, but in this case we are scaling horizontally. MongoDB partitions a collection and stores the different portions on different machines. From a logical overview client only see one single database, but internally a cluster of machines are being used with data spread across all system.
+
+To run sharding we must set up a sharded cluster. A sharded cluster is composed by next elements:
+
+-   shards which are _mongod_ instances that holds a portion of the database collections.
+-   config servers which stores metadata about the clusters. 
+-   mongos servers determine the location of required data from shards.
+
+Apart from setting up a sharding architecture, we also have to register each shard, enable sharding for database, enable sharding for each collection we want to particionate,  and defining which element of the document is used to calculate the shard key. 
+
+For more information about _Sharding_ read [mongoDB](http://docs.mongodb.org/manual/sharding/)
+
+### Set up and Start Sharding
+
+In **NoSQLUnit** we can define a sharding architecture and starting it up, so our tests are executed against it instead of a single server. Due the nature of sharding system, we can only create sharding for managed servers.
+
+So let's see how to define an architecture and starting all related servers. The main class is *ShardedManagedMongoDb* which manages lifecycle of all servers involved in sharding (shards, configs and mongos). To build a *ShardedManagedMongoDb* class, *ShardedGroupBuilder* builder class is provided and it will allows us to define each server involved in sharding.
+
+Let's see an example on how to set up and start a system with two shards, one config server and one mongos.
+
+~~~~ {.java}
+@ClassRule
+public static ShardedManagedMongoDb shardedManagedMongoDb = shardedGroup()
+								.shard(newManagedMongoDbLifecycle().port(27018).dbRelativePath("rs-1").logRelativePath("log-1").get())
+								.shard(newManagedMongoDbLifecycle().port(27019).dbRelativePath("rs-2").logRelativePath("log-2").get())
+								.config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
+								.mongos(newManagedMongosLifecycle().configServer(27020).get())
+							.get();
+~~~~
+
+Notice that you must define different port for each server and also a different database path. Also note that in case of _mongos_ you must set the config server port, and is not necessary to set up the database path.
+
+And finally we only have to create a _MongoDbRule_ as usually which will populate defined data into sharding servers. For this case we must use the same builder used for replica set but enabling sharding. Keep in mind that in this case we only have to register the mongos instances, not shards or config servers.
+
+~~~~ {.java}
+@Rule
+public MongoDbRule mongoDbRule = newMongoDbRule().configure(
+								replicationMongoDbConfiguration().databaseName("test")
+			 					 				 .enableSharding()
+									 			 .seed("localhost", 27017)
+								 				 .configure())
+											.build(); 
+~~~~
+
+And finally the dataset format is changed from the standard one to allow us define which attributes are used as shards. Let's see an example:
+
+~~~~ {.json}
+{
+	"collection_name": {
+				"shard-key-pattern": ["attribute_1", "attribute_2"],
+				"data": 
+						[
+							{"attribute_1":"value_1","attribute_2":value_2, "attribute_3":"value_3"}
+						]
+			}
+}
+~~~~
+
+For each collection you define which attributes are used for calculating the shard key by using _shard-key-pattern_ attribute, and finally using _data_ attribute we set the whole document which will be inserted into collection.
+
 Neo4j Engine
 ============
 
@@ -598,17 +697,19 @@ Datasets must have next [format](#ex.neo4j_dataset) :
 ~~~~ {.xml}
 <?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns">
-    <key id="attr1" for="edge" attr.name="attr1" attr.type="float"/>
+    <key id="attr1" for="edge" attr.name="attr1" attr.type="float" attr.autoindexName="indexName"/>
     <key id="attr2" for="node" attr.name="attr2" attr.type="string"/>
     <graph id="G" edgedefault="directed">
         <node id="1">
             <data key="attr2">value1</data>
+            <index name="mynodeindex" key="mykey">myvalue</index>
         </node>
         <node id="2">
             <data key="attr2">value2</data>
         </node>
         <edge id="7" source="1" target="2" label="label1">
             <data key="attr1">float</data>
+            <index name="myrelindex" key="mykey">myvalue</index>
         </edge>
     </graph>
 </graphml>
@@ -640,6 +741,12 @@ where:
 
 -   *data* : the key/value data associated with a graph element. Data
     value will be validated against type defined in key element.
+    
+-   *attr.autoindexName* : this attribute is optional and can only set in *key* element. 
+    It creates an index with given name for properties of that type for all nodes or edges.
+    
+-   *index* :  This tag is optional and creates an index with given name, key and value in 
+	the *node* or *edge* where it is declared.
 
 Getting Started
 ---------------

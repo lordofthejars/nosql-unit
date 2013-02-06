@@ -1,6 +1,8 @@
 package com.lordofthejars.nosqlunit.mongodb.shard;
 
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
+import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetGroup;
+import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 
 public class ShardedGroupBuilder {
 
@@ -30,6 +32,11 @@ public class ShardedGroupBuilder {
 	public ShardedGroupBuilder config(ManagedMongoDbLifecycleManager config) {
 		config.setConfigServer(true);
 		this.shardedGroup.addConfig(config);
+		return this;
+	}
+	
+	public ShardedGroupBuilder replicaSet(ReplicaSetManagedMongoDb replicaSetManagedMongoDb) {
+		this.shardedGroup.addReplicaSet(replicaSetManagedMongoDb);
 		return this;
 	}
 	

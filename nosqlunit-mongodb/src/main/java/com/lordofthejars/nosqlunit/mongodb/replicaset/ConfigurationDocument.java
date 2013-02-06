@@ -14,4 +14,8 @@ public class ConfigurationDocument {
 		return this.configuration;
 	}
 	
+	public String getReplicaSetName() {
+		return (String) this.configuration.get(ReplicaSetConfigurationBuilder.ID_TAG);
+	}
+	
 }

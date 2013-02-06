@@ -67,7 +67,14 @@ public class ReplicaSetGroup {
 		return this.username != null && this.password != null;
 	}
 	
-	public ManagedMongoDbLifecycleManager getStoppingServer(int port) {
+	public ManagedMongoDbLifecycleManager getStoppedServer(int port) {
+		return selectFirst(
+				this.servers,
+				having(on(ManagedMongoDbLifecycleManager.class).getPort(),
+						is(port)).and(having(on(ManagedMongoDbLifecycleManager.class).isReady(), is(false))));
+	}
+	
+	public ManagedMongoDbLifecycleManager getStartedServer(int port) {
 		return selectFirst(
 				this.servers,
 				having(on(ManagedMongoDbLifecycleManager.class).getPort(),
@@ -89,4 +96,9 @@ public class ReplicaSetGroup {
 		
 		return numberOfStoppedServers;
 	}
+
+	public String getReplicaSetName() {
+		return this.configurationDocument.getReplicaSetName();
+	}
+
 }

@@ -11,18 +11,18 @@ import com.mongodb.util.JSON;
 
 public class ReplicaSetConfigurationBuilder {
 
-	private static final String ID_TAG = "_id";
-	private static final String PRIORITY_TAG = "priority";
-	private static final String HIDDEN_TAG = "hidden";
-	private static final String HOST_TAG = "host";
-	private static final String VERSION_TAG = "version";
-	private static final String SLAVE_DELAY_TAG = "slaveDelay";
-	private static final String ARBITER_TAG = "arbiterOnly";
-	private static final String VOTES_TAG = "votes";
-	private static final String TAGS_TAG = "tags";
-	private static final String BUILD_INDEXES_TAG = "buildIndexes";
-	private static final String MEMBERS_TAG = "members";
-	private static final String SETTINGS_TAG = "settings";
+	public static final String ID_TAG = "_id";
+	public static final String PRIORITY_TAG = "priority";
+	public static final String HIDDEN_TAG = "hidden";
+	public static final String HOST_TAG = "host";
+	public static final String VERSION_TAG = "version";
+	public static final String SLAVE_DELAY_TAG = "slaveDelay";
+	public static final String ARBITER_TAG = "arbiterOnly";
+	public static final String VOTES_TAG = "votes";
+	public static final String TAGS_TAG = "tags";
+	public static final String BUILD_INDEXES_TAG = "buildIndexes";
+	public static final String MEMBERS_TAG = "members";
+	public static final String SETTINGS_TAG = "settings";
 	
 	private BasicDBObjectBuilder configurationBuilder;
 	private List<DBObject> members;

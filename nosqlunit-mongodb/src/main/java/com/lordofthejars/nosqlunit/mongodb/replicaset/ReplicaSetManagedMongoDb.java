@@ -1,10 +1,5 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectFirst;
-import static org.hamcrest.CoreMatchers.is;
-
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOpsFactory;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOpsFactory;
 import com.mongodb.CommandResult;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
@@ -36,10 +31,18 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 		this.replicaSetGroup = replicaSetGroup;
 	}
 
+	public String replicaSetName() {
+		return this.replicaSetGroup.getReplicaSetName();
+	}
+	
+	public List<ManagedMongoDbLifecycleManager> getReplicaSetServers() {
+		return this.replicaSetGroup.getServers();
+	}
+	
 	public void shutdownServer(int port) {
 
 		ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager = replicaSetGroup
-				.getStoppingServer(port);
+				.getStartedServer(port);
 
 		if (managedMongoDbLifecycleManager != null) {
 			managedMongoDbLifecycleManager.stopEngine();
@@ -71,12 +74,7 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 
 	public void startupServer(int port) throws Throwable {
 
-		ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager = selectFirst(
-				replicaSetGroup.getServers(),
-				having(on(ManagedMongoDbLifecycleManager.class).getPort(),
-						is(port)).and(
-						having(on(ManagedMongoDbLifecycleManager.class)
-								.isReady(), is(false))));
+		ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager = replicaSetGroup.getStoppedServer(port);
 
 		if (managedMongoDbLifecycleManager != null) {
 			managedMongoDbLifecycleManager.startEngine();
@@ -84,6 +82,14 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 
 	}
 
+	public ManagedMongoDbLifecycleManager getServerByPortAndState(int port, boolean state) {
+		if(state) {
+			return replicaSetGroup.getStartedServer(port);			
+		} else {
+			return replicaSetGroup.getStoppedServer(port);
+		}
+	}
+	
 	@Override
 	protected void before() throws Throwable {
 		wakeUpServers();
@@ -91,6 +97,10 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 		waitUntilConfigurationSpreadAcrossServersFromDefaultConnection();
 	}
 
+	public void startAllReplicaSet() throws Throwable {
+		this.before();
+	}
+	
 	private void waitUntilConfigurationSpreadAcrossServersFromDefaultConnection() throws UnknownHostException {
 		
 		MongoClient mongoClient = getDefaultMongoClient();
@@ -106,6 +116,10 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 		shutdownServers();
 	}
 
+	public void stopAllReplicaSet() {
+		this.after();
+	}
+	
 	protected List<ManagedMongoDbLifecycleManager> getServers() {
 		return replicaSetGroup.getServers();
 	}

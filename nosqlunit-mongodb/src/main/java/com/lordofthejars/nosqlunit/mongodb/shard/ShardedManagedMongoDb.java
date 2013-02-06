@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
+import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 import com.mongodb.MongoClient;
 
 public class ShardedManagedMongoDb extends ExternalResource {
 
 	private static final String HOST_PORT_SEPARATOR = ":";
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ShardedManagedMongoDb.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ShardedManagedMongoDb.class);
 
 	private ShardedGroup shardedGroup;
 
@@ -30,8 +30,7 @@ public class ShardedManagedMongoDb extends ExternalResource {
 
 	public void shutdownServer(int port) {
 
-		AbstractLifecycleManager stoppingServer = shardedGroup
-				.getStoppingServer(port);
+		AbstractLifecycleManager stoppingServer = shardedGroup.getStoppingServer(port);
 
 		if (stoppingServer != null) {
 			stoppingServer.stopEngine();
@@ -41,8 +40,7 @@ public class ShardedManagedMongoDb extends ExternalResource {
 
 	public void startupServer(int port) throws Throwable {
 
-		AbstractLifecycleManager startingServer = shardedGroup
-				.getStartingServer(port);
+		AbstractLifecycleManager startingServer = shardedGroup.getStartingServer(port);
 
 		if (startingServer != null) {
 			startingServer.startEngine();
@@ -50,19 +48,16 @@ public class ShardedManagedMongoDb extends ExternalResource {
 
 	}
 
-	private boolean isServerStarted(
-			AbstractLifecycleManager abstractLifecycleManager) {
+	private boolean isServerStarted(AbstractLifecycleManager abstractLifecycleManager) {
 		return abstractLifecycleManager.isReady();
 	}
 
-	private boolean isServerStopped(
-			AbstractLifecycleManager abstractLifecycleManager) {
+	private boolean isServerStopped(AbstractLifecycleManager abstractLifecycleManager) {
 		return !abstractLifecycleManager.isReady();
 	}
 
 	@Override
 	protected void before() throws Throwable {
-
 		wakeUpShards();
 		wakeUpConfigs();
 		wakeUpMongos();
@@ -70,23 +65,28 @@ public class ShardedManagedMongoDb extends ExternalResource {
 	}
 
 	private Set<String> shardsUri() {
-		
+
 		List<ManagedMongoDbLifecycleManager> shards = shardedGroup.getShards();
-		
+
 		Set<String> shardsUri = new HashSet<String>();
-		
+
 		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : shards) {
-			shardsUri.add(managedMongoDbLifecycleManager.getHost()+HOST_PORT_SEPARATOR+Integer.toString(managedMongoDbLifecycleManager.getPort()));
+			shardsUri.add(getUri(managedMongoDbLifecycleManager));
 		}
-		
+
 		return shardsUri;
-		
+
 	}
-	
+
+	private String getUri(ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager) {
+		return managedMongoDbLifecycleManager.getHost() + HOST_PORT_SEPARATOR
+				+ Integer.toString(managedMongoDbLifecycleManager.getPort());
+	}
+
 	private void wakeUpMongos() throws Throwable {
-		
+
 		LOGGER.info("Starting Mongos");
-		
+
 		List<ManagedMongosLifecycleManager> mongos = shardedGroup.getMongos();
 
 		for (ManagedMongosLifecycleManager managedMongosLifecycleManager : mongos) {
@@ -94,32 +94,58 @@ public class ShardedManagedMongoDb extends ExternalResource {
 				managedMongosLifecycleManager.startEngine();
 			}
 		}
-		
+
 		LOGGER.info("Started Mongos");
-		
+
 	}
 
 	private void wakeUpConfigs() throws Throwable {
-		
+
 		LOGGER.info("Starting Configs");
-		
-		List<ManagedMongoDbLifecycleManager> configs = shardedGroup
-				.getConfigs();
+
+		List<ManagedMongoDbLifecycleManager> configs = shardedGroup.getConfigs();
 
 		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : configs) {
 			if (isServerStopped(managedMongoDbLifecycleManager)) {
 				managedMongoDbLifecycleManager.startEngine();
 			}
 		}
-		
+
 		LOGGER.info("Started Configs");
-		
+
 	}
 
 	private void wakeUpShards() throws Throwable {
+
+		if (this.shardedGroup.isShardsAndReplicSetShardsMixed()) {
+			throw new IllegalArgumentException("Cannot mix shards servers with replica set shards servers.");
+		}
 		
+		if (this.shardedGroup.isOnlyShards()) {
+			wakeUpShardsServers();
+		} else {
+			if(this.shardedGroup.isOnlyReplicaSetShards()) {
+				wakeUpReplicaSetShardsServers();
+			}
+		}
+
+	}
+
+	private void wakeUpReplicaSetShardsServers() throws Throwable {
+		LOGGER.info("Starting ReplicaSet Shards");
+		
+		List<ReplicaSetManagedMongoDb> replicaSets = shardedGroup.getReplicaSets();
+		
+		for (ReplicaSetManagedMongoDb replicaSetManagedMongoDb : replicaSets) {
+			replicaSetManagedMongoDb.startAllReplicaSet();
+		}
+		
+		LOGGER.info("Started ReplicaSet Shards");
+	}
+
+	private void wakeUpShardsServers() throws Throwable {
 		LOGGER.info("Starting Shards");
-		
+
 		List<ManagedMongoDbLifecycleManager> shards = shardedGroup.getShards();
 
 		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : shards) {
@@ -127,44 +153,114 @@ public class ShardedManagedMongoDb extends ExternalResource {
 				managedMongoDbLifecycleManager.startEngine();
 			}
 		}
-		
 		LOGGER.info("Started Shards");
 	}
 
 	private void registerAllShards() throws UnknownHostException {
-		MongoClient mongosMongoClient = getMongosMongoClient();
-		
-		if(shardedGroup.isAuthenticationSet()) {
-			MongoDbCommands.addShard(mongosMongoClient, shardsUri(), shardedGroup.getUsername(), shardedGroup.getPassword());
+
+		if (this.shardedGroup.isShardsAndReplicSetShardsMixed()) {
+			throw new IllegalArgumentException("Cannot mix shards servers with replica set shards servers.");
+		}
+
+		MongoClient mongosMongoClient = null;
+		try {
+			mongosMongoClient = getMongosMongoClient();
+
+			if (this.shardedGroup.isOnlyShards()) {
+				registerShardServers(mongosMongoClient);
+			} else {
+				if (this.shardedGroup.isOnlyReplicaSetShards()) {
+					registerReplicaSetShardServers(mongosMongoClient);
+				}
+			}
+		} finally {
+			if (mongosMongoClient != null) {
+				mongosMongoClient.close();
+			}
+		}
+	}
+
+	private void registerReplicaSetShardServers(MongoClient mongosMongoClient) {
+		Set<String> replicaSetShardsConfig = buildReplicaSetShardAddingCommand();
+
+		if (shardedGroup.isAuthenticationSet()) {
+			MongoDbCommands.addShard(mongosMongoClient, replicaSetShardsConfig, shardedGroup.getUsername(),
+					shardedGroup.getPassword());
+		} else {
+			MongoDbCommands.addShard(mongosMongoClient, replicaSetShardsConfig);
+		}
+	}
+
+	private Set<String> buildReplicaSetShardAddingCommand() {
+		Set<String> replicaSetShardsConfig = new HashSet<String>();
+
+		for (ReplicaSetManagedMongoDb replicaSetManagedMongoDb : this.shardedGroup.getReplicaSets()) {
+			List<ManagedMongoDbLifecycleManager> replicaSetServers = replicaSetManagedMongoDb.getReplicaSetServers();
+			replicaSetShardsConfig.add(shardUri(replicaSetManagedMongoDb.replicaSetName(), replicaSetServers));
+		}
+
+		return replicaSetShardsConfig;
+	}
+
+	private void registerShardServers(MongoClient mongosMongoClient) {
+		if (shardedGroup.isAuthenticationSet()) {
+			MongoDbCommands.addShard(mongosMongoClient, shardsUri(), shardedGroup.getUsername(),
+					shardedGroup.getPassword());
 		} else {
 			MongoDbCommands.addShard(mongosMongoClient, shardsUri());
 		}
-		
-		mongosMongoClient.close();
+	}
+
+	private String shardUri(String replicaSetName, List<ManagedMongoDbLifecycleManager> managedMongoDbLifecycleManagers) {
+
+		StringBuilder stringBuilder = new StringBuilder(replicaSetName);
+		stringBuilder.append("/");
+
+		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : managedMongoDbLifecycleManagers) {
+			stringBuilder.append(getUri(managedMongoDbLifecycleManager));
+			stringBuilder.append(", ");
+		}
+
+		return stringBuilder.toString().substring(0, stringBuilder.length() - 2);
 	}
 
 	private MongoClient getMongosMongoClient() throws UnknownHostException {
-		
+
 		ManagedMongosLifecycleManager firstMongosServer = shardedGroup.getFirstMongosServer();
 		MongoClient mongoClient = new MongoClient(firstMongosServer.getHost(), firstMongosServer.getPort());
-		
+
 		return mongoClient;
-		
+
 	}
-	
+
 	@Override
 	protected void after() {
-		
+
 		shutdownMongos();
 		shutdownConfigs();
 		shutdownShards();
+		shutdownReplicaSetShards();
+
+	}
+
+	private void shutdownReplicaSetShards() {
+		
+		LOGGER.info("Stopping ReplicaSet Shards");
+		
+		List<ReplicaSetManagedMongoDb> replicaSets = shardedGroup.getReplicaSets();
+		
+		for (ReplicaSetManagedMongoDb replicaSetManagedMongoDb : replicaSets) {
+			replicaSetManagedMongoDb.stopAllReplicaSet();
+		}
+		
+		LOGGER.info("Stopped ReplicaSet Shards");
 		
 	}
 
 	private void shutdownMongos() {
-		
+
 		LOGGER.info("Stopping Mongos");
-		
+
 		List<ManagedMongosLifecycleManager> mongos = shardedGroup.getMongos();
 
 		for (ManagedMongosLifecycleManager managedMongosLifecycleManager : mongos) {
@@ -172,32 +268,31 @@ public class ShardedManagedMongoDb extends ExternalResource {
 				managedMongosLifecycleManager.stopEngine();
 			}
 		}
-		
+
 		LOGGER.info("Stopped Mongos");
-		
+
 	}
 
 	private void shutdownConfigs() {
-		
+
 		LOGGER.info("Stopping Configs");
-		
-		List<ManagedMongoDbLifecycleManager> configs = shardedGroup
-				.getConfigs();
+
+		List<ManagedMongoDbLifecycleManager> configs = shardedGroup.getConfigs();
 
 		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : configs) {
 			if (isServerStarted(managedMongoDbLifecycleManager)) {
 				managedMongoDbLifecycleManager.stopEngine();
 			}
 		}
-		
+
 		LOGGER.info("Stopped Configs");
-		
+
 	}
 
 	private void shutdownShards() {
-		
+
 		LOGGER.info("Stopping Shards");
-		
+
 		List<ManagedMongoDbLifecycleManager> shards = shardedGroup.getShards();
 
 		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : shards) {
@@ -205,8 +300,8 @@ public class ShardedManagedMongoDb extends ExternalResource {
 				managedMongoDbLifecycleManager.stopEngine();
 			}
 		}
-		
+
 		LOGGER.info("Stopped Shards");
 	}
-	
+
 }

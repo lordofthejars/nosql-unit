@@ -33,9 +33,9 @@ public class WhenYouFindAllBooksInShards {
 
 	@ClassRule
 	public static ShardedManagedMongoDb shardedManagedMongoDb = shardedGroup()
-																	.shard(newManagedMongoDbLifecycle().shardServer().port(27018).dbRelativePath("rs-1").logRelativePath("log-1").get())
-																	.shard(newManagedMongoDbLifecycle().shardServer().port(27019).dbRelativePath("rs-2").logRelativePath("log-2").get())
-																	.config(newManagedMongoDbLifecycle().configServer().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
+																	.shard(newManagedMongoDbLifecycle().port(27018).dbRelativePath("rs-1").logRelativePath("log-1").get())
+																	.shard(newManagedMongoDbLifecycle().port(27019).dbRelativePath("rs-2").logRelativePath("log-2").get())
+																	.config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
 																	.mongos(newManagedMongosLifecycle().configServer(27020).get())
 																	.get();
 	

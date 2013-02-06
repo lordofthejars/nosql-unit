@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
+import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 
 public class ShardedGroup {
 
@@ -17,6 +18,8 @@ public class ShardedGroup {
 	private List<ManagedMongoDbLifecycleManager> configs = new ArrayList<ManagedMongoDbLifecycleManager>();
 	private List<ManagedMongosLifecycleManager> mongos = new ArrayList<ManagedMongosLifecycleManager>();
 
+	private List<ReplicaSetManagedMongoDb> replicaSets = new ArrayList<ReplicaSetManagedMongoDb>();
+	
 	private String username;
 	private String password;
 	
@@ -30,6 +33,10 @@ public class ShardedGroup {
 	
 	public void addMongos(ManagedMongosLifecycleManager managedMongosLifecycleManager) {
 		this.mongos.add(managedMongosLifecycleManager);
+	}
+	
+	public void addReplicaSet(ReplicaSetManagedMongoDb replicaSetManagedMongoDb) {
+		this.replicaSets.add(replicaSetManagedMongoDb);
 	}
 	
 	public ManagedMongosLifecycleManager getFirstMongosServer() {
@@ -70,6 +77,18 @@ public class ShardedGroup {
 		return getServerByPortAndState(port, false);
 	}
 	
+	public boolean isOnlyShards() {
+		return this.getShards().size() > 0 && this.getReplicaSets().size() == 0;
+	}
+	
+	public boolean isOnlyReplicaSetShards() {
+		return this.getShards().size() == 0 && this.getReplicaSets().size() > 0;
+	}
+	
+	public boolean isShardsAndReplicSetShardsMixed() {
+		return this.getShards().size() != 0 && this.getReplicaSets().size() != 0;
+	}
+	
 	private AbstractLifecycleManager getServerByPortAndState(int port, boolean state) {
 		AbstractLifecycleManager abstractLifecycleManager = selectFirst(
 				this.shards,
@@ -87,6 +106,17 @@ public class ShardedGroup {
 						this.mongos,
 						having(on(ManagedMongoDbLifecycleManager.class).getPort(),
 								is(port)).and(having(on(ManagedMongoDbLifecycleManager.class).isReady(), is(state))));
+				if(abstractLifecycleManager == null) {
+					for (ReplicaSetManagedMongoDb replicaSetManagedMongoDb : this.replicaSets) {
+						ManagedMongoDbLifecycleManager serverByPortAndState = replicaSetManagedMongoDb.getServerByPortAndState(port, state);
+						
+						if(serverByPortAndState != null) {
+							abstractLifecycleManager = serverByPortAndState;
+							break;
+						}
+						
+					}
+				}
 			}
 			
 		}
@@ -106,4 +136,7 @@ public class ShardedGroup {
 		return mongos;
 	}
 	
+	public List<ReplicaSetManagedMongoDb> getReplicaSets() {
+		return replicaSets;
+	}
 }
