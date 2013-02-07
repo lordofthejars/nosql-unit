@@ -19,6 +19,7 @@ public class MongoDbCommands {
 	private static final String ADD_SHARD_COMMAND = "addshard";
 	private static final String ENABLE_SHARDING_COMMAND = "enablesharding";
 	private static final String SHARD_COLLECTION_COMMAND = "shardcollection";
+	private static final String LIST_SHARDS_COMMAND = "listShards";
 	
 	private MongoDbCommands() {
 		super();
@@ -55,6 +56,17 @@ public class MongoDbCommands {
 	public static CommandResult enableSharding(MongoClient mongoClient, String database) {
 		DB adminDb = getAdminDatabase(mongoClient);
 		return adminDb.command(new BasicDBObject(ENABLE_SHARDING_COMMAND, database));
+	}
+	
+	public static CommandResult listShards(MongoClient mongoClient) {
+		DB adminDb = getAdminDatabase(mongoClient);
+		return adminDb.command(new BasicDBObject(LIST_SHARDS_COMMAND, 1));
+	}
+	
+	public static CommandResult listShards(MongoClient mongoClient, String username, String password) {
+		DB adminDb = getAdminDatabase(mongoClient);
+		adminDb.authenticate(username, password.toCharArray());
+		return adminDb.command(new BasicDBObject(LIST_SHARDS_COMMAND, 1));
 	}
 	
 	public static CommandResult enableSharding(MongoClient mongoClient, String database, String username, String password) {

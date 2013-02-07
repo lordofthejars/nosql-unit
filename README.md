@@ -506,14 +506,14 @@ Replica Set
 
 Database replication in **MongoDB** adds redundancy and high availability of the data. 
 In case of **MongoDB** instead of having traditional master-slave pattern architecture, it implements _Replica Set_ architecture, 
-which can be understood as more sophisticated maste-slave replication. For more information about _Replica Set_ read
+which can be understood as more sophisticated master-slave replication. For more information about _Replica Set_ read
 [mongoDB](http://docs.mongodb.org/manual/core/replication/)
 
 ### Set up and Start Replica Set architecture
 
 In **NoSQLUnit** we can define a replica set architecture and starting it up, so our tests are executed against a replica set servers instead of a single server. Due the nature of replica set system, we can only create a replica set of managed servers.
 
-So let's see how to define an architecture and starting all related servers. The main class is *ReplicaSetManagedMongoDb* which manages lifecycle of all servers involved in replica set. To build a *ReplicaSetManagedMongoDb* class, *ReplicaSetBuilder* builder class is provided and it will allows us to define the replica set architecture. Using it we can set the eligible servers (those that can be primaries or secondaries), the only secondaries servers, the arbiters, the hidden ones, and configure all of them with the attributes like priority, voters, or setting tags.
+So let's see how to define an architecture and starting all related servers. The main class is *ReplicaSetManagedMongoDb* which manages lifecycle of all servers involved in replica set. To build a *ReplicaSetManagedMongoDb* class, *ReplicaSetBuilder* builder class is provided and it will allow us to define the replica set architecture. Using it we can set the eligible servers (those that can be primaries or secondaries), the only secondaries servers, the arbiters, the hidden ones, and configure all of them with the attributes like priority, voters, or setting tags.
 
 So let's see an example where we are defining two eligible servers and one arbiter in a replica set called rs-test.
 
@@ -543,7 +543,7 @@ Notice that you must define different port for each server and also a different 
 Then we only have to create a _MongoDbRule_ as usually which will populate defined data into replica set servers. For this case a new configuration builder is provided that  allows us to define the mongo servers location and the write concern used during seeding phase. By default _Aknownledge_ write concern is used.
 
 ~~~~ {.java}
-import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicationMongoDbConfigurationBuilder.replicationMongoDbConfiguration;
+import static com.lordofthejars.nosqlunit.mongodb.ReplicationMongoDbConfigurationBuilder.replicationMongoDbConfiguration;
 
 @Rule
 public MongoDbRule mongoDbRule = newMongoDbRule().configure(
@@ -602,7 +602,7 @@ For more information about _Sharding_ read [mongoDB](http://docs.mongodb.org/man
 
 In **NoSQLUnit** we can define a sharding architecture and starting it up, so our tests are executed against it instead of a single server. Due the nature of sharding system, we can only create sharding for managed servers.
 
-So let's see how to define an architecture and starting all related servers. The main class is *ShardedManagedMongoDb* which manages lifecycle of all servers involved in sharding (shards, configs and mongos). To build a *ShardedManagedMongoDb* class, *ShardedGroupBuilder* builder class is provided and it will allows us to define each server involved in sharding.
+So let's see how to define an architecture and starting all related servers. The main class is *ShardedManagedMongoDb* which manages lifecycle of all servers involved in sharding (shards, configs and mongos). To build a *ShardedManagedMongoDb* class, *ShardedGroupBuilder* builder class is provided and it will allow us to define each server involved in sharding.
 
 Let's see an example on how to set up and start a system with two shards, one config server and one mongos.
 
@@ -645,6 +645,78 @@ And finally the dataset format is changed from the standard one to allow us defi
 ~~~~
 
 For each collection you define which attributes are used for calculating the shard key by using _shard-key-pattern_ attribute, and finally using _data_ attribute we set the whole document which will be inserted into collection.
+
+In case we use this dataset as expected dataset, _shard-key-pattern_ is ignored, and only _data_ document is used for comparison.
+
+Replicated Sharded Cluster
+--------------------------
+
+### Introduction
+
+The third way of replication is an hybrid. Each shard contains a replica set with n-member replica set. And as sharding at least one _config_ server and one _mongos_ server is required.
+
+For more information about _Replicated Sharded Cluster_ read [mongoDB](http://docs.mongodb.org/manual/tutorial/convert-replica-set-to-replicated-shard-cluster/)
+
+### Set up and Start Sharding
+
+In **NoSQLUnit** we can define a replicated sharded cluster architecture and starting it up, so our tests are executed against it instead of a single server. Due the nature of replicated sharded cluster, we can only create sharding for managed servers.
+
+So let's see how to define an architecture and starting all related servers. The main class is *ShardedManagedMongoDb* which manages lifecycle of all servers involved in sharding (shards, configs and mongos). To build a *ShardedManagedMongoDb* class, *ShardedGroupBuilder* builder class is provided and it will allow us to define each server involved in sharding, but in contrast of sharding, we need to add a replica set instead of a shard. For this reason *ReplicaSetManagedMongoDb* is also used.
+
+Let's see an example on how to set up two replicated sharded cluster, with one member each replica set, (of course in production environment you would have more), one config server and one mongos.
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.mongodb.shard.ShardedGroupBuilder.shardedGroup;
+import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
+
+@ClassRule
+public static ShardedManagedMongoDb shardedManagedMongoDb = shardedGroup()
+									.replicaSet(replicaSet("rs-test-1")
+											.eligible(
+												   newManagedMongoDbLifecycle()
+													.port(27007).dbRelativePath("rs-0").logRelativePath("log-0")
+												    .get()
+												 )
+										   .get())
+									.replicaSet(replicaSet("rs-test-2")
+											.eligible(
+												newManagedMongoDbLifecycle()
+													.port(27009).dbRelativePath("rs-0").logRelativePath("log-0")
+												    .get()
+												 )
+										   .get())
+									.config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
+									.mongos(newManagedMongosLifecycle().configServer(27020).get())
+								.get();
+~~~~
+
+Note that we are using the _replicaSet_ method of _shardedGroup_ to create a replica set inside a sharded, and then we use methods defined into *ReplicaSetBuilder* to configure the replica set.
+
+And finally we only have to create a _MongoDbRule_ as usually which will populate defined data into servers. For replicated sharded clusters we can use the same class and dataset as sharding.
+
+~~~~ {.java}
+@Rule
+public MongoDbRule mongoDbRule = newMongoDbRule().configure(
+								replicationMongoDbConfiguration().databaseName("test")
+			 					 				 .enableSharding()
+									 			 .seed("localhost", 27017)
+								 				 .configure())
+											.build(); 
+~~~~
+
+and
+
+~~~~ {.json}
+{
+	"collection_name": {
+				"shard-key-pattern": ["attribute_1", "attribute_2"],
+				"data": 
+						[
+							{"attribute_1":"value_1","attribute_2":value_2, "attribute_3":"value_3"}
+						]
+			}
+}
+~~~~
 
 Neo4j Engine
 ============

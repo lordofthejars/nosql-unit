@@ -2,7 +2,7 @@ package com.lordofthejars.nosqlunit.demo.mongodb;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManagerBuilder.newManagedMongoDbLifecycle;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
-import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicationMongoDbConfigurationBuilder.replicationMongoDbConfiguration;
+import static com.lordofthejars.nosqlunit.mongodb.ReplicationMongoDbConfigurationBuilder.replicationMongoDbConfiguration;
 import static com.lordofthejars.nosqlunit.mongodb.shard.ManagedMongosLifecycleManagerBuilder.newManagedMongosLifecycle;
 import static com.lordofthejars.nosqlunit.mongodb.shard.ShardedGroupBuilder.shardedGroup;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;

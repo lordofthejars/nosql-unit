@@ -13,6 +13,7 @@ import com.mongodb.DBObject;
 public class MongoDbAssertion {
 
 	private static final String SYSTEM_COLLECTIONS_PATTERN = "system."; 
+	private static final String DATA = "data";
 	
 	private MongoDbAssertion() {
 		super();
@@ -68,7 +69,14 @@ public class MongoDbAssertion {
 	private static void checkCollectionObjects(DBObject expectedData,
 			DB mongoDb, Set<String> collectionaNames, String collectionName)
 			throws Error {
-		BasicDBList dataObjects = (BasicDBList)expectedData.get(collectionName);
+		DBObject object = (DBObject) expectedData.get(collectionName);
+		BasicDBList	dataObjects = null;
+		
+		if(isShardedCollection(object)) {
+			dataObjects = (BasicDBList)object.get(DATA);			
+		} else {
+			dataObjects = (BasicDBList)object;
+		}
 		
 		DBCollection dbCollection = mongoDb.getCollection(collectionName);
 		
@@ -95,6 +103,10 @@ public class MongoDbAssertion {
 		}
 	}
 
+	private static boolean isShardedCollection(DBObject dbObject) {
+		return !(dbObject instanceof BasicDBList);
+	}
+	
 	private static void checkSameKeys(DBObject expectedDataObject,DBObject foundObject) {
 		
 		Set<String> expectedKeys = expectedDataObject.keySet();

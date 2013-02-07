@@ -30,6 +30,27 @@ import com.mongodb.MongoException;
 
 public class WhenExpectedDataShouldBeCompared {
 
+	private static final String DATA_SHARD = "" +
+			"{" +
+			"\"collection1\": " +
+			"				[" +
+			"					{\"id\":1,\"code\":\"JSON dataset\",}," +
+			"					{\"id\":2,\"code\":\"Another row\",}" +
+			"				]"+
+			"}";
+	
+	private static final String DATA_SHARD_2 = "" +
+			"{" +
+			"\"collection1\": {" +
+			"  \"shard-key-pattern\":[\"id\",\"code2\"],"+
+			"	\"data\":"+
+			"				[" +
+			"					{\"id\":1,\"code\":\"JSON dataset\",}," +
+			"					{\"id\":2,\"code\":\"Another row\",}" +
+			"				]"+
+			"   }"+
+			"}";
+	
 	@ClassRule
 	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo")
 			.build();
@@ -46,6 +67,15 @@ public class WhenExpectedDataShouldBeCompared {
 	public void setUp() {
 		DB mongoDb = getMongoDB();
 		dropDatabase(mongoDb);
+	}
+	
+	@Test
+	public void shards_data_should_be_ignored() {
+		
+		mongoOperation.insert(new ByteArrayInputStream(DATA_SHARD.getBytes()));
+		boolean isEquals = mongoOperation.databaseIs(new ByteArrayInputStream(DATA_SHARD_2.getBytes()));
+		assertThat(isEquals, is(true));
+		
 	}
 	
 	@Test

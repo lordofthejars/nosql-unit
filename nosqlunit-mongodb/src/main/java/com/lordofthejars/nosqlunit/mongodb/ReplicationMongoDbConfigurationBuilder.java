@@ -1,11 +1,9 @@
-package com.lordofthejars.nosqlunit.mongodb.replicaset;
+package com.lordofthejars.nosqlunit.mongodb;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
 import com.mongodb.DBPort;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
