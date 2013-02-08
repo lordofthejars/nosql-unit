@@ -244,6 +244,12 @@ Datasets must have next [format](#ex.mongodb_dataset) :
 Notice that if attributes value are integers, double quotes are not
 required.
 
+> If you want to use ISODate function or any other javascript function you should see how *MongoDB* Java Driver deals with it. For example in case of ISODate:
+
+~~~~ {.json}
+"bornAt":{ "$date" : "2011-01-05T10:09:15.210Z"}
+~~~~
+
 Getting Started
 ---------------
 
@@ -513,7 +519,7 @@ which can be understood as more sophisticated master-slave replication. For more
 
 In **NoSQLUnit** we can define a replica set architecture and starting it up, so our tests are executed against a replica set servers instead of a single server. Due the nature of replica set system, we can only create a replica set of managed servers.
 
-So let's see how to define an architecture and starting all related servers. The main class is *ReplicaSetManagedMongoDb* which manages lifecycle of all servers involved in replica set. To build a *ReplicaSetManagedMongoDb* class, *ReplicaSetBuilder* builder class is provided and it will allow us to define the replica set architecture. Using it we can set the eligible servers (those that can be primaries or secondaries), the only secondaries servers, the arbiters, the hidden ones, and configure all of them with the attributes like priority, voters, or setting tags.
+So let's see how to define an architecture and starting all related servers. The main class is *ReplicaSetManagedMongoDb* which manages lifecycle of all servers involved in replica set. To build a *ReplicaSetManagedMongoDb* class, *ReplicaSetBuilder* builder class is provided and it will allow us to define the replica set architecture. Using it we can set the eligible servers (those that can be primary or secondary), the only secondary servers, the arbiters, the hidden ones, and configure all of them with the attributes like priority, voters, or setting tags.
 
 So let's see an example where we are defining two eligible servers and one arbiter in a replica set called rs-test.
 
@@ -594,7 +600,7 @@ To run sharding we must set up a sharded cluster. A sharded cluster is composed 
 -   config servers which stores metadata about the clusters. 
 -   mongos servers determine the location of required data from shards.
 
-Apart from setting up a sharding architecture, we also have to register each shard, enable sharding for database, enable sharding for each collection we want to particionate,  and defining which element of the document is used to calculate the shard key. 
+Apart from setting up a sharding architecture, we also have to register each shard, enable sharding for database, enable sharding for each collection we want to partition,  and defining which element of the document is used to calculate the shard key. 
 
 For more information about _Sharding_ read [mongoDB](http://docs.mongodb.org/manual/sharding/)
 
