@@ -84,7 +84,7 @@ public class ReplicationMongoDbConfigurationBuilder {
 			enableSharding(mongoClient);
 		}
 		
-		mongoClient.setWriteConcern(writeConcern);
+		mongoDbConfiguration.setWriteConcern(writeConcern);
 		mongoDbConfiguration.setMongo(mongoClient);
 
 		return mongoDbConfiguration;

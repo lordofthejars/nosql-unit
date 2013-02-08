@@ -3,6 +3,7 @@ package com.lordofthejars.nosqlunit.mongodb;
 import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
 import com.mongodb.DBPort;
 import com.mongodb.Mongo;
+import com.mongodb.WriteConcern;
 
 public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	
@@ -17,6 +18,8 @@ public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	private int port = DBPort.PORT;
 	
 	private Mongo mongo;
+	
+	private WriteConcern writeConcern = WriteConcern.SAFE;
 	
 	public MongoDbConfiguration() {
 		super();
@@ -87,6 +90,14 @@ public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	
 	public Mongo getMongo() {
 		return mongo;
+	}
+	
+	public WriteConcern getWriteConcern() {
+		return writeConcern;
+	}
+	
+	public void setWriteConcern(WriteConcern writeConcern) {
+		this.writeConcern = writeConcern;
 	}
 	
 }

@@ -13,7 +13,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
-import com.mongodb.WriteConcern;
 
 public final class MongoOperation extends AbstractCustomizableDatabaseOperation<MongoDbConnectionCallback, Mongo> {
 
@@ -32,7 +31,7 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 	public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
 		try {
 			this.mongo = mongoDbConfiguration.getMongo();
-			this.mongo.setWriteConcern(WriteConcern.SAFE);
+			this.mongo.setWriteConcern(mongoDbConfiguration.getWriteConcern());
 			this.mongoDbConfiguration = mongoDbConfiguration;
 			this.setInsertionStrategy(new DefaultInsertionStrategy());
 			this.setComparisonStrategy(new DefaultComparisonStrategy());
