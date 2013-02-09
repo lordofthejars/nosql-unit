@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -27,6 +28,7 @@ public class WhenManagedWrappingNeoServerLifecycleIsManaged {
 	private static final int ALTERNATIVE_PORT = 7575;
 	
 	@Test
+	@Ignore
 	public void neo4j_should_start_at_default_location() throws Throwable {
 		
 		ManagedWrappingNeoServer managedWrappingNeoServer = newWrappingNeoServerNeo4jRule().build();
