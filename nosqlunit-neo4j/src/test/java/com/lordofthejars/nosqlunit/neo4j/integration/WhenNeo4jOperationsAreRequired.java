@@ -29,8 +29,6 @@ import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.tooling.GlobalGraphOperations;
 
-import scala.actors.threadpool.Arrays;
-
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jConfiguration;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jLowLevelOps;
@@ -169,6 +167,7 @@ public class WhenNeo4jOperationsAreRequired {
 		String[] nodeIndexNames = newEmbeddedDatabase.index().nodeIndexNames();
 		
 		assertThat(nodeIndexNames, arrayContainingInAnyOrder("myindex"));
+		neo4jOperation.deleteAll();
 		
 		newEmbeddedDatabase.shutdown();
 	}
@@ -277,7 +276,8 @@ public class WhenNeo4jOperationsAreRequired {
 		
 		assertThat(nodeIndexNames, arrayContainingInAnyOrder("myindex"));
 		
-		newEmbeddedDatabase.shutdown();
+		neo4jOperation.deleteAll();
+		graphDb.stop();
 	}
 	
 	@Test
