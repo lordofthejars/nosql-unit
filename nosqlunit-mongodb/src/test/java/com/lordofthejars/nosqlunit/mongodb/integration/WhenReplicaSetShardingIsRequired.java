@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import java.net.UnknownHostException;
 
+import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -44,6 +45,11 @@ public class WhenReplicaSetShardingIsRequired {
 																	.config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
 																	.mongos(newManagedMongosLifecycle().configServer(27020).get())
 																	.get();
+	
+	@AfterClass
+	public static void tearDown() {
+		System.clearProperty("MONGO_HOME");
+	}
 	
 	@Test
 	public void sharded_replica_set_should_be_started() throws UnknownHostException {

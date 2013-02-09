@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 
 import java.net.UnknownHostException;
 
+import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -34,6 +35,11 @@ public class WhenReplicaSetIsRequired {
 																					newManagedMongoDbLifecycle().port(27019).dbRelativePath("rs-2").logRelativePath("log-2").get()
 																				 )
 																	  .get();
+	
+	@AfterClass
+	public static void tearDown() {
+		System.clearProperty("MONGO_HOME");
+	}
 	
 	@Test
 	public void three_member_set_scenario_should_be_started() throws UnknownHostException, InterruptedException {

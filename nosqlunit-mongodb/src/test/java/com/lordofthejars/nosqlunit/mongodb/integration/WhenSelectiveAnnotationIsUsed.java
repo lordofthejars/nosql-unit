@@ -1,10 +1,9 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;

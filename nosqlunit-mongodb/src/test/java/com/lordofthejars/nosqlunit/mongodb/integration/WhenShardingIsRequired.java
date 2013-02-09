@@ -9,6 +9,7 @@ import static com.lordofthejars.nosqlunit.mongodb.shard.ShardedGroupBuilder.shar
 
 import java.net.UnknownHostException;
 
+import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -31,6 +32,11 @@ public class WhenShardingIsRequired {
 																	.mongos(newManagedMongosLifecycle().configServer(27020).get())
 																	.get();
 
+	@AfterClass
+	public static void tearDown() {
+		System.clearProperty("MONGO_HOME");
+	}
+	
 	@Test
 	public void two_shards_scenario_should_be_started() throws UnknownHostException {
 		
