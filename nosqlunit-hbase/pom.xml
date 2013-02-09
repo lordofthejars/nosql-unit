@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>nosqlunit</artifactId>
 		<groupId>com.lordofthejars</groupId>
-		<version>0.7.4</version>
+		<version>0.7.4-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>nosqlunit-hbase</artifactId>
