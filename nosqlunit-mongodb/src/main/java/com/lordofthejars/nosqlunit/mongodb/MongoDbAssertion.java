@@ -72,7 +72,7 @@ public class MongoDbAssertion {
 		DBObject object = (DBObject) expectedData.get(collectionName);
 		BasicDBList	dataObjects = null;
 		
-		if(isShardedCollection(object)) {
+		if(isShardOrIndexCollection(object)) {
 			dataObjects = (BasicDBList)object.get(DATA);			
 		} else {
 			dataObjects = (BasicDBList)object;
@@ -103,7 +103,7 @@ public class MongoDbAssertion {
 		}
 	}
 
-	private static boolean isShardedCollection(DBObject dbObject) {
+	private static boolean isShardOrIndexCollection(DBObject dbObject) {
 		return !(dbObject instanceof BasicDBList);
 	}
 	

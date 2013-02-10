@@ -1,0 +1,13 @@
+{
+	"Book": {
+				"indexes": [
+							{
+								"index": {"title": 1}
+							}
+						   ],
+				"data": 
+						[
+							{"title":"The Hobbit","numberOfPages":293}
+						]
+			}
+}
