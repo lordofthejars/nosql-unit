@@ -10,6 +10,7 @@ import javax.inject.Named;
 import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.annotation.ByContainer;
+import com.lordofthejars.nosqlunit.annotation.ConnectionManager;
 
 public class WhenFieldIsInjected {
 
@@ -83,6 +84,18 @@ public class WhenFieldIsInjected {
 		
 	}
 	
+	@Test
+	public void object_should_be_injected_as_field_instance_with_connection_manager() {
+		
+		InjectAnnotationProcessor injectAnnotationProcessor = new InjectAnnotationProcessor("1");
+		TestWithFieldConnectionManager testInstance = new TestWithFieldConnectionManager();
+
+		injectAnnotationProcessor.processInjectAnnotation(TestWithFieldConnectionManager.class, testInstance, "Hello");
+		
+		assertThat(testInstance.getMyInjection(), is("Hello"));
+		
+	}
+	
 }
 
 class TestWithInjectionByContainer {
@@ -110,6 +123,17 @@ class TestWithNamedFieldInjection {
 	public String getMySecondInjection() {
 		return mySecondInjection;
 	}
+	
+	public String getMyInjection() {
+		return myInjection;
+	}
+	
+}
+
+class TestWithFieldConnectionManager {
+	
+	@ConnectionManager
+	private String myInjection;
 	
 	public String getMyInjection() {
 		return myInjection;
