@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.lordofthejars.nosqlunit.annotation.ByContainer;
+import com.lordofthejars.nosqlunit.annotation.ConnectionManager;
 
 public class InjectAnnotationProcessor {
 
@@ -23,8 +24,10 @@ public class InjectAnnotationProcessor {
 			Field[] fields = clazz.getDeclaredFields();
 			for (Field field : fields) {
 				Annotation injectAnnotation = field.getAnnotation(Inject.class);
+				Annotation connectionManagerAnnotation = field.getAnnotation(ConnectionManager.class);
 				Annotation byContainerAnnotation = field.getAnnotation(ByContainer.class);
-				if (isInjectedAndNotExternallyManaged(injectAnnotation, byContainerAnnotation)) {
+				
+				if (isInjectedAndNotExternallyManaged(injectAnnotation, byContainerAnnotation, connectionManagerAnnotation)) {
 					Annotation namedAnnotation = field
 							.getAnnotation(Named.class);
 
@@ -41,8 +44,8 @@ public class InjectAnnotationProcessor {
 		}
 	}
 
-	private boolean isInjectedAndNotExternallyManaged(Annotation injectAnnotation, Annotation byContainerAnnotation) {
-		return injectAnnotation != null && byContainerAnnotation == null;
+	private boolean isInjectedAndNotExternallyManaged(Annotation injectAnnotation, Annotation byContainerAnnotation, Annotation connectionManagerAnnotation) {
+		return (injectAnnotation != null && byContainerAnnotation == null) || connectionManagerAnnotation != null;
 	}
 
 	private boolean isIdentifierValueInNamedAnnotation(
