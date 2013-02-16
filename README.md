@@ -264,8 +264,10 @@ To configure **in-memory** approach you should only instantiate next
 [rule](#program.inmemory_conf) :
 
 ~~~~ {.java}
+import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
+
 @ClassRule
-InMemoryMongoDb inMemoryMongoDb = new InMemoryMongoDb();
+public static InMemoryMongoDb inMemoryMongoDb = newInMemoryMongoDbRule().build();
 ~~~~
 
 To configure the **managed** way, you should use ManagedMongoDb rule and
