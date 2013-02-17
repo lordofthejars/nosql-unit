@@ -41,14 +41,14 @@ public class EmbeddedInfinispanLifecycleManager extends AbstractLifecycleManager
 		EmbeddedCacheManager embeddedCacheManager = embeddedCacheManager();
 		EmbeddedInfinispanInstancesFactory.getInstance().addEmbeddedInstance(embeddedCacheManager, targetPath);
 		
-		LOGGER.info("Started Embedded InMemory Redis instance.");
+		LOGGER.info("Started Embedded Infinispan instance.");
 	}
 
 	@Override
 	public void doStop() {
-		LOGGER.info("Stopping Embedded InMemory Redis instance.");
+		LOGGER.info("Stopping Embedded Infinispan instance.");
 		EmbeddedInfinispanInstancesFactory.getInstance().removeEmbeddedInstance(targetPath);
-		LOGGER.info("Stopped Embedded InMemory Redis instance.");
+		LOGGER.info("Stopped Embedded Infinispan instance.");
 	}
 
 	private EmbeddedCacheManager embeddedCacheManager() throws IOException {
