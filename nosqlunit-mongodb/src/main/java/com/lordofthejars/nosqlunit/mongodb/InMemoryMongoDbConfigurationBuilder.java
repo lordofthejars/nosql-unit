@@ -20,6 +20,11 @@ public class InMemoryMongoDbConfigurationBuilder {
 		return this;
 	}
 	
+	public InMemoryMongoDbConfigurationBuilder connectionIdentifier(String connectionIdentifier) {
+		this.mongoDbConfiguration.setConnectionIdentifier(connectionIdentifier);
+		return this;
+	}
+	
 	public MongoDbConfiguration build() {
 		
 		Mongo embeddedMongo = EmbeddedMongoInstancesFactory.getInstance().getDefaultEmbeddedInstance();
