@@ -320,6 +320,7 @@
 		<module>nosqlunit-hbase</module>
 		<module>nosqlunit-couchdb</module>
 		<module>nosqlunit-infinispan</module>
+		<module>nosqlunit-elasticsearch</module>
 	</modules>
 
 	<build>
