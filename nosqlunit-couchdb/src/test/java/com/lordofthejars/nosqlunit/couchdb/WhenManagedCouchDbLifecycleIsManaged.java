@@ -173,6 +173,7 @@ public class WhenManagedCouchDbLifecycleIsManaged {
 		
 	}
 	
+	@Test
 	public void managed_couchdb_should_start_from_windows_systems() throws Throwable {
 		
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(OperatingSystem.WINDOWS_7);
@@ -186,6 +187,7 @@ public class WhenManagedCouchDbLifecycleIsManaged {
 		ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build();
 		
 		managedCouchDb.managedCouchDbLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedCouchDb.managedCouchDbLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
 		managedCouchDb.before();
 		managedCouchDb.after();
 		
