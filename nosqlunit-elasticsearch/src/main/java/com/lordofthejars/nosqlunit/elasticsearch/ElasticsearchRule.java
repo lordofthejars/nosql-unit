@@ -1,6 +1,7 @@
 package com.lordofthejars.nosqlunit.elasticsearch;
 
 
+import static com.lordofthejars.nosqlunit.elasticsearch.ManagedElasticsearchConfigurationBuilder.managedElasticsearch;
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearchConfigurationBuilder.embeddedElasticsearch;
 
 import org.elasticsearch.client.Client;
@@ -38,6 +39,10 @@ public class ElasticsearchRule extends AbstractNoSqlTestRule {
 		
 		public ElasticsearchRule defaultEmbeddedElasticsearch() {
 			return new ElasticsearchRule(embeddedElasticsearch().build());
+		}
+		
+		public ElasticsearchRule defaultManagedElasticsearch() {
+			return new ElasticsearchRule(managedElasticsearch().build());
 		}
 		
 		public ElasticsearchRule build() {

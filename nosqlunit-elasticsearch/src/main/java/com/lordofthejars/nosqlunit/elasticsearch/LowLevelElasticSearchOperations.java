@@ -3,8 +3,6 @@ package com.lordofthejars.nosqlunit.elasticsearch;
 import java.util.concurrent.TimeUnit;
 
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.node.DiscoveryNode;
-import org.elasticsearch.common.collect.ImmutableList;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 public class LowLevelElasticSearchOperations {
@@ -19,13 +17,15 @@ public class LowLevelElasticSearchOperations {
 			transportClient.addTransportAddress(new InetSocketTransportAddress(host, port));
 			for (int i = 0; i < NUM_RETRIES_TO_CHECK_SERVER_UP; i++) {
 
-				ImmutableList<DiscoveryNode> connectedNodes = transportClient.connectedNodes();
-
-				if (!connectedNodes.isEmpty()) {
+				try {
+					
+					transportClient.admin().cluster().prepareState().execute().actionGet();
 					return true;
-				}
+					
+				} catch(Exception e) {
+					TimeUnit.SECONDS.sleep(7);
+				}				
 
-				TimeUnit.SECONDS.sleep(3);
 			}
 
 		} finally {

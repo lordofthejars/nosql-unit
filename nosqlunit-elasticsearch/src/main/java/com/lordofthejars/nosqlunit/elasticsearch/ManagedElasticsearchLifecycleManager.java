@@ -39,7 +39,7 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 	protected static final String ELASTICSEARC_EXECUTABLE_X = "elasticsearch";
 	protected static final String ELASTICSEARC_EXECUTABLE_W = "elasticsearch.bat";
 
-	protected static final int DEFAULT_PORT = 9200;
+	protected static final int DEFAULT_PORT = 9300;
 
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
 	private List<String> singleCommandArguments = new ArrayList<String>();
@@ -89,13 +89,12 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 	}
 
 
-	private List<String> startElasticsearchAsADaemon() throws InterruptedException {
+	private void startElasticsearchAsADaemon() throws InterruptedException {
 		CountDownLatch processIsReady = new CountDownLatch(1);
 		processRunnable = new ProcessRunnable(processIsReady);
 		Thread thread = new Thread(processRunnable);
 		thread.start();
 		processIsReady.await();
-		return processRunnable.consoleOutput;
 	}
 
 	@Override
@@ -206,7 +205,6 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 	public class ProcessRunnable implements Runnable {
 
 		private CountDownLatch processIsReady;
-		private List<String> consoleOutput;
 
 		private Process process;
 
@@ -218,7 +216,6 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 		public void run() {
 			try {
 				process = startProcess();
-				consoleOutput = getConsoleOutput(process);
 			} catch (IOException e) {
 				throw prepareException(e);
 			} finally {
@@ -250,9 +247,6 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 					buildOperationSystemProgramAndArguments());
 		}
 
-		private List<String> getConsoleOutput(Process pwd) throws IOException {
-			return commandLineExecutor.getConsoleOutput(pwd);
-		}
 	}
 
 }
