@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.ektorp.CouchDbConnector;
 
+import com.lordofthejars.nosqlunit.demo.custom.MapBookConverter;
 import com.lordofthejars.nosqlunit.demo.model.Book;
 
 public class BookManager {

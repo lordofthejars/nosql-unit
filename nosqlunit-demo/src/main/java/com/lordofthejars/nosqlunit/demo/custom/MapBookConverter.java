@@ -1,4 +1,4 @@
-package com.lordofthejars.nosqlunit.demo.couchdb;
+package com.lordofthejars.nosqlunit.demo.custom;
 
 import java.util.HashMap;
 import java.util.Map;
