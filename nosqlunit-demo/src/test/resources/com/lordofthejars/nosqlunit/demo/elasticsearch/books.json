@@ -1,0 +1,21 @@
+{
+   "documents":[
+      {
+         "document":[
+            {
+               "index":{
+                  "indexName":"books",
+                  "indexType":"book",
+                  "indexId":"1"
+               }
+            },
+            {
+               "data":{
+                  "title":"The Hobbit",
+                  "numberOfPages":293
+               }
+            }
+         ]
+      }
+   ]
+}

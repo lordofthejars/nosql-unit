@@ -8,10 +8,6 @@
 	</parent>
 	<artifactId>nosqlunit-elasticsearch</artifactId>
 
-	<properties>
-		<elasticsearch.version>0.20.5</elasticsearch.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<artifactId>nosqlunit-core</artifactId>

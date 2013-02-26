@@ -11,7 +11,7 @@ public class MapBookConverter {
 	private static final String NUMBER_OF_PAGES = "numberOfPages"; 
 	
 	public static Book toBook(Map<String, Object> book) {
-		return new Book((String)book.get(TITLE), Integer.parseInt((String) book.get(NUMBER_OF_PAGES)));
+		return new Book((String)book.get(TITLE),  (Integer) book.get(NUMBER_OF_PAGES));
 	}
 	
 	public static Map<String, Object> toMap(Book book) {

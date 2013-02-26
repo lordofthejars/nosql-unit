@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.elasticsearch;
 
 import java.io.InputStream;
 
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -9,16 +10,17 @@ import org.elasticsearch.index.query.QueryBuilders;
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 
-public class ElasticsearchOperation extends AbstractCustomizableDatabaseOperation<ElasticsearchConnectionCallback, Client> {
+public class ElasticsearchOperation extends
+		AbstractCustomizableDatabaseOperation<ElasticsearchConnectionCallback, Client> {
 
 	private Client client;
-	
+
 	public ElasticsearchOperation(Client client) {
 		this.client = client;
 		setInsertionStrategy(new DefaultElasticsearchInsertionStrategy());
 		setComparisonStrategy(new DefaultElasticsearchComparisonStrategy());
 	}
-	
+
 	@Override
 	public void insert(InputStream dataScript) {
 		insertData(dataScript);
@@ -27,7 +29,7 @@ public class ElasticsearchOperation extends AbstractCustomizableDatabaseOperatio
 	private void insertData(InputStream dataScript) {
 		try {
 			executeInsertion(new ElasticsearchConnectionCallback() {
-				
+
 				@Override
 				public Client nodeClient() {
 					return client;
@@ -37,31 +39,39 @@ public class ElasticsearchOperation extends AbstractCustomizableDatabaseOperatio
 			throw new IllegalArgumentException(e);
 		}
 	}
-	
+
 	@Override
 	public void deleteAll() {
 		clearDocuments();
 	}
 
 	private void clearDocuments() {
+
+		if (isAnyIndexPresent()) {
 		
-		DeleteByQueryRequestBuilder deleteByQueryRequestBuilder = new DeleteByQueryRequestBuilder(client);
-		deleteByQueryRequestBuilder.setQuery(QueryBuilders.matchAllQuery());
-		deleteByQueryRequestBuilder.execute().actionGet();
-		
-		refreshNode();
-		
+			DeleteByQueryRequestBuilder deleteByQueryRequestBuilder = new DeleteByQueryRequestBuilder(client);
+			deleteByQueryRequestBuilder.setQuery(QueryBuilders.matchAllQuery());
+			deleteByQueryRequestBuilder.execute().actionGet();
+
+			refreshNode();
+		}
+
 	}
-	
+
+	private boolean isAnyIndexPresent() {
+		CountResponse numberOfElements = client.prepareCount().execute().actionGet();
+		return numberOfElements.count() > 0;
+	}
+
 	private void refreshNode() {
 		client.admin().indices().prepareRefresh().execute().actionGet();
 	}
-	
+
 	@Override
 	public boolean databaseIs(InputStream expectedData) {
 		try {
 			return executeComparison(new ElasticsearchConnectionCallback() {
-				
+
 				@Override
 				public Client nodeClient() {
 					return client;

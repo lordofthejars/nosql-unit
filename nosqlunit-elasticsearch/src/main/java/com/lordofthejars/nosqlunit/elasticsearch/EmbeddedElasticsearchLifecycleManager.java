@@ -17,6 +17,8 @@ public class EmbeddedElasticsearchLifecycleManager extends AbstractLifecycleMana
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedElasticsearchLifecycleManager.class); 
 	private static final String LOCALHOST = "127.0.0.1";
 	private static final int DEFAULT_PORT = 9300;
+	private static final String DATA_PATH_PROPERTY = "path.data";
+	
 	
 	public static final String EMBEDDED_ELASTICSEARCH_TARGET_PATH = "target" + File.separatorChar + "elasticsearch-test-data"
 			+ File.separatorChar + "impermanent-db";
@@ -43,6 +45,7 @@ public class EmbeddedElasticsearchLifecycleManager extends AbstractLifecycleMana
 	public void doStart() throws Throwable {
 		LOGGER.info("Starting Embedded Elasticsearch instance.");
 		
+		nodeBuilder.getSettings().put(DATA_PATH_PROPERTY, targetPath);
 		Node node = elasticsearchNode();
 		EmbeddedElasticsearchInstancesFactory.getInstance().addEmbeddedInstance(node, targetPath);
 		

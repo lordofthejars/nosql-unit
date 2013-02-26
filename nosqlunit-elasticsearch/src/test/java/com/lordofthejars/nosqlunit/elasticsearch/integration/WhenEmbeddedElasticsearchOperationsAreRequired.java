@@ -1,9 +1,10 @@
 package com.lordofthejars.nosqlunit.elasticsearch.integration;
 
+import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch.ManagedElasticsearch.ManagedElasticsearchRuleBuilder.newManagedElasticsearchRule;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
@@ -14,15 +15,19 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.node.Node;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchOperation;
+import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
+import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearchInstancesFactory;
 import com.lordofthejars.nosqlunit.elasticsearch.ManagedElasticsearch;
 
-public class WhenManagedElasticsearchOperationsAreRequired {
+public class WhenEmbeddedElasticsearchOperationsAreRequired {
 
+	
 	private static final String ELASTICSEARCH_DATA = "{\n" + 
 			"   \"documents\":[\n" + 
 			"      {\n" + 
@@ -47,11 +52,12 @@ public class WhenManagedElasticsearchOperationsAreRequired {
 	
 	
 	@ClassRule
-	public static ManagedElasticsearch managedElasticsearch = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-0.20.5").build();
+	public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
 	
 	@After
 	public void removeIndexes() {
-		Client client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
+		Node defaultEmbeddedInstance = EmbeddedElasticsearchInstancesFactory.getInstance().getDefaultEmbeddedInstance();
+		Client client = defaultEmbeddedInstance.client();
 		
 		DeleteByQueryRequestBuilder deleteByQueryRequestBuilder = new DeleteByQueryRequestBuilder(client);
 		deleteByQueryRequestBuilder.setQuery(QueryBuilders.matchAllQuery());
@@ -65,7 +71,8 @@ public class WhenManagedElasticsearchOperationsAreRequired {
 	@Test
 	public void insert_operation_should_index_all_dataset() {
 		
-		Client client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
+		Node defaultEmbeddedInstance = EmbeddedElasticsearchInstancesFactory.getInstance().getDefaultEmbeddedInstance();
+		Client client = defaultEmbeddedInstance.client();
 		
 		ElasticsearchOperation elasticsearchOperation = new ElasticsearchOperation(client);
 		elasticsearchOperation.insert(new ByteArrayInputStream(ELASTICSEARCH_DATA.getBytes()));
@@ -83,7 +90,8 @@ public class WhenManagedElasticsearchOperationsAreRequired {
 	@Test
 	public void delete_operation_should_remove_all_Indexes() {
 		
-		Client client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
+		Node defaultEmbeddedInstance = EmbeddedElasticsearchInstancesFactory.getInstance().getDefaultEmbeddedInstance();
+		Client client = defaultEmbeddedInstance.client();
 		
 		ElasticsearchOperation elasticsearchOperation = new ElasticsearchOperation(client);
 		elasticsearchOperation.insert(new ByteArrayInputStream(ELASTICSEARCH_DATA.getBytes()));
@@ -99,7 +107,8 @@ public class WhenManagedElasticsearchOperationsAreRequired {
 	@Test
 	public void databaseIs_operation_should_compare_all_Indexes() {
 		
-		Client client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
+		Node defaultEmbeddedInstance = EmbeddedElasticsearchInstancesFactory.getInstance().getDefaultEmbeddedInstance();
+		Client client = defaultEmbeddedInstance.client();
 		
 		ElasticsearchOperation elasticsearchOperation = new ElasticsearchOperation(client);
 		elasticsearchOperation.insert(new ByteArrayInputStream(ELASTICSEARCH_DATA.getBytes()));
@@ -110,5 +119,4 @@ public class WhenManagedElasticsearchOperationsAreRequired {
 		
 		client.close();
 	}
-	
 }
