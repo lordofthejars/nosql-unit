@@ -38,6 +38,12 @@ public class SpringMongoDbRule extends MongoDbRule {
 		ApplicationContext applicationContext = propertyGetter.propertyByType(testObject, ApplicationContext.class);
 
 		Map<String, Mongo> beansOfType = applicationContext.getBeansOfType(Mongo.class);
+		
+		if(beansOfType == null) {
+			throw new IllegalArgumentException(
+					"At least one Mongo instance should be defined into Spring Application Context.");
+		}
+		
 		Mongo mongo = with(beansOfType).values().first(anything());
 
 		if (mongo == null) {

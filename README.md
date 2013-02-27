@@ -249,6 +249,34 @@ required.
 "bornAt":{ "$date" : "2011-01-05T10:09:15.210Z"}
 ~~~~
 
+With last versions of **MongoDB**, index support is also implemented allowing developers to define indexes through defined document properties. For more information visit [MongoDB](http://docs.mongodb.org/manual/core/indexes/). In this case dataset has been changed to let us define indexes too.
+
+~~~~ {.json}
+{
+   "collection1":{
+      "indexes":[
+         {
+            "index":{
+               "code":1
+            }
+         }
+      ],
+      "data":[
+         {
+            "id":1,
+            "code":"JSON dataset"
+         },
+         {
+            "id":2,
+            "code":"Another row"
+         }
+      ]
+   }
+}
+~~~~
+
+Note that we define the collection name, and then we define two subdocuments. The first one is where we define an array of indexes, all of them related to defined collection and we define which fields are going to be indexed (same as document as defined in **MongoDB** index specification). And then data property, where we define all documents that goes into collection under test.
+
 Getting Started
 ---------------
 
@@ -382,6 +410,29 @@ import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mo
 @Rule
 public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb().databaseName("test").host("my_remote_host").build());
 ~~~~
+
+But also we can define it to use Spring Data MongoDB defined instance.
+
+If you are plannig to use **Spring Data MongoDB**, you may require to use the *Mongo* instance defined within Spring Application Context, mostly because you are defining an embedded connection using **Fongo**:
+
+~~~~ {.xml}
+\<bean name="fongo" class="com.foursquare.fongo.Fongo"\>
+	\<constructor-arg value="InMemoryMongo" /\>
+\</bean\>
+\<bean id="mongo" factory-bean="fongo" factory-method="getMongo" /\>
+~~~~
+
+In these cases you should use an special method which gets *Mongo* **Fongo** instance, instead of creating new one.
+
+~~~~ {.java}
+@Autowired
+private ApplicationContext applicationContext;
+	
+@Rule
+public MongoDbRule mongoDbRule = newMongoDbRule().defaultSpringMongoDb("test");
+~~~~
+
+> Note that you need to autowire the application context, so **NoSQLUnit** can inject instance defined within application context into *MongoDbRule*.
 
 ### Complete Example
 
@@ -970,7 +1021,7 @@ If you are using in-memory approach mixed with embedded approach, target
 path for in-memory instance can be found at
 `InMemoryNeo4j.INMEMORY_NEO4J_TARGET_PATH` variable.
 
-#### Remote Connection
+#### Managed/Remote Connection
 
 The second one is for configuring a connection to remote *Neo4j* server
 (it is irrelevant at this level if it is wrapped or not). Default values
@@ -989,6 +1040,33 @@ import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServerConfigurationBui
 @Rule
 public Neo4jRule neo4jRule = new Neo4jRule(newManagedNeoServerConfiguration().build());
 ~~~~
+
+or you can use the fast way:
+
+~~~~ {.java}
+@Rule
+public Neo4jRule neo4jRule = newNeo4jRule().defaultManagedNeo4j();
+~~~~
+
+### Spring Connection
+
+If you are plannig to use **Spring Data Neo4j**, you may require to use the *GraphDatabaseService* defined within Spring Application Context, mostly because you are defining an embedded connection using Spring namespace:
+
+~~~~ {.xml}
+\<neo4j:config storeDirectory="target/config-test"/\>
+~~~~
+
+In these cases you should use an special method which gets *GraphDatabaseService* instance instead of creating new one.
+
+~~~~ {.java}
+@Autowired
+private ApplicationContext applicationContext;
+	
+@Rule
+public Neo4jRule neo4jRule = newNeo4jRule().defaultSpringGraphDatabaseServiceNeo4j();
+~~~~
+
+> Note that you need to autowire the application context, so **NoSQLUnit** can inject instance defined within application context into *Neo4jRule*.
 
 ### Verifying Graph
 

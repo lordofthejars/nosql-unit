@@ -34,6 +34,12 @@ class SpringGraphDatabaseServiceNeo4jRule extends Neo4jRule {
 		ApplicationContext applicationContext = propertyGetter.propertyByType(testObject, ApplicationContext.class);
 
 		Map<String, GraphDatabaseService> beansOfType = applicationContext.getBeansOfType(GraphDatabaseService.class);
+		
+		if(beansOfType == null) {
+			throw new IllegalArgumentException(
+					"At least one GraphDatabaseService instance should be defined into Spring Application Context.");
+		}
+		
 		GraphDatabaseService graphDatabaseService = with(beansOfType).values().first(anything());
 
 		if (graphDatabaseService == null) {
