@@ -1,8 +1,5 @@
 package com.lordofthejars.nosqlunit.neo4j;
 
-import static ch.lambdaj.Lambda.selectFirst;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.collection.LambdaCollections.with;
 import static org.hamcrest.CoreMatchers.anything;
 

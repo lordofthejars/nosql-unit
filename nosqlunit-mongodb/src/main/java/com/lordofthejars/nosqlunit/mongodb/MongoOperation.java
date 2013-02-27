@@ -39,7 +39,7 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 			throw new IllegalArgumentException(e);
 		}
 	}
-
+	
 	@Override
 	public void insert(InputStream contentStream) {
 

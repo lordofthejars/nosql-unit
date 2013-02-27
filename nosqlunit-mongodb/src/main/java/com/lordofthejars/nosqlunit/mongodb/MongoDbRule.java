@@ -13,7 +13,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 
 	private static final String EXTENSION = "json";
 	
-	private DatabaseOperation<Mongo> databaseOperation;
+	protected DatabaseOperation<Mongo> databaseOperation;
 	
 	public static class MongoDbRuleBuilder {
 		
@@ -58,6 +58,10 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 		
 		public MongoDbRule defaultManagedMongoDb(String databaseName, int port) {
 			return new MongoDbRule(mongoDb().databaseName(databaseName).port(port).build());
+		}
+		
+		public MongoDbRule defaultSpringMongoDb(String databaseName) {
+			return new SpringMongoDbRule(mongoDb().databaseName(databaseName).build());
 		}
 		
 		/**
