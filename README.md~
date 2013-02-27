@@ -1053,7 +1053,7 @@ public Neo4jRule neo4jRule = newNeo4jRule().defaultManagedNeo4j();
 If you are plannig to use **Spring Data Neo4j**, you may require to use the *GraphDatabaseService* defined within Spring Application Context, mostly because you are defining an embedded connection using Spring namespace:
 
 ~~~~ {.xml}
-<neo4j:config storeDirectory="target/config-test"/>
+\<neo4j:config storeDirectory="target/config-test"/\>
 ~~~~
 
 In these cases you should use an special method which gets *GraphDatabaseService* instance instead of creating new one.
