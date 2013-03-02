@@ -12,7 +12,7 @@ private ElasticsearchConfiguration elasticsearchConfiguration = new Elasticsearc
 		super();
 	}
 	
-	public static RemoteElasticsearchConfigurationBuilder managedElasticsearch() {
+	public static RemoteElasticsearchConfigurationBuilder remoteElasticsearch() {
 		return new RemoteElasticsearchConfigurationBuilder();
 	}
 	
