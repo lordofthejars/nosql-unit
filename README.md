@@ -2913,6 +2913,248 @@ public class WhenUserIsInserted {
 }
 ~~~~
 
+Elasticsearch Engine
+==============
+
+Elasticsearch
+=============
+
+ElasticSearch is a distributed, RESTful, free/open source search server based on Apache Lucene.
+
+**NoSQLUnit** supports **Elasticsearch** by using next classes:
+
+  ----------- -----------------------------------------------------
+  In Memory   com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch
+  Managed     com.lordofthejars.nosqlunit.elasticsearch.ManagedElasticsearch
+  ----------- -----------------------------------------------------
+
+  : Lifecycle Management Rules
+
+  ---------------------- -------------------------------------------------
+  NoSQLUnit Management   com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule
+  ---------------------- -------------------------------------------------
+
+  : Manager Rule
+
+Maven Setup
+-----------
+
+To use **NoSQLUnit** with **Elasticsearch** you only need to add next dependency:
+
+~~~~ {.xml}
+<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-elasticsearch</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+~~~~
+
+Dataset Format
+--------------
+
+Default dataset file format in **Elasticsearch** module is *json* .
+
+Datasets must have next format:
+
+~~~~ {.json}
+{
+   "documents":[
+      {
+         "document":[
+            {
+               "index":{
+                  "indexName":"indexName1",
+                  "indexType":"indexType1",
+                  "indexId":"indexId1"
+               }
+            },
+	    {
+               "index":{
+                  "indexName":"indexName2",
+                  "indexType":"indexType2",
+                  "indexId":"indexId2"
+               }
+            },
+            {
+               "data":{
+                  "property1":"value1",
+                  "property2": value2
+               }
+            }
+         ]
+      },
+      ...
+   ]
+}
+~~~~
+
+> Notice that if attributes value are integers, double quotes are not
+  required. Also you can define as many *index* subdocuments as required, but only one *data* document which will be inserted into **Elasticsearch**.
+  Moreover property *indexId* is only mandatory if you want to use the inserted data to be validated with *@ShouldMatchDataSet*. Document index is used to run comparisions      faster than retrieving all data. If you are not planning to use the expectations capability of **NoSQLUnit** then you are not required to set *indexId* property and **Elasticsearch** will provie one for you.
+
+Getting Started
+---------------
+
+### Lifecycle Management Strategy
+
+First step is defining which lifecycle management strategy is required
+for your tests. Depending on kind of test you are implementing (unit
+test, integration test, deployment test, ...) you will require an
+**embedded** approach, **managed** approach or **remote** approach.
+
+#### Embedded
+
+To configure **embedded** approach you should only instantiate next
+rule:
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
+
+@ClassRule
+public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+~~~~
+
+By default Elasticsearch Node is started with property *local* set to true, but this property and all other supported properties can be configured or you can still use the default configuration approach provided by **Elasticsearch** by creating `elasticsearch.yml` file into classpath. 
+
+Data will be stored in `target/elasticsearch-test-data/impermanent-db` directory.
+
+#### Managed
+
+To configure the **managed** way, we should use ManagedElasticsearch rule and
+may require some configuration parameters.
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.elasticsearch.ManagedElasticsearch.ManagedElasticsearchRuleBuilder.newManagedElasticsearchRule;
+
+@ClassRule
+public static final ManagedElasticsearch MANAGED_ELASTICSEARCH = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-0.20.5").build();
+~~~~
+
+By default managed *Elasticsearch* rule uses next default values:
+
+-   *Elasticsearch* installation directory is retrieved from `ES_HOME`
+    system environment variable.
+
+-   Target path, that is the directory where **Elasticsearch** server is
+    started `target/elasticsearch-temp` .
+
+ManagedElasticsearch can be created from scratch, but for making life easier,
+a *DSL* is provided using ManagedElasticsearchRuleBuilder class as seen in previous example.
+
+#### Remote
+
+Configuring **remote** approach does not require any special rule
+because you (or System like Maven ) is the responsible of starting and
+stopping the server. This mode is used in deployment tests where you are
+testing your application on real environment.
+
+### Configuring Elasticsearch Connection
+
+Next step is configuring ***Elasticsearch*** rule in charge of maintaining
+*Elasticsearch* database into known state by inserting and deleting defined
+datasets. You must register *ElasticsearchRule* *JUnit* rule class, which
+requires a configuration parameter with information like host, port or
+database name.
+
+To make developer's life easier and code more readable, a fluent
+interface can be used to create these configuration objects. Three
+different kind of configuration builders exist.
+
+#### Embedded
+
+The first one is for configuring a connection to embedded *Node* instance. For almost all cases default parameters are enough.
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
+
+@Rule
+public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
+~~~~
+
+If you need to customize embedded connection we can use *EmbeddedElasticsearchConfigurationBuilder* class builder. 
+
+#### Managed
+
+The second one is for configuring a connection to managed/remote *Elasticsearch*
+server. Default values are:
+
+  ---------------- -------------------------------
+  Host             localhost
+  Port             9300
+  ---------------- -------------------------------
+
+And you can create a managed connection with default values as shown in next example:
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
+
+@Rule
+public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultManagedElasticsearch();
+~~~~
+
+But you can cusomize connection parameters by using *ManagedElasticsearchConfigurationBuilder* class. There you can set the *Settings* class and define the transport port. 
+
+#### Remote
+
+Moreover we can also use *RemoteElasticsearchConfigurationBuilder* which allows us to set the host.
+
+~~~~ {.java}
+@Rule
+public ElasticsearchRule elasticsearchRule = newElasticsearchRule().configure(remoteElasticsearch().host("10.0.10.1").build()).build();
+~~~~
+
+### Full Example
+
+Dataset used:
+
+~~~~ {.json}
+{
+   "documents":[
+      {
+         "document":[
+            {
+               "index":{
+                  "indexName":"books",
+                  "indexType":"book",
+                  "indexId":"1"
+               }
+            },
+            {
+               "data":{
+                  "title":"The Hobbit",
+                  "numberOfPages":293
+               }
+            }
+         ]
+      }
+   ]
+}
+~~~~
+
+Managed test:
+
+~~~~ {.java}
+@ClassRule
+public static final ManagedElasticsearch MANAGED_EALSTICSEARCH = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-0.20.5").build();
+	
+@Rule
+public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultManagedElasticsearch();
+	
+@Inject
+private Client client;
+	
+@Test
+@UsingDataSet(locations="books.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+public void all_books_should_be_returned() {
+		
+	BookManager bookManager = new BookManager(client);
+	List<Book> books = bookManager.searchAllBooks();
+		
+	assertThat(books, hasItems(new Book("The Hobbit", 293)));
+		
+}
+~~~~
+
 Advanced Usage
 ==============
 
