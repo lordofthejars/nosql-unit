@@ -1,0 +1,15 @@
+{
+	"data": [
+				{
+					"implementation":"com.lordofthejars.nosqlunit.neo4j.extension.springtemplate.integration.Person",
+					"object": {
+						"name":"alex",
+						"friends":[
+									{
+										"name":"soto"
+									}
+						]
+					}
+				}
+	]
+}
