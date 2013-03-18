@@ -32,13 +32,14 @@ public class WhenPersonWantsToKnowItsCar {
 	
 	
 	@Test
-	@UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	@UsingDataSet(locations={"persons.json"}, loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 	public void car_should_be_returned() throws IOException {
 
 		PersonManager personManager = new PersonManager(configuration);
 		String car = personManager.getCarByPersonName("john");
 		
-		assertThat(car, is("toyota"));		
+		assertThat(car, is("toyota"));
+		
 	}
 	
 }
