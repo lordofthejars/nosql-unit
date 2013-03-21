@@ -70,6 +70,23 @@ public class WhenMongoDbOperationsAreRequired {
 			"   }"+
 			"}";
 	
+	private static final String DATA_INDEX_OPTIONS = "" +
+			"{" +
+			"\"collection1\": {" +
+			"	\"indexes\": [\n" + 
+			"					{\n" + 
+			"						\"index\": {\"field\": 1},\n" +
+			"						\"options\": {\"unique\":\"true\"}  "+		
+			"					}\n" + 
+			"				 ],"+
+			"	\"data\":"+
+			"				[" +
+			"					{\"id\":1,\"code\":\"JSON dataset\",}," +
+			"					{\"id\":2,\"code\":\"Another row\",}" +
+			"				]"+
+			"   }"+
+			"}";
+	
 	private static final String[] EXPECTED_COLLECTION_1 = new String[]{"{ \"id\" : 1 , \"code\" : \"JSON dataset\"}", "{ \"id\" : 2 , \"code\" : \"Another row\"}"};
 	private static final String[] EXPECTED_COLLECTION_2 = new String[]{"{ \"id\" : 3 , \"code\" : \"JSON dataset 2\"}" , "{ \"id\" : 4 , \"code\" : \"Another row 2\"}"};
 	
@@ -101,6 +118,25 @@ public class WhenMongoDbOperationsAreRequired {
 		DBObject expectedIndex = new BasicDBObject("field", 1);
 		
 		verifyIndexCreationCommand(expectedIndex, collection1);
+	}
+	
+	@Test
+	public void insert_operation_with_options_in_indexes_should_add_data_and_indexes_into_collections() throws UnsupportedEncodingException {
+		DBCollection collection1 = mock(DBCollection.class);
+		
+		when(db.getName()).thenReturn("test");
+		when(db.getMongo()).thenReturn(mongo);
+		when(db.getCollection("collection1")).thenReturn(collection1);
+		
+		MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost","test"));
+		mongoOperation.insert(new ByteArrayInputStream(DATA_INDEX_OPTIONS.getBytes("UTF-8")));
+		
+		verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
+		
+		DBObject expectedIndex = new BasicDBObject("field", 1);
+		DBObject expectedOptionsIndex = new BasicDBObject("unique", "true");
+		
+		verifyIndexCreationCommandAndOptions(expectedIndex, expectedOptionsIndex, collection1);
 	}
 	
 	@Test
@@ -204,6 +240,19 @@ public class WhenMongoDbOperationsAreRequired {
                 .forClass(DBObject.class);
 		verify(collection, times(1)).createIndex(indexCommandCaptor.capture());
 		assertThat(indexCommandCaptor.getValue(), is(indexDocument));
+		
+	}
+	
+	private void verifyIndexCreationCommandAndOptions(DBObject indexDocument, DBObject indexOptions, DBCollection collection) {
+		
+		final ArgumentCaptor<DBObject> indexCommandCaptor = ArgumentCaptor
+                .forClass(DBObject.class);
+		final ArgumentCaptor<DBObject> indexOptionCommandCaptor = ArgumentCaptor
+                .forClass(DBObject.class);
+		
+		verify(collection, times(1)).createIndex(indexCommandCaptor.capture(), indexOptionCommandCaptor.capture());
+		assertThat(indexCommandCaptor.getValue(), is(indexDocument));
+		assertThat(indexOptionCommandCaptor.getValue(), is(indexOptions));
 		
 	}
 	

@@ -17,6 +17,7 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
 	private static final String SHARD_KEY_PATTERN = "shard-key-pattern";
 	private static final String INDEXES = "indexes";
 	private static final String INDEX = "index";
+	private static final String INDEX_OPTIONS = "options";
 	private static final String DATA = "data";
 	private static final String DATABASE_COLLECTION_SEPARATOR = ".";
 
@@ -75,7 +76,15 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
 		
 		for (Object object : indexes) {
 			DBObject index = (DBObject) object;
-			indexedCollection.createIndex((DBObject) index.get(INDEX));
+			
+			DBObject indexKeys = (DBObject) index.get(INDEX);
+			
+			if(index.containsField(INDEX_OPTIONS)) {
+				DBObject indexOptions = (DBObject)index.get(INDEX_OPTIONS);
+				indexedCollection.createIndex(indexKeys, indexOptions);
+			} else {
+				indexedCollection.createIndex(indexKeys);
+			}
 		}
 		
 	}
