@@ -107,6 +107,45 @@ public class WhenManagedRedisLifecycleIsManaged {
 	}
 	
 	@Test
+	public void redis_should_be_started_with_slaveof_parameter() throws Throwable {
+		
+		System.setProperty("REDIS_HOME", "/opt/redis-2.4.16");
+		
+		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(
+				OperatingSystem.LINUX_OS);
+		
+		
+		CommandLineExecutor commandLineExecutor = mock(CommandLineExecutor.class);
+
+		Process mockProcess = mock(Process.class);
+		when(mockProcess.exitValue()).thenReturn(0);
+
+		when(
+				commandLineExecutor.startProcessInDirectoryAndArguments(
+						anyString(), anyList())).thenReturn(mockProcess);
+		
+		ManagedRedis managedRedis = newManagedRedisRule().slaveOf("localhost", 4444).build();
+		
+		managedRedis.managedRedisLifecycleManager.setCommandLineExecutor(commandLineExecutor);
+		managedRedis.managedRedisLifecycleManager.setOperatingSystemResolver(operatingSystemResolver);
+		
+		managedRedis.before();
+		
+		List<String> expectedCommand = new ArrayList<String>();
+		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedisLifecycleManager.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedisLifecycleManager.REDIS_EXECUTABLE_X);
+		expectedCommand.add(ManagedRedisLifecycleManager.SLAVE_OF_ARGUMENT);
+		expectedCommand.add("localhost");
+		expectedCommand.add(Integer.toString(4444));
+		managedRedis.after();
+
+		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
+				ManagedRedisLifecycleManager.DEFAULT_REDIS_TARGET_PATH, expectedCommand);
+		
+		System.clearProperty("REDIS_HOME");
+		
+	}
+	
+	@Test
 	public void redis_should_be_started_in_Linux() throws Throwable {
 		
 		System.setProperty("REDIS_HOME", "/opt/redis-2.4.16");

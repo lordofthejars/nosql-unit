@@ -37,6 +37,13 @@ public class ManagedRedis extends ExternalResource {
 			return this;
 		}
 
+		public ManagedRedisRuleBuilder slaveOf(String masterHost, int masterPort) {
+			this.managedRedisLifecycleManager.setMasterHost(masterHost);
+			this.managedRedisLifecycleManager.setMasterPort(masterPort);
+			
+			return this;
+		}
+		
 		public ManagedRedisRuleBuilder configurationPath(String configurationPath) {
 			this.managedRedisLifecycleManager.setConfigurationFilepath(configurationPath);
 			return this;

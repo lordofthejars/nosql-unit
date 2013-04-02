@@ -32,17 +32,23 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 	private static final String LOCALHOST = "127.0.0.1";
 
 	public static final int DEFAULT_PORT = 6379;
+	private static final int NO_MASTER_PORT = -1;
 	protected static final String DEFAULT_REDIS_TARGET_PATH = "target" + File.separatorChar + "redis-temp";
 	protected static final String REDIS_BINARY_DIRECTORY = "src";
 
 	protected static final String REDIS_EXECUTABLE_X = "redis-server";
 
+	protected static final String SLAVE_OF_ARGUMENT = "--slaveof";
+	
 	private String targetPath = DEFAULT_REDIS_TARGET_PATH;
 	private String redisPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("REDIS_HOME");
 	private String configurationFilepath = null;
 	
 	private int port = DEFAULT_PORT;
 
+	private String masterHost;
+	private int masterPort = NO_MASTER_PORT;
+	
 	private Map<String, String> extraCommandArguments = new HashMap<String, String>();
 	private List<String> singleCommandArguments = new ArrayList<String>();
 
@@ -149,6 +155,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 		List<String> programAndArguments = new ArrayList<String>();
 
 		programAndArguments.add(getExecutablePath());
+		addSlaveOfParameter(programAndArguments);
 		addConfigurationPath(programAndArguments);
 
 		for (String argument : this.singleCommandArguments) {
@@ -181,6 +188,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 
 	}
 
+	private List<String> addSlaveOfParameter(List<String> programAndArguments) {
+		
+		if(isMasterDefined()) {
+			programAndArguments.add(SLAVE_OF_ARGUMENT);
+			programAndArguments.add(this.masterHost);
+			programAndArguments.add(Integer.toString(this.masterPort));
+		}
+		
+		return programAndArguments;
+	}
+	
 	private List<String> addConfigurationPath(List<String> programAndArguments) {
 
 		if (this.configurationFilepath != null) {
@@ -217,6 +235,10 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 		return pwd != null;
 	}
 
+	private boolean isMasterDefined() {
+		return this.masterHost != null && this.masterPort != NO_MASTER_PORT;
+	}
+	
 	public void setTargetPath(String targetPath) {
 		this.targetPath = targetPath;
 	}
@@ -228,7 +250,15 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 	public void setRedisPath(String redisPath) {
 		this.redisPath = redisPath;
 	}
+	
+	public void setMasterHost(String host) {
+		this.masterHost = host;
+	}
 
+	public void setMasterPort(int port) {
+		this.masterPort = port;
+	}
+	
 	public void addExtraCommandLineArgument(String argumentName, String argumentValue) {
 		this.extraCommandArguments.put(argumentName, argumentValue);
 	}
