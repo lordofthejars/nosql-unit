@@ -3525,5 +3525,6 @@ Stay in Touch
   Twitter:   @alexsotob
   Github:    [NoSQLUnit Github](https://github.com/lordofthejars/nosql-unit/)
   Forum:     [Forum](http://nosqlunit.1092832.n5.nabble.com)
+  Mailing:   [Mailing List](http://nosqlunit.1093269.n5.nabble.com)
   ---------- ------------------------------------------------------------------
 
