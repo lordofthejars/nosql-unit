@@ -3524,5 +3524,6 @@ Stay in Touch
   Blog:      [Lord Of The Jars](www.lordofthejars.com)
   Twitter:   @alexsotob
   Github:    [NoSQLUnit Github](https://github.com/lordofthejars/nosql-unit/)
+  Forum:     [Forum](http://nosqlunit.1092832.n5.nabble.com)
   ---------- ------------------------------------------------------------------
 
