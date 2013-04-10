@@ -59,11 +59,11 @@ public class WhenComparingRedisDatasetWithShards {
 	
 
 	@ClassRule
-	public static ManagedRedis managedRedis79 = newManagedRedisRule().redisPath("/opt/redis-2.4.17").targetPath("target/redis1")
+	public static ManagedRedis managedRedis79 = newManagedRedisRule().redisPath("/opt/redis-2.6.12").targetPath("target/redis1")
 			.configurationPath(getConfigurationFilePath("src/test/resources/redis_6379.conf")).port(6379).build();
 
 	@ClassRule
-	public static ManagedRedis managedRedis80 = newManagedRedisRule().redisPath("/opt/redis-2.4.17").targetPath("target/redis2")
+	public static ManagedRedis managedRedis80 = newManagedRedisRule().redisPath("/opt/redis-2.6.12").targetPath("target/redis2")
 			.configurationPath(getConfigurationFilePath("src/test/resources/redis_6380.conf")).port(6380).build();
 
 

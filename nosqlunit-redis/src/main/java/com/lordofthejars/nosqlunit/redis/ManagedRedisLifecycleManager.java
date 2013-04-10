@@ -155,8 +155,8 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 		List<String> programAndArguments = new ArrayList<String>();
 
 		programAndArguments.add(getExecutablePath());
-		addSlaveOfParameter(programAndArguments);
 		addConfigurationPath(programAndArguments);
+		addSlaveOfParameter(programAndArguments);
 
 		for (String argument : this.singleCommandArguments) {
 			programAndArguments.add(argument);
@@ -191,9 +191,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedRedis.class)
 	private List<String> addSlaveOfParameter(List<String> programAndArguments) {
 		
 		if(isMasterDefined()) {
-			programAndArguments.add(SLAVE_OF_ARGUMENT);
-			programAndArguments.add(this.masterHost);
-			programAndArguments.add(Integer.toString(this.masterPort));
+			programAndArguments.add(SLAVE_OF_ARGUMENT+" "+this.masterHost+" "+Integer.toString(this.masterPort));
 		}
 		
 		return programAndArguments;

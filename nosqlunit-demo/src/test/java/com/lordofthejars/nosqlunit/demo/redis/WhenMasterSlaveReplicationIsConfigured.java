@@ -4,8 +4,10 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 
 import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
+import static com.lordofthejars.nosqlunit.redis.ManagedRedisLifecycleManagerBuilder.newManagedRedis;
 import static com.lordofthejars.nosqlunit.redis.ManagedRedis.ManagedRedisRuleBuilder.newManagedRedisRule;
 import static com.lordofthejars.nosqlunit.redis.RedisRule.RedisRuleBuilder.newRedisRule;
+import static com.lordofthejars.nosqlunit.redis.replication.ReplicationGroupBuilder.master;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -24,42 +26,44 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.redis.ManagedRedis;
 import com.lordofthejars.nosqlunit.redis.RedisRule;
+import com.lordofthejars.nosqlunit.redis.replication.ReplicationManagedRedis;
 
 public class WhenMasterSlaveReplicationIsConfigured {
 
-	static {
-		System.setProperty("REDIS_HOME", "/opt/redis-2.4.17");
-	}
-
-	private static final File MASTER_CONFIGURATION_DIRECTORY = new File(
-			"src/test/resources/com/lordofthejars/nosqlunit/demo/redis/master-redis.conf");
-	private static final File SLAVE_CONFIGURATION_DIRECTORY = new File(
-			"src/test/resources/com/lordofthejars/nosqlunit/demo/redis/slave-redis.conf");
+	private static final String MASTER_CONFIGURATION_DIRECTORY = 
+			"src/test/resources/com/lordofthejars/nosqlunit/demo/redis/master-redis.conf";
+	private static final String SLAVE_CONFIGURATION_DIRECTORY = 
+			"src/test/resources/com/lordofthejars/nosqlunit/demo/redis/slave-redis.conf";
 
 	@ClassRule
-	public static ManagedRedis masterRedis = newManagedRedisRule()
-			.configurationPath(MASTER_CONFIGURATION_DIRECTORY.getAbsolutePath()).targetPath("target/redis1").port(6379).build();
-
-	@ClassRule
-	public static ManagedRedis slaveRedis = newManagedRedisRule()
-			.configurationPath(SLAVE_CONFIGURATION_DIRECTORY.getAbsolutePath()).targetPath("target/redis2").port(6380).build();
+	public static ReplicationManagedRedis replication = master(
+																newManagedRedis()
+																.redisPath("/opt/redis-2.6.12")
+																.targetPath("target/redism")
+																.configurationPath(getConfigurationFilePath(MASTER_CONFIGURATION_DIRECTORY))
+																.port(6379)
+																.build()
+															   )
+													    .slave(
+													    		newManagedRedis()
+																.redisPath("/opt/redis-2.6.12")
+																.targetPath("target/rediss1")
+																.configurationPath(getConfigurationFilePath(SLAVE_CONFIGURATION_DIRECTORY))
+																.port(6380)
+																.slaveOf("127.0.0.1", 6379)
+																.build())
+														.get();
+	
 
 	@Rule
 	public RedisRule masterRedisRule = newRedisRule().configure(
 			newManagedRedisConfiguration().connectionIdentifier("master").port(6379).build()).build();
 
-	@Rule
-	public RedisRule slaveRedisRule = newRedisRule().configure(
-			newManagedRedisConfiguration().connectionIdentifier("slave").port(6380).slaveOf("127.0.0.1", 6379).build())
-			.build();
 
 	@Inject
 	@Named("master")
 	private Jedis masterConnection;
 	
-	@Inject
-	@Named("slave")
-	private Jedis slaveConnection;
 	
 	@Test
 	@UsingDataSet(withSelectiveLocations = { @Selective(identifier = "master", locations = "book.json") }, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
@@ -70,9 +74,16 @@ public class WhenMasterSlaveReplicationIsConfigured {
 		
 		TimeUnit.SECONDS.sleep(5);
 		
+		Jedis slaveConnection = new Jedis("localhost", 6380);
+		
 		theHobbitTitle = slaveConnection.hget("The Hobbit", "title");
 		assertThat(theHobbitTitle, is("The Hobbit"));
 	
 	}
 
+	private static String getConfigurationFilePath(String fileName) {
+		File configurationFile = new File(fileName);
+		return configurationFile.getAbsolutePath();
+	}
+	
 }

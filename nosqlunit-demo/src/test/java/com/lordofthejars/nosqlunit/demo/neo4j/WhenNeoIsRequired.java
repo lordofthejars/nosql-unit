@@ -18,6 +18,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.neo4j.InMemoryNeo4j;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jRule;
 
+@UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 public class WhenNeoIsRequired {
 
 	@ClassRule
@@ -31,13 +32,17 @@ public class WhenNeoIsRequired {
 	
 	
 	@Test
-	@UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 	public void neo_node_should_be_returned() {
 		MatrixManager matrixManager = new MatrixManager(graphDatabaseService);
 		Node neo = matrixManager.getNeoNode();
 		assertThat((String)neo.getProperty("name"), is("Thomas Anderson"));
 	}
 	
-	
+	@Test
+	public void neo_node_should_be_returnedd() {
+		MatrixManager matrixManager = new MatrixManager(graphDatabaseService);
+		Node neo = matrixManager.getNeoNode();
+		assertThat((String)neo.getProperty("name"), is("Thomas Anderson"));
+	}
 	
 }

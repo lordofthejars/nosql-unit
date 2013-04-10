@@ -36,11 +36,6 @@ public class ManagedRedisConfigurationBuilder {
 		return this;
 	}
 	
-	public ManagedRedisConfigurationBuilder slaveOf(String masterHost, int masterPort) {
-		this.redisConfiguration.salveOf(masterHost, masterPort);
-		return this;
-	}
-	
 	public RedisConfiguration build() {
 		
 		Jedis jedis = new Jedis(this.redisConfiguration.getHost(), this.redisConfiguration.getPort());
@@ -53,11 +48,6 @@ public class ManagedRedisConfigurationBuilder {
 			}
 			
 		}
-		
-		if(this.redisConfiguration.isSlave()) {
-			jedis.slaveof(this.redisConfiguration.getMasterHost(), this.redisConfiguration.getMasterPort());
-		}
-		
 		this.redisConfiguration.setDatabaseOperation(new RedisOperation(jedis));
 		return redisConfiguration;
 	}

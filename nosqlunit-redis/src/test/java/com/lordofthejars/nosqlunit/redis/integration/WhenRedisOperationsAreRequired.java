@@ -70,7 +70,7 @@ public class WhenRedisOperationsAreRequired {
 			"}";
 	
 	@ClassRule
-	public static ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/redis-2.4.17").build();
+	public static ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/redis-2.6.12").build();
 	
 	@Test
 	public void insert_operation_should_add_all_dataset_to_redis() throws InterruptedException {

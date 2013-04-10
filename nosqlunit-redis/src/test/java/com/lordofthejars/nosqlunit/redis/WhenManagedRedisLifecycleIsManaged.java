@@ -133,9 +133,7 @@ public class WhenManagedRedisLifecycleIsManaged {
 		
 		List<String> expectedCommand = new ArrayList<String>();
 		expectedCommand.add("/opt/redis-2.4.16"+File.separatorChar+ManagedRedisLifecycleManager.REDIS_BINARY_DIRECTORY+File.separatorChar+ManagedRedisLifecycleManager.REDIS_EXECUTABLE_X);
-		expectedCommand.add(ManagedRedisLifecycleManager.SLAVE_OF_ARGUMENT);
-		expectedCommand.add("localhost");
-		expectedCommand.add(Integer.toString(4444));
+		expectedCommand.add(ManagedRedisLifecycleManager.SLAVE_OF_ARGUMENT+" "+"localhost "+Integer.toString(4444));
 		managedRedis.after();
 
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(

@@ -375,7 +375,7 @@ public class WhenComparingRedisDataset {
 			"}";
 	
 	@ClassRule
-	public static ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/redis-2.4.17").build();
+	public static ManagedRedis managedRedis = newManagedRedisRule().redisPath("/opt/redis-2.6.12").build();
 	
 	@After
 	public void tearDown() {
