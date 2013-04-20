@@ -79,6 +79,10 @@
 					<artifactId>asm</artifactId>
 					<groupId>asm</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>janino</artifactId>
+					<groupId>janino</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
