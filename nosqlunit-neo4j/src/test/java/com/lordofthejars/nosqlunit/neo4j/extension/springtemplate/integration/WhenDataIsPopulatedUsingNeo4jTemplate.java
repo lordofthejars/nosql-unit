@@ -36,6 +36,7 @@ import com.lordofthejars.nosqlunit.neo4j.Neo4jRule;
 import com.lordofthejars.nosqlunit.neo4j.extension.springtemplate.SpringTemplateComparisonStrategy;
 import com.lordofthejars.nosqlunit.neo4j.extension.springtemplate.SpringTemplateInsertionStrategy;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="embedded-neo4j-spring-definition.xml")
 @CustomInsertionStrategy(insertionStrategy = SpringTemplateInsertionStrategy.class)
