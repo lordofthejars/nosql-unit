@@ -20,7 +20,7 @@ import me.prettyprint.hector.api.mutation.Mutator;
 import me.prettyprint.hector.api.query.ColumnQuery;
 import me.prettyprint.hector.api.query.QueryResult;
 
-import org.apache.cassandra.config.ConfigurationException;
+import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.Test;
 
