@@ -1,9 +1,9 @@
 package com.lordofthejars.nosqlunit.cassandra.integration;
 
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static com.lordofthejars.nosqlunit.cassandra.EmbeddedCassandra.EmbeddedCassandraRuleBuilder.newEmbeddedCassandraRule;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 
@@ -11,7 +11,8 @@ import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
 import me.prettyprint.hector.api.factory.HFactory;
 
-import org.junit.Rule;
+import org.cassandraunit.exception.CassandraUnitException;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.cassandra.CassandraAssertion;
@@ -280,8 +281,8 @@ public class WhenComparingCassandraDataset {
 
 	
 	
-	@Rule
-	public EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().build();
+    @ClassRule
+    public static EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().build();
 	
 	@Test
 	public void no_exception_shoud_be_thrown_when_comparing_same_dataset_with_counters_type() {
@@ -624,7 +625,7 @@ public class WhenComparingCassandraDataset {
 
 	}
 
-	@Test(expected = NoSqlAssertionError.class)
+    @Test(expected = CassandraUnitException.class)
 	public void exception_should_be_thrown_if_different_types_are_provided_between_expected_file_and_database() {
 
 		CassandraOperation cassandraOperation = new CassandraOperation(new CassandraConfiguration("Test Cluster",

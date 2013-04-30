@@ -18,11 +18,11 @@ import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.ddl.KeyspaceDefinition;
 import me.prettyprint.hector.api.factory.HFactory;
 
-import org.apache.cassandra.config.ConfigurationException;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.commitlog.CommitLog;
+import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.io.util.FileUtils;
-import org.apache.cassandra.thrift.CassandraDaemon;
+import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
@@ -102,6 +102,9 @@ public class EmbeddedCassandraServerHelper {
 	 * stop the embedded cassandra
 	 */
 	public void stopEmbeddedCassandra() {
+        if (cassandraDaemon != null) {
+            cassandraDaemon.stop();
+        }
 		executor.shutdown();
 		executor.shutdownNow();
 		log.debug("Cassandra is stopped");
@@ -200,11 +203,7 @@ public class EmbeddedCassandraServerHelper {
 	}
 
 	public static void mkdirs() {
-		try {
-			DatabaseDescriptor.createAllDirectories();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+        DatabaseDescriptor.createAllDirectories();
 	}
 
 }
