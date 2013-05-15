@@ -82,7 +82,7 @@ public class CassandraOperation extends AbstractCustomizableDatabaseOperation<Ca
 		for (KeyspaceDefinition keyspaceDefinition : keyspaces) {
 			String keyspaceName = keyspaceDefinition.getName();
 
-			if (!INTERNAL_CASSANDRA_KEYSPACE.equals(keyspaceName)) {
+            if (!keyspaceName.startsWith(INTERNAL_CASSANDRA_KEYSPACE)) {
 				cluster.dropKeyspace(keyspaceName, true);
 			}
 		}

@@ -27,6 +27,14 @@
 					<artifactId>junit</artifactId>
 					<groupId>junit</groupId>
 				</exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-all</artifactId>
+                </exclusion>
 				<exclusion>
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
@@ -85,6 +93,8 @@
 						</goals>
 						<configuration>
 							<skip>false</skip>
+                 <forkCount>1</forkCount>
+                 <reuseForks>false</reuseForks>
 							<excludes>
 								<exclude>**/*Test.java</exclude>
 							</excludes>

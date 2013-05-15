@@ -51,7 +51,7 @@
 		<lambdaj.version>2.3.3</lambdaj.version>
 		<stax.version>1.0.1</stax.version>
 		<hamcrest.xml.version>0.10</hamcrest.xml.version>
-		<cassandra.unit.version>1.1.0.1</cassandra.unit.version>
+		<cassandra.unit.version>1.1.2.1</cassandra.unit.version>
 		<jedis.version>2.1.0</jedis.version>
 		<json.simple.version>1.1.1</json.simple.version>
 		<guava.version>13.0.1</guava.version>

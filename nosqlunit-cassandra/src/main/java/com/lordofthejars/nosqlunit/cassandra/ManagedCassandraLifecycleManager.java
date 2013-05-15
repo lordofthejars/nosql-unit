@@ -46,7 +46,7 @@ public class ManagedCassandraLifecycleManager extends AbstractLifecycleManager {
 	protected static final String CASSANDRA_BINARY_DIRECTORY = "bin";
 
 	protected String CASSANDRA_CONF_DIRECTORY = "/conf";
-	protected String CASSANDRA_DAEMON_CLASS = "org.apache.cassandra.thrift.CassandraDaemon";
+    protected String CASSANDRA_DAEMON_CLASS = "org.apache.cassandra.service.CassandraDaemon";
 
 	protected String javaHome = System.getProperty("java.home");
 	private String cassandraPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("CASSANDRA_HOME");
@@ -163,7 +163,8 @@ public class ManagedCassandraLifecycleManager extends AbstractLifecycleManager {
 	}
 
 	private void stopCassandra() {
-		pwd.destroy();
+        if (pwd != null)
+            pwd.destroy();
 	}
 
 	private File[] getCassandraJarLibraries() {

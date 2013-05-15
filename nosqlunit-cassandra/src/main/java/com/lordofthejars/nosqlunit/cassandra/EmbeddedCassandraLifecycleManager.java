@@ -3,7 +3,7 @@ package com.lordofthejars.nosqlunit.cassandra;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.cassandra.config.ConfigurationException;
+import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

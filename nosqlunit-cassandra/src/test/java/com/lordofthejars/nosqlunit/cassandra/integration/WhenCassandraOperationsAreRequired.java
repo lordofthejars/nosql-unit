@@ -8,7 +8,6 @@ import static org.junit.Assert.assertThat;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-
 import me.prettyprint.cassandra.service.CassandraHostConfigurator;
 import me.prettyprint.hector.api.Cluster;
 import me.prettyprint.hector.api.Keyspace;
@@ -18,7 +17,7 @@ import me.prettyprint.hector.api.factory.HFactory;
 import me.prettyprint.hector.api.query.ColumnQuery;
 import me.prettyprint.hector.api.query.QueryResult;
 
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.cassandra.CassandraConfiguration;
@@ -45,8 +44,8 @@ public class WhenCassandraOperationsAreRequired {
 			"}";
 	
 
-	@Rule
-	public EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().build();
+    @ClassRule
+    public static EmbeddedCassandra cassandraRule = newEmbeddedCassandraRule().build();
 	
 	@Test
 	public void insert_operation_should_add_all_dataset_to_cassandra() {
@@ -76,7 +75,7 @@ public class WhenCassandraOperationsAreRequired {
 		/* get all keyspace */
 		List<KeyspaceDefinition> keyspaces = cluster.describeKeyspaces();
 		
-		assertThat(keyspaces, hasSize(1));
+        assertThat(keyspaces, hasSize(3));
 		
 	}
 	
