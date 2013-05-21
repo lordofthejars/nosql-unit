@@ -13,7 +13,7 @@ public class PropertyGetter <T> {
 			Field[] fields = clazz.getDeclaredFields();
 			for (Field field : fields) {
 
-				if (field.getType().isAssignableFrom(type)) {
+				if (type.isAssignableFrom(field.getType())) {
 					return (T) new FieldGetter(testInstance, field).get();
 				}
 			}
