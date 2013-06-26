@@ -37,6 +37,9 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 			return this;
 		}
 		
+		public Neo4jRule defaultSpringGraphDatabaseServiceNeo4j(Neo4jConfiguration neo4jConfiguration) {
+            return new SpringGraphDatabaseServiceNeo4jRule(neo4jConfiguration);
+        }
 		
 		public Neo4jRule defaultSpringGraphDatabaseServiceNeo4j() {
 			return new SpringGraphDatabaseServiceNeo4jRule(new Neo4jConfiguration());
