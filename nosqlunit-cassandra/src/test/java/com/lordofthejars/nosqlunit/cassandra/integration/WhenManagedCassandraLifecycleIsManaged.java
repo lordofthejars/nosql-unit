@@ -16,6 +16,7 @@ import java.util.List;
 import me.prettyprint.cassandra.service.CassandraHost;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -36,9 +37,8 @@ public class WhenManagedCassandraLifecycleIsManaged {
 		MockitoAnnotations.initMocks(this);
 	}
 
-    // TODO: This should mock more to actually work. Now fails in
-    // ManagedCassandraLifecycleManager.getCassandraClasspath
-    // @Test
+
+    @Test
 	public void managed_cassandra_should_be_registered_and_started_with_default_parameters() throws Throwable {
 
 		System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
@@ -69,9 +69,8 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 	}
 
-    // TODO: This should mock more to actually work. Now fails in
-    // ManagedCassandraLifecycleManager.getCassandraClasspath
-    // @Test
+
+    @Test
 	public void managed_cassandra_should_be_registered_and_started_with_custom_parameters() throws Throwable {
 
 		System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
@@ -100,9 +99,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 	}
 
-    // TODO: This should mock more to actually work. Now fails in
-    // ManagedCassandraLifecycleManager.getCassandraClasspath
-    // @Test
+    @Test
 	public void simulataneous_cassandra_should_start_only_one_instance() throws Throwable {
 
 		System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
@@ -142,9 +139,8 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 	}
 
-    // TODO: This should mock more to actually work. Now fails in
-    // ManagedCassandraLifecycleManager.getCassandraClasspath
-    // @Test
+
+    @Test
 	public void cassandra_should_be_started_using_java() throws Throwable {
 
 		System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
@@ -173,9 +169,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 	}
 
-    // TODO: This should mock more to actually work. Now fails in
-    // ManagedCassandraLifecycleManager.getCassandraClasspath
-    // @Test
+    @Test
 	public void cassandra_should_be_started_using_java_from_custom_location() throws Throwable {
 
 		when(operatingSystemResolver.currentOperatingSystem()).thenReturn(OperatingSystem.LINUX_OS);
@@ -201,8 +195,7 @@ public class WhenManagedCassandraLifecycleIsManaged {
 
 	}
 
-    // TODO: Should be removed and the verification of command line done in a bit
-    // different manner. This is too OS and Cassandra version specific
+
 	private List<String> getExpectedCommand() {
 		List<String> expectedCommand = new ArrayList<String>();
 
