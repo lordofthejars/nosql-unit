@@ -3511,7 +3511,15 @@ There are some situations (mostly if using *Arquillian*) that you want to inject
 @ByContainer
 private Mongo mongo2;
 ~~~~
- 
+
+Spring Data
+===========
+
+With **NoSQLUnit** you can also write tests for `Spring Data` project. You can 
+
+[Spring Data MongoDB](http://www.lordofthejars.com/2013/01/testing-spring-data-mongodb.html)
+
+[Spring Data Neo4j](http://www.lordofthejars.com/2013/03/testing-spring-data-neo4j-applications.html)
 
 Stay In Touch
 =============
