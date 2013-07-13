@@ -10,6 +10,9 @@ import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.helpers.collection.MapUtil;
+
+import com.google.common.base.Strings;
 
 public class Edge {
 
@@ -50,13 +53,22 @@ public class Edge {
 
 	public void createManualIndexes(GraphDatabaseService graphDatabaseService, Relationship relationship) {
 		for (ManualIndex manualIndex : manualIndexes) {
-			graphDatabaseService.index().forRelationships(manualIndex.getIndexName())
-					.add(relationship, manualIndex.getKey(), manualIndex.getValue());
+			if(manualIndex.getConfiguration() == null){
+				graphDatabaseService.index().forRelationships(manualIndex.getIndexName())
+						.add(relationship, manualIndex.getKey(), manualIndex.getValue());
+			} else {
+				graphDatabaseService.index().forRelationships(manualIndex.getIndexName(), manualIndex.getConfiguration())
+						.add(relationship, manualIndex.getKey(), manualIndex.getValue());
+			}
 		}
 	}
 
 	public void putManualIndex(String indexName, String indexKey, String indexValue) {
-		this.manualIndexes.add(new ManualIndex(indexName, indexKey, indexValue));
+		putManualIndex(indexName, indexKey, indexValue, null);
+	}
+
+	public void putManualIndex(String indexName, String indexKey, String indexValue, Map<String, String> configuration) {
+		this.manualIndexes.add(new ManualIndex(indexName, indexKey, indexValue, configuration));
 	}
 
 	public void putData(String key, Object data) {
@@ -94,12 +106,21 @@ public class Edge {
 		private String indexName;
 		private String key;
 		private String value;
+		private Map<String, String> configuration;
 
 		public ManualIndex(String indexName, String key, String value) {
 			super();
 			this.indexName = indexName;
 			this.key = key;
 			this.value = value;
+		}
+
+		public ManualIndex(String indexName, String key, String value, Map<String, String> configuration) {
+			super();
+			this.indexName = indexName;
+			this.key = key;
+			this.value = value;
+			this.configuration = configuration;
 		}
 
 		public String getIndexName() {
@@ -112,6 +133,10 @@ public class Edge {
 
 		public String getValue() {
 			return value;
+		}
+
+		public Map<String, String> getConfiguration() {
+			return configuration;
 		}
 
 	}
