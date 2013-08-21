@@ -14,9 +14,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.commons.lang.StringUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.helpers.collection.MapUtil;
+
+import com.google.common.base.Strings;
 
 public class GraphMLReader {
 
@@ -180,20 +184,30 @@ public class GraphMLReader {
 							//add custom index over currentNode
 							String indexName = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_NAME);
 							String indexKey = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_KEY);
+							String indexConfiguration = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_CONFIGURATION);
 							String indexData = reader.getElementText();
 							
-							this.graphDatabaseService.index().forNodes(indexName).add(currentNode, indexKey, indexData);
+							if(Strings.isNullOrEmpty(indexConfiguration)) {
+								this.graphDatabaseService.index().forNodes(indexName).add(currentNode, indexKey, indexData);
+							} else {
+								String[] indexConfigurationTokens = indexConfiguration.split(GraphMLTokens.ATTR_INDEX_CONFIGURATION_SEPARATOR);
+								this.graphDatabaseService.index().forNodes(indexName, MapUtil.stringMap(indexConfigurationTokens)).add(currentNode, indexKey, indexData);
+							}
 							
 						} else {
 							if (isInsideEdgeTag(inEdge)) {
 								//add custom index over currentEdge
-								
 								String indexName = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_NAME);
 								String indexKey = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_KEY);
+								String indexConfiguration = reader.getAttributeValue(null, GraphMLTokens.ATTR_INDEX_CONFIGURATION);
 								String indexData = reader.getElementText();
 								
-								currentEdge.putManualIndex(indexName, indexKey, indexData);
-								
+								if(Strings.isNullOrEmpty(indexConfiguration)) {
+									currentEdge.putManualIndex(indexName, indexKey, indexData);
+								} else {
+									String[] indexConfigurationTokens = indexConfiguration.split(GraphMLTokens.ATTR_INDEX_CONFIGURATION_SEPARATOR);
+									currentEdge.putManualIndex(indexName, indexKey, indexData, MapUtil.stringMap(indexConfigurationTokens));
+								}
 							}
 						}
 						

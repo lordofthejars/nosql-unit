@@ -19,6 +19,8 @@ public class GraphMLTokens {
     public static final String ATTR_AUTOINDEX = "attr.autoindexName";
     public static final String ATTR_INDEX_NAME = "name";
     public static final String ATTR_INDEX_KEY = "key";
+    public static final String ATTR_INDEX_CONFIGURATION = "configuration";
+    public static final String ATTR_INDEX_CONFIGURATION_SEPARATOR = ",";
     public static final String INDEX = "index";
     public static final String GRAPH = "graph";
     public static final String NODE = "node";
