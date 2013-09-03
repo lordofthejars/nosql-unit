@@ -3,6 +3,7 @@ package com.lordofthejars.nosqlunit.graph.parser;
 import static com.lordofthejars.nosqlunit.graph.parser.TypeCaster.getStringType;
 
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -147,7 +148,11 @@ public class GraphMLWriter {
 				writer.writeAttribute(GraphMLTokens.KEY, key);
 				Object value = edge.getProperty(key);
 				if (null != value) {
-					writer.writeCharacters(value.toString());
+				    if(TypeCaster.isArray(value)) {
+				        writeArray(value, writer);
+				    } else {
+				        writer.writeCharacters(value.toString());
+				    }
 				}
 				writer.writeEndElement();
 			}
@@ -155,6 +160,22 @@ public class GraphMLWriter {
 		}
 	}
 
+	private void writeArray(Object array, XMLStreamWriter writer) throws XMLStreamException {
+	    
+	    int length = Array.getLength(array);
+	    
+	    for (int i = 0; i < length-1; i ++) {
+	        Object arrayElement = Array.get(array, i);
+	        writer.writeCharacters(arrayElement.toString());
+            writer.writeCharacters(", ");
+	    }
+
+	    if(length > 0) {
+	        writer.writeCharacters(Array.get(array, length-1).toString());
+	    }
+	    
+	}
+	
 	private void writeNodes(List<Node> nodes, XMLStreamWriter writer) throws XMLStreamException {
 		for (Node node : nodes) {
 			writer.writeStartElement(GraphMLTokens.NODE);
