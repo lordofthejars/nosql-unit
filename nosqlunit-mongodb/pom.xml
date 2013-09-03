@@ -94,22 +94,6 @@
 
 						</configuration>
 					</execution>
-					<execution>
-						<id>integration-tests</id>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<skip>false</skip>
-							<excludes>
-								<exclude>**/*Test.java</exclude>
-							</excludes>
-							<includes>
-								<include>%regex[.*integration.When.*]</include>
-							</includes>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 		</plugins>
