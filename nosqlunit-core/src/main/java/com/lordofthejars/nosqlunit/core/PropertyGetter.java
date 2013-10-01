@@ -1,6 +1,8 @@
 package com.lordofthejars.nosqlunit.core;
 
 import java.lang.reflect.Field;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class PropertyGetter <T> {
@@ -10,7 +12,7 @@ public class PropertyGetter <T> {
 		Class<?> clazz = testInstance.getClass();
 
 		if (isTargetSet(testInstance)) {
-			Field[] fields = clazz.getDeclaredFields();
+            List<Field> fields = getAllFields(new LinkedList<Field>(), clazz);
 			for (Field field : fields) {
 
 				if (type.isAssignableFrom(field.getType())) {
@@ -21,6 +23,18 @@ public class PropertyGetter <T> {
 
 		return null;
 	}
+
+    public static List<Field> getAllFields(List<Field> fields, Class<?> type) {
+        for (Field field: type.getDeclaredFields()) {
+            fields.add(field);
+        }
+
+        if (type.getSuperclass() != null) {
+            fields = getAllFields(fields, type.getSuperclass());
+        }
+
+        return fields;
+    }
 
 	private boolean isTargetSet(Object testInstance) {
 		return testInstance != null;
