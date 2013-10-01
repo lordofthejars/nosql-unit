@@ -81,9 +81,9 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
 			
 			if(index.containsField(INDEX_OPTIONS)) {
 				DBObject indexOptions = (DBObject)index.get(INDEX_OPTIONS);
-				indexedCollection.createIndex(indexKeys, indexOptions);
+				indexedCollection.ensureIndex(indexKeys, indexOptions);
 			} else {
-				indexedCollection.createIndex(indexKeys);
+				indexedCollection.ensureIndex(indexKeys);
 			}
 		}
 		
