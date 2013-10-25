@@ -321,7 +321,7 @@ public class HashDatatypeOperations extends ExpirationDatatypeOperations impleme
 
 	@Override
 	public List<byte[]> keys() {
-		return new ArrayList<byte[]>(convert(this.hashElements.columnKeySet(),
+		return new ArrayList<byte[]>(convert(this.hashElements.rowKeySet(),
 				ByteBuffer2ByteArrayConverter.createByteBufferConverter()));
 	}
 
