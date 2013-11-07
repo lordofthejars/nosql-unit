@@ -39,7 +39,7 @@
 	</developers>
 
 	<properties>
-		<mongo.version>2.10.1</mongo.version>
+		<mongo.version>2.11.3</mongo.version>
 		<elasticsearch.version>0.20.5</elasticsearch.version>
 		<junit.version>4.11</junit.version>
 		<hamcrest.version>1.3</hamcrest.version>
@@ -63,14 +63,14 @@
 		<ektorp.couchdb.version>1.3.0</ektorp.couchdb.version>
 		<infinispan.version>5.1.8.Final</infinispan.version>
 		<bool.version>0.9.0</bool.version>
-		<fongo.version>1.0.7</fongo.version>
+		<fongo.version>1.3.1</fongo.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 
 			<dependency>
-				<groupId>com.foursquare</groupId>
+				<groupId>com.github.fakemongo</groupId>
 				<artifactId>fongo</artifactId>
 				<version>${fongo.version}</version>
 			</dependency>

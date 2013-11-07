@@ -53,7 +53,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.foursquare</groupId>
+			<groupId>com.github.fakemongo</groupId>
 			<artifactId>fongo</artifactId>
 			<exclusions>
 				<exclusion>
