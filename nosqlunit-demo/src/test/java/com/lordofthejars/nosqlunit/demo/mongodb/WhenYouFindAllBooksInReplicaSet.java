@@ -22,7 +22,7 @@ import com.lordofthejars.nosqlunit.demo.model.Book;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
 import com.mongodb.DBCollection;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 
 public class WhenYouFindAllBooksInReplicaSet {
 
@@ -56,7 +56,7 @@ public class WhenYouFindAllBooksInReplicaSet {
 										.build();
 
 	@Inject
-	private Mongo mongo;
+	private MongoClient mongo;
 
 	@Test
 	@UsingDataSet(locations = "initialData.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)

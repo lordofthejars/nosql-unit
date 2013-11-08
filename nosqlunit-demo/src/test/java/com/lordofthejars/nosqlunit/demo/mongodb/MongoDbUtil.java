@@ -1,10 +1,10 @@
 package com.lordofthejars.nosqlunit.demo.mongodb;
 
+import com.mongodb.MongoClient;
 import java.net.UnknownHostException;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 public class MongoDbUtil {
@@ -13,7 +13,7 @@ public class MongoDbUtil {
     
     static{
         try {
-            Mongo mongo=new Mongo("localhost",27017);
+            MongoClient mongo=new MongoClient("localhost",27017);
             database=mongo.getDB("test");
         } catch (UnknownHostException ex) {
             throw new IllegalArgumentException(ex);

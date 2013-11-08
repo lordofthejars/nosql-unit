@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.mongodb.integration;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import com.mongodb.MongoClient;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -23,7 +24,6 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBPort;
-import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 public class WhenSelectiveAnnotationIsUsed {
@@ -57,8 +57,8 @@ public class WhenSelectiveAnnotationIsUsed {
 			loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
 	public void data_should_be_inserted_into_configured_backend() throws UnknownHostException, MongoException {
 		
-		Mongo mongo1 = new Mongo("127.0.0.1", DBPort.PORT);
-		Mongo mongo2 = new Mongo("127.0.0.1", DBPort.PORT+1);
+		MongoClient mongo1 = new MongoClient("127.0.0.1", DBPort.PORT);
+    		MongoClient mongo2 = new MongoClient("127.0.0.1", DBPort.PORT+1);
 		
 		DB db1 = mongo1.getDB("test");
 		DB db2 = mongo2.getDB("test");

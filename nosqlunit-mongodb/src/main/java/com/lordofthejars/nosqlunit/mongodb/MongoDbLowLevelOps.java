@@ -131,7 +131,7 @@ public class MongoDbLowLevelOps {
 		try {
 			do {
 				TimeUnit.SECONDS.sleep(WAIT_TIME);
-				server = new Mongo(host, port);
+				server = new MongoClient(host, port);
 				DB db = server.getDB("admin");
 				try {
 					db.getStats();

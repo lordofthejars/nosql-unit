@@ -130,9 +130,9 @@ public class MongoDbCommands {
 	}
 	
 	public static void shutdown(String host, int port) {
-		Mongo mongo = null;
+		MongoClient mongo = null;
 		try {
-			mongo = new Mongo(host, port);
+			mongo = new MongoClient(host, port);
 			DB db = mongo.getDB("admin");
 			CommandResult shutdownResult = db.command(new BasicDBObject(
 					"shutdown", 1));
