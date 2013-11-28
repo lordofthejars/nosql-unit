@@ -89,7 +89,7 @@ public class HBaseAssertion {
 			ParsedRowModel parsedRowModel) throws IOException, Error {
 		
 		HTable table = new HTable(configuration, expectedTableName);
-		Get get = new Get(parsedRowModel.getKey().getBytes());
+		Get get = new Get(parsedRowModel.getKeyInBytes());
 		Result result = table.get(get);
 		
 		checkRowName(parsedRowModel, result);
