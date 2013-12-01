@@ -212,7 +212,7 @@ To use **NoSQLUnit** with MongoDb you only need to add next dependency:
 
 Note that if you are plannig to use **in-memory** approach it is implemented using
 *Fongo* . *Fongo* is a new project that help with unit testing
-Java-based MongoDb Applications. [Fongo](https://github.com/foursquare/fongo)
+Java-based MongoDb Applications. [Fongo](https://github.com/fakemongo/fongo)
 
 Dataset Format
 --------------

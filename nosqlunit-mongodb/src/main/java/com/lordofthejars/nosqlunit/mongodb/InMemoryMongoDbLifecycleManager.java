@@ -5,7 +5,7 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.foursquare.fongo.Fongo;
+import com.github.fakemongo.Fongo;
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.mongodb.DBPort;
 import com.mongodb.Mongo;

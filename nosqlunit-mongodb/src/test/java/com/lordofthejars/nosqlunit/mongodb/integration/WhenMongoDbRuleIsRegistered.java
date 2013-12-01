@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.mongodb.integration;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import com.mongodb.MongoClient;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -180,7 +181,7 @@ public class WhenMongoDbRuleIsRegistered {
 	private int countDBObjectsByParameter(String collectionName, String parameterName, Object value)
 			throws UnknownHostException, MongoException {
 
-		Mongo mongo = new Mongo("localhost");
+		MongoClient mongo = new MongoClient("localhost");
 		DB mongodb = mongo.getDB("test");
 		DBCollection collection = mongodb.getCollection(collectionName);
 
@@ -196,7 +197,7 @@ public class WhenMongoDbRuleIsRegistered {
 
 	private DBObject findOneDBOjectByParameter(String collectionName, String parameterName, Object value)
 			throws UnknownHostException {
-		Mongo mongo = new Mongo("localhost");
+		MongoClient mongo = new MongoClient("localhost");
 		DB mongodb = mongo.getDB("test");
 		DBCollection collection = mongodb.getCollection(collectionName);
 

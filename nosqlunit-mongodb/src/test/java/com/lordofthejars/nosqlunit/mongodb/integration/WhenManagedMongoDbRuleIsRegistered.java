@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
+import com.mongodb.MongoClient;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -14,7 +15,6 @@ import org.junit.runners.model.Statement;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
-import com.mongodb.Mongo;
 
 public class WhenManagedMongoDbRuleIsRegistered {
 
@@ -30,7 +30,7 @@ public class WhenManagedMongoDbRuleIsRegistered {
 			
 			@Override
 			public void evaluate() throws Throwable {
-				Mongo server = new Mongo();
+				MongoClient server = new MongoClient();
 				DB db = server.getDB("admin");
 				CommandResult stats = db.getStats();
 				assertThat(stats.ok(), is(true));
@@ -58,7 +58,7 @@ public class WhenManagedMongoDbRuleIsRegistered {
 			
 			@Override
 			public void evaluate() throws Throwable {
-				Mongo server = new Mongo();
+				MongoClient server = new MongoClient();
 				DB db = server.getDB("admin");
 				CommandResult stats = db.getStats();
 				assertThat(stats.ok(), is(true));
