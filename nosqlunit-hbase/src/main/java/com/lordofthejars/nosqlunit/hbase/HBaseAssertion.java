@@ -31,6 +31,7 @@ import com.lordofthejars.nosqlunit.hbase.model.ParsedColumnFamilyModel;
 import com.lordofthejars.nosqlunit.hbase.model.ParsedColumnModel;
 import com.lordofthejars.nosqlunit.hbase.model.ParsedDataModel;
 import com.lordofthejars.nosqlunit.hbase.model.ParsedRowModel;
+import org.apache.hadoop.hbase.util.Bytes;
 
 public class HBaseAssertion {
 
@@ -90,6 +91,7 @@ public class HBaseAssertion {
 		
 		HTable table = new HTable(configuration, expectedTableName);
 		Get get = new Get(parsedRowModel.getKeyInBytes());
+		get.addFamily(Bytes.toBytes(parsedColumnFamilyModel.getName()));
 		Result result = table.get(get);
 		
 		checkRowName(parsedRowModel, result);
@@ -110,16 +112,27 @@ public class HBaseAssertion {
 	private static void checkRowValues(KeyValue[] raws, ParsedRowModel parsedRowModel) throws Error {
 		
 		List<ParsedColumnModel> expectedColumns = parsedRowModel.getColumns();
-		
-		ParsedColumnModel parsedColumnModel = selectFirst(
-				expectedColumns,
-				having(on(ParsedColumnModel.class).getName(), equalTo(getName(raws))).and(
-						having(on(ParsedColumnModel.class).getValue(), equalTo(getValue(raws)))));
+		for (KeyValue raw : raws) {
 
-		if(parsedColumnModel == null) {
-			throw FailureHandler.createFailure("Expected column are not found. Encountered column with name %s and value %s is not found.",
+			final byte[] qualifier = raw.getQualifier();
+			final byte[] value = raw.getValue();
+			boolean found=false;
+
+			for (ParsedColumnModel expectedColumn : expectedColumns) {
+				if(Bytes.equals(Bytes.toBytes(expectedColumn.getName()), qualifier)){
+					if(Bytes.equals(expectedColumn.getValueInBytes(), value)) {
+						found=true;
+					}
+					break;
+				}
+			}
+			
+			if(!found){
+				throw FailureHandler.createFailure("Expected column are not found. Encountered column with name %s and value %s is not found.",
 					getName(raws), getValue(raws));
+			}
 		}
+		
 	}
 
 	private static void checkNumberOfColumns(List<ParsedColumnFamilyModel> expectedColumnFamilies,
