@@ -285,9 +285,9 @@ public class ListDatatypeOperations extends ExpirationDatatypeOperations impleme
 	 * @param index
 	 * @return Bulk reply, specifically the requested element
 	 */
-	public byte[] lindex(final byte[] key, final int index) {
+	public byte[] lindex(final byte[] key, final long index) {
 
-		ByteBuffer elementAtIndex = this.blockingMultimap.getElement(wrap(key), index);
+		ByteBuffer elementAtIndex = this.blockingMultimap.getElement(wrap(key), (int)index);
 		return elementAtIndex == null ? null : elementAtIndex.array();
 
 	}
@@ -456,12 +456,12 @@ public class ListDatatypeOperations extends ExpirationDatatypeOperations impleme
 	 * @return Multi bulk reply, specifically a list of elements in the
 	 *         specified range.
 	 */
-	public List<byte[]> lrange(final byte[] key, final int start, final int end) {
+	public List<byte[]> lrange(final byte[] key, final long start, final long end) {
 
 		List<ByteBuffer> elements = new LinkedList<ByteBuffer>(this.blockingMultimap.elements(wrap(key)));
 
-		int calculatedStart = RangeUtils.calculateStart(start, elements.size());
-		int calculatedEnd = RangeUtils.calculateEnd(end, elements.size());
+		int calculatedStart = RangeUtils.calculateStart((int)start, elements.size());
+		int calculatedEnd = RangeUtils.calculateEnd((int)end, elements.size());
 
 		try {
 			List<ByteBuffer> subList = elements.subList(calculatedStart, calculatedEnd);
@@ -515,7 +515,7 @@ public class ListDatatypeOperations extends ExpirationDatatypeOperations impleme
 	 * @return Integer Reply, specifically: The number of removed elements if
 	 *         the operation succeeded
 	 */
-	public Long lrem(final byte[] key, final int count, final byte[] value) {
+	public Long lrem(final byte[] key, final long count, final byte[] value) {
 
 		ByteBuffer wrappedKey = wrap(key);
 		ByteBuffer wrappedValue = wrap(value);
@@ -523,12 +523,12 @@ public class ListDatatypeOperations extends ExpirationDatatypeOperations impleme
 		long numberOfElementsRemoved = 0;
 
 		if (count < 0) {
-			numberOfElementsRemoved = removeLastElements(count, wrappedKey, wrappedValue);
+			numberOfElementsRemoved = removeLastElements((int)count, wrappedKey, wrappedValue);
 		} else {
 			if (count == 0) {
 				numberOfElementsRemoved = removeAllElements(wrappedKey, wrappedValue);
 			} else {
-				numberOfElementsRemoved = removeFirstElements(count, wrappedKey, wrappedValue);
+				numberOfElementsRemoved = removeFirstElements((int)count, wrappedKey, wrappedValue);
 			}
 		}
 
@@ -568,13 +568,13 @@ public class ListDatatypeOperations extends ExpirationDatatypeOperations impleme
 	 * @param end
 	 * @return Status code reply
 	 */
-	public String ltrim(final byte[] key, final int start, final int end) {
+	public String ltrim(final byte[] key, final long start, final long end) {
 
 		ByteBuffer wrappedKey = wrap(key);
 		List<ByteBuffer> elements = new LinkedList<ByteBuffer>(this.blockingMultimap.elements(wrappedKey));
 
-		int calculatedStart = RangeUtils.calculateStart(start, elements.size());
-		int calculatedEnd = RangeUtils.calculateEnd(end, elements.size());
+		int calculatedStart = RangeUtils.calculateStart((int)start, elements.size());
+		int calculatedEnd = RangeUtils.calculateEnd((int)end, elements.size());
 
 		try {
 			List<ByteBuffer> sublist = elements.subList(calculatedStart, calculatedEnd);

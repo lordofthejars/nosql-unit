@@ -32,6 +32,8 @@ public class EmbeddedJedisUsedWithString {
 	private static final byte[] MY_JUANITA = SMY_JUANITA.getBytes();
 	private static final String SROCK_THIS_TOWN = "Rock This Town";
 	private static final byte[] ROCK_THIS_TOWN = SROCK_THIS_TOWN.getBytes();
+	private static final byte[] MARINA = "Marina".getBytes();
+	private static final String SMARINA = "Marina";
 	private static final String SCONCAT_JIVE = "My JuanitaRock This Town";
 	private static final String SSONG = "Song";
 	private static final byte[] SONG = SSONG.getBytes();
@@ -1660,6 +1662,17 @@ public class EmbeddedJedisUsedWithString {
 	}
 	
 	@Test
+    public void rpushx_should_return_number_of_elements_when_added_as_list() throws InterruptedException {
+
+        embeddedJedis.lpush(SJIVE, SROCK_THIS_TOWN);
+        
+        Long numberOfElements = embeddedJedis.rpushx(SJIVE, SMY_JUANITA, SMARINA);
+        
+        assertThat(numberOfElements, is(3L));
+
+    }
+	
+	@Test
 	public void lpushx_should_return_zero_if_key_expired() throws InterruptedException {
 
 		embeddedJedis.lpush(SJIVE, SROCK_THIS_TOWN);
@@ -1694,6 +1707,8 @@ public class EmbeddedJedisUsedWithString {
 		assertThat(numberOfElements, is(0L));
 
 	}
+	
+	
 	
 	@Test
 	public void setbit_should_return_zero_if_key_expired() throws InterruptedException {

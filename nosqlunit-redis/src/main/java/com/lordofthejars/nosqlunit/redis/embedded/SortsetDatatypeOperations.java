@@ -414,18 +414,18 @@ public class SortsetDatatypeOperations extends ExpirationDatatypeOperations impl
 		return zXStore(dstkey, params, union, sets);
 	}
 
-	public Set<byte[]> zrange(final byte[] key, final int start, final int end) {
+	public Set<byte[]> zrange(final byte[] key, final long start, final long end) {
 
 		Collection<ScoredByteBuffer> elements = sortset.get(wrap(key));
-		Set<ScoredByteBuffer> elementsByRange = getElementsByRange(elements, start, end);
+		Set<ScoredByteBuffer> elementsByRange = getElementsByRange(elements, (int)start, (int)end);
 
 		return new LinkedHashSet<byte[]>(convert(extract(elementsByRange, on(ScoredByteBuffer.class).getByteBuffer()),
 				new ByteBuffer2ByteArrayConverter()));
 	}
 
-	public Set<ScoredByteBuffer> zrangeWithScores(final byte[] key, final int start, final int end) {
+	public Set<ScoredByteBuffer> zrangeWithScores(final byte[] key, final long start, final long end) {
 		Collection<ScoredByteBuffer> elements = sortset.get(wrap(key));
-		return getElementsByRange(elements, start, end);
+		return getElementsByRange(elements, (int)start, (int)end);
 	}
 
 	/**
@@ -827,10 +827,10 @@ public class SortsetDatatypeOperations extends ExpirationDatatypeOperations impl
 	 * operation
 	 * 
 	 */
-	public Long zremrangeByRank(final byte[] key, final int start, final int end) {
+	public Long zremrangeByRank(final byte[] key, final long start, final long end) {
 
 		Collection<ScoredByteBuffer> elements = sortset.get(wrap(key));
-		Set<ScoredByteBuffer> elementsToRemove = getElementsByRange(elements, start, end);
+		Set<ScoredByteBuffer> elementsToRemove = getElementsByRange(elements, (int)start, (int)end);
 
 		Collection<ScoredByteBuffer> allElements = sortset.get(wrap(key));
 
@@ -866,21 +866,21 @@ public class SortsetDatatypeOperations extends ExpirationDatatypeOperations impl
 
 	}
 
-	public Set<byte[]> zrevrange(final byte[] key, final int start, final int end) {
+	public Set<byte[]> zrevrange(final byte[] key, final long start, final long end) {
 
 		Collection<ScoredByteBuffer> elements = sortset.get(wrap(key));
 		Set<ScoredByteBuffer> reverseOrderElements = reverseElements(elements);
-		Set<ScoredByteBuffer> elementsByRange = getElementsByRange(reverseOrderElements, start, end);
+		Set<ScoredByteBuffer> elementsByRange = getElementsByRange(reverseOrderElements, (int)start, (int)end);
 
 		return new LinkedHashSet<byte[]>(convert(extract(elementsByRange, on(ScoredByteBuffer.class).getByteBuffer()),
 				new ByteBuffer2ByteArrayConverter()));
 
 	}
 
-	public Set<ScoredByteBuffer> zrevrangeWithScores(final byte[] key, final int start, final int end) {
+	public Set<ScoredByteBuffer> zrevrangeWithScores(final byte[] key, final long start, final long end) {
 		Collection<ScoredByteBuffer> elements = sortset.get(wrap(key));
 		Set<ScoredByteBuffer> reverseOrderElements = reverseElements(elements);
-		Set<ScoredByteBuffer> elementsByRange = getElementsByRange(reverseOrderElements, start, end);
+		Set<ScoredByteBuffer> elementsByRange = getElementsByRange(reverseOrderElements, (int)start, (int)end);
 
 		return elementsByRange;
 	}

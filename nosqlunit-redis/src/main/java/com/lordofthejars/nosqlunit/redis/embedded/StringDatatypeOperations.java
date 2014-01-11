@@ -225,6 +225,47 @@ public class StringDatatypeOperations extends ExpirationDatatypeOperations imple
 
 	}
 	
+	public Long bitcount(byte[] key) {
+	    byte[] content = this.get(key);
+	    long totalBits = countbits(content);
+	    
+	    return totalBits;
+	}
+
+    private long countbits(byte[] content) {
+        long totalBits = 0;
+	    
+	    for (byte b : content) {
+            totalBits += BitsUtils.countBits(b);
+        }
+        return totalBits;
+    }
+	
+	public Long bitcount(byte[] key, long startOffset, long endOffset) {
+	    
+	    if (simpleTypes.containsKey(wrap(key))) {
+
+            byte[] value = simpleTypes.get(wrap(key)).array();
+            
+            int calculatedStart = RangeUtils.calculateStart((int)startOffset, value.length);
+            int calculatedEnd = RangeUtils.calculateEnd((int)endOffset, value.length);
+
+            try {
+                
+                byte[] subvalue =  Arrays.copyOfRange(value, calculatedStart, calculatedEnd);
+                return countbits(subvalue);
+                
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return 0L;
+            } catch(IllegalArgumentException e) {
+                return 0L;
+            }
+        } else {
+            return 0L;
+        }
+	    
+	}
+	
 	 /**
      * Sets or clears the bit at offset in the string value stored at key
      * 
@@ -330,7 +371,7 @@ public class StringDatatypeOperations extends ExpirationDatatypeOperations imple
 		return SUCCESS;
 	}
 
-	public int strlen(byte[] key) {
+	public long strlen(byte[] key) {
 		/**
 		 * Returns the length of the string value stored at key. An error is
 		 * returned when key holds a non-string value. Return value Integer

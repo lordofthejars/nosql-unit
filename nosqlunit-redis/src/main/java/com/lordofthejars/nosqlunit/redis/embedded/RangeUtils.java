@@ -45,6 +45,10 @@ public class RangeUtils {
 		}
 	}
 
+	public static long calculateStart(long start, int size) {
+        return start < 0 ? size + start : start;
+    }
+	
 	public static long calculateStart(long start, long size) {
 		return start < 0 ? size + start : start;
 	}

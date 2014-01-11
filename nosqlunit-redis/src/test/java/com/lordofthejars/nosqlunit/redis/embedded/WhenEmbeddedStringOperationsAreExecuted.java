@@ -1,11 +1,10 @@
 package com.lordofthejars.nosqlunit.redis.embedded;
 
 import static java.nio.ByteBuffer.wrap;
-
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -79,17 +78,17 @@ public class WhenEmbeddedStringOperationsAreExecuted {
 
 	@Test
 	public void strlen_key_does_not_exist() {
-		int result = stringDatatypeOperations.strlen(ONE);
+		long result = stringDatatypeOperations.strlen(ONE);
 		
-		assertThat(0, is(result));
+		assertThat(0L, is(result));
 	}
 	
 	@Test
 	public void strlen_length() {
 		stringDatatypeOperations.set(ONE, QUEEN);
-		int result = stringDatatypeOperations.strlen(ONE);
+		long result = stringDatatypeOperations.strlen(ONE);
 		
-		assertThat(5, is(result));
+		assertThat(5L, is(result));
 	}
 	
 	@Test

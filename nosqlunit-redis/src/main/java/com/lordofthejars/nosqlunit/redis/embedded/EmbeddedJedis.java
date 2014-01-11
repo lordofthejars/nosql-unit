@@ -2,7 +2,6 @@ package com.lordofthejars.nosqlunit.redis.embedded;
 
 import static ch.lambdaj.collection.LambdaCollections.with;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -275,35 +274,35 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	@Override
-	public List<byte[]> lrange(byte[] key, int start, int end) {
+	public List<byte[]> lrange(byte[] key, long start, long end) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, ListDatatypeOperations.LIST);
 		return this.listDatatypeOperations.lrange(key, start, end);
 	}
 
 	@Override
-	public String ltrim(byte[] key, int start, int end) {
+	public String ltrim(byte[] key, long start, long end) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, ListDatatypeOperations.LIST);
 		return this.listDatatypeOperations.ltrim(key, start, end);
 	}
 
 	@Override
-	public byte[] lindex(byte[] key, int index) {
+	public byte[] lindex(byte[] key, long index) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, ListDatatypeOperations.LIST);
-		return this.listDatatypeOperations.lindex(key, index);
+		return this.listDatatypeOperations.lindex(key, (int)index);
 	}
 
 	@Override
-	public String lset(byte[] key, int index, byte[] value) {
+	public String lset(byte[] key, long index, byte[] value) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, ListDatatypeOperations.LIST);
-		return this.listDatatypeOperations.lset(key, index, value);
+		return this.listDatatypeOperations.lset(key, (int)index, value);
 	}
 
 	@Override
-	public Long lrem(byte[] key, int count, byte[] value) {
+	public Long lrem(byte[] key, long count, byte[] value) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, ListDatatypeOperations.LIST);
 		return this.listDatatypeOperations.lrem(key, count, value);
@@ -387,7 +386,7 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	@Override
-	public Set<byte[]> zrange(byte[] key, int start, int end) {
+	public Set<byte[]> zrange(byte[] key, long start, long end) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
 		return this.sortsetDatatypeOperations.zrange(key, start, end);
@@ -422,14 +421,14 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	@Override
-	public Set<byte[]> zrevrange(byte[] key, int start, int end) {
+	public Set<byte[]> zrevrange(byte[] key, long start, long end) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
 		return this.sortsetDatatypeOperations.zrevrange(key, start, end);
 	}
 
 	@Override
-	public Set<Tuple> zrangeWithScores(byte[] key, int start, int end) {
+	public Set<Tuple> zrangeWithScores(byte[] key, long start, long end) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
 		Set<ScoredByteBuffer> rangeWithScore = this.sortsetDatatypeOperations.zrangeWithScores(key, start, end);
@@ -437,7 +436,7 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	@Override
-	public Set<Tuple> zrevrangeWithScores(byte[] key, int start, int end) {
+	public Set<Tuple> zrevrangeWithScores(byte[] key, long start, long end) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
 		Set<ScoredByteBuffer> rangeWithScore = this.sortsetDatatypeOperations.zrevrangeWithScores(key, start, end);
@@ -610,7 +609,7 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	@Override
-	public Long zremrangeByRank(byte[] key, int start, int end) {
+	public Long zremrangeByRank(byte[] key, long start, long end) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
 		return this.sortsetDatatypeOperations.zremrangeByRank(key, start, end);
@@ -637,17 +636,14 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 		return this.listDatatypeOperations.linsert(key, toListPosition().convert(where), pivot, value);
 	}
 
-	@Override
 	public Long objectRefcount(byte[] key) {
 		return this.keysServerOperations.objectRefcount(key);
 	}
 
-	@Override
 	public Long objectIdletime(byte[] key) {
 		return this.keysServerOperations.objectIdletime(key);
 	}
 
-	@Override
 	public byte[] objectEncoding(byte[] key) {
 		return this.keysServerOperations.objectEncoding(key);
 	}
@@ -699,14 +695,12 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 		return this.publish(toByteArray().convert(channel), toByteArray().convert(message));
 	}
 
-	@Override
 	public Long lpushx(byte[] key, byte[] value) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, ListDatatypeOperations.LIST);
 		return this.listDatatypeOperations.lpushx(key, value);
 	}
 
-	@Override
 	public Long rpushx(byte[] key, byte[] value) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, ListDatatypeOperations.LIST);
@@ -821,7 +815,7 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	public Long move(final byte[] key, final int dbIndex) {
-		return this.move(key, dbIndex);
+		return 0L;
 	}
 
 	@Override
@@ -1294,12 +1288,10 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 				toByteArray().convert(value));
 	}
 
-	@Override
 	public Long lpushx(String key, String string) {
 		return this.lpushx(toByteArray().convert(key), toByteArray().convert(string));
 	}
 
-	@Override
 	public Long rpushx(String key, String string) {
 		return this.rpushx(toByteArray().convert(key), toByteArray().convert(string));
 	}
@@ -1649,5 +1641,127 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	private Converter<String, byte[]> toByteArray() {
 		return STRING_TO_BYTE_ARRAY_CONVERTER;
 	}
+
+    @Override
+    public Long bitcount(byte[] key) {
+        return this.stringDatatypeOperations.bitcount(key);
+    }
+
+    @Override
+    public Long bitcount(byte[] key, long start, long end) {
+        return this.stringDatatypeOperations.bitcount(key, start, start);
+    }
+
+    @Override
+    public List<byte[]> blpop(byte[] key) {
+        return this.listDatatypeOperations.blpop(0, key);
+    }
+
+    @Override
+    public List<byte[]> brpop(byte[] key) {
+        return this.listDatatypeOperations.brpop(0, key);
+    }
+
+    @Override
+    public Long del(byte[] key) {
+        return this.keysServerOperations.del(key);
+    }
+
+    @Override
+    public Long lpushx(byte[] key, byte[]... values) {
+        long lastSize = this.listDatatypeOperations.llen(key);
+        
+        for (byte[] bs : values) {
+            lastSize = this.lpushx(key, bs);
+        }
+        
+        return lastSize;
+    }
+
+    @Override
+    public Long rpushx(byte[] key, byte[]... values) {
+        long lastSize = this.listDatatypeOperations.llen(key);
+        
+        for (byte[] bs : values) {
+            lastSize = this.rpushx(key, bs);
+        }
+        
+        return lastSize;
+    }
+
+    @Override
+    public Boolean setbit(byte[] key, long offset, boolean value) {
+        return this.setbit(new String(key), offset, value);
+    }
+
+    @Override
+    public Long strlen(byte[] key) {
+        return this.stringDatatypeOperations.strlen(key);
+    }
+
+
+    @Override
+    public Long bitcount(String key) {
+       return this.bitcount(key.getBytes());
+    }
+
+    @Override
+    public Long bitcount(String key, long start, long end) {
+        return this.bitcount(key.getBytes(), start, end);
+    }
+
+    @Override
+    public List<String> blpop(String key) {
+        List<byte[]> result = this.blpop(key.getBytes());
+        return new LinkedList<String>(with(result).convert(toStringValue()));
+    }
+
+    @Override
+    public List<String> brpop(String key) {
+        List<byte[]> result = this.brpop(key.getBytes());
+        return new LinkedList<String>(with(result).convert(toStringValue()));
+    }
+
+    @Override
+    public Long del(String key) {
+        return this.del(key.getBytes());
+    }
+
+    @Override
+    public Long lpushx(String key, String... values) {
+        long lastSize = this.listDatatypeOperations.llen(key.getBytes());
+        
+        for (String value : values) {
+            lastSize = this.lpushx(key, value);
+        }
+        
+        return lastSize;
+    }
+
+    @Override
+    public Long rpushx(String key, String... values) {
+        long lastSize = this.listDatatypeOperations.llen(key.getBytes());
+        
+        for (String value : values) {
+            lastSize = this.rpushx(key, value);
+        }
+        
+        return lastSize;
+    }
+
+    @Override
+    public Boolean setbit(String key, long offset, String value) {
+        return this.setbit(key.getBytes(), offset, value.getBytes());
+    }
+
+    @Override
+    public Long strlen(String key) {
+        return this.strlen(key.getBytes());
+    }
+
+    @Override
+    public Long move(String key, int dbIndex) {
+        return this.move(key.getBytes(), dbIndex);
+    }
 
 }
