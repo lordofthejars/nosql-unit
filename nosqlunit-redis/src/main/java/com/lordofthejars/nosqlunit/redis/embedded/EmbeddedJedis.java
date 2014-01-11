@@ -56,7 +56,7 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 		pubSubServerOperations = new PubSubServerOperations();
 		connectionServerOperations = new ConnectionServerOperations();
 		scriptingServerOperations = new ScriptingServerOperations();
-		transactionServerOperations = new TransactionServerOperations();
+		transactionServerOperations = new TransactionServerOperations(this);
 		keysServerOperations = KeysServerOperations.createKeysServerOperations(hashDatatypeOperations,
 				listDatatypeOperations, setDatatypeOperations, sortsetDatatypeOperations, stringDatatypeOperations);
 	}

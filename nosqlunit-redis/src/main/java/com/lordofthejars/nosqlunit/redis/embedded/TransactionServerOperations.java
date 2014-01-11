@@ -10,6 +10,12 @@ import redis.clients.jedis.TransactionBlock;
 
 public class TransactionServerOperations {
 
+    private EmbeddedJedis jedis;
+    
+    public TransactionServerOperations(EmbeddedJedis jedis) {
+        this.jedis = jedis;
+    }
+    
 	public String watch(final byte[]... keys) {
 		return "OK";
 	}
@@ -32,7 +38,7 @@ public class TransactionServerOperations {
 	}
 
 	public Pipeline pipelined() {
-		return null;
+		return new EmbeddedPipeline(jedis);
 	}
 
 	public Transaction multi() {
