@@ -53,7 +53,7 @@ public class RedisOperation extends AbstractCustomizableDatabaseOperation<RedisC
 
 	@Override
 	public void deleteAll() {
-		this.jedis.flushAll();
+		this.jedis.flushDB();
 	}
 
 	@Override
