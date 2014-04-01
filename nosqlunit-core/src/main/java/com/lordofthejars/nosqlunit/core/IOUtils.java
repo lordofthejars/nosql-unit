@@ -84,7 +84,7 @@ public final class IOUtils {
 	
 	public static String readFullStream(InputStream data) throws IOException {
 		
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data, "UTF-8"));
 		
 		StringBuilder readData = new StringBuilder();
 		String readLine;
