@@ -416,7 +416,7 @@ But also we can define it to use Spring Data MongoDB defined instance.
 If you are plannig to use **Spring Data MongoDB**, you may require to use the *Mongo* instance defined within Spring Application Context, mostly because you are defining an embedded connection using **Fongo**:
 
 ~~~~ {.xml}
-<bean name="fongo" class="com.foursquare.fongo.Fongo">
+<bean name="fongo" class="com.github.fakemongo.Fongo">
 	<constructor-arg value="InMemoryMongo" />
 </bean>
 <bean id="mongo" factory-bean="fongo" factory-method="getMongo" />
