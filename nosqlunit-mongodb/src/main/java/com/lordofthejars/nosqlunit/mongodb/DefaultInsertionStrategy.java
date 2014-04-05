@@ -8,6 +8,7 @@ import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
+import com.mongodb.DBRef;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
@@ -114,7 +115,12 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
 		DBCollection dbCollection = mongoDb.getCollection(collectionName);
 
 		for (Object dataObject : dataObjects) {
-
+			for (String key : ((DBObject)dataObject).keySet()) {
+        Object data = ((DBObject)dataObject).get(key);
+        if (data instanceof DBRef) {
+          ((DBObject)dataObject).put(key, new DBRef(mongoDb,((DBRef)data).getRef(), ((DBRef)data).getId()));
+        }
+      }
 			dbCollection.insert((DBObject) dataObject);
 		}
 	}
