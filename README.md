@@ -3297,6 +3297,7 @@ limitations:
 
 -   From Key commands, only sort by pattern is not supported.
 
+
 All the other operations, including flushing, expiration control, and
 each operation of every datatype is supported in the same way Jedis
 support it. Note that expiration management is also implemented as
