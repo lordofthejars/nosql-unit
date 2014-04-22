@@ -21,8 +21,8 @@ import com.lordofthejars.nosqlunit.demo.model.Book;
 public class WhenYouFindBooksById {
 
 	@ClassRule
-	public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build(); 
-	
+	public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build();
+
 	@Rule
 	public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedCouchDb("books");
 	

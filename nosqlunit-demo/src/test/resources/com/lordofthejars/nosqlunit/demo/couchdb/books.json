@@ -1,6 +1,6 @@
 {
 	"data":
 			[
-				{"_id":"1", "title":"The Hobbit","numberOfPages":"293"}
+				{"_id":"1", "title":"The Hobbit","numberOfPages":293}
 			]
 }
