@@ -380,7 +380,7 @@ The first one is for configuring a connection to in-memory *Fongo*
 server. For almost all cases default parameters are enough.
 
 ~~~~ {.java}
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBuilder.inMemoryMongoDb;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
 
 @Rule
 public MongoDbRule embeddedMongoDbRule = newMongoDbRule().defaultEmbeddedMongoDb("test");
