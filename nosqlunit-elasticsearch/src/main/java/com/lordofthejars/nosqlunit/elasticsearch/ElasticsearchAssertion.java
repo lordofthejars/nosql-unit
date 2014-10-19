@@ -22,7 +22,7 @@ import com.lordofthejars.nosqlunit.util.DeepEquals;
 public class ElasticsearchAssertion {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	
+
 	private ElasticsearchAssertion() {
 		super();
 	}
@@ -65,7 +65,7 @@ public class ElasticsearchAssertion {
 	private static void checkIndicesWithDocument(List<GetRequestBuilder> indexes,
 			Map<String, Object> expectedDataOfDocument) throws Error {
 		for (GetRequestBuilder getRequestBuilder : indexes) {
-			
+
 			GetResponse dataOfDocumentResponse = getRequestBuilder.execute().actionGet();
 
 			checkExistanceOfDocument(getRequestBuilder, dataOfDocumentResponse);
@@ -96,7 +96,7 @@ public class ElasticsearchAssertion {
 
 	private static void checkExistanceOfDocument(GetRequestBuilder getRequestBuilder, GetResponse dataOfDocumentResponse)
 			throws Error {
-		if (!dataOfDocumentResponse.exists()) {
+		if (!dataOfDocumentResponse.isExists()) {
 			throw FailureHandler.createFailure(
 					"Document with index: %s - type: %s - id: %s has not returned any document.",
 					getRequestBuilder.request().index(), getRequestBuilder.request().type(),
@@ -143,7 +143,7 @@ public class ElasticsearchAssertion {
 	private static final long numberOfInsertedDocuments(Client client) {
 
 		CountResponse numberOfElements = client.prepareCount().execute().actionGet();
-		return numberOfElements.count();
+		return numberOfElements.getCount();
 	}
 
 }

@@ -47,7 +47,7 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 	private CommandLineExecutor commandLineExecutor = new CommandLineExecutor();
 	private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
 	private LowLevelElasticSearchOperations lowLevelElasticSearchOperations = new LowLevelElasticSearchOperations();
-	
+
 	private String elasticsearchPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("ES_HOME");
 	private int port = DEFAULT_PORT;
 
@@ -100,7 +100,7 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 	@Override
 	public void doStop() {
 		LOGGER.info("Stopping {} Elasticsearch instance.", elasticsearchPath);
-		
+
 		try {
 			if(this.processRunnable != null) {
 				this.processRunnable.destroyProcess();
@@ -108,7 +108,7 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 		} finally {
 			ensureDbPathDoesNotExitsAndReturnCompositePath();
 		}
-		
+
 		LOGGER.info("Stopped {} Elasticsearch instance.", elasticsearchPath);
 	}
 
@@ -168,15 +168,15 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 	public void setPort(int port) {
 		this.port = port;
 	}
-	
+
 	public void setElasticsearchPath(String elasticsearchPath) {
 		this.elasticsearchPath = elasticsearchPath;
 	}
-	
+
 	public void setTargetPath(String targetPath) {
 		this.targetPath = targetPath;
 	}
-	
+
 	public void addExtraCommandLineArgument(String argumentName,
 			String argumentValue) {
 		this.extraCommandArguments.put(argumentName, argumentValue);
@@ -185,23 +185,23 @@ public class ManagedElasticsearchLifecycleManager extends AbstractLifecycleManag
 	public void addSingleCommandLineArgument(String argument) {
 		this.singleCommandArguments.add(argument);
 	}
-	
+
 	public String getElasticsearchPath() {
 		return elasticsearchPath;
 	}
-	
+
 	protected void setCommandLineExecutor(CommandLineExecutor commandLineExecutor) {
 		this.commandLineExecutor = commandLineExecutor;
 	}
-	
+
 	protected void setOperatingSystemResolver(OperatingSystemResolver operatingSystemResolver) {
 		this.operatingSystemResolver = operatingSystemResolver;
 	}
-	
+
 	protected void setLowLevelElasticSearchOperations(LowLevelElasticSearchOperations lowLevelElasticSearchOperations) {
 		this.lowLevelElasticSearchOperations = lowLevelElasticSearchOperations;
 	}
-	
+
 	public class ProcessRunnable implements Runnable {
 
 		private CountDownLatch processIsReady;

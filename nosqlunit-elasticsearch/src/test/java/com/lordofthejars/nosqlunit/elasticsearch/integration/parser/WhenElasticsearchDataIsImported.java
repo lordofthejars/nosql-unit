@@ -38,25 +38,25 @@ public class WhenElasticsearchDataIsImported {
 			"      }\n" + 
 			"   ]\n" + 
 			"}";
-	
-	
+
+
 	@Test
 	public void data_should_be_indexed() {
-		
+
 		Node node = nodeBuilder().local(true).node();
 		Client client = node.client();
-		
+
 		DataReader dataReader = new DataReader(client);
 		dataReader.read(new ByteArrayInputStream(ELASTICSEARCH_DATA.getBytes()));
-		
+
 		GetResponse response = client.prepareGet("tweeter", "tweet", "1").execute().actionGet();
-		Map<String, Object> document = response.sourceAsMap();
-		
+		Map<String, Object> document = response.getSourceAsMap();
+
 		assertThat((String)document.get("name"), is("a"));
 		assertThat((String)document.get("msg"), is("b"));
-		
+
 		node.close();
 	}
-	
-	
+
+
 }

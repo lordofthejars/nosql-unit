@@ -48,7 +48,7 @@ public class ElasticsearchOperation extends
 	private void clearDocuments() {
 
 		if (isAnyIndexPresent()) {
-		
+
 			DeleteByQueryRequestBuilder deleteByQueryRequestBuilder = new DeleteByQueryRequestBuilder(client);
 			deleteByQueryRequestBuilder.setQuery(QueryBuilders.matchAllQuery());
 			deleteByQueryRequestBuilder.execute().actionGet();
@@ -60,7 +60,7 @@ public class ElasticsearchOperation extends
 
 	private boolean isAnyIndexPresent() {
 		CountResponse numberOfElements = client.prepareCount().execute().actionGet();
-		return numberOfElements.count() > 0;
+		return numberOfElements.getCount() > 0;
 	}
 
 	private void refreshNode() {
