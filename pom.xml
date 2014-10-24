@@ -343,7 +343,8 @@
 		<module>nosqlunit-couchdb</module>
 		<module>nosqlunit-infinispan</module>
 		<module>nosqlunit-elasticsearch</module>
-	</modules>
+        <module>nosqlunit-couchbase</module>
+    </modules>
 
 	<build>
 

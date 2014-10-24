@@ -1,0 +1,17 @@
+{
+    "data": {
+        "K::1": {
+            "document": {
+                "title": "The Hobbit",
+                "numberOfPages": 293
+            }
+        },
+        "T::the-hobbit": {
+            "document": "K::1"
+        },
+        "AboutToExpire": {
+            "document": "Dummy",
+            "expirationMSecs": 100
+        }
+    }
+}
