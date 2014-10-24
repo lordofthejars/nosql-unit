@@ -95,22 +95,21 @@ public class SortsetDatatypeOperations extends ExpirationDatatypeOperations impl
 	 * The score value can be the string representation of a double precision
 	 * floating point number.
 	 * <p>
-	 * 
+	 *
 	 * @param key
-	 * @param score
-	 * @param member
+	 * @param scoreMembers
 	 * @return Integer reply, specifically: 1 if the new element was added 0 if
 	 *         the element was already a member of the sorted set and the score
 	 *         was updated
 	 */
-	public Long zadd(final byte[] key, final Map<Double, byte[]> scoreMembers) {
+	public Long zadd(final byte[] key, final Map<byte[], Double> scoreMembers) {
 
 		long insertedElements = 0;
 
-		Set<Entry<Double, byte[]>> scoreMemberSet = scoreMembers.entrySet();
+		Set<Entry<byte[], Double>> scoreMemberSet = scoreMembers.entrySet();
 
-		for (Entry<Double, byte[]> entry : scoreMemberSet) {
-			insertedElements += zadd(key, entry.getKey(), entry.getValue());
+		for (Entry<byte[], Double> entry : scoreMemberSet) {
+			insertedElements += zadd(key, entry.getValue(), entry.getKey());
 		}
 
 		return insertedElements;

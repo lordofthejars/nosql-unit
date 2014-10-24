@@ -1083,8 +1083,8 @@ public class EmbeddedJedisUsedWithByteArray {
 
 		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
-		Map<Double, byte[]> elements = new HashMap<Double, byte[]>();
-		elements.put(1D, MY_JUANITA);
+		Map<byte[], Double> elements = new HashMap<byte[], Double>();
+		elements.put(MY_JUANITA, 1D);
 
 		embeddedJedis.zadd(JIVE, elements);
 		assertThat(embeddedJedis.sortsetDatatypeOperations.zcard(JIVE), is(1L));

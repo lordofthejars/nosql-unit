@@ -341,9 +341,9 @@ public class WhenRedisDataIsImported {
 		ArgumentCaptor<Map> argument = ArgumentCaptor.forClass(Map.class);
 		verify(jedis).zadd(eq("key".getBytes()), argument.capture());
 
-		byte[] objectValue1 = (byte[]) argument.getValue().get(1.0);
+		byte[] objectValue1 = (byte[]) firstKeyForValue(argument.getValue(), 1.0);
 		assertThat(objectValue1, is("value1".getBytes()));
-		byte[] objectValue2 = (byte[]) argument.getValue().get(2.0);
+		byte[] objectValue2 = (byte[]) firstKeyForValue(argument.getValue(), 2.0);
 		assertThat(objectValue2, is("value2".getBytes()));
 	}
 	
@@ -360,9 +360,9 @@ public class WhenRedisDataIsImported {
 		ArgumentCaptor<Map> argument = ArgumentCaptor.forClass(Map.class);
 		verify(jedis).zadd(eq("key".getBytes()), argument.capture());
 
-		byte[] objectValue1 = (byte[]) argument.getValue().get(1.0);
+		byte[] objectValue1 = (byte[]) firstKeyForValue(argument.getValue(), 1.0);
 		assertThat(objectValue1, is("value1".getBytes()));
-		byte[] objectValue2 = (byte[]) argument.getValue().get(2.0);
+		byte[] objectValue2 = (byte[]) firstKeyForValue(argument.getValue(), 2.0);
 		assertThat(objectValue2, is("value2".getBytes()));
 	}
 	
@@ -376,5 +376,12 @@ public class WhenRedisDataIsImported {
 		
 		return bytes;
 	}
-	
+
+	private <K, V> K firstKeyForValue(Map<K, V> map, V value) {
+		for (Map.Entry<K, V> entry : map.entrySet()) {
+			if (value.equals(entry.getValue()))
+				return entry.getKey();
+		}
+		return null;
+	}
 }

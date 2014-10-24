@@ -10,19 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import redis.clients.jedis.BinaryClient;
+import com.google.common.collect.Maps;
+import redis.clients.jedis.*;
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
-import redis.clients.jedis.BinaryJedisCommands;
-import redis.clients.jedis.BinaryJedisPubSub;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.JedisMonitor;
-import redis.clients.jedis.JedisPubSub;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.PipelineBlock;
-import redis.clients.jedis.SortingParams;
-import redis.clients.jedis.Transaction;
-import redis.clients.jedis.TransactionBlock;
-import redis.clients.jedis.Tuple;
 import redis.clients.util.Slowlog;
 import ch.lambdaj.function.convert.Converter;
 
@@ -379,7 +369,7 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	@Override
-	public Long zadd(byte[] key, Map<Double, byte[]> scoreMembers) {
+	public Long zadd(byte[] key, Map<byte[], Double> scoreMembers) {
 		updateTtl(key);
 		checkValidTypeOrNone(key, SortsetDatatypeOperations.ZSET);
 		return this.sortsetDatatypeOperations.zadd(key, scoreMembers);
@@ -1091,8 +1081,12 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
 	}
 
 	@Override
-	public Long zadd(String key, Map<Double, String> scoreMembers) {
-		return this.zadd(toByteArray().convert(key), with(scoreMembers).convertValues(toByteArray()));
+	public Long zadd(String key, Map<String, Double> scoreMembers) {
+		Map<byte[], Double> convertedScoreMembers = Maps.newHashMapWithExpectedSize(scoreMembers.size());
+		for (Map.Entry<String, Double> entry : scoreMembers.entrySet()) {
+			convertedScoreMembers.put(toByteArray().convert(entry.getKey()), entry.getValue());
+		}
+		return this.zadd(toByteArray().convert(key), convertedScoreMembers);
 	}
 
 	@Override
@@ -1708,6 +1702,36 @@ public class EmbeddedJedis implements JedisCommands, BinaryJedisCommands {
     @Override
     public Long bitcount(String key, long start, long end) {
         return this.bitcount(key.getBytes(), start, end);
+    }
+
+    @Override
+    public ScanResult<Map.Entry<String, String>> hscan(String s, int i) {
+        throw new UnsupportedOperationException("Sort with parameters is not supported.");
+    }
+
+    @Override
+    public ScanResult<String> sscan(String s, int i) {
+        throw new UnsupportedOperationException("Scan operations are not supported.");
+    }
+
+    @Override
+    public ScanResult<Tuple> zscan(String s, int i) {
+        throw new UnsupportedOperationException("Scan operations are not supported.");
+    }
+
+    @Override
+    public ScanResult<Map.Entry<String, String>> hscan(String s, String s2) {
+        throw new UnsupportedOperationException("Scan operations are not supported.");
+    }
+
+    @Override
+    public ScanResult<String> sscan(String s, String s2) {
+        throw new UnsupportedOperationException("Scan operations are not supported.");
+    }
+
+    @Override
+    public ScanResult<Tuple> zscan(String s, String s2) {
+        throw new UnsupportedOperationException("Scan operations are not supported.");
     }
 
     @Override
