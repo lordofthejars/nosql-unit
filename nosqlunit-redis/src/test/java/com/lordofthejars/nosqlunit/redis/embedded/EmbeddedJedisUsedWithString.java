@@ -1083,8 +1083,8 @@ public class EmbeddedJedisUsedWithString {
 
 		TimeUnit.MILLISECONDS.sleep(SLEEP_IN_MILLIS);
 
-		Map<Double, String> elements = new HashMap<Double, String>();
-		elements.put(1D, SMY_JUANITA);
+		Map<String, Double> elements = new HashMap<String, Double>();
+		elements.put(SMY_JUANITA, 1D);
 
 		embeddedJedis.zadd(SJIVE, elements);
 		assertThat(embeddedJedis.sortsetDatatypeOperations.zcard(JIVE), is(1L));

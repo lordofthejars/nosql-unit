@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -112,12 +113,12 @@ public class DataReader {
 		Object key = sortsetObject.get(KEY_TOKEN);
 		JSONArray valuesArray = (JSONArray) sortsetObject.get(VALUES_TOKEN);
 
-		Map<Double, byte[]> scoreMembers = new HashMap<Double, byte[]>();
+		Map<byte[], Double> scoreMembers = Maps.newHashMap();
 
 		for (Object valueObject : valuesArray) {
 			JSONObject valueScopeObject = (JSONObject) valueObject;
-			scoreMembers.put(toDouble(valueScopeObject.get(SCORE_TOKEN)),
-					toByteArray(valueScopeObject.get(VALUE_TOKEN)));
+			scoreMembers.put(toByteArray(valueScopeObject.get(VALUE_TOKEN)),
+					toDouble(valueScopeObject.get(SCORE_TOKEN)));
 		}
 
 		this.jedis.zadd(toByteArray(key), scoreMembers);
