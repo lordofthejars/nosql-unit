@@ -21,10 +21,6 @@
 			<groupId>com.lordofthejars</groupId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.lordofthejars</groupId>
-			<artifactId>bool</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>

@@ -1,10 +1,5 @@
 package com.lordofthejars.nosqlunit.infinispan;
 
-import static com.lordofthejars.bool.Bool.is;
-import static com.lordofthejars.bool.Bool.the;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -39,8 +34,8 @@ public class InfinispanAssertion {
 		if (cache.containsKey(expectedKey)) {
 			Object currentValue = cache.get(expectedKey);
 			Object expectedValue = expectedElement.getValue();
-
-			if (the(currentValue, is(not(equalTo(expectedValue))))) {
+			
+			if(!currentValue.equals(expectedValue)) {
 				throw FailureHandler.createFailure("Object for key %s should be %s but was found %s.", expectedKey,
 						expectedValue, currentValue);
 			}
