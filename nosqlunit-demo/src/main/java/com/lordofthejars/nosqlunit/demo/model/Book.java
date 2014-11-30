@@ -1,16 +1,30 @@
 package com.lordofthejars.nosqlunit.demo.model;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor // Jackson required
-@AllArgsConstructor
 public class Book {
 
 	private String title;
-	
 	private int numberOfPages;
+
+    public Book(String title, int numberOfPages) {
+        super();
+        this.title = title;
+        this.numberOfPages = numberOfPages;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getNumberOfPages() {
+        return numberOfPages;
+    }
+
+    public void setNumberOfPages(int numberOfPages) {
+        this.numberOfPages = numberOfPages;
+    }
+	
 }

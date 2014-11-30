@@ -3,8 +3,8 @@ package com.lordofthejars.nosqlunit.couchbase;
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.JsonParseException;
 import com.lordofthejars.nosqlunit.couchbase.model.Document;
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
+
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.MapType;
@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-@AllArgsConstructor
 public class DataLoader {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -27,28 +26,52 @@ public class DataLoader {
 
     private CouchbaseClient couchbaseClient;
 
+    public DataLoader(CouchbaseClient couchbaseClient) {
+        super();
+        this.couchbaseClient = couchbaseClient;
+    }
+
     public void load(final InputStream dataScript) {
         final Map<String, Document> documentsIterator = getDocuments(dataScript);
         insertDocuments(documentsIterator);
     }
 
-    @SneakyThrows({ExecutionException.class, InterruptedException.class, IOException.class})
     private void insertDocuments(final Map<String, Document> documentsIterator) {
         for (final Map.Entry<String, Document> documentEntry : documentsIterator.entrySet()) {
             final Document document = documentEntry.getValue();
-            couchbaseClient.add(documentEntry.getKey(), document.calculateExpiration(),
-                    MAPPER.writeValueAsString(document.getDocument())).get();
+            try {
+                couchbaseClient.add(documentEntry.getKey(), document.calculateExpiration(),
+                        MAPPER.writeValueAsString(document.getDocument())).get();
+            } catch (JsonGenerationException e) {
+               throw new IllegalArgumentException(e);
+            } catch (JsonMappingException e) {
+                throw new IllegalArgumentException(e);
+            } catch (InterruptedException e) {
+                throw new IllegalArgumentException(e);
+            } catch (ExecutionException e) {
+                throw new IllegalArgumentException(e);
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
+            }
         }
     }
 
-    @SneakyThrows({JsonParseException.class, JsonMappingException.class, IOException.class})
     public static Map<String, Document> getDocuments(final InputStream dataScript) {
         TypeFactory typeFactory = MAPPER.getTypeFactory();
         final MapType mapType = typeFactory.constructMapType(Map.class, String.class, Document.class);
         JavaType stringType = typeFactory.uncheckedSimpleType(String.class);
         MapType type = typeFactory.constructMapType(Map.class, stringType, mapType);
 
-        Map<String, Map<String, Document>> rootNode = MAPPER.readValue(dataScript, type);
+        Map<String, Map<String, Document>> rootNode;
+        try {
+            rootNode = MAPPER.readValue(dataScript, type);
+        } catch (org.codehaus.jackson.JsonParseException e) {
+            throw new IllegalArgumentException(e);
+        } catch (JsonMappingException e) {
+            throw new IllegalArgumentException(e);
+        } catch (IOException e) {
+           throw new IllegalArgumentException(e);
+        }
         return rootNode.get(DATA_ROOT);
     }
 

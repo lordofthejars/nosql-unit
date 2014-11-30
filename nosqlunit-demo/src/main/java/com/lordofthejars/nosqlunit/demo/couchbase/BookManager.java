@@ -2,9 +2,11 @@ package com.lordofthejars.nosqlunit.demo.couchbase;
 
 import com.couchbase.client.CouchbaseClient;
 import com.lordofthejars.nosqlunit.demo.model.Book;
-import lombok.SneakyThrows;
 import net.spy.memcached.internal.OperationCompletionListener;
 import net.spy.memcached.internal.OperationFuture;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
@@ -43,8 +45,7 @@ public class BookManager {
         });
     }
 
-    @SneakyThrows(IOException.class)
-    public Book findBookByTitle(final String title) {
+    public Book findBookByTitle(final String title) throws JsonParseException, JsonMappingException, IOException {
         final String key = ((String) client.get(toTitleKey(title))).replaceAll("\"","");
 
 
@@ -56,8 +57,7 @@ public class BookManager {
         return mapper.readValue(json, Book.class);
     }
 
-    @SneakyThrows(IOException.class)
-    public Book findById(final Long id) {
+    public Book findById(final Long id) throws JsonParseException, JsonMappingException, IOException {
         final String json = (String) client.get(toIdKey(String.valueOf(id)));
         return mapper.readValue(json, Book.class);
     }

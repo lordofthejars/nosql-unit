@@ -35,11 +35,6 @@
 			<artifactId>couchbase-client</artifactId>
 			<version>1.4.1</version>
 		</dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.12.6</version>
-        </dependency>
 	</dependencies>
 
 	<build>

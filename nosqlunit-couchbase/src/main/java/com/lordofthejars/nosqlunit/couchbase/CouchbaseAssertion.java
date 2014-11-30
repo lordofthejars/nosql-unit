@@ -11,10 +11,14 @@ import com.couchbase.client.protocol.views.ViewResponse;
 import com.couchbase.client.protocol.views.ViewRow;
 import com.lordofthejars.nosqlunit.core.FailureHandler;
 import com.lordofthejars.nosqlunit.couchbase.model.Document;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,9 +28,9 @@ import java.util.Map;
 
 import static com.lordofthejars.nosqlunit.util.DeepEquals.deepEquals;
 
-@Slf4j
 public class CouchbaseAssertion {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CouchbaseAssertion.class);
     private static final String DESIGN_DOC_INTERNAL = "__design_doc_internal_";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -53,17 +57,29 @@ public class CouchbaseAssertion {
         }
     }
 
-    @SneakyThrows(IOException.class)
     private static String toJson(final Object document) {
-        return OBJECT_MAPPER.writeValueAsString(document);
+        try {
+            return OBJECT_MAPPER.writeValueAsString(document);
+        } catch (JsonGenerationException e) {
+            throw new IllegalArgumentException(e);
+        } catch (JsonMappingException e) {
+            throw new IllegalArgumentException(e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
-    @SneakyThrows(IOException.class)
     private static Object fromJson(final Object document) {
         if (document instanceof String) {
             String json = (String) document;
-            JsonNode node = OBJECT_MAPPER.readTree(json);
-            return OBJECT_MAPPER.readValue(json, String.class);
+            try {
+                JsonNode node = OBJECT_MAPPER.readTree(json);
+                return OBJECT_MAPPER.readValue(json, String.class);
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException(e);
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
+            }
         }
         return document;
     }
@@ -131,7 +147,7 @@ public class CouchbaseAssertion {
             final String proposal = (DESIGN_DOC_INTERNAL + (i++));
             try {
                 couchbaseClient.getDesignDoc(proposal);
-                log.trace("Invalid doc, keep trying. Now trying with {} " + proposal);
+                LOGGER.trace("Invalid doc, keep trying. Now trying with {} " + proposal);
             } catch (final InvalidViewException ignored) {
                 return proposal;
             }

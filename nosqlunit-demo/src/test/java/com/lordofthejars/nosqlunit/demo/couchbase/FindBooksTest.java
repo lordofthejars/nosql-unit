@@ -1,5 +1,7 @@
 package com.lordofthejars.nosqlunit.demo.couchbase;
 
+import java.io.IOException;
+
 import com.couchbase.client.CouchbaseClient;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -7,6 +9,9 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.couchbase.CouchbaseRule;
 import com.lordofthejars.nosqlunit.couchbase.RemoteCouchbaseConfigurationBuilder;
 import com.lordofthejars.nosqlunit.demo.model.Book;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -32,7 +37,7 @@ public class FindBooksTest {
     @Test
     @UsingDataSet(locations = "books.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @ShouldMatchDataSet(location = "books.json")
-    public void should_find_existing_book_by_title() {
+    public void should_find_existing_book_by_title() throws JsonParseException, JsonMappingException, IOException {
         final BookManager bookManager = new BookManager(couchbaseClient);
         final Book book = bookManager.findBookByTitle("The Hobbit");
 
@@ -43,7 +48,7 @@ public class FindBooksTest {
     @Test
     @UsingDataSet(locations = "books.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @ShouldMatchDataSet(location = "books.json")
-    public void should_find_existing_book_by_id() {
+    public void should_find_existing_book_by_id() throws JsonParseException, JsonMappingException, IOException {
         final BookManager bookManager = new BookManager(couchbaseClient);
         final Book book = bookManager.findById(1l);
 
