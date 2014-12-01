@@ -269,7 +269,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongosLifecy
         public void run() {
             try {
             	process = startProcess();
-                consoleOutput = getConsoleOutput(process);
+                //consoleOutput = getConsoleOutput(process);
             } catch (IOException e) {
                 throw prepareException(e);
             } finally {
