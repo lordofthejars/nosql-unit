@@ -307,7 +307,7 @@ public class ManagedMongoDbLifecycleManager extends AbstractLifecycleManager {
         public void run() {
             try {
             	process = startProcess();
-                consoleOutput = getConsoleOutput(process);
+                //consoleOutput = getConsoleOutput(process);
             } catch (IOException e) {
                 throw prepareException(e);
             } finally {
