@@ -1,15 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
 
 	<groupId>com.lordofthejars</groupId>
 	<artifactId>nosqlunit</artifactId>
-	<version>0.7.10-SNAPSHOT</version>
+	<version>0.8.0</version>
 	<packaging>pom</packaging>
 	<name>nosqlunit</name>
 	<description>NoSQL is a JUnit extension targeted to nosql-driven projects.</description>
@@ -287,14 +282,12 @@
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
 			<version>${hamcrest.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-library</artifactId>
 			<version>${hamcrest.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 
@@ -354,22 +347,43 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
 			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.5.7.201204190339</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
 				<executions>
 					<execution>
+						<id>attach-sources</id>
 						<goals>
-							<goal>prepare-agent</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
 					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
 					<execution>
-						<id>report</id>
+						<id>sign-artifacts</id>
 						<phase>verify</phase>
 						<goals>
-							<goal>report</goal>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -378,7 +392,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -412,15 +426,25 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.14</version>
-					<!-- <configuration> <forkCount>1</forkCount> <reuseForks>false</reuseForks>
+					<!-- <configuration> <forkCount>1</forkCount> <reuseForks>false</reuseForks> 
 						</configuration> -->
 				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>bintray-maven-nosql-unit</id>
+			<name>lordofthejars-maven-nosql-unit</name>
+			<url>https://api.bintray.com/maven/lordofthejars/maven/nosql-unit</url>
+		</repository>
+	</distributionManagement>
 	<profiles>
 		<profile>
 			<id>integration-tests</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
 			<build>
 				<plugins>
 
