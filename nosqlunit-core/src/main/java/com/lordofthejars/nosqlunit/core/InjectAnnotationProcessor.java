@@ -1,12 +1,8 @@
 package com.lordofthejars.nosqlunit.core;
 
-import java.security.PrivilegedAction;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -29,9 +25,9 @@ public class InjectAnnotationProcessor {
 		if (isTargetSet(testInstance)) {
 		    
 		    Set<Field> fields = new HashSet<Field>();
-		    fields.addAll(getFieldsWithAnnotation(clazz, Inject.class));
-		    fields.addAll(getFieldsWithAnnotation(clazz, ConnectionManager.class));
-		    fields.addAll(getFieldsWithAnnotation(clazz, ByContainer.class));
+		    fields.addAll(IOUtils.getFieldsWithAnnotation(clazz, Inject.class));
+		    fields.addAll(IOUtils.getFieldsWithAnnotation(clazz, ConnectionManager.class));
+		    fields.addAll(IOUtils.getFieldsWithAnnotation(clazz, ByContainer.class));
 		    
 			for (Field field : fields) {
 				Annotation injectAnnotation = field.getAnnotation(Inject.class);
@@ -55,29 +51,6 @@ public class InjectAnnotationProcessor {
 		}
 	}
 
-    public static List<Field> getFieldsWithAnnotation(final Class<?> source,
-            final Class<? extends Annotation> annotationClass) {
-        List<Field> declaredAccessableFields = AccessController
-                .doPrivileged(new PrivilegedAction<List<Field>>() {
-                    public List<Field> run() {
-                        List<Field> foundFields = new ArrayList<Field>();
-                        Class<?> nextSource = source;
-                        while (nextSource != Object.class) {
-                            for (Field field : nextSource.getDeclaredFields()) {
-                                if (field.isAnnotationPresent(annotationClass)) {
-                                    if (!field.isAccessible()) {
-                                        field.setAccessible(true);
-                                    }
-                                    foundFields.add(field);
-                                }
-                            }
-                            nextSource = nextSource.getSuperclass();
-                        }
-                        return foundFields;
-                    }
-                });
-        return declaredAccessableFields;
-    }
 
     private boolean isInjectedAndNotExternallyManaged(
             Annotation injectAnnotation, Annotation byContainerAnnotation,

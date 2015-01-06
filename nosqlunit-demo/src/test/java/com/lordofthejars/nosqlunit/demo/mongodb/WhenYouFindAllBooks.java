@@ -22,7 +22,7 @@ import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
 
-@UsingDataSet
+@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 public class WhenYouFindAllBooks {
 
 
@@ -36,7 +36,6 @@ public class WhenYouFindAllBooks {
 	private Mongo mongo;
 	
 	@Test
-	@UsingDataSet(locations="initialData.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 	public void manager_should_return_all_inserted_books() {
 		
 		BookManager bookManager = new BookManager(bookCollection());

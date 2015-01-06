@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +31,44 @@ public final class IOUtils {
 
 	    return dir.delete();
 	}
+	
+	public static Class<?> getClassWithAnnotation(final Class<?> source, final Class<? extends Annotation> annotationClass) {
+	    
+	    Class<?> nextSource = source;
+	    while (nextSource != Object.class) {
+	        if(nextSource.isAnnotationPresent(annotationClass)) {
+	            return nextSource;
+	        } else {
+	            nextSource = nextSource.getSuperclass();
+	        }
+	    }
+	    
+	    return null;
+	}
+	
+	public static List<Field> getFieldsWithAnnotation(final Class<?> source,
+            final Class<? extends Annotation> annotationClass) {
+        List<Field> declaredAccessableFields = AccessController
+                .doPrivileged(new PrivilegedAction<List<Field>>() {
+                    public List<Field> run() {
+                        List<Field> foundFields = new ArrayList<Field>();
+                        Class<?> nextSource = source;
+                        while (nextSource != Object.class) {
+                            for (Field field : nextSource.getDeclaredFields()) {
+                                if (field.isAnnotationPresent(annotationClass)) {
+                                    if (!field.isAccessible()) {
+                                        field.setAccessible(true);
+                                    }
+                                    foundFields.add(field);
+                                }
+                            }
+                            nextSource = nextSource.getSuperclass();
+                        }
+                        return foundFields;
+                    }
+                });
+        return declaredAccessableFields;
+    }
 	
 	public static boolean isFileAvailableOnClasspath(Class<?> resourceBase, String dataLocation) {
 		return resourceBase.getResourceAsStream(dataLocation) != null;
