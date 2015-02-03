@@ -16,19 +16,45 @@ import java.io.InputStream;
  * <p/>
  * Checks the following assertions:
  * <li>
- * <ul>
- * Checks that all the expected collections are present in Mongo DB, but accepts other
- * collections stored in the database that are not defined in the expected file.
- * </ul>
- * <ul>
- * Checks that all the expected objects are present in Mongo DB, but accepts other
- * objects stored in the same collections that are not defined as expected.
- * </ul>
- * <ul>
- * For each object checks that all properties set with "@IgnorePropertyValue" value
- * exist in the object stored in the database, but it accepts any saved value.
- * </ul>
+ *      <ul>
+ *          Checks that all the expected collections are present in Mongo DB, but accepts
+ *          other collections stored in the database that are not defined in the expected
+ *          file.
+ *      </ul>
+ *      <ul>
+ *          Checks that all the expected objects are present in Mongo DB, but accepts
+ *          other objects stored in the same collections that are not defined as expected.
+ *      </ul>
+ *      <ul>
+ *          For each object checks that all properties set to be ignored its value
+ *          exist in the object stored in the database, but it accepts any saved value.
+ *      </ul>
  * </li>
+ *
+ * The annotation '@IgnorePropertyValue(properties = {String...})' allows the user define
+ * the properties that should be ignored when checking the expected objects.
+ *
+ * It accepts two formats for property definition:
+ * <li>
+ *     <ol>
+ *         collection.property : When is defined both collection and property name
+ *         the exclusion will only affect to the indicated collection.
+ *         e.g: With @IgnorePropertyValue(properties = {"book.date"}), the property
+ *         will be ignored in each object of the other collection. If other objects
+ *         have the property 'date' it won't be ignored.
+ *     </ol>
+ *     <ol>
+ *         property : When only is defined the property name, it will be excluded
+ *         for all objects in any expected collection.
+ *         e.g: With @IgnorePropertyValue(properties = {"date"}), the property 'date'
+ *         will be ignored in each object, no matter the collection.
+ *     </ol>
+ * </li>
+ *
+ * The values of the properties to be ignored should be named following the rules for valid
+ * collection and property names defined in
+ * <a href="http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>
+ * "Mongo DB: naming restrictions"</a> document.
  *
  * @author <a mailto="victor.hernandezbermejo@gmail.com">Víctor Hernández</a>
  */

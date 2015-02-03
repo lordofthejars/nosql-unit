@@ -145,7 +145,6 @@ public class MongoDbAssertion {
 	}
 
     //<editor-fold desc="Flexible comparator">
-
     /**
      * Checks that all the expected data is present in MongoDB.
      *
@@ -166,20 +165,22 @@ public class MongoDbAssertion {
         // Check expected data
         flexibleCheckCollectionsName(collectionNames, mongodbCollectionNames);
         for (String collectionName : collectionNames) {
-            flexibleCheckCollectionObjects(expectedData, mongoDb, collectionName);
+            flexibleCheckCollectionObjects(expectedData, mongoDb, collectionName, propertiesToIgnore);
         }
     }
 
     /**
-     * http://docs.mongodb.org/manual/reference/limits/#naming-restrictions
+     * Resolve the properties that will be ignored for each expected collection.
+     * <p/>
+     * Parses the input value following the rules for valid collection and property names
+     * defined in <a href="http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>
+     * "Mongo DB: naming restrictions"</a> document.
      *
-     * @param ignorePropertyValues
-     * @return
+     * @param ignorePropertyValues Input values defined with @IgnorePropertyValue.
+     * @return Map with the properties that will be ignored for each document.
      */
     private static Map<String, Set<String>> parseIgnorePropertyValues(Set<String> collectionNames, String[] ignorePropertyValues) {
         Map<String, Set<String>> propertiesToIgnore = new HashMap<String, Set<String>>();
-        // Check collection, property name
-        //      ^(?!system\.)([a-z,A-Z,_][^$\0]*)([.][^$][^.\0]*)$
         Pattern collectionAndPropertyPattern = Pattern.compile("^(?!system\\.)([a-z,A-Z,_][^$\0]*)([.])([^$][^.\0]*)$");
         Pattern propertyPattern = Pattern.compile("^([^$][^.0]*)$");
 
@@ -224,7 +225,6 @@ public class MongoDbAssertion {
             }
         }
 
-
         return propertiesToIgnore;
     }
 
@@ -262,7 +262,7 @@ public class MongoDbAssertion {
      * @param mongoDb        Mongo database.
      * @param collectionName Collection name.
      */
-    private static void flexibleCheckCollectionObjects(DBObject expectedData, DB mongoDb, String collectionName) throws Error {
+    private static void flexibleCheckCollectionObjects(DBObject expectedData, DB mongoDb, String collectionName, Map<String, Set<String>> propertiesToIgnore) throws Error {
         DBObject object = (DBObject) expectedData.get(collectionName);
         BasicDBList dataObjects;
 
@@ -276,7 +276,7 @@ public class MongoDbAssertion {
 
         for (Object dataObject : dataObjects) {
             BasicDBObject expectedDataObject = (BasicDBObject) dataObject;
-            DBObject filteredExpectedDataObject = filterProperties(expectedDataObject);
+            DBObject filteredExpectedDataObject = filterProperties(expectedDataObject, propertiesToIgnore.get(collectionName));
             DBObject foundObject = dbCollection.findOne(filteredExpectedDataObject);
 
             if (dbCollection.count(filteredExpectedDataObject) > 1) {
@@ -294,17 +294,19 @@ public class MongoDbAssertion {
     }
 
     /**
-     * Removes the properties set with "@IgnorePropertyValue" value from the dataObject.
+     * Removes the properties set with "@IgnorePropertyValue" value from the dataObject
+     * or defined in propertiesToIgnore annotation.
      *
      * @param dataObject Object to filter.
+     * @param propertiesToIgnore Properties to filter
      * @return Data object without the properties to be ignored.
      */
-    private static BasicDBObject filterProperties(BasicDBObject dataObject) {
+    private static BasicDBObject filterProperties(BasicDBObject dataObject, Set<String> propertiesToIgnore) {
         BasicDBObject filteredDataObject = new BasicDBObject();
 
         for (Map.Entry<String, Object> entry : dataObject.entrySet()) {
-            if (!(entry.getValue() instanceof String
-                    && entry.getValue().equals("@IgnorePropertyValue"))) {
+            if (!((propertiesToIgnore != null && propertiesToIgnore.contains(entry.getKey()))
+                    || (entry.getValue() instanceof String && entry.getValue().equals("@IgnorePropertyValue")))) {
                 filteredDataObject.put(entry.getKey(), entry.getValue());
             }
         }
