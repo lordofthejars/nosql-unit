@@ -5,9 +5,12 @@ import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MongoDbAssertion {
@@ -149,18 +152,80 @@ public class MongoDbAssertion {
      * @param expectedData Expected data.
      * @param mongoDb      Mongo Database.
      */
-    public static void flexibleAssertEquals(DBObject expectedData, DB mongoDb) {
+    public static void flexibleAssertEquals(DBObject expectedData, String[] ignorePropertyValues, DB mongoDb) {
         // Get the expected collections
         Set<String> collectionNames = expectedData.keySet();
 
         // Get the current collections in mongoDB
         Set<String> mongodbCollectionNames = mongoDb.getCollectionNames();
 
+        // Get the concrete property names that should be ignored
+        // Map<String:Collection, Set<String:Property>>
+        Map<String, Set<String>> propertiesToIgnore = parseIgnorePropertyValues(collectionNames, ignorePropertyValues);
+
         // Check expected data
         flexibleCheckCollectionsName(collectionNames, mongodbCollectionNames);
         for (String collectionName : collectionNames) {
             flexibleCheckCollectionObjects(expectedData, mongoDb, collectionName);
         }
+    }
+
+    /**
+     * http://docs.mongodb.org/manual/reference/limits/#naming-restrictions
+     *
+     * @param ignorePropertyValues
+     * @return
+     */
+    private static Map<String, Set<String>> parseIgnorePropertyValues(Set<String> collectionNames, String[] ignorePropertyValues) {
+        Map<String, Set<String>> propertiesToIgnore = new HashMap<String, Set<String>>();
+        // Check collection, property name
+        //      ^(?!system\.)([a-z,A-Z,_][^$\0]*)([.][^$][^.\0]*)$
+        Pattern collectionAndPropertyPattern = Pattern.compile("^(?!system\\.)([a-z,A-Z,_][^$\0]*)([.])([^$][^.\0]*)$");
+        Pattern propertyPattern = Pattern.compile("^([^$][^.0]*)$");
+
+        for (String ignorePropertyValue : ignorePropertyValues) {
+            Matcher collectionAndPropertyMatcher = collectionAndPropertyPattern.matcher(ignorePropertyValue);
+            Matcher propertyMatcher = propertyPattern.matcher(ignorePropertyValue);
+
+            // If the property to ignore includes the collection, add it to only exclude
+            // the property in the indicated collection
+            if (collectionAndPropertyMatcher.matches()) {
+                // Add the property to ignore to the proper collection
+                String collectionName = collectionAndPropertyMatcher.group(1);
+                String propertyName = collectionAndPropertyMatcher.group(3);
+
+                if (collectionNames.contains(collectionName)) {
+                    Set<String> properties = propertiesToIgnore.get(collectionName);
+                    if (properties == null) {
+                        properties = new HashSet<String>();
+                    }
+                    properties.add(propertyName);
+                    propertiesToIgnore.put(collectionName, properties);
+                } else {
+                    logger.warn(String.format("Collection %s for %s is not defined as expected. It won't be used for ignoring properties", collectionName, ignorePropertyValue));
+                }
+                // If the property to ignore doesn't include the collection, add it to
+                // all the expected collections
+            } else if (propertyMatcher.matches()) {
+                String propertyName = propertyMatcher.group(0);
+
+                // Add the property to ignore to all the expected collections
+                for (String collectionName : collectionNames) {
+                    Set<String> properties = propertiesToIgnore.get(collectionName);
+                    if (properties == null) {
+                        properties = new HashSet<String>();
+                    }
+                    properties.add(propertyName);
+                    propertiesToIgnore.put(collectionName, properties);
+                }
+                // If doesn't match any pattern
+            } else {
+                logger.warn(String.format("Property %s has an invalid collection.property value. It won't be used for ignoring properties", ignorePropertyValue));
+            }
+        }
+
+
+        return propertiesToIgnore;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
+import com.lordofthejars.nosqlunit.core.FlexibleComparisonStrategy;
 import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
@@ -31,14 +32,17 @@ import java.io.InputStream;
  *
  * @author <a mailto="victor.hernandezbermejo@gmail.com">Víctor Hernández</a>
  */
-public class MongoFlexibleComparisonStrategy implements MongoComparisonStrategy {
+public class MongoFlexibleComparisonStrategy
+        implements MongoComparisonStrategy, FlexibleComparisonStrategy {
+
+    private String[] ignorePropertyValues = new String[0];
 
     @Override
     public boolean compare(MongoDbConnectionCallback connection, InputStream dataset) throws IOException {
         String expectedJsonData = loadContentFromInputStream(dataset);
         DBObject parsedData = parseData(expectedJsonData);
 
-        MongoDbAssertion.flexibleAssertEquals(parsedData, connection.db());
+        MongoDbAssertion.flexibleAssertEquals(parsedData, ignorePropertyValues, connection.db());
 
         return true;
     }
@@ -50,5 +54,10 @@ public class MongoFlexibleComparisonStrategy implements MongoComparisonStrategy 
     private DBObject parseData(String jsonData) throws IOException {
         DBObject parsedData = (DBObject) JSON.parse(jsonData);
         return parsedData;
+    }
+
+    @Override
+    public void setIgnorePropertyValues(String... ignorePropertyValues) {
+        this.ignorePropertyValues = ignorePropertyValues;
     }
 }
