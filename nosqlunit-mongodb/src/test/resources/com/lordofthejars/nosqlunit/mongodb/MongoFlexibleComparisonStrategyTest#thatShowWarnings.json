@@ -1,0 +1,29 @@
+{
+  "collection": [
+    {
+      "1": "one",
+      "2": "two",
+      "3": "three"
+    },
+    {
+      "1": "one",
+      "2": "2",
+      "3": "three"
+    },
+    {
+      "1": "one",
+      "2": "two",
+      "3": "3"
+    },
+    {
+      "1": "one",
+      "2": "2",
+      "3": "3"
+    }
+  ],
+  "another-collection": [
+    {
+      "value": "Some objects"
+    }
+  ]
+}
