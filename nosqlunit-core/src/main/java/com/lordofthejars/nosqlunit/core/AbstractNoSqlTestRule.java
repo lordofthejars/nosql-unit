@@ -1,28 +1,19 @@
 package com.lordofthejars.nosqlunit.core;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectFirst;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import com.lordofthejars.nosqlunit.annotation.*;
+import com.lordofthejars.nosqlunit.util.DefaultClasspathLocationBuilder;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.map.introspect.AnnotatedClass;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
-
-import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
-import com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy;
-import com.lordofthejars.nosqlunit.annotation.Selective;
-import com.lordofthejars.nosqlunit.annotation.SelectiveMatcher;
-import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.util.DefaultClasspathLocationBuilder;
+import static ch.lambdaj.Lambda.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 public abstract class AbstractNoSqlTestRule implements MethodRule {
 
@@ -101,6 +92,11 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                         ComparisonStrategy<?> comparisionStrategyObject = org.joor.Reflect
                                 .on(comparisionStrategy).create().get();
 
+                        // If was selected a flexible comparison strategy set the properties that should be ignored
+                        if (comparisionStrategyObject instanceof FlexibleComparisonStrategy) {
+                            ((FlexibleComparisonStrategy) comparisionStrategyObject).setIgnorePropertyValues(getPropertiesToIgnore());
+                        }
+
                         overrideComparisionStrategy(databaseOperation,
                                 comparisionStrategyObject);
 
@@ -169,6 +165,19 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                 }
 
                 return shouldMatchDataSet;
+            }
+
+            private String[] getPropertiesToIgnore() {
+                String[] propertyValuesToIgnore = new String[0];
+
+                IgnorePropertyValue ignorePropertyValue = method
+                        .getAnnotation(IgnorePropertyValue.class);
+
+                if (isTestAnnotatedWithIgnoreProperty(ignorePropertyValue)) {
+                    propertyValuesToIgnore = ignorePropertyValue.properties();
+                }
+
+                return propertyValuesToIgnore;
             }
 
             private UsingDataSet getUsingDataSetAnnotation() {
@@ -471,6 +480,11 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
             private boolean isTestAnnotatedWithDataSet(UsingDataSet usingDataSet) {
                 return usingDataSet != null;
+            }
+
+            private boolean isTestAnnotatedWithIgnoreProperty(
+                    IgnorePropertyValue ignorePropertyValue) {
+                return ignorePropertyValue != null;
             }
         };
     }

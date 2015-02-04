@@ -2,8 +2,8 @@
   "collection": [
     {
       "1": "one",
-      "2": "@IgnorePropertyValue",
-      "3": "@IgnorePropertyValue"
+      "2": "two",
+      "3": "three"
     }
   ]
 }

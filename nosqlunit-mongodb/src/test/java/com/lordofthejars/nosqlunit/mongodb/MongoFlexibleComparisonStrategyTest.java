@@ -1,6 +1,7 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
+import com.lordofthejars.nosqlunit.annotation.IgnorePropertyValue;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import org.junit.ClassRule;
@@ -22,6 +23,7 @@ public class MongoFlexibleComparisonStrategyTest {
     @Test
     @UsingDataSet(locations = "MongoFlexibleComparisonStrategyTest#thatShowWarnings.json")
     @ShouldMatchDataSet(location = "MongoFlexibleComparisonStrategyTest#thatShowWarnings-expected.json")
+    @IgnorePropertyValue(properties = {"2", "collection.3"})
     public void thatShowsWarnings() {
     }
 }

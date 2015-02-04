@@ -5,9 +5,12 @@ import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MongoDbAssertion {
@@ -142,25 +145,87 @@ public class MongoDbAssertion {
 	}
 
     //<editor-fold desc="Flexible comparator">
-
     /**
      * Checks that all the expected data is present in MongoDB.
      *
      * @param expectedData Expected data.
      * @param mongoDb      Mongo Database.
      */
-    public static void flexibleAssertEquals(DBObject expectedData, DB mongoDb) {
+    public static void flexibleAssertEquals(DBObject expectedData, String[] ignorePropertyValues, DB mongoDb) {
         // Get the expected collections
         Set<String> collectionNames = expectedData.keySet();
 
         // Get the current collections in mongoDB
         Set<String> mongodbCollectionNames = mongoDb.getCollectionNames();
 
+        // Get the concrete property names that should be ignored
+        // Map<String:Collection, Set<String:Property>>
+        Map<String, Set<String>> propertiesToIgnore = parseIgnorePropertyValues(collectionNames, ignorePropertyValues);
+
         // Check expected data
         flexibleCheckCollectionsName(collectionNames, mongodbCollectionNames);
         for (String collectionName : collectionNames) {
-            flexibleCheckCollectionObjects(expectedData, mongoDb, collectionName);
+            flexibleCheckCollectionObjects(expectedData, mongoDb, collectionName, propertiesToIgnore);
         }
+    }
+
+    /**
+     * Resolve the properties that will be ignored for each expected collection.
+     * <p/>
+     * Parses the input value following the rules for valid collection and property names
+     * defined in <a href="http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>
+     * "Mongo DB: naming restrictions"</a> document.
+     *
+     * @param ignorePropertyValues Input values defined with @IgnorePropertyValue.
+     * @return Map with the properties that will be ignored for each document.
+     */
+    private static Map<String, Set<String>> parseIgnorePropertyValues(Set<String> collectionNames, String[] ignorePropertyValues) {
+        Map<String, Set<String>> propertiesToIgnore = new HashMap<String, Set<String>>();
+        Pattern collectionAndPropertyPattern = Pattern.compile("^(?!system\\.)([a-z,A-Z,_][^$\0]*)([.])([^$][^.\0]*)$");
+        Pattern propertyPattern = Pattern.compile("^([^$][^.0]*)$");
+
+        for (String ignorePropertyValue : ignorePropertyValues) {
+            Matcher collectionAndPropertyMatcher = collectionAndPropertyPattern.matcher(ignorePropertyValue);
+            Matcher propertyMatcher = propertyPattern.matcher(ignorePropertyValue);
+
+            // If the property to ignore includes the collection, add it to only exclude
+            // the property in the indicated collection
+            if (collectionAndPropertyMatcher.matches()) {
+                // Add the property to ignore to the proper collection
+                String collectionName = collectionAndPropertyMatcher.group(1);
+                String propertyName = collectionAndPropertyMatcher.group(3);
+
+                if (collectionNames.contains(collectionName)) {
+                    Set<String> properties = propertiesToIgnore.get(collectionName);
+                    if (properties == null) {
+                        properties = new HashSet<String>();
+                    }
+                    properties.add(propertyName);
+                    propertiesToIgnore.put(collectionName, properties);
+                } else {
+                    logger.warn(String.format("Collection %s for %s is not defined as expected. It won't be used for ignoring properties", collectionName, ignorePropertyValue));
+                }
+                // If the property to ignore doesn't include the collection, add it to
+                // all the expected collections
+            } else if (propertyMatcher.matches()) {
+                String propertyName = propertyMatcher.group(0);
+
+                // Add the property to ignore to all the expected collections
+                for (String collectionName : collectionNames) {
+                    Set<String> properties = propertiesToIgnore.get(collectionName);
+                    if (properties == null) {
+                        properties = new HashSet<String>();
+                    }
+                    properties.add(propertyName);
+                    propertiesToIgnore.put(collectionName, properties);
+                }
+                // If doesn't match any pattern
+            } else {
+                logger.warn(String.format("Property %s has an invalid collection.property value. It won't be used for ignoring properties", ignorePropertyValue));
+            }
+        }
+
+        return propertiesToIgnore;
     }
 
     /**
@@ -197,7 +262,7 @@ public class MongoDbAssertion {
      * @param mongoDb        Mongo database.
      * @param collectionName Collection name.
      */
-    private static void flexibleCheckCollectionObjects(DBObject expectedData, DB mongoDb, String collectionName) throws Error {
+    private static void flexibleCheckCollectionObjects(DBObject expectedData, DB mongoDb, String collectionName, Map<String, Set<String>> propertiesToIgnore) throws Error {
         DBObject object = (DBObject) expectedData.get(collectionName);
         BasicDBList dataObjects;
 
@@ -211,7 +276,7 @@ public class MongoDbAssertion {
 
         for (Object dataObject : dataObjects) {
             BasicDBObject expectedDataObject = (BasicDBObject) dataObject;
-            DBObject filteredExpectedDataObject = filterProperties(expectedDataObject);
+            DBObject filteredExpectedDataObject = filterProperties(expectedDataObject, propertiesToIgnore.get(collectionName));
             DBObject foundObject = dbCollection.findOne(filteredExpectedDataObject);
 
             if (dbCollection.count(filteredExpectedDataObject) > 1) {
@@ -229,17 +294,17 @@ public class MongoDbAssertion {
     }
 
     /**
-     * Removes the properties set with "@IgnorePropertyValue" value from the dataObject.
+     * Removes the properties defined with @IgnorePropertyValue annotation.
      *
      * @param dataObject Object to filter.
+     * @param propertiesToIgnore Properties to filter
      * @return Data object without the properties to be ignored.
      */
-    private static BasicDBObject filterProperties(BasicDBObject dataObject) {
+    private static BasicDBObject filterProperties(BasicDBObject dataObject, Set<String> propertiesToIgnore) {
         BasicDBObject filteredDataObject = new BasicDBObject();
 
         for (Map.Entry<String, Object> entry : dataObject.entrySet()) {
-            if (!(entry.getValue() instanceof String
-                    && entry.getValue().equals("@IgnorePropertyValue"))) {
+            if (propertiesToIgnore == null || !propertiesToIgnore.contains(entry.getKey())) {
                 filteredDataObject.put(entry.getKey(), entry.getValue());
             }
         }
