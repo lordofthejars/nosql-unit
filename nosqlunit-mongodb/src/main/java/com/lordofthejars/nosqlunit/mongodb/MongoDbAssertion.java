@@ -294,8 +294,7 @@ public class MongoDbAssertion {
     }
 
     /**
-     * Removes the properties set with "@IgnorePropertyValue" value from the dataObject
-     * or defined in propertiesToIgnore annotation.
+     * Removes the properties defined with @IgnorePropertyValue annotation.
      *
      * @param dataObject Object to filter.
      * @param propertiesToIgnore Properties to filter
@@ -305,8 +304,7 @@ public class MongoDbAssertion {
         BasicDBObject filteredDataObject = new BasicDBObject();
 
         for (Map.Entry<String, Object> entry : dataObject.entrySet()) {
-            if (!((propertiesToIgnore != null && propertiesToIgnore.contains(entry.getKey()))
-                    || (entry.getValue() instanceof String && entry.getValue().equals("@IgnorePropertyValue")))) {
+            if (propertiesToIgnore == null || !propertiesToIgnore.contains(entry.getKey())) {
                 filteredDataObject.put(entry.getKey(), entry.getValue());
             }
         }

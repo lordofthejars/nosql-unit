@@ -37,15 +37,15 @@ import java.io.InputStream;
  * It accepts two formats for property definition:
  * <li>
  *     <ol>
- *         collection.property : When is defined both collection and property name
+ *         collection.property : When are defined both collection and property name
  *         the exclusion will only affect to the indicated collection.
- *         e.g: With @IgnorePropertyValue(properties = {"book.date"}), the property
- *         will be ignored in each object of the other collection. If other objects
- *         have the property 'date' it won't be ignored.
+ *         e.g: With @IgnorePropertyValue(properties = {"book.date"}), the property date
+ *         will be ignored in each object of the 'book' collection. If other objects in
+ *         different collections have the property 'date' it won't be ignored.
  *     </ol>
  *     <ol>
- *         property : When only is defined the property name, it will be excluded
- *         for all objects in any expected collection.
+ *         property : When only is defined the property name it will be excluded
+ *         from all objects in any expected collection.
  *         e.g: With @IgnorePropertyValue(properties = {"date"}), the property 'date'
  *         will be ignored in each object, no matter the collection.
  *     </ol>
@@ -55,6 +55,9 @@ import java.io.InputStream;
  * collection and property names defined in
  * <a href="http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>
  * "Mongo DB: naming restrictions"</a> document.
+ *
+ * When more than one object stored in the database matches the expected object after
+ * ignoring properties a warning is shown notifying the number of objects that were found.
  *
  * @author <a mailto="victor.hernandezbermejo@gmail.com">Víctor Hernández</a>
  */
