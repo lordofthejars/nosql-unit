@@ -87,7 +87,7 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 	}
 
 	private boolean isNotASystemCollection(String collectionName) {
-		return !collectionName.startsWith("system");
+		return !collectionName.startsWith("system.");
 	}
 
 	@Override
