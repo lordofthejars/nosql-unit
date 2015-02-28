@@ -114,4 +114,8 @@ public class SpringTemplateComparisonStrategy implements Neo4jComparisonStrategy
 		return neo4jTemplate;
 	}
 
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
 }

@@ -37,5 +37,9 @@ public class DefaultHBaseComparisonStrategy implements HBaseComparisonStrategy {
 			throw new IllegalArgumentException(e);
 		}
 	}
+
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
 	
 }

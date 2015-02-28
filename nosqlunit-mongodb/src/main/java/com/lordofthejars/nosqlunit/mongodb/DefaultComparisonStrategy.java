@@ -27,5 +27,9 @@ public class DefaultComparisonStrategy implements MongoComparisonStrategy {
 		DBObject parsedData = (DBObject) JSON.parse(jsonData);
 		return parsedData;
 	}
+
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
 	
 }

@@ -13,4 +13,8 @@ public class DefaultRedisComparisonStrategy implements RedisComparisonStrategy {
 		return true;
 	}
 
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
 }

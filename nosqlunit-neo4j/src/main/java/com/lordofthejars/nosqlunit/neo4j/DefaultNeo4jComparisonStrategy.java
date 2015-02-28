@@ -110,5 +110,9 @@ public class DefaultNeo4jComparisonStrategy implements Neo4jComparisonStrategy {
 
 		return neo4jGraphMlRepresentation;
 	}
+
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
 	
 }

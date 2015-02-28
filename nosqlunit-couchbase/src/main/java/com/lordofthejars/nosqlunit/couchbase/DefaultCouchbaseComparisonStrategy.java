@@ -13,4 +13,8 @@ public class DefaultCouchbaseComparisonStrategy implements com.lordofthejars.nos
         CouchbaseAssertion.strictAssertEquals(dataset, connection.couchBaseClient());
         return true;
     }
+
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
 }

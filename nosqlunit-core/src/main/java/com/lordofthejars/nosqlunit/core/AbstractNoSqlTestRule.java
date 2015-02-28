@@ -92,9 +92,15 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                         ComparisonStrategy<?> comparisionStrategyObject = org.joor.Reflect
                                 .on(comparisionStrategy).create().get();
 
-                        // If was selected a flexible comparison strategy set the properties that should be ignored
-                        if (comparisionStrategyObject instanceof FlexibleComparisonStrategy) {
-                            ((FlexibleComparisonStrategy) comparisionStrategyObject).setIgnorePropertyValues(getPropertiesToIgnore());
+                        Class<?> classWithAnnotation = IOUtils.getClassWithAnnotation(
+                                target.getClass(),
+                                IgnorePropertyValue.class);
+                        if (method.getAnnotation(IgnorePropertyValue.class) != null
+                                || (classWithAnnotation != null && classWithAnnotation
+                                        .getAnnotation(
+                                                IgnorePropertyValue.class) != null)) {
+                            comparisionStrategyObject
+                                    .setIgnoreProperties(getPropertiesToIgnore());
                         }
 
                         overrideComparisionStrategy(databaseOperation,
@@ -159,8 +165,9 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                     Class<?> testClass = target.getClass();
                     Class<?> annotatedClass = IOUtils.getClassWithAnnotation(
                             testClass, ShouldMatchDataSet.class);
-                    shouldMatchDataSet = annotatedClass == null ? null :
-                            annotatedClass.getAnnotation(ShouldMatchDataSet.class);
+                    shouldMatchDataSet = annotatedClass == null ? null
+                            : annotatedClass
+                                    .getAnnotation(ShouldMatchDataSet.class);
 
                 }
 
@@ -168,16 +175,34 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
             }
 
             private String[] getPropertiesToIgnore() {
-                String[] propertyValuesToIgnore = new String[0];
+                List<String> propertyValuesToIgnore = new ArrayList<String>();
+
+                Class<?> annotated = IOUtils.getClassWithAnnotation(
+                        target.getClass(), IgnorePropertyValue.class);
+                if (annotated != null) {
+                    IgnorePropertyValue annotationIgnore = annotated
+                            .getAnnotation(IgnorePropertyValue.class);
+
+                    if (annotationIgnore != null) {
+                        String[] properties = annotationIgnore.properties();
+                        for (String property : properties) {
+                            propertyValuesToIgnore.add(property);
+                        }
+                    }
+                }
 
                 IgnorePropertyValue ignorePropertyValue = method
                         .getAnnotation(IgnorePropertyValue.class);
 
                 if (isTestAnnotatedWithIgnoreProperty(ignorePropertyValue)) {
-                    propertyValuesToIgnore = ignorePropertyValue.properties();
+                    String[] properties = ignorePropertyValue.properties();
+                    for (String property : properties) {
+                        propertyValuesToIgnore.add(property);
+                    }
                 }
 
-                return propertyValuesToIgnore;
+                return propertyValuesToIgnore
+                        .toArray(new String[propertyValuesToIgnore.size()]);
             }
 
             private UsingDataSet getUsingDataSetAnnotation() {
@@ -190,8 +215,8 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                     Class<?> testClass = target.getClass();
                     Class<?> annotatedClass = IOUtils.getClassWithAnnotation(
                             testClass, UsingDataSet.class);
-                    usingDataSet = annotatedClass == null ? null : 
-                            annotatedClass.getAnnotation(UsingDataSet.class);
+                    usingDataSet = annotatedClass == null ? null
+                            : annotatedClass.getAnnotation(UsingDataSet.class);
 
                 }
 
@@ -204,8 +229,9 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                         .getClassWithAnnotation(
                                 testClass,
                                 com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy.class);
-                return annotatedClass == null ? null : 
-                        annotatedClass.getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy.class);
+                return annotatedClass == null ? null
+                        : annotatedClass
+                                .getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy.class);
             }
 
             private com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy getCustomInsertationStrategy() {
@@ -215,8 +241,9 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                         .getClassWithAnnotation(
                                 testClass,
                                 com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy.class);
-                return annotatedClass == null ? null: annotatedClass
-                        .getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy.class);
+                return annotatedClass == null ? null
+                        : annotatedClass
+                                .getAnnotation(com.lordofthejars.nosqlunit.annotation.CustomInsertionStrategy.class);
             }
 
             private void assertExpectation(ShouldMatchDataSet shouldMatchDataSet)

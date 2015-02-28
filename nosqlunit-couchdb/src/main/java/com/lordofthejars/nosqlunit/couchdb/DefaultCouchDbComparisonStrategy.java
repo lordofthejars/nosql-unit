@@ -12,4 +12,8 @@ public class DefaultCouchDbComparisonStrategy implements CouchDbComparisonStrate
 		return true;
 	}
 
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
 }

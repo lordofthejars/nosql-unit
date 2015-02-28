@@ -13,4 +13,8 @@ public class DefaultCassandraComparisonStrategy implements CassandraComparisonSt
 		return true;
 	}
 
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
 }

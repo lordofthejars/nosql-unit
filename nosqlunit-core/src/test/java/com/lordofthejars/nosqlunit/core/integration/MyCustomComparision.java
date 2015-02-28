@@ -12,4 +12,8 @@ public class MyCustomComparision implements ComparisonStrategy<Object>{
 		return false;
 	}
 
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
 }

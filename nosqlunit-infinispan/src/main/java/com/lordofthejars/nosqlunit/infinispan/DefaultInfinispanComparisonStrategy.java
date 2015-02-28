@@ -21,5 +21,9 @@ public class DefaultInfinispanComparisonStrategy implements InfinispanComparison
 		Map<Object, Object> values = keyValueObjectMapper.readValues(dataScript);
 		return values;
 	}
+
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
 	
 }

@@ -20,4 +20,8 @@ public class DefaultElasticsearchComparisonStrategy implements ElasticsearchComp
 		return true;
 	}
 
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
 }

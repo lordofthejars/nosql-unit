@@ -4,6 +4,8 @@ import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
 import com.lordofthejars.nosqlunit.annotation.IgnorePropertyValue;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,12 +20,19 @@ public class MongoFlexibleComparisonStrategyTest {
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
 
     @Rule
-    public MongoDbRule mongoDbRule = newMongoDbRule().defaultManagedMongoDb("test");
+    public MongoDbRule mongoDbRule = newMongoDbRule().defaultEmbeddedMongoDb("test");
 
+    @Test(expected=NoSqlAssertionError.class)
+    @UsingDataSet(locations = "MongoFlexibleComparisonStrategyTest#thatShowWarnings.json")
+    @ShouldMatchDataSet(location = "MongoFlexibleComparisonStrategyTest#thatShowWarnings-expected.json")
+    //@IgnorePropertyValue(properties = {"2", "collection.3"})
+    public void shouldThrowAnExceptionIfDifferentValuesInFlexibleStrategy() {
+    }
+    
     @Test
     @UsingDataSet(locations = "MongoFlexibleComparisonStrategyTest#thatShowWarnings.json")
     @ShouldMatchDataSet(location = "MongoFlexibleComparisonStrategyTest#thatShowWarnings-expected.json")
     @IgnorePropertyValue(properties = {"2", "collection.3"})
-    public void thatShowsWarnings() {
+    public void shouldIgnorePropertiesInFlexibleStrategy() {
     }
 }

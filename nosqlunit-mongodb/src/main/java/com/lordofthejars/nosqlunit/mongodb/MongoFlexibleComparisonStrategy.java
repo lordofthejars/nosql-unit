@@ -1,6 +1,5 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.lordofthejars.nosqlunit.core.FlexibleComparisonStrategy;
 import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
@@ -62,7 +61,7 @@ import java.io.InputStream;
  * @author <a mailto="victor.hernandezbermejo@gmail.com">Víctor Hernández</a>
  */
 public class MongoFlexibleComparisonStrategy
-        implements MongoComparisonStrategy, FlexibleComparisonStrategy {
+        implements MongoComparisonStrategy {
 
     private String[] ignorePropertyValues = new String[0];
 
@@ -86,7 +85,7 @@ public class MongoFlexibleComparisonStrategy
     }
 
     @Override
-    public void setIgnorePropertyValues(String... ignorePropertyValues) {
+    public void setIgnoreProperties(String[] ignorePropertyValues) {
         this.ignorePropertyValues = ignorePropertyValues;
     }
 }
