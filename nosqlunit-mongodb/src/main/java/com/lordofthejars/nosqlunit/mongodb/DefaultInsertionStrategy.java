@@ -1,17 +1,12 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
+import com.lordofthejars.nosqlunit.core.IOUtils;
+import com.mongodb.*;
+import com.mongodb.util.JSON;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
-
-import com.lordofthejars.nosqlunit.core.IOUtils;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DB;
-import com.mongodb.DBRef;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 
 public class DefaultInsertionStrategy implements MongoInsertionStrategy {
 
@@ -119,7 +114,17 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
         Object data = ((DBObject)dataObject).get(key);
         if (data instanceof DBRef) {
           ((DBObject)dataObject).put(key, new DBRef(mongoDb,((DBRef)data).getRef(), ((DBRef)data).getId()));
+        } else if(data instanceof BasicDBList) {
+            for (Object subData : (BasicDBList) data) {
+                for (String subKey : ((DBObject)data).keySet()) {
+                    if(subData instanceof DBRef) {
+                        ((BasicDBList)data).put(subKey, new DBRef(mongoDb,((DBRef)subData).getRef(), ((DBRef)subData).getId()));
+                    }
+                }
+
+            }
         }
+
       }
 			dbCollection.insert((DBObject) dataObject);
 		}
