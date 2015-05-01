@@ -25,7 +25,7 @@ public class WhenManagedNeoServerLifecycleIsManaged {
 	@Test
 	public void neo4j_should_start_and_stop_from_configured_location() throws Throwable {
 		
-		ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().neo4jPath("/opt/neo4j-community-1.7.2").build();
+		ManagedNeoServer managedNeoServer = newManagedNeo4jServerRule().neo4jPath("/tmp/neo4j-community-2.1.8").build();
 		
 		Statement noStatement = new Statement() {
 			

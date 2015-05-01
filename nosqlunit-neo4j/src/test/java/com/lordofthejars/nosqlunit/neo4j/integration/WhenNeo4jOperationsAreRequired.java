@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -27,7 +28,6 @@ import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.util.FileUtils;
 import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.neo4j.Neo4jConfiguration;
@@ -127,17 +127,24 @@ public class WhenNeo4jOperationsAreRequired {
 			"		</edge>\n" + 
 			"	</graph>\n" + 
 			"</graphml>";
-	
+	private GraphDatabaseService newEmbeddedDatabase;
+	private Transaction tx;
+
 	@Before
 	public void setUp() {
 		clearDb();
+		newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
 	}
-	
+
+	@After
+	public void tearDown() throws Exception {
+		if (newEmbeddedDatabase!=null)
+			newEmbeddedDatabase.shutdown();
+	}
+
 	@Test
 	public void insert_opertation_should_add_data_and_indexes_into_graph()  {
-		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		
+
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
@@ -145,10 +152,9 @@ public class WhenNeo4jOperationsAreRequired {
 		
 		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_MANUAL_INDEX.getBytes()));
 		
-		GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(newEmbeddedDatabase);
-		Iterable<Node> allNodes = globalGraphOperations.getAllNodes();
-		Iterable<Relationship> allRelationships = globalGraphOperations.getAllRelationships();
-		
+		Iterable<Node> allNodes = neo4jOperation.getAllNodes();
+		Iterable<Relationship> allRelationships = neo4jOperation.getAllRelationships();
+
 		Node firstNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("I")));
 		assertThat(firstNode, notNullValue());
 		
@@ -169,34 +175,28 @@ public class WhenNeo4jOperationsAreRequired {
 		assertThat(nodeIndexNames, arrayContainingInAnyOrder("myindex"));
 		neo4jOperation.deleteAll();
 		
-		newEmbeddedDatabase.shutdown();
 	}
 	
 	@Test
 	public void delete_opertation_should_remove_indexes_of_graph()  {
 		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		
+
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
 		Neo4jOperation neo4jOperation = new Neo4jOperation(newEmbeddedDatabase);
 		
 		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_MANUAL_INDEX.getBytes()));
-		
-		
+
 		neo4jOperation.deleteAll();
-		
-		String[] nodeIndexNames = newEmbeddedDatabase.index().nodeIndexNames();
+
+
+		String[] nodeIndexNames = neo4jOperation.nodeIndexNames();
 		assertThat(nodeIndexNames, emptyArray());
-		
-		newEmbeddedDatabase.shutdown();
 	}
-	
+
 	@Test
 	public void insert_opertation_should_add_data_into_graph()  {
-		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
 		
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
@@ -205,9 +205,8 @@ public class WhenNeo4jOperationsAreRequired {
 		
 		neo4jOperation.insert(new ByteArrayInputStream(WELL_FORMED_GRAPH.getBytes()));
 		
-		GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(newEmbeddedDatabase);
-		Iterable<Node> allNodes = globalGraphOperations.getAllNodes();
-		Iterable<Relationship> allRelationships = globalGraphOperations.getAllRelationships();
+		Iterable<Node> allNodes = neo4jOperation.getAllNodes();
+		Iterable<Relationship> allRelationships = neo4jOperation.getAllRelationships();
 		
 		Node firstNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("I")));
 		assertThat(firstNode, notNullValue());
@@ -225,15 +224,13 @@ public class WhenNeo4jOperationsAreRequired {
 		assertThat(secondRelationship, notNullValue());
 		
 		
-		newEmbeddedDatabase.shutdown();
 	}
-	
+
 	
 	@Test
 	public void delete_all_operation_should_remove_all_data_from_graph_except_reference_node() {
 		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		
+
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
@@ -243,24 +240,17 @@ public class WhenNeo4jOperationsAreRequired {
 		
 		
 		neo4jOperation.deleteAll();
-		
-		GlobalGraphOperations globalGraphOperations = GlobalGraphOperations.at(newEmbeddedDatabase);
-		
-		Iterator<Node> allNodes = globalGraphOperations.getAllNodes().iterator();
-		Iterator<Relationship> allRelationships = globalGraphOperations.getAllRelationships().iterator();
-		Node referenceNode = allNodes.next();
-		assertThat(referenceNode.getId(), is(0L));
+
+		Iterator<Node> allNodes = neo4jOperation.getAllNodes().iterator();
+		Iterator<Relationship> allRelationships = neo4jOperation.getAllRelationships().iterator();
 		assertThat(allNodes.hasNext(), is(false));
 		assertThat(allRelationships.hasNext(), is(false));
-		
-		newEmbeddedDatabase.shutdown();
-		
+
 	}
-	
+
 	@Test
 	public void insert_opertation_should_add_indexes_into_remote_graph()  {
 		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
 		WrappingNeoServerBootstrapper graphDb = new WrappingNeoServerBootstrapper((GraphDatabaseAPI) newEmbeddedDatabase);
 		graphDb.start();
 		
@@ -277,13 +267,11 @@ public class WhenNeo4jOperationsAreRequired {
 		assertThat(nodeIndexNames, arrayContainingInAnyOrder("myindex"));
 		
 		neo4jOperation.deleteAll();
-		graphDb.stop();
 	}
 	
 	@Test
 	public void delete_all_operation_should_remove_all_data_from_graph_except_reference_node_in_remote_mode() {
 		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
 		WrappingNeoServerBootstrapper graphDb = new WrappingNeoServerBootstrapper((GraphDatabaseAPI) newEmbeddedDatabase);
 		graphDb.start();
 		
@@ -302,8 +290,6 @@ public class WhenNeo4jOperationsAreRequired {
 		
 		Iterator<Node> allNodes = Neo4jLowLevelOps.getAllNodes(graphDatabaseService);
 		Iterator<Relationship> allRelationships = Neo4jLowLevelOps.getAllRelationships(graphDatabaseService);
-		Node referenceNode = allNodes.next();
-		assertThat(referenceNode.getId(), is(0L));
 		assertThat(allNodes.hasNext(), is(false));
 		assertThat(allRelationships.hasNext(), is(false));
 		
@@ -312,9 +298,7 @@ public class WhenNeo4jOperationsAreRequired {
 
 	@Test
 	public void should_assert_same_expected_data_and_inserted_data() {
-		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		
+
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
@@ -331,8 +315,7 @@ public class WhenNeo4jOperationsAreRequired {
 	@Test(expected=NoSqlAssertionError.class)
 	public void should_throw_exception_same_expected_data_and_inserted_data() {
 		
-		GraphDatabaseService newEmbeddedDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-		
+
 		Neo4jConfiguration neo4jConfiguration = new Neo4jConfiguration();
 		neo4jConfiguration.setGraphDatabaseService(newEmbeddedDatabase);
 		
