@@ -109,13 +109,7 @@ public class SpringTemplateComparisonStrategy implements Neo4jComparisonStrategy
 
 	private Neo4jTemplate neo4jTemplate(Neo4jConnectionCallback connection) {
 		GraphDatabaseService graphDatabaseService = connection.graphDatabaseService();
-		Neo4jTemplate neo4jTemplate = new Neo4jTemplate(graphDatabaseService);
 
-		return neo4jTemplate;
+		return new Neo4jTemplate(graphDatabaseService);
 	}
-
-    @Override
-    public void setIgnoreProperties(String[] ignoreProperties) {
-    }
-
 }
