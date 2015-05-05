@@ -213,7 +213,7 @@ public class GraphMLReader {
 						
 						
 					} else if(elementName.equals(GraphMLTokens.GRAPH)) {
-						nodes.put("0", this.graphDatabaseService.getReferenceNode());
+//						nodes.put("0", this.graphDatabaseService.getNodeById(0));
 						graphDepth++;
 					}
 

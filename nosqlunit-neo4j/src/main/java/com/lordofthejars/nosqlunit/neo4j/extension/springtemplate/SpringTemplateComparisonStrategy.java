@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.data.neo4j.config.JtaTransactionManagerFactoryBean;
-import org.springframework.data.neo4j.conversion.EndResult;
+import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -66,12 +66,12 @@ public class SpringTemplateComparisonStrategy implements Neo4jComparisonStrategy
 			@Override
 			public List<Object> doInTransaction(TransactionStatus status) {
 
-				EndResult<?> allEntities = neo4jTemplate.findAll(entityClass);
+				Result<?> allEntities = neo4jTemplate.findAll(entityClass);
 				final List<Object> fetchedData = fetchData(neo4jTemplate, allEntities);
 				return fetchedData;
 			}
 
-			private List<Object> fetchData(final Neo4jTemplate neo4jTemplate, EndResult<?> allEntities) {
+			private List<Object> fetchData(final Neo4jTemplate neo4jTemplate, Result<?> allEntities) {
 				final List<Object> fetchedData = new ArrayList<Object>();
 				Iterator<?> iterator = allEntities.iterator();
 
@@ -109,13 +109,7 @@ public class SpringTemplateComparisonStrategy implements Neo4jComparisonStrategy
 
 	private Neo4jTemplate neo4jTemplate(Neo4jConnectionCallback connection) {
 		GraphDatabaseService graphDatabaseService = connection.graphDatabaseService();
-		Neo4jTemplate neo4jTemplate = new Neo4jTemplate(graphDatabaseService);
 
-		return neo4jTemplate;
+		return new Neo4jTemplate(graphDatabaseService);
 	}
-
-    @Override
-    public void setIgnoreProperties(String[] ignoreProperties) {
-    }
-
 }

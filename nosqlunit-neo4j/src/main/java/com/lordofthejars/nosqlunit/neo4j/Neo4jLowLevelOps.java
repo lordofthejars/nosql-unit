@@ -13,9 +13,9 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 public class Neo4jLowLevelOps {
 
-	private static final String GET_ALL_NODES_QUERY = "start nodes=node(*) return nodes";
+	private static final String GET_ALL_NODES_QUERY = "MATCH (nodes) return nodes";
 	
-	private static final String GET_ALL_RELATIONSHIPS_QUERY = "start relationships=relationship(*) return relationships";
+	private static final String GET_ALL_RELATIONSHIPS_QUERY = "match ()-[relationships]-() return relationships";
 	
 	private Neo4jLowLevelOps() {
 		super();

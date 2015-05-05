@@ -35,8 +35,8 @@ public class WhenImportingGraphMLStream {
             "    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
             "    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
             "    <graph id=\"G\" edgedefault=\"directed\">\n" + 
-            "        <node id=\"15\">\n" + 
-            "            <data key=\"name\">I</data>\n" + 
+            "        <node id=\"15\">\n" +
+            "            <data key=\"name\">I</data>\n" +
             "        </node>\n" + 
             "        <node id=\"25\">\n" + 
             "            <data key=\"name\">you</data>\n" + 
@@ -89,8 +89,9 @@ public class WhenImportingGraphMLStream {
 			"    <key id=\"age\" for=\"node\" attr.name=\"age\" attr.type=\"int\"/>\n" + 
 			"    <key id=\"lang\" for=\"node\" attr.name=\"lang\" attr.type=\"string\"/>\n" + 
 			"    <graph id=\"G\" edgedefault=\"directed\">\n" + 
-			"        <node id=\"15\">\n" + 
-			"            <data key=\"name\">I</data>\n" + 
+			"        <node id=\"0\"/>\n" +
+			"        <node id=\"15\">\n" +
+			"            <data key=\"name\">I</data>\n" +
 			"        </node>\n" + 
 			"        <node id=\"25\">\n" + 
 			"            <data key=\"name\">you</data>\n" + 
@@ -484,7 +485,7 @@ public class WhenImportingGraphMLStream {
 		Node node3 = mock(Node.class);
 		Node referenceNode = mock(Node.class);
 
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -510,7 +511,7 @@ public class WhenImportingGraphMLStream {
 		
 		when(indexManager.forNodes("myindex")).thenReturn(index);
 		when(graphDatabaseService.index()).thenReturn(indexManager);
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -550,7 +551,7 @@ public class WhenImportingGraphMLStream {
 		
 		when(indexManager.forNodes("myindex", MapUtil.stringMap("provider", "lucene", "type", "fulltext"))).thenReturn(index);
 		when(graphDatabaseService.index()).thenReturn(indexManager);
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -590,7 +591,7 @@ public class WhenImportingGraphMLStream {
 		
 		when(indexManager.forRelationships("myindex")).thenReturn(index);
 		when(graphDatabaseService.index()).thenReturn(indexManager);
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -630,7 +631,7 @@ public class WhenImportingGraphMLStream {
 		
 		when(indexManager.forRelationships("myindex", MapUtil.stringMap("type", "exact", "to_lower_case", "true"))).thenReturn(index);
 		when(graphDatabaseService.index()).thenReturn(indexManager);
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -670,7 +671,7 @@ public class WhenImportingGraphMLStream {
 		
 		when(indexManager.forNodes("names")).thenReturn(index);
 		when(graphDatabaseService.index()).thenReturn(indexManager);
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -710,7 +711,7 @@ public class WhenImportingGraphMLStream {
 		
 		when(indexManager.forRelationships("weights")).thenReturn(index);
 		when(graphDatabaseService.index()).thenReturn(indexManager);
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -746,7 +747,7 @@ public class WhenImportingGraphMLStream {
         Node node3 = mock(Node.class);
         Node referenceNode = mock(Node.class);
 
-        when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+        when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
         when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
         Relationship relationship1 = mock(Relationship.class);
@@ -780,7 +781,7 @@ public class WhenImportingGraphMLStream {
 		Node node3 = mock(Node.class);
 		Node referenceNode = mock(Node.class);
 
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -813,7 +814,7 @@ public class WhenImportingGraphMLStream {
 		Node node3 = mock(Node.class);
 		Node referenceNode = mock(Node.class);
 
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
@@ -847,7 +848,7 @@ public class WhenImportingGraphMLStream {
 		Node node3 = mock(Node.class);
 		Node referenceNode = mock(Node.class);
 
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
@@ -877,14 +878,13 @@ public class WhenImportingGraphMLStream {
 	
 	@Test
 	public void parser_should_use_id_0_as_reference_node() {
-		
+
+		Node referenceNode = mock(Node.class);
 		Node node15 = mock(Node.class);
 		Node node25 = mock(Node.class);
 		Node node3 = mock(Node.class);
-		Node referenceNode = mock(Node.class);
 
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
-		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
+		when(graphDatabaseService.createNode()).thenReturn(referenceNode).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
 		Relationship relationship1 = mock(Relationship.class);
 		when(referenceNode.createRelationshipTo(eq(node25), any(RelationshipType.class))).thenReturn(relationship1);
@@ -896,7 +896,7 @@ public class WhenImportingGraphMLStream {
 
 		graphMLReader.read(new ByteArrayInputStream(WELL_FORMED_GRAPH_WITH_REFERENCE_NODE.getBytes()));
 
-		verify(graphDatabaseService, times(3)).createNode();
+		verify(graphDatabaseService, times(4)).createNode();
 
 		verify(referenceNode, times(1)).createRelationshipTo(eq(node25), any(DynamicRelationshipType.class));
 		verify(node15, times(1)).createRelationshipTo(eq(node3), any(DynamicRelationshipType.class));
@@ -918,7 +918,7 @@ public class WhenImportingGraphMLStream {
 		Node node3 = mock(Node.class);
 		Node referenceNode = mock(Node.class);
 
-		when(graphDatabaseService.getReferenceNode()).thenReturn(referenceNode);
+		when(graphDatabaseService.getNodeById(eq(0))).thenReturn(referenceNode);
 		
 		when(graphDatabaseService.createNode()).thenReturn(node15).thenReturn(node25).thenReturn(node3);
 
