@@ -1,36 +1,9 @@
 package com.lordofthejars.nosqlunit.demo.selective;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-
-import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer.Neo4jServerRuleBuilder.newManagedNeo4jServerRule;
-import static com.lordofthejars.nosqlunit.neo4j.ManagedNeoServerConfigurationBuilder.newManagedNeoServerConfiguration;
-import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
-import static com.lordofthejars.nosqlunit.redis.ManagedRedis.ManagedRedisRuleBuilder.newManagedRedisRule;
-import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
-import static com.lordofthejars.nosqlunit.redis.RedisRule.RedisRuleBuilder.newRedisRule;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.neo4j.graphdb.Node;
-import org.neo4j.rest.graphdb.RestGraphDatabase;
-
-import redis.clients.jedis.Jedis;
-
-import com.lordofthejars.nosqlunit.annotation.Selective;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.neo4j.ManagedNeoServer;
-import com.lordofthejars.nosqlunit.neo4j.Neo4jConfiguration;
-import com.lordofthejars.nosqlunit.neo4j.Neo4jRule;
-import com.lordofthejars.nosqlunit.redis.ManagedRedis;
-import com.lordofthejars.nosqlunit.redis.RedisConfiguration;
-import com.lordofthejars.nosqlunit.redis.RedisRule;
 
 public class WhenRedisAndNeo4jAreUsedInCommon {
 
-	@ClassRule
+	/*@ClassRule
 	public static final ManagedNeoServer MANAGED_NEO_SERVER = newManagedNeo4jServerRule().neo4jPath("/opt/neo4j-community-1.7.2").build();
 	
 	@ClassRule
@@ -78,5 +51,5 @@ public class WhenRedisAndNeo4jAreUsedInCommon {
 		
 	}
 	
-	
+	*/
 }

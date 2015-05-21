@@ -10,6 +10,7 @@ import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.Traverser;
 import org.neo4j.graphdb.Traverser.Order;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 public class MatrixManager {
 
@@ -51,7 +52,13 @@ public class MatrixManager {
 	}
 
 	public Node getNeoNode() {
-		return graphDb.getReferenceNode().getSingleRelationship(RelTypes.NEO_NODE, Direction.OUTGOING).getEndNode();
+		Iterable<Node> allNodes = GlobalGraphOperations.at(graphDb).getAllNodes();
+		for(Node node: allNodes) {
+			if("Thomas Anderson".equals(node.getProperty("name"))) {
+				return node;
+			}
+		}
+		return null;
 	}
 
 }
