@@ -30,6 +30,11 @@ private ElasticsearchConfiguration elasticsearchConfiguration = new Elasticsearc
 		this.elasticsearchConfiguration.setSettings(settings);
 		return this;
 	}
+
+	public RemoteElasticsearchConfigurationBuilder connectionIdentifier(String connectionIdentifier) {
+        this.elasticsearchConfiguration.setConnectionIdentifier(connectionIdentifier);
+        return this;
+    }
 	
 	public ElasticsearchConfiguration build() {
 		
