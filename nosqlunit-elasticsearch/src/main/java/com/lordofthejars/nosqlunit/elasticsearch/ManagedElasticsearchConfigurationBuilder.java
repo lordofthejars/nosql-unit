@@ -27,6 +27,11 @@ public class ManagedElasticsearchConfigurationBuilder {
 		this.elasticsearchConfiguration.setSettings(settings);
 		return this;
 	}
+
+	public ManagedElasticsearchConfigurationBuilder connectionIdentifier(String connectionIdentifier) {
+		this.elasticsearchConfiguration.setConnectionIdentifier(connectionIdentifier);
+		return this;
+	}
 	
 	public ElasticsearchConfiguration build() {
 		
