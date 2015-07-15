@@ -1,10 +1,13 @@
 package com.lordofthejars.nosqlunit.mongodb.shard;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,12 +186,7 @@ public class ShardedManagedMongoDb extends ExternalResource {
 	private void registerReplicaSetShardServers(MongoClient mongosMongoClient) {
 		Set<String> replicaSetShardsConfig = buildReplicaSetShardAddingCommand();
 
-		if (shardedGroup.isAuthenticationSet()) {
-			MongoDbCommands.addShard(mongosMongoClient, replicaSetShardsConfig, shardedGroup.getUsername(),
-					shardedGroup.getPassword());
-		} else {
-			MongoDbCommands.addShard(mongosMongoClient, replicaSetShardsConfig);
-		}
+		MongoDbCommands.addShard(mongosMongoClient, replicaSetShardsConfig);
 	}
 
 	private Set<String> buildReplicaSetShardAddingCommand() {
@@ -203,12 +201,7 @@ public class ShardedManagedMongoDb extends ExternalResource {
 	}
 
 	private void registerShardServers(MongoClient mongosMongoClient) {
-		if (shardedGroup.isAuthenticationSet()) {
-			MongoDbCommands.addShard(mongosMongoClient, shardsUri(), shardedGroup.getUsername(),
-					shardedGroup.getPassword());
-		} else {
-			MongoDbCommands.addShard(mongosMongoClient, shardsUri());
-		}
+		MongoDbCommands.addShard(mongosMongoClient, shardsUri());
 	}
 
 	private String shardUri(String replicaSetName, List<ManagedMongoDbLifecycleManager> managedMongoDbLifecycleManagers) {
@@ -227,9 +220,14 @@ public class ShardedManagedMongoDb extends ExternalResource {
 	private MongoClient getMongosMongoClient() throws UnknownHostException {
 
 		ManagedMongosLifecycleManager firstMongosServer = shardedGroup.getFirstMongosServer();
-		MongoClient mongoClient = new MongoClient(firstMongosServer.getHost(), firstMongosServer.getPort());
-
-		return mongoClient;
+		if(shardedGroup.isAuthenticationSet()) {
+			MongoCredential credential = MongoCredential.createCredential(this.shardedGroup.getUsername(),
+					"admin",
+					this.shardedGroup.getPassword().toCharArray());
+			return new MongoClient(new ServerAddress(firstMongosServer.getHost(), firstMongosServer.getPort()), Arrays.asList(credential));
+		} else {
+			return new MongoClient(firstMongosServer.getHost(), firstMongosServer.getPort());
+		}
 
 	}
 

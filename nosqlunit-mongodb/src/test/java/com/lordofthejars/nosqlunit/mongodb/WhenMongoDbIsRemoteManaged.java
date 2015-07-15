@@ -1,21 +1,8 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
+import com.lordofthejars.nosqlunit.core.OperatingSystem;
+import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,10 +10,19 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
-import com.lordofthejars.nosqlunit.core.OperatingSystem;
-import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
-import com.mongodb.DBPort;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 public class WhenMongoDbIsRemoteManaged {
 
@@ -128,7 +124,7 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DBPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.PORT_ARGUMENT_NAME);
-		expectedCommand.add(DBPort.PORT+"");
+		expectedCommand.add(27017+"");
 		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.NONE_JOURNALING_ENABLED);
@@ -181,7 +177,7 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DBPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.PORT_ARGUMENT_NAME);
-		expectedCommand.add(DBPort.PORT+"");
+		expectedCommand.add(27017+"");
 		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.NONE_JOURNALING_ENABLED);
@@ -234,7 +230,7 @@ public class WhenMongoDbIsRemoteManaged {
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DBPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_DBPATH);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.PORT_ARGUMENT_NAME);
-		expectedCommand.add(DBPort.PORT+"");
+		expectedCommand.add(27017+"");
 		expectedCommand.add(ManagedMongoDbLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.DEFAULT_MONGO_LOGPATH);
 		expectedCommand.add(ManagedMongoDbLifecycleManager.NONE_JOURNALING_ENABLED);

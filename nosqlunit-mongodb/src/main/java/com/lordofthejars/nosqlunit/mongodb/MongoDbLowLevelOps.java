@@ -1,16 +1,10 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
+import com.mongodb.*;
+import com.mongodb.util.JSON;
+
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
-
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.util.JSON;
 
 public class MongoDbLowLevelOps {
 
@@ -113,8 +107,7 @@ public class MongoDbLowLevelOps {
 
 	private DBObject getMongosStatus(MongoClient mongoClient, String username,
 			String password) {
-		return MongoDbCommands.replicaSetGetStatus(mongoClient, username,
-				password);
+		return MongoDbCommands.replicaSetGetStatus(mongoClient);
 	}
 
 	private DBObject getMongosStatus(MongoClient mongoClient) {

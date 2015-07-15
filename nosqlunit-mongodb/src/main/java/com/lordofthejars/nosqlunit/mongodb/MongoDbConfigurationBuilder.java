@@ -1,8 +1,10 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import java.net.UnknownHostException;
-
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+
+import java.util.Arrays;
 
 
 public class MongoDbConfigurationBuilder {
@@ -18,14 +20,17 @@ public class MongoDbConfigurationBuilder {
 	}
 	
 	public MongoDbConfiguration build() {
-		
-		try {
-			MongoClient mongo = new MongoClient(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort());
-			this.mongoDbConfiguration.setMongo(mongo);
-		} catch (UnknownHostException e) {
-			throw new IllegalStateException(e);
+		MongoClient mongo = null;
+		if(this.mongoDbConfiguration.isAuthenticateParametersSet()) {
+			MongoCredential credential = MongoCredential.createCredential(this.mongoDbConfiguration.getUsername(),
+					this.mongoDbConfiguration.getDatabaseName(),
+					this.mongoDbConfiguration.getPassword().toCharArray());
+			mongo = new MongoClient(new ServerAddress(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort()), Arrays.asList(credential));
+		} else {
+			mongo = new MongoClient(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort());
 		}
-		
+		this.mongoDbConfiguration.setMongo(mongo);
+
 		return mongoDbConfiguration;
 	}
 	

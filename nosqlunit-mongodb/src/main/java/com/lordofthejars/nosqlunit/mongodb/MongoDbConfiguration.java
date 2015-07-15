@@ -1,21 +1,19 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
-import com.mongodb.DBPort;
 import com.mongodb.Mongo;
 import com.mongodb.WriteConcern;
 
 public final class MongoDbConfiguration extends AbstractJsr330Configuration {
-	
 	private static final String DEFAULT_HOST = "localhost";
-
+	private static final int DEFAULT_PORT = 27017;
 	private String databaseName;
 	
 	private String username;
 	private String password;
 	
 	private String host = DEFAULT_HOST;
-	private int port = DBPort.PORT;
+	private int port = DEFAULT_PORT;
 	
 	private Mongo mongo;
 	

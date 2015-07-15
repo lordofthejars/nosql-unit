@@ -1,18 +1,13 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import java.io.InputStream;
-import java.util.Set;
-
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
-import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
-import com.mongodb.MongoOptions;
+import java.io.InputStream;
+import java.util.Set;
 
 public final class MongoOperation extends AbstractCustomizableDatabaseOperation<MongoDbConnectionCallback, Mongo> {
 
@@ -116,20 +111,7 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 	}
 
 	private DB getMongoDb() {
-
 		DB db = mongo.getDB(this.mongoDbConfiguration.getDatabaseName());
-
-		if (this.mongoDbConfiguration.isAuthenticateParametersSet() && !db.isAuthenticated()) {
-
-			boolean authenticated = db.authenticate(this.mongoDbConfiguration.getUsername(), this.mongoDbConfiguration
-					.getPassword().toCharArray());
-
-			if (!authenticated) {
-				throw new IllegalArgumentException("Login/Password provided to connect to MongoDb are not valid");
-			}
-
-		}
-
 		return db;
 	}
 

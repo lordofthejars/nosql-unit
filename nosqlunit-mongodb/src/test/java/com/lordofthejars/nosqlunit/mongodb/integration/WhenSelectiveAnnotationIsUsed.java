@@ -1,30 +1,23 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
-import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
-import com.mongodb.MongoClient;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
-
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
 import com.lordofthejars.nosqlunit.annotation.Selective;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.DBPort;
-import com.mongodb.MongoException;
+import com.mongodb.*;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 
 public class WhenSelectiveAnnotationIsUsed {
 
@@ -32,23 +25,23 @@ public class WhenSelectiveAnnotationIsUsed {
 	public static ManagedMongoDb managedMongoDb1 = newManagedMongoDbRule()
 			.mongodPath("/opt/mongo").logRelativePath("log1")
 			.dbRelativePath("mongo-dbpath1").targetPath("target/mongo-temp1")
-			.port(DBPort.PORT).build();
+			.port(27017).build();
 
 	@ClassRule
 	public static ManagedMongoDb managedMongoDb2 = newManagedMongoDbRule()
 			.mongodPath("/opt/mongo").logRelativePath("log2")
 			.dbRelativePath("mongo-dbpath2").targetPath("target/mongo-temp2")
-			.port(DBPort.PORT + 1).build();
+			.port(27017 + 1).build();
 
 	@Rule
 	public MongoDbRule remoteMongoDbRule1 = new MongoDbRule(mongoDb()
-			.databaseName("test").connectionIdentifier("one").port(DBPort.PORT)
+			.databaseName("test").connectionIdentifier("one").port(27017)
 			.build(), this);
 
 	@Rule
 	public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
 			.databaseName("test").connectionIdentifier("two")
-			.port(DBPort.PORT + 1).build(), this);
+			.port(27017 + 1).build(), this);
 
 	@Test
 	@UsingDataSet(withSelectiveLocations = {
@@ -57,8 +50,8 @@ public class WhenSelectiveAnnotationIsUsed {
 			loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
 	public void data_should_be_inserted_into_configured_backend() throws UnknownHostException, MongoException {
 		
-		MongoClient mongo1 = new MongoClient("127.0.0.1", DBPort.PORT);
-    		MongoClient mongo2 = new MongoClient("127.0.0.1", DBPort.PORT+1);
+		MongoClient mongo1 = new MongoClient("127.0.0.1", 27017);
+    		MongoClient mongo2 = new MongoClient("127.0.0.1", 27017+1);
 		
 		DB db1 = mongo1.getDB("test");
 		DB db2 = mongo2.getDB("test");

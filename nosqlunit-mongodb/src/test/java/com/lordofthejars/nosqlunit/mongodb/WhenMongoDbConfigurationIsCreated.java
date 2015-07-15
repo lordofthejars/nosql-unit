@@ -6,8 +6,6 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import com.mongodb.DBPort;
-
 public class WhenMongoDbConfigurationIsCreated {
 
 	@Test
@@ -15,7 +13,7 @@ public class WhenMongoDbConfigurationIsCreated {
 		MongoDbConfiguration managedConfiguration = mongoDb().databaseName("test").build();
 		
 		assertThat(managedConfiguration.getHost(), is("localhost"));
-		assertThat(managedConfiguration.getPort(), is(DBPort.PORT));
+		assertThat(managedConfiguration.getPort(), is(27017));
 		assertThat(managedConfiguration.getDatabaseName(), is("test"));
 		
 	}

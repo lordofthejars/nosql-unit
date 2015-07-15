@@ -1,18 +1,16 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.mongodb.DBPort;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ReplicationMongoDbConfigurationBuilder {
 
 	private static final String DEFAULT_HOST = "localhost";
-	private static final int DEFAULT_PORT = DBPort.PORT;
+	private static final int DEFAULT_PORT = 27017;
 
 	private MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
 	private List<ServerAddress> serverAddresses = new ArrayList<ServerAddress>();
@@ -30,11 +28,7 @@ public class ReplicationMongoDbConfigurationBuilder {
 	}
 
 	public ReplicationMongoDbConfigurationBuilder seed(String host, int port) {
-		try {
-			serverAddresses.add(new ServerAddress(host, port));
-		} catch (UnknownHostException e) {
-			throw new IllegalArgumentException(e);
-		}
+		serverAddresses.add(new ServerAddress(host, port));
 		return this;
 	}
 
@@ -91,15 +85,9 @@ public class ReplicationMongoDbConfigurationBuilder {
 	}
 
 	private void enableSharding(MongoClient mongoClient) {
-		if (isAuthenticationSet()) {
-			MongoDbCommands.enableSharding(mongoClient,
-					this.mongoDbConfiguration.getDatabaseName(),
-					this.mongoDbConfiguration.getUsername(),
-					this.mongoDbConfiguration.getPassword());
-		} else {
-			MongoDbCommands.enableSharding(mongoClient,
-					this.mongoDbConfiguration.getDatabaseName());
-		}
+
+		MongoDbCommands.enableSharding(mongoClient,
+				this.mongoDbConfiguration.getDatabaseName());
 	}
 
 	private boolean isAuthenticationSet() {
@@ -108,11 +96,7 @@ public class ReplicationMongoDbConfigurationBuilder {
 	}
 
 	private void addDefaultSeed() {
-		try {
-			serverAddresses.add(new ServerAddress(DEFAULT_HOST, DEFAULT_PORT));
-		} catch (UnknownHostException e) {
-			throw new IllegalArgumentException(e);
-		}
+		serverAddresses.add(new ServerAddress(DEFAULT_HOST, DEFAULT_PORT));
 	}
 
 }

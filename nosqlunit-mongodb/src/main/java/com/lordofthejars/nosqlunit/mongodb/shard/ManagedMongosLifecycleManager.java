@@ -23,7 +23,6 @@ import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResol
 import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOpsFactory;
-import com.mongodb.DBPort;
 
 public class ManagedMongosLifecycleManager extends AbstractLifecycleManager {
 
@@ -34,6 +33,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongosLifecy
 	}
 	
 	private static final String LOCALHOST = "localhost";
+	protected static final int DEFAULT_PORT = 27017;
 
 	
 	protected static final String LOGPATH_ARGUMENT_NAME = "--logpath";
@@ -57,7 +57,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongosLifecy
 	private String mongosPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("MONGO_HOME");
 	private int chunkSize = DEFAULT_CHUNK_SIZE;
 	
-	private int port = DBPort.PORT;
+	private int port = DEFAULT_PORT;
 	
 	private String targetPath = DEFAULT_MONGO_TARGET_PATH;
 	private String logRelativePath = DEFAULT_MONGO_LOGPATH;

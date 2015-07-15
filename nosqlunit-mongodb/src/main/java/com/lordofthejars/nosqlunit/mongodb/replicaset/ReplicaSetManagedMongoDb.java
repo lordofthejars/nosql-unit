@@ -2,8 +2,10 @@ package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.mongodb.MongoCredential;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,16 +144,8 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 		
 		MongoClient mongoClient = getDefaultMongoClient();
 
-		CommandResult commandResult = null;
-		if (this.replicaSetGroup.isAuthenticationSet()) {
-			commandResult = MongoDbCommands.replicaSetInitiate(mongoClient, cmd,
-					this.replicaSetGroup.getUsername(),
-					this.replicaSetGroup.getPassword());
-			
-		} else {
-			commandResult = MongoDbCommands.replicaSetInitiate(mongoClient, cmd);
-		}
-		
+		CommandResult commandResult = MongoDbCommands.replicaSetInitiate(mongoClient, cmd);
+
 		mongoClient.close();
 		return commandResult;
 	}
@@ -216,8 +210,15 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
 
 		ManagedMongoDbLifecycleManager defaultConnection = replicaSetGroup
 				.getDefaultConnection();
-		return new MongoClient(defaultConnection.getHost(),
-				defaultConnection.getPort());
+		if (this.replicaSetGroup.isAuthenticationSet()) {
+			MongoCredential credential = MongoCredential.createCredential(this.replicaSetGroup.getUsername(),
+					"admin",
+					this.replicaSetGroup.getPassword().toCharArray());
+			return new MongoClient(new ServerAddress(defaultConnection.getHost(), defaultConnection.getPort()), Arrays.asList(credential));
+		} else {
+			return new MongoClient(defaultConnection.getHost(),
+					defaultConnection.getPort());
+		}
 
 	}
 

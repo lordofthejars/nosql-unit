@@ -12,14 +12,8 @@ public class MongoDbUtil {
     private static DB database;
     
     static{
-        try {
             MongoClient mongo=new MongoClient("localhost",27017);
             database=mongo.getDB("test");
-        } catch (UnknownHostException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (MongoException ex) {
-        	throw new IllegalArgumentException(ex);
-        }
     }
     
     public static DBCollection getCollection(String collectionName){

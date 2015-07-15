@@ -24,7 +24,6 @@ import com.lordofthejars.nosqlunit.core.CommandLineExecutor;
 import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
-import com.mongodb.DBPort;
 
 public class WhenMongosIsRemoteManaged {
 
@@ -81,7 +80,7 @@ public class WhenMongosIsRemoteManaged {
 				+ File.separatorChar
 				+ ManagedMongosLifecycleManager.MONGOS_EXECUTABLE_X);
 		expectedCommand.add(ManagedMongosLifecycleManager.PORT_ARGUMENT_NAME);
-		expectedCommand.add(DBPort.PORT + "");
+		expectedCommand.add(27017 + "");
 		expectedCommand
 				.add(ManagedMongosLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand
@@ -141,7 +140,7 @@ public class WhenMongosIsRemoteManaged {
 				+ File.separatorChar
 				+ ManagedMongosLifecycleManager.MONGOS_EXECUTABLE_W);
 		expectedCommand.add(ManagedMongosLifecycleManager.PORT_ARGUMENT_NAME);
-		expectedCommand.add(DBPort.PORT + "");
+		expectedCommand.add(27017 + "");
 		expectedCommand
 				.add(ManagedMongosLifecycleManager.LOGPATH_ARGUMENT_NAME);
 		expectedCommand

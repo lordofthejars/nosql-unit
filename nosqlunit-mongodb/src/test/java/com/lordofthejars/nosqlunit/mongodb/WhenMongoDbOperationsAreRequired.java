@@ -238,7 +238,7 @@ public class WhenMongoDbOperationsAreRequired {
 		
 		final ArgumentCaptor<DBObject> indexCommandCaptor = ArgumentCaptor
                 .forClass(DBObject.class);
-		verify(collection, times(1)).ensureIndex(indexCommandCaptor.capture());
+		verify(collection, times(1)).createIndex(indexCommandCaptor.capture());
 		assertThat(indexCommandCaptor.getValue(), is(indexDocument));
 		
 	}
@@ -250,7 +250,7 @@ public class WhenMongoDbOperationsAreRequired {
 		final ArgumentCaptor<DBObject> indexOptionCommandCaptor = ArgumentCaptor
                 .forClass(DBObject.class);
 		
-		verify(collection, times(1)).ensureIndex(indexCommandCaptor.capture(), indexOptionCommandCaptor.capture());
+		verify(collection, times(1)).createIndex(indexCommandCaptor.capture(), indexOptionCommandCaptor.capture());
 		assertThat(indexCommandCaptor.getValue(), is(indexDocument));
 		assertThat(indexOptionCommandCaptor.getValue(), is(indexOptions));
 		

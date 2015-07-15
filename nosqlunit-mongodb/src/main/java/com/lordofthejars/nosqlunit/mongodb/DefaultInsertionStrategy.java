@@ -77,9 +77,9 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
 			
 			if(index.containsField(INDEX_OPTIONS)) {
 				DBObject indexOptions = (DBObject)index.get(INDEX_OPTIONS);
-				indexedCollection.ensureIndex(indexKeys, indexOptions);
+				indexedCollection.createIndex(indexKeys, indexOptions);
 			} else {
-				indexedCollection.ensureIndex(indexKeys);
+				indexedCollection.createIndex(indexKeys);
 			}
 		}
 		
@@ -113,12 +113,12 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
 			for (String key : ((DBObject)dataObject).keySet()) {
         Object data = ((DBObject)dataObject).get(key);
         if (data instanceof DBRef) {
-          ((DBObject)dataObject).put(key, new DBRef(mongoDb,((DBRef)data).getRef(), ((DBRef)data).getId()));
+          ((DBObject)dataObject).put(key, new DBRef(((DBRef)data).getCollectionName(), ((DBRef)data).getId()));
         } else if(data instanceof BasicDBList) {
             for (Object subData : (BasicDBList) data) {
                 for (String subKey : ((DBObject)data).keySet()) {
                     if(subData instanceof DBRef) {
-                        ((BasicDBList)data).put(subKey, new DBRef(mongoDb,((DBRef)subData).getRef(), ((DBRef)subData).getId()));
+                        ((BasicDBList)data).put(subKey, new DBRef(((DBRef)subData).getCollectionName(), ((DBRef)subData).getId()));
                     }
                 }
 

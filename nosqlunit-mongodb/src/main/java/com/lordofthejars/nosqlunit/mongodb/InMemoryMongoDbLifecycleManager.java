@@ -1,20 +1,18 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import java.io.File;
-
+import com.github.fakemongo.Fongo;
+import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
+import com.mongodb.Mongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.fakemongo.Fongo;
-import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
-import com.mongodb.DBPort;
-import com.mongodb.Mongo;
+import java.io.File;
 
 public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryMongoDb.class); 
 	private static final String LOCALHOST = "127.0.0.1";
-	private static final int PORT = DBPort.PORT;
+	private static final int PORT = 27017;
 	
 	public static final String INMEMORY_MONGO_TARGET_PATH = "target" + File.separatorChar + "mongo-data"
 			+ File.separatorChar + "impermanent-db";

@@ -20,12 +20,10 @@ import com.lordofthejars.nosqlunit.core.OperatingSystem;
 import com.lordofthejars.nosqlunit.core.OperatingSystemResolver;
 import com.lordofthejars.nosqlunit.core.OsNameSystemPropertyOperatingSystemResolver;
 import com.lordofthejars.nosqlunit.env.SystemEnvironmentVariables;
-import com.mongodb.DBPort;
 
 public class ManagedMongoDbLifecycleManager extends AbstractLifecycleManager {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDbLifecycleManager.class); 
-	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManagedMongoDbLifecycleManager.class);
 	public ManagedMongoDbLifecycleManager() {
 		super();
 	}
@@ -52,9 +50,10 @@ public class ManagedMongoDbLifecycleManager extends AbstractLifecycleManager {
 
 	protected static final String MONGODB_EXECUTABLE_X = "mongod";
 	protected static final String MONGODB_EXECUTABLE_W = "mongod.exe";
+	protected static final int DEFAULT_PORT = 27017;
 
 	private String mongodPath = SystemEnvironmentVariables.getEnvironmentOrPropertyVariable("MONGO_HOME");
-	private int port = DBPort.PORT;
+	private int port = DEFAULT_PORT;
 	
 	private String targetPath = DEFAULT_MONGO_TARGET_PATH;
 	private String dbRelativePath = DEFAULT_MONGO_DBPATH;
