@@ -33,10 +33,6 @@ public class DefaultNeo4jComparisonStrategy implements Neo4jComparisonStrategy {
 		return compareContents(dataset, neo4jGraphMlRepresentation);
 	}
 
-	@Override
-	public void setIgnoreProperties(String[] ignoreProperties) {
-	}
-
 	private boolean compareContents(InputStream expectedData, ByteArrayInputStream neo4jGraphMlRepresentation) {
 		try {
 			configureXmlUnit();
