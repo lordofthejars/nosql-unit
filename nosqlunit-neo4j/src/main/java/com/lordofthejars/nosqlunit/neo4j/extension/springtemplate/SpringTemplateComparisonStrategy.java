@@ -58,10 +58,6 @@ public class SpringTemplateComparisonStrategy implements Neo4jComparisonStrategy
 		return true;
 	}
 
-	@Override
-	public void setIgnoreProperties(String[] ignoreProperties) {
-	}
-
 	private List<Object> findAndFetchAllEntitiesByClass(final Neo4jTemplate neo4jTemplate, final Class<?> entityClass) {
 
 		TransactionTemplate transactionalTemplate = transactionalTemplate(neo4jTemplate.getGraphDatabaseService());

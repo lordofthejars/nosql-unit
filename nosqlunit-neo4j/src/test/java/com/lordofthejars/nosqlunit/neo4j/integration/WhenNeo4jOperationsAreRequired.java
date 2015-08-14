@@ -25,7 +25,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.util.FileUtils;
 import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 
@@ -347,7 +346,7 @@ public class WhenNeo4jOperationsAreRequired {
 	private void clearDb() {
 
 		try {
-			FileUtils.deleteRecursively(new File(DB_PATH));
+			org.apache.commons.io.FileUtils.deleteDirectory(new File(DB_PATH));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

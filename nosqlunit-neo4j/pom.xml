@@ -9,7 +9,7 @@
 	<artifactId>nosqlunit-neo4j</artifactId>
 
 	<properties>
-		<spring.data.neo4j.version>3.3.0.RELEASE</spring.data.neo4j.version>
+		<spring.data.neo4j.version>3.3.2.RELEASE</spring.data.neo4j.version>
 	</properties>
 
 	<dependencies>
@@ -33,13 +33,9 @@
 
 		<dependency>
 			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-kernel</artifactId>
+			<artifactId>neo4j</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-cypher</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>stax</groupId>
 			<artifactId>stax-api</artifactId>
@@ -89,6 +85,12 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-kernel</artifactId>
+			<type>test-jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-io</artifactId>
 			<type>test-jar</type>
 		</dependency>
 
