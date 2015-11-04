@@ -3,8 +3,7 @@ package com.lordofthejars.nosqlunit.mongodb;
 import static ch.lambdaj.collection.LambdaCollections.with;
 import static org.hamcrest.CoreMatchers.anything;
 
-import java.util.Map;
-
+import com.lordofthejars.nosqlunit.util.SpringUtils;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.springframework.context.ApplicationContext;
@@ -34,25 +33,17 @@ public class SpringMongoDbRule extends MongoDbRule {
 		return super.apply(base, method, testObject);
 	}
 	
-	private Mongo definedMongo(Object testObject) {
+	private Mongo definedMongo(Object testObject)
+	{
 		ApplicationContext applicationContext = propertyGetter.propertyByType(testObject, ApplicationContext.class);
 
-		Map<String, Mongo> beansOfType = applicationContext.getBeansOfType(Mongo.class);
-		
-		if(beansOfType == null) {
-			throw new IllegalArgumentException(
-					"At least one Mongo instance should be defined into Spring Application Context.");
-		}
-		
-		Mongo mongo = with(beansOfType).values().first(anything());
+		Mongo mongo = SpringUtils.getBeanOfType(applicationContext, Mongo.class);
 
 		if (mongo == null) {
 			throw new IllegalArgumentException(
 					"At least one Mongo instance should be defined into Spring Application Context.");
 		}
-
 		return mongo;
-
 	}
-	
+
 }
