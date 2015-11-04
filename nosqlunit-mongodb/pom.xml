@@ -9,7 +9,7 @@
 	<artifactId>nosqlunit-mongodb</artifactId>
 
 	<properties>
-		<spring.data.mongodb.version>1.1.1.RELEASE</spring.data.mongodb.version>
+		<spring.data.mongodb.version>1.4.3.RELEASE</spring.data.mongodb.version>
 	</properties>
 
 	<dependencies>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>3.1.2.RELEASE</version>
+			<version>3.2.9.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
 
