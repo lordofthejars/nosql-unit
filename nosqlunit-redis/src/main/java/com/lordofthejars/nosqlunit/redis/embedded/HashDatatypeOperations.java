@@ -278,7 +278,7 @@ public class HashDatatypeOperations extends ExpirationDatatypeOperations impleme
 	private Long incrementAndSetValue(final byte[] key, final byte[] field, final long value, byte[] elementToUpdate) {
 		try {
 			long longValue = incrementValue(value, elementToUpdate);
-			hset(key, field, Long.toString(value).getBytes("UTF-8"));
+			hset(key, field, Long.toString(longValue).getBytes("UTF-8"));
 			return longValue;
 		} catch (UnsupportedEncodingException e) {
 			throw new UnsupportedOperationException("ERR value is not an integer");
