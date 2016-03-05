@@ -12,7 +12,7 @@ import java.io.InputStream;
  * It doesn't compare that all the data stored in the database is included in the expected
  * file, so other data not defined in the expected resource could exist in Mongo. It just
  * assure that the expected data exists.
- * <p/>
+ * <p>
  * Checks the following assertions:
  * <li>
  *      <ul>
@@ -49,6 +49,7 @@ import java.io.InputStream;
  *         will be ignored in each object, no matter the collection.
  *     </ol>
  * </li>
+ * </p>
  *
  * The values of the properties to be ignored should be named following the rules for valid
  * collection and property names defined in
