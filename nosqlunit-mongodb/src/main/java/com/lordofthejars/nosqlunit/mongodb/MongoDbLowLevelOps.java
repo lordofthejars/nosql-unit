@@ -134,7 +134,8 @@ public class MongoDbLowLevelOps {
 				}
 			} while (!connectionIsPossible && currentRetry <= MAX_RETRIES);
 		} finally {
-			server.close();
+			if(server!=null)
+				server.close();
 		}
 
 		return connectionIsPossible;
