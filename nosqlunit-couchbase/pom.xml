@@ -15,7 +15,10 @@
 	<repositories>
 		<repository>
 			<id>couchbase maven repo</id>
-			<url>http://files.couchbase.com/maven2/</url>
+			<url>http://files.couchbase.com/maven2</url>
+			<snapshots>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
 		</repository>
 	</repositories>
 
