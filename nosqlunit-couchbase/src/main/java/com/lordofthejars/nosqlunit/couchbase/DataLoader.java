@@ -1,7 +1,6 @@
 package com.lordofthejars.nosqlunit.couchbase;
 
 import com.couchbase.client.CouchbaseClient;
-import com.google.gson.JsonParseException;
 import com.lordofthejars.nosqlunit.couchbase.model.Document;
 
 import org.codehaus.jackson.JsonGenerationException;
