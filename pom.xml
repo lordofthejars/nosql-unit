@@ -42,7 +42,7 @@
 		<mockito.version>1.9.0</mockito.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<logback.version>1.0.11</logback.version>
-		<neo4j.version>2.2.4</neo4j.version>
+		<neo4j.version>2.3.3</neo4j.version>
 		<xmlunit.version>1.3</xmlunit.version>
 		<lambdaj.version>2.3.3</lambdaj.version>
 		<stax.version>1.0.1</stax.version>
@@ -162,8 +162,8 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.neo4j</groupId>
-				<artifactId>neo4j-kernel</artifactId>
+				<groupId>org.neo4j.test</groupId>
+				<artifactId>neo4j-harness</artifactId>
 				<version>${neo4j.version}</version>
 				<type>test-jar</type>
 			</dependency>

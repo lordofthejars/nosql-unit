@@ -1,29 +1,28 @@
 package com.lordofthejars.nosqlunit.demo.neo4j;
 
-import static com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer.ManagedWrappingNeoServerRuleBuilder.newWrappingNeoServerNeo4jRule;
-import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
-
-import javax.inject.Inject;
-
+import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j;
+import com.lordofthejars.nosqlunit.neo4j.Neo4jRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
-import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.neo4j.ManagedWrappingNeoServer;
-import com.lordofthejars.nosqlunit.neo4j.Neo4jRule;
+import javax.inject.Inject;
+
+import static com.lordofthejars.nosqlunit.neo4j.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
+import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
 
 public class WhenNeoMeetsANewFriend {
 
 	@ClassRule
-	public static ManagedWrappingNeoServer managedWrappingNeoServer = newWrappingNeoServerNeo4jRule().build();
-	
+	public static EmbeddedNeo4j managedNeoServer = newEmbeddedNeo4jRule().build();
+
 	@Rule
-	public Neo4jRule neo4jRule = newNeo4jRule().defaultManagedNeo4j(this);
-	
+	public Neo4jRule neo4jRule = newNeo4jRule().defaultEmbeddedNeo4j();
+
 	@Inject
 	private GraphDatabaseService graphDatabaseService;
 	

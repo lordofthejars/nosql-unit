@@ -1,44 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
-    <key id="name" for="node" attr.name="name" attr.type="string"/>
-    <key id="age" for="edge" attr.name="age" attr.type="int"/>
-    <graph id="G" edgedefault="directed">
-    	<node id="0"></node>
-        <node id="1">
+    <key attr.name="age" attr.type="int" for="edge" id="age"/>
+    <key attr.name="name" attr.type="string" for="node" id="name"/>
+    <graph edgedefault="directed" id="G">
+        <node id="0">
             <data key="name">Thomas Anderson</data>
         </node>
-        <node id="2">
+        <node id="1">
             <data key="name">Trinity</data>
         </node>
-        <node id="3">
+        <node id="2">
             <data key="name">Morpheus</data>
         </node>
-        <node id="4">
+        <node id="3">
             <data key="name">Agent Smith</data>
         </node>
-        <node id="5">
+        <node id="4">
             <data key="name">The Architect</data>
         </node>
-        <node id="6">
+        <node id="5">
             <data key="name">The Oracle</data>
         </node>
-        <edge id="0" source="0" target="1" label="NEO_NODE">
-        </edge>
-        <edge id="1" source="1" target="2" label="KNOWS">
+        <edge id="0" label="KNOWS" source="0" target="1">
             <data key="age">3</data>
         </edge>
-        <edge id="2" source="1" target="3" label="KNOWS">
+        <edge id="1" label="KNOWS" source="0" target="2">
             <data key="age">5</data>
         </edge>
-        <edge id="3" source="2" target="3" label="KNOWS">
+        <edge id="2" label="KNOWS" source="1" target="2">
             <data key="age">18</data>
         </edge>
-        <edge id="4" source="3" target="4" label="KNOWS">
+        <edge id="3" label="KNOWS" source="2" target="3">
             <data key="age">20</data>
         </edge>
-        <edge id="5" source="4" target="5" label="CODED_BY">
+        <edge id="4" label="CODED_BY" source="3" target="4">
             <data key="age">20</data>
         </edge>
-        <edge id="6" source="1" target="6" label="KNOWS">
+        <edge id="5" label="KNOWS" source="0" target="5">
             <data key="age">4</data>
         </edge>
     </graph>
