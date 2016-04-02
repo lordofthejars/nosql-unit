@@ -59,7 +59,7 @@
 		<ektorp.couchdb.version>1.3.0</ektorp.couchdb.version>
 		<infinispan.version>5.1.8.Final</infinispan.version>
 		<bool.version>0.9.0</bool.version>
-		<fongo.version>2.0.1</fongo.version>
+		<fongo.version>2.0.6</fongo.version>
 	</properties>
 
 	<dependencyManagement>
