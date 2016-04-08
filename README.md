@@ -2894,34 +2894,34 @@ public class WhenUserIsInserted {
 
 	@ClassRule
 	public static final ManagedInfinispan MANAGED_INFINISPAN = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build();
-	
+
 	@Rule
 	public final InfinispanRule infinispanRule = newInfinispanRule().defaultManagedInfinispan();
-	
+
 	@Inject
 	private BasicCache<String, User> remoteCache;
-	
+
 	@UsingDataSet(loadStrategy=LoadStrategyEnum.DELETE_ALL)
 	@ShouldMatchDataSet(location="user.json")
 	@Test
 	public void user_should_be_available_in_cache() {
-		
+
 		UserManager userManager = new UserManager(remoteCache);
 		userManager.addUser(new User("alex", 32));
 	}
-	
+
 }
 ~~~~
 
 Elasticsearch Engine
-==============
+====================
+
+Elasticsearch is a distributed, RESTful, free/open source search server based on Apache Lucene.
 
 Elasticsearch
 =============
 
-ElasticSearch is a distributed, RESTful, free/open source search server based on Apache Lucene.
-
-**NoSQLUnit** supports **Elasticsearch** by using next classes:
+**NoSQLUnit** supports **Elasticsearch 1.x** by using next classes:
 
   ----------- -----------------------------------------------------
   In Memory   com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch
@@ -2936,10 +2936,26 @@ ElasticSearch is a distributed, RESTful, free/open source search server based on
 
   : Manager Rule
 
+
+**NoSQLUnit** supports **Elasticsearch 2.x** by using next classes:
+
+  ----------- -----------------------------------------------------
+  In Memory   com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch
+  Managed     com.lordofthejars.nosqlunit.elasticsearch2.ManagedElasticsearch
+  ----------- -----------------------------------------------------
+
+  : Lifecycle Management Rules
+
+  ---------------------- -------------------------------------------------
+  NoSQLUnit Management   com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule
+  ---------------------- -------------------------------------------------
+
+  : Manager Rule
+
 Maven Setup
 -----------
 
-To use **NoSQLUnit** with **Elasticsearch** you only need to add next dependency:
+To use **NoSQLUnit** with **Elasticsearch 1.x** you only need to add next dependency:
 
 ~~~~ {.xml}
 <dependency>
@@ -2948,6 +2964,17 @@ To use **NoSQLUnit** with **Elasticsearch** you only need to add next dependency
     <version>${version.nosqlunit}</version>
 </dependency>
 ~~~~
+
+To use **NoSQLUnit** with **Elasticsearch 2.x** you only need to add next dependency:
+
+~~~~ {.xml}
+<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-elasticsearch2</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+~~~~
+
 
 Dataset Format
 --------------
@@ -2990,7 +3017,7 @@ Datasets must have next format:
 
 > Notice that if attributes value are integers, double quotes are not
   required. Also you can define as many *index* subdocuments as required, but only one *data* document which will be inserted into **Elasticsearch**.
-  Moreover property *indexId* is only mandatory if you want to use the inserted data to be validated with *@ShouldMatchDataSet*. Document index is used to run comparisions      faster than retrieving all data. If you are not planning to use the expectations capability of **NoSQLUnit** then you are not required to set *indexId* property and **Elasticsearch** will provie one for you.
+  Moreover property *indexId* is only mandatory if you want to use the inserted data to be validated with *@ShouldMatchDataSet*. Document index is used to run comparisions      faster than retrieving all data. If you are not planning to use the expectations capability of **NoSQLUnit** then you are not required to set *indexId* property and **Elasticsearch** will provide one for you.
 
 Getting Started
 ---------------
@@ -3004,8 +3031,8 @@ test, integration test, deployment test, ...) you will require an
 
 #### Embedded
 
-To configure **embedded** approach you should only instantiate next
-rule:
+To configure the **embedded** approach with **Elasticsearch 1.x**
+you should only instantiate the following rule:
 
 ~~~~ {.java}
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
@@ -3014,20 +3041,39 @@ import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.Em
 public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
 ~~~~
 
-By default Elasticsearch Node is started with property *local* set to true, but this property and all other supported properties can be configured or you can still use the default configuration approach provided by **Elasticsearch** by creating `elasticsearch.yml` file into classpath. 
+In order to configure the **embedded** approach with **Elasticsearch 2.x**
+you should instantiate the following rule:
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
+
+@ClassRule
+public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+~~~~
+
+By default, the **Elasticsearch** node is started as a client node (`node.local: true`), but this property and all other supported properties can be configured or you can still use the default configuration approach provided by **Elasticsearch** by creating `elasticsearch.yml` file into classpath.
 
 Data will be stored in `target/elasticsearch-test-data/impermanent-db` directory.
 
 #### Managed
 
-To configure the **managed** way, we should use ManagedElasticsearch rule and
+To configure the **managed** way with **Elasticsearch 1.x**, we should use the `ManagedElasticsearch` rule and
 may require some configuration parameters.
 
 ~~~~ {.java}
 import static com.lordofthejars.nosqlunit.elasticsearch.ManagedElasticsearch.ManagedElasticsearchRuleBuilder.newManagedElasticsearchRule;
 
 @ClassRule
-public static final ManagedElasticsearch MANAGED_ELASTICSEARCH = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-0.20.5").build();
+public static final ManagedElasticsearch MANAGED_ELASTICSEARCH = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-1.7.5").build();
+~~~~
+
+In order to use a **managed** instance with **Elasticsearch 2.x**, use the following rule:
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.elasticsearch2.ManagedElasticsearch.ManagedElasticsearchRuleBuilder.newManagedElasticsearchRule;
+
+@ClassRule
+public static final ManagedElasticsearch MANAGED_ELASTICSEARCH = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-2.0.2").build();
 ~~~~
 
 By default managed *Elasticsearch* rule uses next default values:
@@ -3071,7 +3117,9 @@ import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.Elasti
 public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
 ~~~~
 
-If you need to customize embedded connection we can use *EmbeddedElasticsearchConfigurationBuilder* class builder. 
+If you're using **Elasticsearch 2.x**, simply use the classes inside the package `com.lordofthejars.nosqlunit.elasticsearch2`.
+
+If you need to customize embedded connection we can use *EmbeddedElasticsearchConfigurationBuilder* class builder.
 
 #### Managed
 
@@ -3092,7 +3140,9 @@ import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.Elasti
 public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultManagedElasticsearch();
 ~~~~
 
-But you can cusomize connection parameters by using *ManagedElasticsearchConfigurationBuilder* class. There you can set the *Settings* class and define the transport port. 
+If you're using **Elasticsearch 2.x**, simply use the classes inside the package `com.lordofthejars.nosqlunit.elasticsearch2`.
+
+But you can customize connection parameters by using *ManagedElasticsearchConfigurationBuilder* class. There you can set the *Settings* class and define the transport port.
 
 #### Remote
 
@@ -3135,23 +3185,23 @@ Managed test:
 
 ~~~~ {.java}
 @ClassRule
-public static final ManagedElasticsearch MANAGED_EALSTICSEARCH = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-0.20.5").build();
-	
+public static final ManagedElasticsearch MANAGED_EALSTICSEARCH = newManagedElasticsearchRule().elasticsearchPath("/opt/elasticsearch-1.7.5").build();
+
 @Rule
 public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultManagedElasticsearch();
-	
+
 @Inject
 private Client client;
-	
+
 @Test
 @UsingDataSet(locations="books.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 public void all_books_should_be_returned() {
-		
+
 	BookManager bookManager = new BookManager(client);
 	List<Book> books = bookManager.searchAllBooks();
-		
+
 	assertThat(books, hasItems(new Book("The Hobbit", 293)));
-		
+
 }
 ~~~~
 
