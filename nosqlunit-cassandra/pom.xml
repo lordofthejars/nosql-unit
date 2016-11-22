@@ -1,32 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>nosqlunit</artifactId>
-		<groupId>com.lordofthejars</groupId>
-		<version>0.10.0</version>
-		<relativePath>..</relativePath>
-	</parent>
-	<artifactId>nosqlunit-cassandra</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>nosqlunit</artifactId>
+        <groupId>com.lordofthejars</groupId>
+        <version>0.11.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <artifactId>nosqlunit-cassandra</artifactId>
 
-	<dependencies>
-	
-		<dependency>
-			<groupId>com.googlecode.lambdaj</groupId>
-			<artifactId>lambdaj</artifactId>
-		</dependency>
-	
-		<dependency>
-			<groupId>org.cassandraunit</groupId>
-			<artifactId>cassandra-unit</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-cli</artifactId>
-					<groupId>commons-cli</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>junit</artifactId>
-					<groupId>junit</groupId>
-				</exclusion>
+    <dependencies>
+
+        <dependency>
+            <groupId>com.googlecode.lambdaj</groupId>
+            <artifactId>lambdaj</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cassandraunit</groupId>
+            <artifactId>cassandra-unit</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-cli</artifactId>
+                    <groupId>commons-cli</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>junit</artifactId>
+                    <groupId>junit</groupId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -35,59 +35,59 @@
                     <groupId>org.hamcrest</groupId>
                     <artifactId>hamcrest-all</artifactId>
                 </exclusion>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
 
-		<dependency>
-			<artifactId>nosqlunit-core</artifactId>
-			<groupId>com.lordofthejars</groupId>
-			<version>${project.version}</version>
-		</dependency>
+        <dependency>
+            <artifactId>nosqlunit-core</artifactId>
+            <groupId>com.lordofthejars</groupId>
+            <version>${project.version}</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 
-	<build>
-		<plugins>
+    <build>
+        <plugins>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-				<executions>
-					<execution>
-						<id>unit-tests</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<skip>false</skip>
-							<includes>
-								<include>**/*Test.java</include>
-								<include>**/Test*.java</include>
-								<include>**/When*.java</include>
-							</includes>
-							<excludes>
-								<exclude>%regex[.*integration.*]</exclude>
-							</excludes>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>unit-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <includes>
+                                <include>**/*Test.java</include>
+                                <include>**/Test*.java</include>
+                                <include>**/When*.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>%regex[.*integration.*]</exclude>
+                            </excludes>
 
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
