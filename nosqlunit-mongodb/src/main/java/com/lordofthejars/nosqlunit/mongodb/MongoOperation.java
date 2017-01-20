@@ -2,122 +2,127 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+import com.mongodb.MongoOptions;
+import java.io.InputStream;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.util.Set;
-
 public final class MongoOperation extends AbstractCustomizableDatabaseOperation<MongoDbConnectionCallback, Mongo> {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
 
-	private Mongo mongo;
-	private MongoDbConfiguration mongoDbConfiguration;
+    private Mongo mongo;
 
-	protected MongoOperation(Mongo mongo, MongoDbConfiguration mongoDbConfiguration) {
-			this.mongo = mongo;
-			this.mongoDbConfiguration = mongoDbConfiguration;
-			this.setInsertionStrategy(new DefaultInsertionStrategy());
-			this.setComparisonStrategy(new DefaultComparisonStrategy());
-	}
-	
-	public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
-		try {
-			this.mongo = mongoDbConfiguration.getMongo();
-			this.mongo.setWriteConcern(mongoDbConfiguration.getWriteConcern());
-			this.mongoDbConfiguration = mongoDbConfiguration;
-			this.setInsertionStrategy(new DefaultInsertionStrategy());
-			this.setComparisonStrategy(new DefaultComparisonStrategy());
-		} catch (MongoException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
-	
-	@Override
-	public void insert(InputStream contentStream) {
+    private MongoDbConfiguration mongoDbConfiguration;
 
-		insertData(contentStream);
+    protected MongoOperation(Mongo mongo, MongoDbConfiguration mongoDbConfiguration) {
+        this.mongo = mongo;
+        this.mongoDbConfiguration = mongoDbConfiguration;
+        this.setInsertionStrategy(new DefaultInsertionStrategy());
+        this.setComparisonStrategy(new DefaultComparisonStrategy());
+    }
 
-	}
+    public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
+        try {
+            this.mongo = mongoDbConfiguration.getMongo();
+            this.mongo.setWriteConcern(mongoDbConfiguration.getWriteConcern());
+            this.mongoDbConfiguration = mongoDbConfiguration;
+            this.setInsertionStrategy(new DefaultInsertionStrategy());
+            this.setComparisonStrategy(new DefaultComparisonStrategy());
+        } catch (MongoException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
-	private void insertData(InputStream contentStream) {
-		try {
+    @Override
+    public void insert(InputStream contentStream) {
 
-			final DB mongoDb = getMongoDb();
-			executeInsertion(new MongoDbConnectionCallback() {
-				
-				@Override
-				public DB db() {
-					return mongoDb;
-				}
-			}, contentStream);
+        insertData(contentStream);
 
-		} catch (Throwable e) {
-			throw new IllegalArgumentException("Unexpected error reading data set file.", e);
-		}
-	}
+    }
 
+    private void insertData(InputStream contentStream) {
+        try {
 
-	@Override
-	public void deleteAll() {
-		DB mongoDb = getMongoDb();
-		deleteAllElements(mongoDb);
-	}
+            final DB mongoDb = getMongoDb();
+            executeInsertion(new MongoDbConnectionCallback() {
 
-	private void deleteAllElements(DB mongoDb) {
-		Set<String> collectionaNames = mongoDb.getCollectionNames();
+                @Override
+                public DB db() {
+                    return mongoDb;
+                }
+            }, contentStream);
 
-		for (String collectionName : collectionaNames) {
+        } catch (Throwable e) {
+            throw new IllegalArgumentException("Unexpected error reading data set file.", e);
+        }
+    }
 
-			if (isNotASystemCollection(collectionName)) {
+    @Override
+    public void deleteAll() {
+        DB mongoDb = getMongoDb();
+        deleteAllElements(mongoDb);
+    }
 
-				LOGGER.debug("Dropping Collection {}.", collectionName);
+    private void deleteAllElements(DB mongoDb) {
+        Set<String> collectionaNames = mongoDb.getCollectionNames();
 
-				DBCollection dbCollection = mongoDb.getCollection(collectionName);
-				dbCollection.drop();
-			}
-		}
-	}
+        for (String collectionName : collectionaNames) {
 
-	private boolean isNotASystemCollection(String collectionName) {
-		return !collectionName.startsWith("system.");
-	}
+            if (isNotASystemCollection(collectionName)) {
 
-	@Override
-	public boolean databaseIs(InputStream contentStream) {
+                LOGGER.debug("Dropping Collection {}.", collectionName);
 
-		return compareData(contentStream);
+                DBCollection dbCollection = mongoDb.getCollection(collectionName);
+                // Delete ALL, No DROP
+                dbCollection.remove(new BasicDBObject(0));
+            }
+        }
+    }
 
-	}
+    private boolean isNotASystemCollection(String collectionName) {
+        return !collectionName.startsWith("system.");
+    }
 
-	private boolean compareData(InputStream contentStream) throws NoSqlAssertionError {
-		try {
-			final DB mongoDb = getMongoDb();
-			executeComparison(new MongoDbConnectionCallback() {
-				
-				@Override
-				public DB db() {
-					return mongoDb;
-				}
-			}, contentStream);
-			return true;
-		} catch (NoSqlAssertionError e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new IllegalArgumentException("Unexpected error reading expected data set file.", e);
-		}
-	}
+    @Override
+    public boolean databaseIs(InputStream contentStream) {
 
-	private DB getMongoDb() {
-		DB db = mongo.getDB(this.mongoDbConfiguration.getDatabaseName());
-		return db;
-	}
+        return compareData(contentStream);
 
-	@Override
-	public Mongo connectionManager() {
-		return mongo;
-	}
+    }
+
+    private boolean compareData(InputStream contentStream) throws NoSqlAssertionError {
+        try {
+            final DB mongoDb = getMongoDb();
+            executeComparison(new MongoDbConnectionCallback() {
+
+                @Override
+                public DB db() {
+                    return mongoDb;
+                }
+            }, contentStream);
+            return true;
+        } catch (NoSqlAssertionError e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new IllegalArgumentException("Unexpected error reading expected data set file.", e);
+        }
+    }
+
+    private DB getMongoDb() {
+        DB db = mongo.getDB(this.mongoDbConfiguration.getDatabaseName());
+        return db;
+    }
+
+    @Override
+    public Mongo connectionManager() {
+        return mongo;
+    }
 
 }
