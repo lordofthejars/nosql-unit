@@ -1,11 +1,10 @@
 package com.lordofthejars.nosqlunit.redis;
 
-import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
-import static com.lordofthejars.nosqlunit.redis.EmbeddedRedisConfigurationBuilder.newEmbeddedRedisConfiguration;
-import redis.clients.jedis.BinaryJedisCommands;
-
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import redis.clients.jedis.BinaryJedisCommands;
+
+import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
 
 public class RedisRule extends AbstractNoSqlTestRule {
 
@@ -52,20 +51,6 @@ public class RedisRule extends AbstractNoSqlTestRule {
 		@Deprecated
 		public RedisRule defaultManagedRedis(Object target) {
 			return new RedisRule(newManagedRedisConfiguration().build(), target);
-		}
-		
-		public RedisRule defaultEmbeddedRedis() {
-			return new RedisRule(newEmbeddedRedisConfiguration().build());
-		}
-		
-		/**
-		 * We can use defaultEmbeddedRedis().
-		 * @param target
-		 * @return
-		 */
-		@Deprecated
-		public RedisRule defaultEmbeddedRedis(Object target) {
-			return new RedisRule(newEmbeddedRedisConfiguration().build(), target);
 		}
 		
 		public RedisRule build() {

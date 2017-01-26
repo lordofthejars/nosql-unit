@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.core;
 
 import com.lordofthejars.nosqlunit.annotation.*;
 import com.lordofthejars.nosqlunit.util.DefaultClasspathLocationBuilder;
+import com.lordofthejars.nosqlunit.util.ReflectionUtil;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -89,8 +90,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                     if (isDatabaseOperationCustomizable(databaseOperation)) {
                         Class<? extends ComparisonStrategy<?>> comparisionStrategy = customComparisonStrategy
                                 .comparisonStrategy();
-                        ComparisonStrategy<?> comparisionStrategyObject = org.joor.Reflect
-                                .on(comparisionStrategy).create().get();
+                        ComparisonStrategy<?> comparisionStrategyObject = ReflectionUtil.createInstance(comparisionStrategy);
 
                         Class<?> classWithAnnotation = IOUtils.getClassWithAnnotation(
                                 target.getClass(),
@@ -122,8 +122,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                     if (isDatabaseOperationCustomizable(databaseOperation)) {
                         Class<? extends InsertionStrategy<?>> insertationStrategy = customInsertionStrategy
                                 .insertionStrategy();
-                        InsertionStrategy<?> insertationStrategyObject = org.joor.Reflect
-                                .on(insertationStrategy).create().get();
+                        InsertionStrategy<?> insertationStrategyObject = ReflectionUtil.createInstance(insertationStrategy);
                         overrideInsertationStrategy(databaseOperation,
                                 insertationStrategyObject);
                     } else {

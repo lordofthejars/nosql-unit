@@ -1,7 +1,9 @@
 package com.lordofthejars.nosqlunit.redis.parser;
 
-import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toByteArray;
-import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toDouble;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import redis.clients.jedis.BinaryJedisCommands;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,12 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import redis.clients.jedis.BinaryJedisCommands;
+import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toByteArray;
+import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toDouble;
 
 public class DataReader {
 
@@ -113,7 +111,7 @@ public class DataReader {
 		Object key = sortsetObject.get(KEY_TOKEN);
 		JSONArray valuesArray = (JSONArray) sortsetObject.get(VALUES_TOKEN);
 
-		Map<byte[], Double> scoreMembers = Maps.newHashMap();
+		Map<byte[], Double> scoreMembers = new HashMap<>();
 
 		for (Object valueObject : valuesArray) {
 			JSONObject valueScopeObject = (JSONObject) valueObject;

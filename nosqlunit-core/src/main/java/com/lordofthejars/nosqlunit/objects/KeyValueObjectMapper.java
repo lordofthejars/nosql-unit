@@ -1,6 +1,10 @@
 package com.lordofthejars.nosqlunit.objects;
 
-import static org.joor.Reflect.on;
+import com.lordofthejars.nosqlunit.util.ReflectionUtil;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,11 +13,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 public class KeyValueObjectMapper {
 
@@ -151,7 +150,7 @@ public class KeyValueObjectMapper {
 		if(implementation.equals(NO_IMPLEMENTATION_PROVIDED)) {
 			return new ArrayList<Object>();
 		} else {
-			return on(implementation).create().get();
+			return ReflectionUtil.createInstance(implementation);
 		}
 	}
 	

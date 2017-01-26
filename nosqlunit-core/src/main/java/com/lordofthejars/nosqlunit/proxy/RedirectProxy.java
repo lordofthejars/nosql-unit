@@ -1,15 +1,13 @@
 package com.lordofthejars.nosqlunit.proxy;
 
-import static org.joor.Reflect.on;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-
-import org.joor.ReflectException;
-
+import com.lordofthejars.nosqlunit.util.ReflectionUtil;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class RedirectProxy<S, D> {
 	
@@ -28,10 +26,9 @@ public class RedirectProxy<S, D> {
 
 		public Object intercept(Object object, Method method, Object[] arguments, MethodProxy proxy) throws Throwable {
 			try {
+				return ReflectionUtil.callMethod(destination, method, arguments);
 
-				return on(destination).call(method.getName(), arguments).get();
-
-			} catch (ReflectException e) {
+			} catch (InvocationTargetException e) {
 				throw new UnsupportedOperationException("The method " + method.getName() + " with parameters "
 						+ Arrays.toString(arguments) + " does not exist on class " + destination.getClass());
 			}

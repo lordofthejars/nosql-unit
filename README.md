@@ -1714,7 +1714,6 @@ lists, sets and sorted sets.
 **NoSQLUnit** supports *Redis* by using next classes:
 
   ---------- -------------------------------------------------
-  Embedded   com.lordofthejars.nosqlunit.redis.EmbeddedRedis
   Managed    com.lordofthejars.nosqlunit.redis.ManagedRedis
   ---------- -------------------------------------------------
 
@@ -1825,32 +1824,8 @@ Getting Started
 First step is defining which lifecycle management strategy is required
 for your tests. Depending on kind of test you are implementing (unit
 test, integration test, deployment test, ...) you will require an
-embedded approach, managed approach or remote approach.
+managed approach or remote approach.
 
-#### Embedded Lifecycle
-
-To configure **embedded** approach you should only instantiate next
-[rule](#program.redis_embedded_conf) :
-
-~~~~ {.java}
-@ClassRule
-    public static EmbeddedRedis embeddedRedis = newEmbeddedRedisRule().build();
-~~~~
-
-By default managed *Redis* rule uses next default values but can be
-configured programmatically:
-
-  ------------- -------------------------------------------------------------------------------------------------------------------
-  Target path   This is the directory where *Redis* embedded instance is started and is `target/redis-test-data/impermanent-db` .
-  ------------- -------------------------------------------------------------------------------------------------------------------
-
-  : Default Embedded Values
-
-Note that target path is only used as a configuration parameter to allow
-multiple instances of embedded in-memory Redis engine.
-
-For more information about embedded in-memory Redis take a tour to
-section: [Embedded In-Memory Redis](#advanced.redis_embedded.section)
 
 #### Managed Lifecycle
 
@@ -1893,18 +1868,6 @@ To make developer's life easier and code more readable, a fluent
 interface can be used to create these configuration objects. Three
 different kind of configuration builders exist.
 
-#### Embedded Connection
-
-The first one is for configuring an embedded connection to managed
-*Redis* .
-
-~~~~ {.java}
-import static com.lordofthejars.nosqlunit.redis.RedisRule.RedisRuleBuilder.newRedisRule;
-                        
-@Rule
-public RedisRule redisRule = newRedisRule().defaultEmbeddedRedis();
-                        
-~~~~
 
 #### Managed Connection
 

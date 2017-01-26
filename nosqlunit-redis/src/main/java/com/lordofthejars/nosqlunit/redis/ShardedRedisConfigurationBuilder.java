@@ -97,7 +97,7 @@ public class ShardedRedisConfigurationBuilder {
 		}
 		
 		private JedisShardInfo getContent() {
-			JedisShardInfo jedisShardInfo =  new JedisShardInfo(host, port, timeout, weight);
+			JedisShardInfo jedisShardInfo =  new JedisShardInfo(host, port, timeout, timeout, weight);
 			jedisShardInfo.setPassword(password);
 			
 			return jedisShardInfo;
