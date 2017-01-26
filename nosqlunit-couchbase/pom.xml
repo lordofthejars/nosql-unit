@@ -26,11 +26,11 @@
 			<groupId>com.lordofthejars</groupId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.couchbase.mock</groupId>
 			<artifactId>CouchbaseMock</artifactId>
 			<version>0.12.0-SNAPSHOT</version>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>com.couchbase.client</groupId>
 			<artifactId>couchbase-client</artifactId>
