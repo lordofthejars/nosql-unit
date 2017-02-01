@@ -22,13 +22,6 @@ public class MongoFlexibleComparisonStrategyTest {
     @Rule
     public MongoDbRule mongoDbRule = newMongoDbRule().defaultEmbeddedMongoDb("test");
 
-    @Test(expected=NoSqlAssertionError.class)
-    @UsingDataSet(locations = "MongoFlexibleComparisonStrategyTest#thatShowWarnings.json")
-    @ShouldMatchDataSet(location = "MongoFlexibleComparisonStrategyTest#thatShowWarnings-expected.json")
-    //@IgnorePropertyValue(properties = {"2", "collection.3"})
-    public void shouldThrowAnExceptionIfDifferentValuesInFlexibleStrategy() {
-    }
-    
     @Test
     @UsingDataSet(locations = "MongoFlexibleComparisonStrategyTest#thatShowWarnings.json")
     @ShouldMatchDataSet(location = "MongoFlexibleComparisonStrategyTest#thatShowWarnings-expected.json")
