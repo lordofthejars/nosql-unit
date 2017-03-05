@@ -10,7 +10,7 @@ public class DefaultCouchbaseComparisonStrategy implements com.lordofthejars.nos
     @Override
     public boolean compare(final CouchBaseClientCallback connection, final InputStream dataset) throws NoSqlAssertionError,
             Throwable {
-        CouchbaseAssertion.strictAssertEquals(dataset, connection.couchBaseClient());
+        CouchbaseAssertion.strictAssertEquals(dataset, connection.couchBaseBucket());
         return true;
     }
 

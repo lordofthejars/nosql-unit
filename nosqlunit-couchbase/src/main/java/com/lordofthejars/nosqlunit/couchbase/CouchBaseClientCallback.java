@@ -1,8 +1,8 @@
 package com.lordofthejars.nosqlunit.couchbase;
 
-import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.java.Bucket;
 
 public interface CouchBaseClientCallback {
 
-    CouchbaseClient couchBaseClient();
+    Bucket couchBaseBucket();
 }

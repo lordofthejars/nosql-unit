@@ -1,36 +1,29 @@
 package com.lordofthejars.nosqlunit.couchbase.model;
 
+import com.couchbase.client.java.document.json.JsonObject;
+
 public class Document {
 
-    // This is the content of the doc, in case is a json will be a map, otherwise a String
-    private Object document;
+    private JsonObject document;
 
-    private Integer expirationMSecs;
+    private Integer expirationSecs;
 
-    public Document() {
+    public Document(JsonObject document, Integer expirationSecs) {
         super();
-    }
 
-    public Document(Object document, Integer expirationMSecs) {
-        super();
+        if (document == null) {
+            throw new IllegalArgumentException("Document should be provided");
+        }
         this.document = document;
-        this.expirationMSecs = expirationMSecs;
+        this.expirationSecs = expirationSecs;
     }
 
-    public Object getDocument() {
+    public JsonObject getDocument() {
         return document;
     }
 
-    public void setDocument(Object document) {
-        this.document = document;
-    }
-
-    public Integer getExpirationMSecs() {
-        return expirationMSecs;
-    }
-
-    public void setExpirationMSecs(Integer expirationMSecs) {
-        this.expirationMSecs = expirationMSecs;
+    public Integer getExpirationSecs() {
+        return expirationSecs;
     }
 
     @Override
@@ -40,7 +33,7 @@ public class Document {
         result = prime * result
                 + ((document == null) ? 0 : document.hashCode());
         result = prime * result
-                + ((expirationMSecs == null) ? 0 : expirationMSecs.hashCode());
+                + ((expirationSecs == null) ? 0 : expirationSecs.hashCode());
         return result;
     }
 
@@ -58,17 +51,20 @@ public class Document {
                 return false;
         } else if (!document.equals(other.document))
             return false;
-        if (expirationMSecs == null) {
-            if (other.expirationMSecs != null)
+        if (expirationSecs == null) {
+            if (other.expirationSecs != null)
                 return false;
-        } else if (!expirationMSecs.equals(other.expirationMSecs))
+        } else if (!expirationSecs.equals(other.expirationSecs))
             return false;
         return true;
     }
 
-    public int calculateExpiration() {
-        return expirationMSecs == null ?
-                0 :
-                (int) (System.currentTimeMillis() + expirationMSecs) / 1000;
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Document{");
+        sb.append("document=").append(document);
+        sb.append(", expirationSecs=").append(expirationSecs);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -46,6 +46,8 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
     public abstract String getWorkingExtension();
 
+    public abstract void close();
+
     @Override
     public Statement apply(final Statement base, final FrameworkMethod method,
             final Object testObject) {
@@ -61,22 +63,28 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
                 UsingDataSet usingDataSet = getUsingDataSetAnnotation();
 
-                if (isTestAnnotatedWithDataSet(usingDataSet)) {
-                    createCustomInsertationStrategyIfPresent();
-                    loadDataSet(usingDataSet, method);
-                }
+                try {
 
-                injectAnnotationProcessor.processInjectAnnotation(testObject
-                        .getClass(), target, getDatabaseOperation()
-                        .connectionManager());
+                    if (isTestAnnotatedWithDataSet(usingDataSet)) {
+                        createCustomInsertationStrategyIfPresent();
+                        loadDataSet(usingDataSet, method);
+                    }
 
-                base.evaluate();
+                    injectAnnotationProcessor.processInjectAnnotation(testObject
+                            .getClass(), target, getDatabaseOperation()
+                            .connectionManager());
 
-                ShouldMatchDataSet shouldMatchDataSet = getShouldMatchDataSetAnnotation();
+                    base.evaluate();
 
-                if (isTestAnnotatedWithExpectedDataSet(shouldMatchDataSet)) {
-                    createCustomComparisionStrategyIfPresent();
-                    assertExpectation(shouldMatchDataSet);
+                    ShouldMatchDataSet shouldMatchDataSet = getShouldMatchDataSetAnnotation();
+
+                    if (isTestAnnotatedWithExpectedDataSet(shouldMatchDataSet)) {
+                        createCustomComparisionStrategyIfPresent();
+                        assertExpectation(shouldMatchDataSet);
+                    }
+
+                } finally {
+                    close();
                 }
 
             }

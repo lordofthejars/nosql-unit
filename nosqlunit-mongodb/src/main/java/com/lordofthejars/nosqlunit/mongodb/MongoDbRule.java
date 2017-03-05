@@ -115,5 +115,10 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	public String getWorkingExtension() {
 		return EXTENSION;
 	}
-	
+
+	@Override
+	public void close() {
+		this.databaseOperation.connectionManager().close();
+	}
+
 }

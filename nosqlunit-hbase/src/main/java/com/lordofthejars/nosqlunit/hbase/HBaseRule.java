@@ -99,6 +99,9 @@ public class HBaseRule extends AbstractNoSqlTestRule {
 		return EXTENSION;
 	}
 
-	
-	
+	@Override
+	public void close() {
+	}
+
+
 }

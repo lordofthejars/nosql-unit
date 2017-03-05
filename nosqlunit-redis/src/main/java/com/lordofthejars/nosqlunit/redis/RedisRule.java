@@ -3,6 +3,8 @@ package com.lordofthejars.nosqlunit.redis;
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import redis.clients.jedis.BinaryJedisCommands;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.ShardedJedis;
 
 import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
 
@@ -84,6 +86,20 @@ public class RedisRule extends AbstractNoSqlTestRule {
 	@Override
 	public String getWorkingExtension() {
 		return EXTENSION;
+	}
+
+	@Override
+	public void close() {
+		final BinaryJedisCommands binaryJedisCommands = getDatabaseOperation().connectionManager();
+
+		if (binaryJedisCommands instanceof Jedis) {
+			((Jedis) binaryJedisCommands).close();
+		} else {
+			if (binaryJedisCommands instanceof ShardedJedis) {
+				((ShardedJedis) binaryJedisCommands).close();
+			}
+		}
+
 	}
 
 }

@@ -10,7 +10,10 @@ public class RemoteCouchbaseConfigurationBuilder {
 
         private String name;
         private String password = "";
+        private String clusterUsername;
+        private String clusterPassword;
         private List<URI> uris;
+        private boolean createBucket = false;
 
         private Builder() {
             uris = new ArrayList<URI>();
@@ -30,16 +33,32 @@ public class RemoteCouchbaseConfigurationBuilder {
             return this;
         }
 
-        public Builder serverUri(final String url) {
+        public Builder serverHost(final String url) {
             uris.add(URI.create(url));
+            return this;
+        }
+
+        public Builder createBucket(boolean createBucket) {
+            this.createBucket = createBucket;
+            return this;
+        }
+
+        public Builder clusterAuth(String clusterUsername, String clusterPassword) {
+            this.clusterUsername = clusterUsername;
+            this.clusterPassword = clusterPassword;
+
             return this;
         }
 
         public CouchbaseConfiguration build() {
             if (uris.isEmpty()) {
-                uris.add(URI.create("http://localhost:8091/pools"));
+                uris.add(URI.create("localhost"));
             }
-            return new CouchbaseConfiguration(uris, password, name);
+            final CouchbaseConfiguration couchbaseConfiguration = new CouchbaseConfiguration(uris, password, name, createBucket );
+            couchbaseConfiguration.setClusterUsername(clusterUsername);
+            couchbaseConfiguration.setClusterPassword(clusterPassword);
+
+            return couchbaseConfiguration;
         }
     }
 }

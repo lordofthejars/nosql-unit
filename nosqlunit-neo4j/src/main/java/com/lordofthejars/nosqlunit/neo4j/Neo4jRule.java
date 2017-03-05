@@ -111,4 +111,8 @@ public class Neo4jRule extends AbstractNoSqlTestRule {
 		return EXTENSION;
 	}
 
+	@Override
+	public void close() {
+	}
+
 }

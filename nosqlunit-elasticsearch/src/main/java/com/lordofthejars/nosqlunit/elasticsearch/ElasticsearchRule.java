@@ -77,4 +77,9 @@ public class ElasticsearchRule extends AbstractNoSqlTestRule {
 		return EXTENSION;
 	}
 
+	@Override
+	public void close() {
+		this.databaseOperation.connectionManager().close();
+	}
+
 }

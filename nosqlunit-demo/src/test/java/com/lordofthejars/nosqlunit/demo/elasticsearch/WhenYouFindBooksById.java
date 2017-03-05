@@ -1,30 +1,27 @@
 package com.lordofthejars.nosqlunit.demo.elasticsearch;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
-import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
-
-import javax.inject.Inject;
-
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import com.lordofthejars.nosqlunit.demo.model.Book;
+import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
+import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.demo.model.Book;
-import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
-import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
+import javax.inject.Inject;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class WhenYouFindBooksById {
 
 	@ClassRule
-	public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+	public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule().build();
 	
 	@Rule
-	public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
+	public ElasticsearchRule elasticsearchRule = ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule().defaultEmbeddedElasticsearch();
 	
 	@Inject
 	private Client client;

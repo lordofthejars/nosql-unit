@@ -1,20 +1,15 @@
 package com.lordofthejars.nosqlunit.couchbase;
 
-import com.couchbase.client.CouchbaseClient;
-import com.couchbase.client.protocol.views.DesignDocument;
-import com.couchbase.client.protocol.views.InvalidViewException;
-import com.couchbase.client.protocol.views.Query;
-import com.couchbase.client.protocol.views.Stale;
-import com.couchbase.client.protocol.views.View;
-import com.couchbase.client.protocol.views.ViewDesign;
-import com.couchbase.client.protocol.views.ViewResponse;
-import com.couchbase.client.protocol.views.ViewRow;
+import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.view.DefaultView;
+import com.couchbase.client.java.view.DesignDocument;
+import com.couchbase.client.java.view.Stale;
+import com.couchbase.client.java.view.View;
+import com.couchbase.client.java.view.ViewQuery;
+import com.couchbase.client.java.view.ViewResult;
 import com.lordofthejars.nosqlunit.core.FailureHandler;
 import com.lordofthejars.nosqlunit.couchbase.model.Document;
-
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -22,9 +17,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.lordofthejars.nosqlunit.util.DeepEquals.deepEquals;
 
@@ -35,18 +32,18 @@ public class CouchbaseAssertion {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static void strictAssertEquals(final InputStream dataset, final CouchbaseClient couchbaseClient) {
+    public static void strictAssertEquals(final InputStream dataset, final Bucket bucket) {
         final Map<String, Document> expectedDocuments = DataLoader.getDocuments(dataset);
-        final List<String> allDocumentIds = getAllDocumentIds(couchbaseClient);
+        final List<String> allDocumentIds = getAllDocumentIds(bucket);
 
         checkNumberOfDocuments(expectedDocuments, allDocumentIds);
-        checkEachDocument(expectedDocuments, allDocumentIds, couchbaseClient);
+        checkEachDocument(expectedDocuments, allDocumentIds, bucket);
     }
 
     private static void checkEachDocument(final Map<String, Document> expectedDocuments, final List<String> allDocumentIds,
-                                          final CouchbaseClient couchbaseClient) {
+                                          final Bucket bucket) {
         for (final String id : allDocumentIds) {
-            final Object real = couchbaseClient.get(id);
+            final Object real = bucket.get(id);
             final Object expected = toJson(expectedDocuments.get(id).getDocument());
 
             if (!deepEquals(real, expected)) {
@@ -69,21 +66,6 @@ public class CouchbaseAssertion {
         }
     }
 
-    private static Object fromJson(final Object document) {
-        if (document instanceof String) {
-            String json = (String) document;
-            try {
-                JsonNode node = OBJECT_MAPPER.readTree(json);
-                return OBJECT_MAPPER.readValue(json, String.class);
-            } catch (JsonProcessingException e) {
-                throw new IllegalArgumentException(e);
-            } catch (IOException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-        return document;
-    }
-
     private static void checkNumberOfDocuments(final Map<String, Document> expectedDocuments, final List<String> allDocumentIds) {
         final int expectedSize = expectedDocuments.size();
         final int currentSize = allDocumentIds.size();
@@ -93,64 +75,55 @@ public class CouchbaseAssertion {
         }
     }
 
-    private static List<String> getAllDocumentIds(final CouchbaseClient couchbaseClient) {
-        final String freeDesignDocName = nextUniqueViewName(couchbaseClient);
+    private static List<String> getAllDocumentIds(final Bucket bucket) {
+        final String freeDesignDocName = nextUniqueViewName(bucket);
 
         try {
-            final View allDocsView = createDesignDocAndView(freeDesignDocName, couchbaseClient);
-            final List<String> result = getAllDocumentIds(allDocsView, couchbaseClient);
+            final DesignDocument designDocAndView = createDesignDocAndView(freeDesignDocName, bucket);
+            final List<String> result = getAllDocumentIds(designDocAndView, bucket);
             return result;
         } finally {
-            deleteDesignDoc(freeDesignDocName, couchbaseClient);
+            deleteDesignDoc(freeDesignDocName, bucket);
         }
     }
 
-    private static List<String> getAllDocumentIds(final View allDocsView, final CouchbaseClient couchbaseClient) {
-        final Query query = new Query();
-        query.setStale(Stale.FALSE);
-        final ViewResponse viewResults = couchbaseClient.query(allDocsView, query);
+    private static List<String> getAllDocumentIds(final DesignDocument designDocument, final Bucket bucket) {
+        final ViewQuery query = ViewQuery.from(designDocument.name(), designDocument.views().get(0).name());
+        query.stale(Stale.FALSE);
+        final ViewResult result = bucket.query(query);
 
-        final List<String> result = new ArrayList<String>();
-        for (final ViewRow viewResult : viewResults) {
-            result.add(viewResult.getId());
-        }
+        return StreamSupport.stream(result.spliterator(), true).map(r -> r.id()).collect(Collectors.toList());
 
-        return result;
     }
 
-    private static View createDesignDocAndView(final String freeDesignDocName, final CouchbaseClient couchbaseClient) {
-        final DesignDocument designDocument = new DesignDocument(freeDesignDocName);
-        final String json = "function (doc, meta) {\n" +
-                "   emit(null, null);\n" +
+    private static DesignDocument createDesignDocAndView(final String freeDesignDocName, final Bucket bucket) {
+
+        final String json = "function (doc, meta) {" + System.lineSeparator() +
+                "   emit(null, null);" + System.lineSeparator() +
                 "}";
 
-        final String viewName = "allDocs";
+        final List<View> views = Arrays.asList(DefaultView.create("allDocs", json));
 
-        designDocument.getViews().add(new ViewDesign(viewName, json));
+        final DesignDocument designDocument = DesignDocument.create(freeDesignDocName, views);
 
-        final Boolean designDoc = couchbaseClient.createDesignDoc(designDocument);
-        if (!designDoc) {
-            throw new IllegalStateException("Cannot create internal designDoc to query for all docs. Name of DesignDoc: " +
-                    freeDesignDocName);
-        }
+        bucket.bucketManager().insertDesignDocument(designDocument);
 
-        return couchbaseClient.getView(freeDesignDocName, viewName);
+        return designDocument;
     }
 
-    private static void deleteDesignDoc(final String freeDesignDocName, final CouchbaseClient couchbaseClient) {
-        couchbaseClient.deleteDesignDoc(freeDesignDocName);
+    private static void deleteDesignDoc(final String freeDesignDocName, final Bucket bucket) {
+        bucket.bucketManager().removeDesignDocument(freeDesignDocName);
     }
 
-    private static String nextUniqueViewName(final CouchbaseClient couchbaseClient) {
+    private static String nextUniqueViewName(final Bucket bucket) {
         int i = 0;
         while (true) {
             final String proposal = (DESIGN_DOC_INTERNAL + (i++));
-            try {
-                couchbaseClient.getDesignDoc(proposal);
-                LOGGER.trace("Invalid doc, keep trying. Now trying with {} " + proposal);
-            } catch (final InvalidViewException ignored) {
+            final DesignDocument designDocument = bucket.bucketManager().getDesignDocument(proposal);
+            if (designDocument == null) {
                 return proposal;
             }
+            LOGGER.trace("Invalid doc, keep trying. Now trying with {} " + proposal);
         }
     }
 }

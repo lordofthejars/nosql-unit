@@ -1,33 +1,28 @@
 package com.lordofthejars.nosqlunit.couchbase;
 
-import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.document.JsonDocument;
+import com.couchbase.client.java.document.json.JsonArray;
+import com.couchbase.client.java.document.json.JsonObject;
+import com.lordofthejars.nosqlunit.core.IOUtils;
 import com.lordofthejars.nosqlunit.couchbase.model.Document;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.MapType;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.JavaType;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class DataLoader {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static final String DATA_ROOT = "data";
+    private Bucket bucket;
 
-    public static final String DESIGN_ROOT = "designDocs";// TODO
-
-    private CouchbaseClient couchbaseClient;
-
-    public DataLoader(CouchbaseClient couchbaseClient) {
+    public DataLoader(Bucket bucket) {
         super();
-        this.couchbaseClient = couchbaseClient;
+        this.bucket = bucket;
     }
 
     public void load(final InputStream dataScript) {
@@ -38,40 +33,25 @@ public class DataLoader {
     private void insertDocuments(final Map<String, Document> documentsIterator) {
         for (final Map.Entry<String, Document> documentEntry : documentsIterator.entrySet()) {
             final Document document = documentEntry.getValue();
-            try {
-                couchbaseClient.add(documentEntry.getKey(), document.calculateExpiration(),
-                        MAPPER.writeValueAsString(document.getDocument())).get();
-            } catch (JsonGenerationException e) {
-               throw new IllegalArgumentException(e);
-            } catch (JsonMappingException e) {
-                throw new IllegalArgumentException(e);
-            } catch (InterruptedException e) {
-                throw new IllegalArgumentException(e);
-            } catch (ExecutionException e) {
-                throw new IllegalArgumentException(e);
-            } catch (IOException e) {
-                throw new IllegalArgumentException(e);
-            }
+            final JsonDocument jsonDocument = JsonDocument.create(documentEntry.getKey(), document.getExpirationSecs(), document.getDocument());
+            bucket.upsert(jsonDocument);
         }
     }
 
     public static Map<String, Document> getDocuments(final InputStream dataScript) {
-        TypeFactory typeFactory = MAPPER.getTypeFactory();
-        final MapType mapType = typeFactory.constructMapType(Map.class, String.class, Document.class);
-        JavaType stringType = typeFactory.uncheckedSimpleType(String.class);
-        MapType type = typeFactory.constructMapType(Map.class, stringType, mapType);
 
-        Map<String, Map<String, Document>> rootNode;
         try {
-            rootNode = MAPPER.readValue(dataScript, type);
-        } catch (org.codehaus.jackson.JsonParseException e) {
-            throw new IllegalArgumentException(e);
-        } catch (JsonMappingException e) {
-            throw new IllegalArgumentException(e);
+            final JsonObject jsonObject = JsonObject.fromJson(IOUtils.readFullStream(dataScript));
+            final JsonArray data = jsonObject.getArray("data");
+            return StreamSupport.stream(data.spliterator(), false)
+                    .map(o -> (JsonObject) o)
+                    .collect(Collectors.toMap(o -> o.getString("key"),
+                            o -> new Document(o.getObject("document"), o.getInt("expirationSecs"))));
+
         } catch (IOException e) {
-           throw new IllegalArgumentException(e);
+            throw new IllegalStateException(e);
         }
-        return rootNode.get(DATA_ROOT);
+
     }
 
 }

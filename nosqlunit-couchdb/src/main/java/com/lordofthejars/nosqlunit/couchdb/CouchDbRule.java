@@ -91,4 +91,8 @@ public class CouchDbRule extends AbstractNoSqlTestRule {
 		return EXTENSION;
 	}
 
+	@Override
+	public void close() {
+	}
+
 }

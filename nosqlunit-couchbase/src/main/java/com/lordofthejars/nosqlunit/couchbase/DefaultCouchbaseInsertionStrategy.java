@@ -6,7 +6,7 @@ public class DefaultCouchbaseInsertionStrategy implements com.lordofthejars.nosq
 
     @Override
     public void insert(final CouchBaseClientCallback connection, final InputStream dataset) throws Throwable {
-        final DataLoader dataLoader = new DataLoader(connection.couchBaseClient());
+        final DataLoader dataLoader = new DataLoader(connection.couchBaseBucket());
         insertDocuments(dataLoader, dataset);
     }
 
