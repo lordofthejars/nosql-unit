@@ -115,12 +115,12 @@ public class DefaultInsertionStrategy implements MongoInsertionStrategy {
         if (data instanceof DBRef) {
           ((DBObject)dataObject).put(key, new DBRef(((DBRef)data).getCollectionName(), ((DBRef)data).getId()));
         } else if(data instanceof BasicDBList) {
-            for (Object subData : (BasicDBList) data) {
-                for (String subKey : ((DBObject)data).keySet()) {
+            BasicDBList	dataDBList = (BasicDBList) data;
+            for (Object subData : dataDBList) {
                     if(subData instanceof DBRef) {
+                    	String subKey = String.valueOf(dataDBList.indexOf(subData));
                         ((BasicDBList)data).put(subKey, new DBRef(((DBRef)subData).getCollectionName(), ((DBRef)subData).getId()));
                     }
-                }
 
             }
         }
