@@ -1,7 +1,7 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 
 public final class MongoDbConfiguration extends AbstractJsr330Configuration {
@@ -15,7 +15,7 @@ public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	private String host = DEFAULT_HOST;
 	private int port = DEFAULT_PORT;
 	
-	private Mongo mongo;
+	private MongoClient mongo;
 	
 	private WriteConcern writeConcern = WriteConcern.SAFE;
 	
@@ -82,11 +82,11 @@ public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 		this.host = host;
 	}
 	
-	public void setMongo(Mongo mongo) {
+	public void setMongo(MongoClient mongo) {
 		this.mongo = mongo;
 	}
 	
-	public Mongo getMongo() {
+	public MongoClient getMongo() {
 		return mongo;
 	}
 	

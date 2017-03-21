@@ -1,9 +1,10 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 
 public interface MongoDbConnectionCallback {
 
-	DB db();
-	
+	MongoDatabase db();
+	MongoClient mongoClient();
 }

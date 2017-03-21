@@ -1,19 +1,19 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBuilder.inMemoryMongoDb;
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
-
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
+
+import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBuilder.inMemoryMongoDb;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 
 
 public class MongoDbRule extends AbstractNoSqlTestRule {
 
 	private static final String EXTENSION = "json";
 	
-	protected DatabaseOperation<Mongo> databaseOperation;
+	protected DatabaseOperation<MongoClient> databaseOperation;
 	
 	public static class MongoDbRuleBuilder {
 		
@@ -107,7 +107,7 @@ public class MongoDbRule extends AbstractNoSqlTestRule {
 	}
 
 	@Override
-	public DatabaseOperation<Mongo> getDatabaseOperation() {
+	public DatabaseOperation<MongoClient> getDatabaseOperation() {
 		return this.databaseOperation;
 	}
 

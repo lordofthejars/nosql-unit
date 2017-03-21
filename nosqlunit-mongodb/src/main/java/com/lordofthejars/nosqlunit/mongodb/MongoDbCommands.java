@@ -1,90 +1,96 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ConfigurationDocument;
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.CommandResult;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
 import java.util.Set;
 
 public class MongoDbCommands {
 
-	private static final String REPL_SET_GET_STATUS_COMMAND = "replSetGetStatus";
-	private static final String REPL_SET_INITIATE_COMMAND = "replSetInitiate";
-	private static final String RECONFIG_COMMAND = "replSetReconfig";	
-	private static final String ADD_SHARD_COMMAND = "addshard";
-	private static final String ENABLE_SHARDING_COMMAND = "enablesharding";
-	private static final String SHARD_COLLECTION_COMMAND = "shardcollection";
-	private static final String LIST_SHARDS_COMMAND = "listShards";
-	
-	private MongoDbCommands() {
-		super();
-	}
-	
-	
-	public static DBObject replicaSetGetStatus(Mongo mongoClient) {
-		return mongoClient.getDB("admin").command(new BasicDBObject(REPL_SET_GET_STATUS_COMMAND, 1));
-	}
-	
-	public static CommandResult shardCollection(Mongo mongoClient, String collectionWithDatabase, DBObject shardKey) {
-		DB adminDb = getAdminDatabase(mongoClient);
-		BasicDBObject basicDBObject = new BasicDBObject(SHARD_COLLECTION_COMMAND, collectionWithDatabase);
-		basicDBObject.put("key", shardKey);
-		
-		return adminDb.command(basicDBObject);
-	}
-	
-	public static CommandResult enableSharding(MongoClient mongoClient, String database) {
-		DB adminDb = getAdminDatabase(mongoClient);
-		return adminDb.command(new BasicDBObject(ENABLE_SHARDING_COMMAND, database));
-	}
-	
-	public static CommandResult listShards(MongoClient mongoClient) {
-		DB adminDb = getAdminDatabase(mongoClient);
-		return adminDb.command(new BasicDBObject(LIST_SHARDS_COMMAND, 1));
-	}
+    private static final String REPL_SET_GET_STATUS_COMMAND = "replSetGetStatus";
+    private static final String REPL_SET_INITIATE_COMMAND = "replSetInitiate";
+    private static final String RECONFIG_COMMAND = "replSetReconfig";
+    private static final String ADD_SHARD_COMMAND = "addshard";
+    private static final String ENABLE_SHARDING_COMMAND = "enablesharding";
+    private static final String SHARD_COLLECTION_COMMAND = "shardcollection";
+    private static final String LIST_SHARDS_COMMAND = "listShards";
 
-	public static void addShard(MongoClient mongoClient, Set<String> shards) {
-		DB adminDb = getAdminDatabase(mongoClient);
-		
-		for (String shardUri : shards) {
-			adminDb.command(new BasicDBObject(ADD_SHARD_COMMAND, shardUri));			
-		}
-	}
-	
-	public static CommandResult replicaSetInitiate(MongoClient mongoClient, ConfigurationDocument configurationDocument) {
-		DB adminDb = getAdminDatabase(mongoClient);
-		BasicDBObject command = new BasicDBObject(REPL_SET_INITIATE_COMMAND,
-				configurationDocument.getConfiguration());
-		return adminDb.command(command);
-	}
+    private MongoDbCommands() {
+        super();
+    }
 
 
-	private static DB getAdminDatabase(Mongo mongoClient) {
-		DB adminDb = mongoClient.getDB("admin");
-		return adminDb;
-	}
-	
-	public static CommandResult replSetReconfig(MongoClient mongoClient, ConfigurationDocument configurationDocument) {
-		DB adminDb = getAdminDatabase(mongoClient);
-		BasicDBObject command = new BasicDBObject(RECONFIG_COMMAND,
-				configurationDocument.getConfiguration());
-		return adminDb.command(command);
-	}
+    public static Document replicaSetGetStatus(MongoClient mongoClient) {
+        return mongoClient.getDatabase("admin").runCommand(new Document(REPL_SET_GET_STATUS_COMMAND, 1));
+    }
 
-	
-	public static void shutdown(String host, int port) {
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient(host, port);
-			DB db = mongo.getDB("admin");
-			CommandResult shutdownResult = db.command(new BasicDBObject(
-					"shutdown", 1));
-			shutdownResult.throwOnError();
-		} catch (MongoException e) {
-			//It is ok because response could not be returned because network connection is closed.
-		} catch (Throwable e) {
-			throw new IllegalStateException("Mongodb could not be shutdown.", e);
-		} finally {
-			mongo.close();
-		}
-	}
+    public static Document shardCollection(MongoClient mongoClient, String collectionWithDatabase, Document shardKey) {
+        MongoDatabase adminDb = getAdminDatabase(mongoClient);
+        Document basicDBObject = new Document(SHARD_COLLECTION_COMMAND, collectionWithDatabase);
+        basicDBObject.append("key", shardKey);
+
+        return adminDb.runCommand(basicDBObject);
+    }
+
+    public static Document enableSharding(MongoClient mongoClient, String database) {
+        MongoDatabase adminDb = getAdminDatabase(mongoClient);
+        return adminDb.runCommand(new Document(ENABLE_SHARDING_COMMAND, database));
+    }
+
+    public static Document listShards(MongoClient mongoClient) {
+        MongoDatabase adminDb = getAdminDatabase(mongoClient);
+        return adminDb.runCommand(new Document(LIST_SHARDS_COMMAND, 1));
+    }
+
+    public static void addShard(MongoClient mongoClient, Set<String> shards) {
+        MongoDatabase adminDb = getAdminDatabase(mongoClient);
+
+        for (String shardUri : shards) {
+            adminDb.runCommand(new Document(ADD_SHARD_COMMAND, shardUri));
+        }
+    }
+
+    public static Document replicaSetInitiate(MongoClient mongoClient, ConfigurationDocument configurationDocument) {
+        MongoDatabase adminDb = getAdminDatabase(mongoClient);
+        Document command = new Document(REPL_SET_INITIATE_COMMAND,
+                configurationDocument.getConfiguration());
+        return adminDb.runCommand(command);
+    }
+
+
+    private static MongoDatabase getAdminDatabase(MongoClient mongoClient) {
+        MongoDatabase adminDb = mongoClient.getDatabase("admin");
+        return adminDb;
+    }
+
+    public static Document replSetReconfig(MongoClient mongoClient, ConfigurationDocument configurationDocument) {
+        MongoDatabase adminDb = getAdminDatabase(mongoClient);
+        Document command = new Document(RECONFIG_COMMAND,
+                configurationDocument.getConfiguration());
+        return adminDb.runCommand(command);
+    }
+
+
+    public static void shutdown(String host, int port) {
+        MongoClient mongo = null;
+        try {
+            mongo = new MongoClient(host, port);
+            DB db = mongo.getDB("admin");
+            CommandResult shutdownResult = db.command(new BasicDBObject(
+                    "shutdown", 1));
+            shutdownResult.throwOnError();
+        } catch (MongoException e) {
+            //It is ok because response could not be returned because network connection is closed.
+        } catch (Throwable e) {
+            throw new IllegalStateException("Mongodb could not be shutdown.", e);
+        } finally {
+            mongo.close();
+        }
+    }
 }

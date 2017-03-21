@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.mongodb.MongoClient;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,32 +25,32 @@ import com.mongodb.Mongo;
 
 public class WhenYouFindIndexedBooks {
 
-	@ClassRule
-	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo").appendSingleCommandLineArguments("-vvv")
-	.build();
-	
-	@Rule
-	public MongoDbRule remoteMongoDbRule = newMongoDbRule().defaultManagedMongoDb("test");
-	
-	@Inject
-	private Mongo mongo;
-	
-	@Test
-	@UsingDataSet(locations="initialDataIndex.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	public void manager_should_return_all_inserted_books() {
-		
-		BookManager bookManager = new BookManager(bookCollection());
-		List<Book> books = bookManager.findAll();
-		
-		Book expectedBook = new Book("The Hobbit", 293);
-		
-		assertThat(books, hasSize(1));
-		assertThat(expectedBook, isIn(books));
-		
-	}
-	
-	private DBCollection bookCollection() {
-		return mongo.getDB("test").getCollection(Book.class.getSimpleName());
-	}
-	
+    @ClassRule
+    public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo").appendSingleCommandLineArguments("-vvv")
+            .build();
+
+    @Rule
+    public MongoDbRule remoteMongoDbRule = newMongoDbRule().defaultManagedMongoDb("test");
+
+    @Inject
+    private MongoClient mongo;
+
+    @Test
+    @UsingDataSet(locations = "initialDataIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void manager_should_return_all_inserted_books() {
+
+        BookManager bookManager = new BookManager(bookCollection());
+        List<Book> books = bookManager.findAll();
+
+        Book expectedBook = new Book("The Hobbit", 293);
+
+        assertThat(books, hasSize(1));
+        assertThat(expectedBook, isIn(books));
+
+    }
+
+    private DBCollection bookCollection() {
+        return mongo.getDB("test").getCollection(Book.class.getSimpleName());
+    }
+
 }

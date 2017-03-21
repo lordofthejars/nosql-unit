@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import java.net.UnknownHostException;
 
+import org.bson.Document;
 import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -56,7 +57,7 @@ public class WhenReplicaSetShardingIsRequired {
 		
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
 		
-		CommandResult listShards = MongoDbCommands.listShards(mongoClient);
+		Document listShards = MongoDbCommands.listShards(mongoClient);
 		
 		assertThat((String)listShards.get("serverUsed"), is("localhost/127.0.0.1:27017"));
 		BasicDBList shards = (BasicDBList) listShards.get("shards");

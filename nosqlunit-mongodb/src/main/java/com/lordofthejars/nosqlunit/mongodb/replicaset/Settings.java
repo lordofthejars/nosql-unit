@@ -1,16 +1,16 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class Settings {
 
-	private DBObject settings;
+	private Document settings;
 	
-	protected Settings(DBObject settings) {
+	protected Settings(Document settings) {
 		this.settings = settings;
 	}
 	
-	public DBObject getSettings() {
+	public Document getSettings() {
 		return settings;
 	}
 	

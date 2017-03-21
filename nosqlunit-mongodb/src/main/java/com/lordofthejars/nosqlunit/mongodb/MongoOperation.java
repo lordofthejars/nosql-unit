@@ -2,26 +2,27 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
-import java.io.InputStream;
-import java.util.Set;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoIterable;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class MongoOperation extends AbstractCustomizableDatabaseOperation<MongoDbConnectionCallback, Mongo> {
+import java.io.InputStream;
+
+public final class MongoOperation extends AbstractCustomizableDatabaseOperation<MongoDbConnectionCallback, MongoClient> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
 
-    private Mongo mongo;
+    private MongoClient mongo;
 
     private MongoDbConfiguration mongoDbConfiguration;
 
-    protected MongoOperation(Mongo mongo, MongoDbConfiguration mongoDbConfiguration) {
+    protected MongoOperation(MongoClient mongo, MongoDbConfiguration mongoDbConfiguration) {
         this.mongo = mongo;
         this.mongoDbConfiguration = mongoDbConfiguration;
         this.setInsertionStrategy(new DefaultInsertionStrategy());
@@ -50,12 +51,17 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
     private void insertData(InputStream contentStream) {
         try {
 
-            final DB mongoDb = getMongoDb();
+            final MongoDatabase mongoDb = getMongoDb();
             executeInsertion(new MongoDbConnectionCallback() {
 
                 @Override
-                public DB db() {
+                public MongoDatabase db() {
                     return mongoDb;
+                }
+
+                @Override
+                public MongoClient mongoClient() {
+                    return mongo;
                 }
             }, contentStream);
 
@@ -66,22 +72,22 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 
     @Override
     public void deleteAll() {
-        DB mongoDb = getMongoDb();
+        MongoDatabase mongoDb = getMongoDb();
         deleteAllElements(mongoDb);
     }
 
-    private void deleteAllElements(DB mongoDb) {
-        Set<String> collectionaNames = mongoDb.getCollectionNames();
+    private void deleteAllElements(MongoDatabase mongoDb) {
+        final MongoIterable<String> listCollectionNames = mongoDb.listCollectionNames();
 
-        for (String collectionName : collectionaNames) {
+        for (String collectionName : listCollectionNames) {
 
             if (isNotASystemCollection(collectionName)) {
 
                 LOGGER.debug("Dropping Collection {}.", collectionName);
 
-                DBCollection dbCollection = mongoDb.getCollection(collectionName);
+                MongoCollection dbCollection = mongoDb.getCollection(collectionName);
                 // Delete ALL, No DROP
-                dbCollection.remove(new BasicDBObject(0));
+                dbCollection.deleteMany(new Document());
             }
         }
     }
@@ -99,12 +105,17 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
 
     private boolean compareData(InputStream contentStream) throws NoSqlAssertionError {
         try {
-            final DB mongoDb = getMongoDb();
+            final MongoDatabase mongoDb = getMongoDb();
             executeComparison(new MongoDbConnectionCallback() {
 
                 @Override
-                public DB db() {
+                public MongoDatabase db() {
                     return mongoDb;
+                }
+
+                @Override
+                public MongoClient mongoClient() {
+                    return mongo;
                 }
             }, contentStream);
             return true;
@@ -115,13 +126,13 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
         }
     }
 
-    private DB getMongoDb() {
-        DB db = mongo.getDB(this.mongoDbConfiguration.getDatabaseName());
+    private MongoDatabase getMongoDb() {
+        MongoDatabase db = mongo.getDatabase(this.mongoDbConfiguration.getDatabaseName());
         return db;
     }
 
     @Override
-    public Mongo connectionManager() {
+    public MongoClient connectionManager() {
         return mongo;
     }
 

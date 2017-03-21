@@ -1,27 +1,27 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.util.JSON;
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
 
 public class WhenMongoDbOperationsAreRequired {
 
@@ -73,7 +73,7 @@ public class WhenMongoDbOperationsAreRequired {
             + "	\"indexes\": [\n"
             + "					{\n"
             + "						\"index\": {\"field\": 1},\n"
-            + "						\"options\": {\"unique\":\"true\"}  "
+            + "						\"options\": {\"unique\":true}  "
             + "					}\n"
             + "				 ],"
             + "	\"data\":"
@@ -84,33 +84,32 @@ public class WhenMongoDbOperationsAreRequired {
             + "   }"
             + "}";
 
-    private static final String[] EXPECTED_COLLECTION_1 = new String[] {"{ \"id\" : 1 , \"code\" : \"JSON dataset\"}", "{ \"id\" : 2 , \"code\" : \"Another row\"}"};
+    private static final String[] EXPECTED_COLLECTION_1 = new String[] {"{ \"id\" : 1, \"code\" : \"JSON dataset\" }", "{ \"id\" : 2, \"code\" : \"Another row\" }"};
 
-    private static final String[] EXPECTED_COLLECTION_2 = new String[] {"{ \"id\" : 3 , \"code\" : \"JSON dataset 2\"}", "{ \"id\" : 4 , \"code\" : \"Another row 2\"}"};
-
-    @Mock
-    private Mongo mongo;
+    private static final String[] EXPECTED_COLLECTION_2 = new String[] {"{ \"id\" : 3, \"code\" : \"JSON dataset 2\" }", "{ \"id\" : 4, \"code\" : \"Another row 2\" }"};
 
     @Mock
-    private DB db;
+    private MongoClient mongo;
 
     @Mock
-    private DB dbAdmin;
+    private MongoDatabase db;
+
+    @Mock
+    private MongoDatabase dbAdmin;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(mongo.getDB("admin")).thenReturn(dbAdmin);
-        when(mongo.getDB("test")).thenReturn(db);
+        when(mongo.getDatabase("admin")).thenReturn(dbAdmin);
+        when(mongo.getDatabase("test")).thenReturn(db);
     }
 
     @Test
     public void insert_operation_with_indexes_should_add_data_and_indexes_into_collections() throws UnsupportedEncodingException {
-        DBCollection collection1 = mock(DBCollection.class);
+        MongoCollection collection1 = mock(MongoCollection.class);
 
         when(db.getName()).thenReturn("test");
-        when(db.getMongo()).thenReturn(mongo);
         when(db.getCollection("collection1")).thenReturn(collection1);
 
         MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost", "test"));
@@ -118,17 +117,16 @@ public class WhenMongoDbOperationsAreRequired {
 
         verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
 
-        DBObject expectedIndex = new BasicDBObject("field", 1);
+        Document expectedIndex = new Document("field", 1);
 
         verifyIndexCreationCommand(expectedIndex, collection1);
     }
 
     @Test
     public void insert_operation_with_options_in_indexes_should_add_data_and_indexes_into_collections() throws UnsupportedEncodingException {
-        DBCollection collection1 = mock(DBCollection.class);
+        MongoCollection collection1 = mock(MongoCollection.class);
 
         when(db.getName()).thenReturn("test");
-        when(db.getMongo()).thenReturn(mongo);
         when(db.getCollection("collection1")).thenReturn(collection1);
 
         MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost", "test"));
@@ -136,20 +134,20 @@ public class WhenMongoDbOperationsAreRequired {
 
         verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
 
-        DBObject expectedIndex = new BasicDBObject("field", 1);
-        DBObject expectedOptionsIndex = new BasicDBObject("unique", "true");
+        Document expectedIndex = new Document("field", 1);
+        IndexOptions indexOptions = new IndexOptions();
+        indexOptions.unique(true);
 
-        verifyIndexCreationCommandAndOptions(expectedIndex, expectedOptionsIndex, collection1);
+        verifyIndexCreationCommandAndOptions(expectedIndex, indexOptions, collection1);
     }
 
     @Test
     public void insert_opertation_with_shards_should_add_data_into_collections() throws UnsupportedEncodingException {
 
-        DBCollection collection1 = mock(DBCollection.class);
-        DBCollection collection2 = mock(DBCollection.class);
+        MongoCollection collection1 = mock(MongoCollection.class);
+        MongoCollection collection2 = mock(MongoCollection.class);
 
         when(db.getName()).thenReturn("test");
-        when(db.getMongo()).thenReturn(mongo);
         when(db.getCollection("collection1")).thenReturn(collection1);
         when(db.getCollection("collection2")).thenReturn(collection2);
 
@@ -163,8 +161,8 @@ public class WhenMongoDbOperationsAreRequired {
     @Test
     public void insert_opertation_should_add_data_into_collections() throws UnsupportedEncodingException {
 
-        DBCollection collection1 = mock(DBCollection.class);
-        DBCollection collection2 = mock(DBCollection.class);
+        MongoCollection collection1 = mock(MongoCollection.class);
+        MongoCollection collection2 = mock(MongoCollection.class);
 
         when(db.getCollection("collection1")).thenReturn(collection1);
         when(db.getCollection("collection2")).thenReturn(collection2);
@@ -176,26 +174,6 @@ public class WhenMongoDbOperationsAreRequired {
         verifyInsertedData(EXPECTED_COLLECTION_2, collection2);
     }
 
-    @Test
-    public void delete_operation_should_remove_all_data_of_collections() {
-
-        DBCollection collection1 = mock(DBCollection.class);
-        DBCollection collection2 = mock(DBCollection.class);
-
-        Set<String> collectionNames = new HashSet<String>();
-        collectionNames.add("collection1");
-        collectionNames.add("collection2");
-        when(db.getCollectionNames()).thenReturn(collectionNames);
-        when(db.getCollection("collection1")).thenReturn(collection1);
-        when(db.getCollection("collection2")).thenReturn(collection2);
-
-        MongoOperation mongoOperation = new MongoOperation(mongo, new MongoDbConfiguration("localhost", "test"));
-        mongoOperation.deleteAll();
-
-        verify(collection1, times(1)).remove(new BasicDBObject(0));
-        verify(collection2, times(1)).remove(new BasicDBObject(0));
-
-    }
 
     /*@Test
      public void same_data_on_compare_operation_should_assert_expected_data_with_inserted() {
@@ -235,51 +213,51 @@ public class WhenMongoDbOperationsAreRequired {
      boolean equal = mongoOperation.compareExpectedData(DATA);
      assertThat(equal, is(false));
      }*/
-    private void verifyIndexCreationCommand(DBObject indexDocument, DBCollection collection) {
+    private void verifyIndexCreationCommand(Document indexDocument, MongoCollection collection) {
 
-        final ArgumentCaptor<DBObject> indexCommandCaptor = ArgumentCaptor
-                .forClass(DBObject.class);
+        final ArgumentCaptor<Document> indexCommandCaptor = ArgumentCaptor
+                .forClass(Document.class);
         verify(collection, times(1)).createIndex(indexCommandCaptor.capture());
         assertThat(indexCommandCaptor.getValue(), is(indexDocument));
 
     }
 
-    private void verifyIndexCreationCommandAndOptions(DBObject indexDocument, DBObject indexOptions, DBCollection collection) {
+    private void verifyIndexCreationCommandAndOptions(Document indexDocument, IndexOptions indexOptions, MongoCollection collection) {
 
-        final ArgumentCaptor<DBObject> indexCommandCaptor = ArgumentCaptor
-                .forClass(DBObject.class);
-        final ArgumentCaptor<DBObject> indexOptionCommandCaptor = ArgumentCaptor
-                .forClass(DBObject.class);
+        final ArgumentCaptor<Document> indexCommandCaptor = ArgumentCaptor
+                .forClass(Document.class);
+        final ArgumentCaptor<IndexOptions> indexOptionCommandCaptor = ArgumentCaptor
+                .forClass(IndexOptions.class);
 
         verify(collection, times(1)).createIndex(indexCommandCaptor.capture(), indexOptionCommandCaptor.capture());
         assertThat(indexCommandCaptor.getValue(), is(indexDocument));
-        assertThat(indexOptionCommandCaptor.getValue(), is(indexOptions));
+        assertThat(indexOptionCommandCaptor.getValue().isUnique(), is(indexOptions.isUnique()));
 
     }
 
-    private void verifyEnableShardingCommand(String expectedCommand, DB mockDb) {
+    private void verifyEnableShardingCommand(String expectedCommand, MongoDatabase mockDb) {
 
-        final ArgumentCaptor<DBObject> enableShardingCommandCaptor = ArgumentCaptor
-                .forClass(DBObject.class);
-        verify(mockDb, times(1)).command(enableShardingCommandCaptor.capture());
+        final ArgumentCaptor<Document> enableShardingCommandCaptor = ArgumentCaptor
+                .forClass(Document.class);
+        verify(mockDb, times(1)).runCommand(enableShardingCommandCaptor.capture());
 
-        DBObject command = enableShardingCommandCaptor.getValue();
+        Document command = enableShardingCommandCaptor.getValue();
 
         String commandDocument = JSON.serialize(command);
         assertThat(commandDocument, is(expectedCommand));
 
     }
 
-    private void verifyInsertedData(String[] expectedData, DBCollection mockCollection) {
+    private void verifyInsertedData(String[] expectedData, MongoCollection mockCollection) {
 
-        final ArgumentCaptor<DBObject> insertCaptor = ArgumentCaptor
-                .forClass(DBObject.class);
+        final ArgumentCaptor<Document> insertCaptor = ArgumentCaptor
+                .forClass(Document.class);
 
-        verify(mockCollection, times(2)).insert(insertCaptor.capture());
+        verify(mockCollection, times(2)).insertOne(insertCaptor.capture());
 
-        List<DBObject> allValues = insertCaptor.getAllValues();
+        List<Document> allValues = insertCaptor.getAllValues();
         for (int i = 0; i < expectedData.length; i++) {
-            assertThat(allValues.get(i).toString(), is(expectedData[i]));
+            assertThat(allValues.get(i).toJson(), is(expectedData[i]));
         }
 
     }

@@ -1,6 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb;
 import com.lordofthejars.nosqlunit.core.FailureHandler;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 
 public class InMemoryMongoDbConfigurationBuilder {
 
@@ -27,7 +27,7 @@ public class InMemoryMongoDbConfigurationBuilder {
 	
 	public MongoDbConfiguration build() {
 		
-		Mongo embeddedMongo = EmbeddedMongoInstancesFactory.getInstance().getDefaultEmbeddedInstance();
+		MongoClient embeddedMongo = EmbeddedMongoInstancesFactory.getInstance().getDefaultEmbeddedInstance();
 		
 		if(embeddedMongo == null) {
 			throw FailureHandler.createIllegalStateFailure("There is no EmbeddedMongo rule with default target defined during test execution. Please create one using @Rule or @ClassRule before executing these tests.");
@@ -44,7 +44,7 @@ public class InMemoryMongoDbConfigurationBuilder {
 	
 	public MongoDbConfiguration buildFromTargetPath(String targetPath) {
 		
-		Mongo embeddedMongo = EmbeddedMongoInstancesFactory.getInstance().getEmbeddedByTargetPath(targetPath);
+		MongoClient embeddedMongo = EmbeddedMongoInstancesFactory.getInstance().getEmbeddedByTargetPath(targetPath);
 		
 		if(embeddedMongo == null) {
 			throw FailureHandler.createIllegalStateFailure("There is no EmbeddedMongo rule with default target defined during test execution. Please create one using @Rule or @ClassRule before executing these tests.");

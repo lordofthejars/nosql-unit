@@ -1,13 +1,10 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
+import org.bson.Document;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 
 public class ReplicaSetConfigurationBuilder {
 
@@ -24,8 +21,8 @@ public class ReplicaSetConfigurationBuilder {
 	public static final String MEMBERS_TAG = "members";
 	public static final String SETTINGS_TAG = "settings";
 	
-	private BasicDBObjectBuilder configurationBuilder;
-	private List<DBObject> members;
+	private Document configurationBuilder;
+	private List<Document> members;
 	
 	//We do not insert directly to add settings at the bottom of the document. Only aesthetic matter. 
 	private Settings settings;
@@ -34,8 +31,8 @@ public class ReplicaSetConfigurationBuilder {
 	
 	private ReplicaSetConfigurationBuilder() {
 		super();
-		this.configurationBuilder = new BasicDBObjectBuilder();
-		this.members = new ArrayList<DBObject>();
+		this.configurationBuilder = new Document();
+		this.members = new ArrayList<>();
 	}
 	
 	public static final ReplicaSetConfigurationBuilder replicaSetConfiguration(String replicaSetName) {
@@ -70,16 +67,16 @@ public class ReplicaSetConfigurationBuilder {
 			this.configurationBuilder.append(SETTINGS_TAG, this.settings.getSettings());
 		}
 		
-		return new ConfigurationDocument(this.configurationBuilder.get());
+		return new ConfigurationDocument(this.configurationBuilder);
 	}
 	
-	private void addMember(DBObject member) {
+	private void addMember(Document member) {
 		this.members.add(member);
 	}
 	
 	public class MemberConfigurationBuilder {
 		
-		private DBObject dbObject = new BasicDBObject();
+		private Document dbObject = new Document();
 		private ReplicaSetConfigurationBuilder parent;
 		
 		private MemberConfigurationBuilder(ReplicaSetConfigurationBuilder replicaSetBuilder, String host) {
@@ -118,13 +115,13 @@ public class ReplicaSetConfigurationBuilder {
 		
 		public MemberConfigurationBuilder tags(String ... tags) {
 			
-			BasicDBObjectBuilder basicDBObjectBuilder = new BasicDBObjectBuilder();
+			Document basicDBObjectBuilder = new Document();
 			
 			for(int i=0;i<tags.length;i+=2) {
 				basicDBObjectBuilder.append(tags[i], tags[i+1]);
 			}
 			
-			dbObject.put(TAGS_TAG, basicDBObjectBuilder.get());
+			dbObject.put(TAGS_TAG, basicDBObjectBuilder);
 			
 			return this;
 		}
@@ -146,7 +143,7 @@ public class ReplicaSetConfigurationBuilder {
 		private static final String GET_LAST_ERROR_DEFAULTS_TAG = "getLastErrorDefaults";
 		private static final String GET_LAST_ERROR_MODES_TAG = "getLastErrorModes";
 		
-		private BasicDBObjectBuilder basicDBObjectBuilder = new BasicDBObjectBuilder();
+		private Document basicDBObjectBuilder = new Document();
 		
 		private SettingsBuilder() {
 			super();
@@ -157,19 +154,19 @@ public class ReplicaSetConfigurationBuilder {
 		}
 		
 		public SettingsBuilder getLastErrorModes(String jsonDocument) {
-			DBObject modes = (DBObject) JSON.parse(jsonDocument);
+			Document modes = Document.parse(jsonDocument);
 			basicDBObjectBuilder.append(GET_LAST_ERROR_MODES_TAG, modes);
 			return this;
 		}
 		
 		public SettingsBuilder getLastErrorDefaults(String jsonDocument) {
-			DBObject error = (DBObject) JSON.parse(jsonDocument);
+			Document error = Document.parse(jsonDocument);
 			basicDBObjectBuilder.append(GET_LAST_ERROR_DEFAULTS_TAG, error);
 			return this;
 		}
 		
 		public Settings get() {
-			return new Settings(basicDBObjectBuilder.get());
+			return new Settings(basicDBObjectBuilder);
 		}
 		
 	}

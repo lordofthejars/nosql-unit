@@ -1,12 +1,16 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.FailureHandler;
-import com.mongodb.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoIterable;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -15,155 +19,155 @@ import java.util.regex.Pattern;
 
 public class MongoDbAssertion {
 
-	private static final String SYSTEM_COLLECTIONS_PATTERN = "system."; 
-	private static final String DATA = "data";
+    private static final String SYSTEM_COLLECTIONS_PATTERN = "system.";
+    private static final String DATA = "data";
 
     private static final Logger logger = LoggerFactory.getLogger(MongoDbAssertion.class);
 
     private MongoDbAssertion() {
         super();
-	}
-	
-	public static final void strictAssertEquals(DBObject expectedData, DB mongoDb) {
-		Set<String> collectionaNames = expectedData.keySet();
+    }
 
-		Set<String> mongodbCollectionNames = mongoDb.getCollectionNames();
-		
-		checkCollectionsName(collectionaNames, mongodbCollectionNames);
-		
-		for (String collectionName : collectionaNames) {
-			
-			checkCollectionObjects(expectedData, mongoDb, collectionaNames,
-					collectionName);
-			
-		}
-	}
+    public static final void strictAssertEquals(Document expectedData, MongoDatabase mongoDb) {
+        Set<String> collectionaNames = expectedData.keySet();
 
-	private static void checkCollectionsName(
-			Set<String> expectedCollectionNames, Set<String> mongodbCollectionNames) {
-		
-		Set<String> mongoDbUserCollectionNames = getUserCollections(mongodbCollectionNames);
-		
-		Set<String> allCollections = new HashSet<String>(mongoDbUserCollectionNames);
-		allCollections.addAll(expectedCollectionNames);
-		
-		if(allCollections.size() != expectedCollectionNames.size() || allCollections.size() != mongoDbUserCollectionNames.size()) {
-			throw FailureHandler.createFailure("Expected collection names are %s but insert collection names are %s", expectedCollectionNames, mongoDbUserCollectionNames);
-		}
-		
-	}
+        final MongoIterable<String> collectionNames = mongoDb.listCollectionNames();
 
-	private static Set<String> getUserCollections(
-			Set<String> mongodbCollectionNames) {
-		Set<String> mongoDbUserCollectionNames = new HashSet<String>();
-		
-		for (String mongodbCollectionName : mongodbCollectionNames) {
-			
-			if(isUserCollection(mongodbCollectionName)) {
-				mongoDbUserCollectionNames.add(mongodbCollectionName);
-			}
-			
-		}
-		return mongoDbUserCollectionNames;
-	}
+        checkCollectionsName(collectionaNames, collectionNames);
 
-	private static boolean isUserCollection(String mongodbCollectionName) {
-		return !mongodbCollectionName.contains(SYSTEM_COLLECTIONS_PATTERN);
-	}
+        for (String collectionName : collectionaNames) {
 
-	private static void checkCollectionObjects(DBObject expectedData,
-			DB mongoDb, Set<String> collectionaNames, String collectionName)
-			throws Error {
-		DBObject object = (DBObject) expectedData.get(collectionName);
-		BasicDBList	dataObjects = null;
-		
-		if(isShardOrIndexCollection(object)) {
-			dataObjects = (BasicDBList)object.get(DATA);			
-		} else {
-			dataObjects = (BasicDBList)object;
-		}
-		
-		DBCollection dbCollection = mongoDb.getCollection(collectionName);
-		
-		int expectedDataObjectsCount = dataObjects.size();
-		long insertedDataObjectsCount = dbCollection.count();
-		
-		if(expectedDataObjectsCount != insertedDataObjectsCount) {
-			throw FailureHandler.createFailure("Expected collection has %s elements but insert collection has %s", expectedDataObjectsCount, insertedDataObjectsCount);
-		}
-		
-		for (Object dataObject : dataObjects) {
-			
-			DBObject expectedDataObject = (DBObject)dataObject;
-			DBObject foundObject = dbCollection.findOne(expectedDataObject);
+            checkCollectionObjects(expectedData, mongoDb, collectionaNames,
+                    collectionName);
+
+        }
+    }
+
+    private static void checkCollectionsName(
+            Set<String> expectedCollectionNames, MongoIterable<String> mongodbCollectionNames) {
+
+        Set<String> mongoDbUserCollectionNames = getUserCollections(mongodbCollectionNames);
+
+        Set<String> allCollections = new HashSet<String>(mongoDbUserCollectionNames);
+        allCollections.addAll(expectedCollectionNames);
+
+        if (allCollections.size() != expectedCollectionNames.size() || allCollections.size() != mongoDbUserCollectionNames.size()) {
+            throw FailureHandler.createFailure("Expected collection names are %s but insert collection names are %s", expectedCollectionNames, mongoDbUserCollectionNames);
+        }
+
+    }
+
+    private static Set<String> getUserCollections(
+            MongoIterable<String> mongodbCollectionNames) {
+        Set<String> mongoDbUserCollectionNames = new HashSet<String>();
+
+        for (String mongodbCollectionName : mongodbCollectionNames) {
+
+            if (isUserCollection(mongodbCollectionName)) {
+                mongoDbUserCollectionNames.add(mongodbCollectionName);
+            }
+
+        }
+        return mongoDbUserCollectionNames;
+    }
+
+    private static boolean isUserCollection(String mongodbCollectionName) {
+        return !mongodbCollectionName.contains(SYSTEM_COLLECTIONS_PATTERN);
+    }
+
+    private static void checkCollectionObjects(Document expectedData,
+                                               MongoDatabase mongoDb, Set<String> collectionaNames, String collectionName)
+            throws Error {
+        Object object = expectedData.get(collectionName);
+        List<Document> dataObjects = null;
+
+        if (isDataDirectly(object)) {
+            dataObjects = (List) object;
+        } else {
+            dataObjects = ((Document) object).get(DATA, List.class);
+        }
+
+        MongoCollection<Document> dbCollection = mongoDb.getCollection(collectionName);
+
+        int expectedDataObjectsCount = dataObjects.size();
+        long insertedDataObjectsCount = dbCollection.count();
+
+        if (expectedDataObjectsCount != insertedDataObjectsCount) {
+            throw FailureHandler.createFailure("Expected collection has %s elements but insert collection has %s", expectedDataObjectsCount, insertedDataObjectsCount);
+        }
+
+        for (Document expectedDataObject : dataObjects) {
+
+            Document foundObject = dbCollection.find(expectedDataObject).first();
 
 
-            if(!exists(foundObject)) {
-				throw FailureHandler.createFailure("Object # %s # is not found into collection %s", expectedDataObject.toString(), collectionaNames);
-			}
+            if (!exists(foundObject)) {
+                throw FailureHandler.createFailure("Object # %s # is not found into collection %s", expectedDataObject.toString(), collectionaNames);
+            }
 
-			checkSameKeys(expectedDataObject,foundObject);
-			
-		}
-	}
+            checkSameKeys(expectedDataObject, foundObject);
 
-	private static boolean isShardOrIndexCollection(DBObject dbObject) {
-		return !(dbObject instanceof BasicDBList);
-	}
-	
-	private static void checkSameKeys(DBObject expectedDataObject,DBObject foundObject) {
-		
-		Set<String> expectedKeys = expectedDataObject.keySet();
-		Set<String> expectedNoneSystemKeys = noneSystemKeys(expectedKeys);
-		Set<String> foundKeys = foundObject.keySet();
-		Set<String> foundNoneSystemKeys = noneSystemKeys(foundKeys);
+        }
+    }
 
-		Set<String> allKeys = new HashSet<String>(expectedNoneSystemKeys);
-		allKeys.addAll(foundNoneSystemKeys);
-		
-		if(allKeys.size() != expectedNoneSystemKeys.size() || allKeys.size() != foundNoneSystemKeys.size()) {
-			throw FailureHandler.createFailure("Expected DbObject and insert DbObject have different keys: Expected: %s Inserted: %s", expectedNoneSystemKeys, foundNoneSystemKeys);
-		}
-		
-	}
-	
-	private static Set<String> noneSystemKeys(Set<String> keys) {
-		
-		Set<String> noneSystemKeys = new HashSet<String>();
-		
-		for (String key : keys) {
-			if(!key.startsWith("_")) {
-				noneSystemKeys.add(key);
-			}
-		}
-		
-		return noneSystemKeys;
-	}
-	
-	private static boolean exists(DBObject foundObject) {
-		return foundObject != null;
-	}
+    private static boolean isDataDirectly(Object object) {
+        return List.class.isAssignableFrom(object.getClass());
+    }
+
+    private static void checkSameKeys(Document expectedDataObject, Document foundObject) {
+
+        Set<String> expectedKeys = expectedDataObject.keySet();
+        Set<String> expectedNoneSystemKeys = noneSystemKeys(expectedKeys);
+        Set<String> foundKeys = foundObject.keySet();
+        Set<String> foundNoneSystemKeys = noneSystemKeys(foundKeys);
+
+        Set<String> allKeys = new HashSet<String>(expectedNoneSystemKeys);
+        allKeys.addAll(foundNoneSystemKeys);
+
+        if (allKeys.size() != expectedNoneSystemKeys.size() || allKeys.size() != foundNoneSystemKeys.size()) {
+            throw FailureHandler.createFailure("Expected DbObject and insert DbObject have different keys: Expected: %s Inserted: %s", expectedNoneSystemKeys, foundNoneSystemKeys);
+        }
+
+    }
+
+    private static Set<String> noneSystemKeys(Set<String> keys) {
+
+        Set<String> noneSystemKeys = new HashSet<String>();
+
+        for (String key : keys) {
+            if (!key.startsWith("_")) {
+                noneSystemKeys.add(key);
+            }
+        }
+
+        return noneSystemKeys;
+    }
+
+    private static boolean exists(Document foundObject) {
+        return foundObject != null;
+    }
 
     //<editor-fold desc="Flexible comparator">
+
     /**
      * Checks that all the expected data is present in MongoDB.
      *
      * @param expectedData Expected data.
      * @param mongoDb      Mongo Database.
      */
-    public static void flexibleAssertEquals(DBObject expectedData, String[] ignorePropertyValues, DB mongoDb) {
+    public static void flexibleAssertEquals(Document expectedData, String[] ignorePropertyValues, MongoDatabase mongoDb) {
         // Get the expected collections
         Set<String> collectionNames = expectedData.keySet();
 
         // Get the current collections in mongoDB
-        Set<String> mongodbCollectionNames = mongoDb.getCollectionNames();
+        final MongoIterable<String> listCollectionNames = mongoDb.listCollectionNames();
 
         // Get the concrete property names that should be ignored
         // Map<String:Collection, Set<String:Property>>
         Map<String, Set<String>> propertiesToIgnore = parseIgnorePropertyValues(collectionNames, ignorePropertyValues);
 
         // Check expected data
-        flexibleCheckCollectionsName(collectionNames, mongodbCollectionNames);
+        flexibleCheckCollectionsName(collectionNames, listCollectionNames);
         for (String collectionName : collectionNames) {
             flexibleCheckCollectionObjects(expectedData, mongoDb, collectionName, propertiesToIgnore);
         }
@@ -234,11 +238,10 @@ public class MongoDbAssertion {
      * <p/>
      * If any expected collection isn't found in the database collection, the returned error indicates only the
      * missing expected collections.
-     *
-     * @param expectedCollectionNames Expected collection names.
+     *  @param expectedCollectionNames Expected collection names.
      * @param mongodbCollectionNames  Current MongoDB collection names.
      */
-    private static void flexibleCheckCollectionsName(Set<String> expectedCollectionNames, Set<String> mongodbCollectionNames) {
+    private static void flexibleCheckCollectionsName(Set<String> expectedCollectionNames, MongoIterable<String> mongodbCollectionNames) {
         Set<String> mongoDbUserCollectionNames = getUserCollections(mongodbCollectionNames);
 
         boolean ok = true;
@@ -262,22 +265,21 @@ public class MongoDbAssertion {
      * @param mongoDb        Mongo database.
      * @param collectionName Collection name.
      */
-    private static void flexibleCheckCollectionObjects(DBObject expectedData, DB mongoDb, String collectionName, Map<String, Set<String>> propertiesToIgnore) throws Error {
-        DBObject object = (DBObject) expectedData.get(collectionName);
-        BasicDBList dataObjects;
+    private static void flexibleCheckCollectionObjects(Document expectedData, MongoDatabase mongoDb, String collectionName, Map<String, Set<String>> propertiesToIgnore) throws Error {
+        Object object = expectedData.get(collectionName);
+        List<Document> dataObjects = null;
 
-        if (isShardOrIndexCollection(object)) {
-            dataObjects = (BasicDBList) object.get(DATA);
+        if (isDataDirectly(object)) {
+            dataObjects = (List) object;
         } else {
-            dataObjects = (BasicDBList) object;
+            dataObjects = ((Document) object).get(DATA, List.class);
         }
 
-        DBCollection dbCollection = mongoDb.getCollection(collectionName);
+        MongoCollection<Document> dbCollection = mongoDb.getCollection(collectionName);
 
-        for (Object dataObject : dataObjects) {
-            BasicDBObject expectedDataObject = (BasicDBObject) dataObject;
-            DBObject filteredExpectedDataObject = filterProperties(expectedDataObject, propertiesToIgnore.get(collectionName));
-            DBObject foundObject = dbCollection.findOne(filteredExpectedDataObject);
+        for (Document expectedDataObject : dataObjects) {
+            Document filteredExpectedDataObject = filterProperties(expectedDataObject, propertiesToIgnore.get(collectionName));
+            final Document foundObject = dbCollection.find(filteredExpectedDataObject).first();
 
             if (dbCollection.count(filteredExpectedDataObject) > 1) {
                 logger.warn(String.format("There were found %d possible matches for this object # %s #. That could have been caused by ignoring too many properties.", dbCollection.count(filteredExpectedDataObject), expectedDataObject.toString()));
@@ -288,7 +290,7 @@ public class MongoDbAssertion {
             }
 
             // Check same keys without filtering
-            flexibleCheckSameKeys((DBObject) dataObject, foundObject);
+            flexibleCheckSameKeys(expectedDataObject, foundObject);
 
         }
     }
@@ -296,12 +298,12 @@ public class MongoDbAssertion {
     /**
      * Removes the properties defined with @IgnorePropertyValue annotation.
      *
-     * @param dataObject Object to filter.
+     * @param dataObject         Object to filter.
      * @param propertiesToIgnore Properties to filter
      * @return Data object without the properties to be ignored.
      */
-    private static BasicDBObject filterProperties(BasicDBObject dataObject, Set<String> propertiesToIgnore) {
-        BasicDBObject filteredDataObject = new BasicDBObject();
+    private static Document filterProperties(Document dataObject, Set<String> propertiesToIgnore) {
+        Document filteredDataObject = new Document();
 
         for (Map.Entry<String, Object> entry : dataObject.entrySet()) {
             if (propertiesToIgnore == null || !propertiesToIgnore.contains(entry.getKey())) {
@@ -321,7 +323,7 @@ public class MongoDbAssertion {
      * @param expectedDataObject Expected object.
      * @param foundObject        Database object.
      */
-    private static void flexibleCheckSameKeys(DBObject expectedDataObject, DBObject foundObject) {
+    private static void flexibleCheckSameKeys(Document expectedDataObject, Document foundObject) {
         Set<String> expectedKeys = expectedDataObject.keySet();
         Set<String> expectedNoneSystemKeys = noneSystemKeys(expectedKeys);
         Set<String> foundKeys = foundObject.keySet();
@@ -343,7 +345,7 @@ public class MongoDbAssertion {
         }
 
         if (expectedKeysNotInserted.size() > 0 || insertedKeysNotExpected.size() > 0) {
-            StringBuilder errorMessage = new StringBuilder("Expected DbObject and insert DbObject have different keys: ");
+            StringBuilder errorMessage = new StringBuilder("Expected Document and insert Document have different keys: ");
             if (expectedKeysNotInserted.size() > 0) {
                 errorMessage.append("expected keys not inserted ").append(expectedKeysNotInserted).append(" ");
             }

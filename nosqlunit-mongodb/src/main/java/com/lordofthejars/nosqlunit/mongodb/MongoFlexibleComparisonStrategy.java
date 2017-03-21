@@ -1,8 +1,7 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.IOUtils;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
+import org.bson.Document;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +68,7 @@ public class MongoFlexibleComparisonStrategy
     @Override
     public boolean compare(MongoDbConnectionCallback connection, InputStream dataset) throws IOException {
         String expectedJsonData = loadContentFromInputStream(dataset);
-        DBObject parsedData = parseData(expectedJsonData);
+        Document parsedData = parseData(expectedJsonData);
 
         MongoDbAssertion.flexibleAssertEquals(parsedData, ignorePropertyValues, connection.db());
 
@@ -80,8 +79,8 @@ public class MongoFlexibleComparisonStrategy
         return IOUtils.readFullStream(inputStreamContent);
     }
 
-    private DBObject parseData(String jsonData) throws IOException {
-        DBObject parsedData = (DBObject) JSON.parse(jsonData);
+    private Document parseData(String jsonData) throws IOException {
+        Document parsedData = Document.parse(jsonData);
         return parsedData;
     }
 

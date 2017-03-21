@@ -1,225 +1,224 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
+import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOpsFactory;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import org.bson.Document;
+import org.junit.rules.ExternalResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mongodb.MongoCredential;
-import org.junit.rules.ExternalResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOpsFactory;
-import com.mongodb.CommandResult;
-import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
-
 public class ReplicaSetManagedMongoDb extends ExternalResource {
 
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(ReplicaSetManagedMongoDb.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(ReplicaSetManagedMongoDb.class);
 
 
-	private ReplicaSetGroup replicaSetGroup;
+    private ReplicaSetGroup replicaSetGroup;
 
-	private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDbLowLevelOpsFactory.getSingletonInstance();
-	
-	protected ReplicaSetManagedMongoDb(ReplicaSetGroup replicaSetGroup) {
-		this.replicaSetGroup = replicaSetGroup;
-	}
+    private MongoDbLowLevelOps mongoDbLowLevelOps = MongoDbLowLevelOpsFactory.getSingletonInstance();
 
-	public String replicaSetName() {
-		return this.replicaSetGroup.getReplicaSetName();
-	}
-	
-	public List<ManagedMongoDbLifecycleManager> getReplicaSetServers() {
-		return this.replicaSetGroup.getServers();
-	}
-	
-	public void shutdownServer(int port) {
+    protected ReplicaSetManagedMongoDb(ReplicaSetGroup replicaSetGroup) {
+        this.replicaSetGroup = replicaSetGroup;
+    }
 
-		ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager = replicaSetGroup
-				.getStartedServer(port);
+    public String replicaSetName() {
+        return this.replicaSetGroup.getReplicaSetName();
+    }
 
-		if (managedMongoDbLifecycleManager != null) {
-			managedMongoDbLifecycleManager.stopEngine();
-		}
-		
-	}
+    public List<ManagedMongoDbLifecycleManager> getReplicaSetServers() {
+        return this.replicaSetGroup.getServers();
+    }
 
-	public void waitUntilReplicaSetBecomesStable() {
-		MongoClient mongoClient;
-		try {
-			mongoClient = getAvailableServersMongoClient();
-		} catch (UnknownHostException e) {
-			throw new IllegalArgumentException(e);
-		}
+    public void shutdownServer(int port) {
 
-		waitingToBecomeStable(mongoClient);
+        ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager = replicaSetGroup
+                .getStartedServer(port);
 
-		mongoClient.close();
-		
-	}
+        if (managedMongoDbLifecycleManager != null) {
+            managedMongoDbLifecycleManager.stopEngine();
+        }
 
-	private void waitingToBecomeStable(MongoClient mongoClient) {
-		if(replicaSetGroup.isAuthenticationSet()) {
-			this.mongoDbLowLevelOps.waitUntilReplicaSetBecomeStable(mongoClient, this.replicaSetGroup.numberOfStartedServers(), replicaSetGroup.getUsername(), replicaSetGroup.getPassword());
-		} else {
-			this.mongoDbLowLevelOps.waitUntilReplicaSetBecomeStable(mongoClient, this.replicaSetGroup.numberOfStartedServers());
-		}
-	}
+    }
 
-	public void startupServer(int port) throws Throwable {
+    public void waitUntilReplicaSetBecomesStable() {
+        MongoClient mongoClient;
+        try {
+            mongoClient = getAvailableServersMongoClient();
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException(e);
+        }
 
-		ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager = replicaSetGroup.getStoppedServer(port);
+        waitingToBecomeStable(mongoClient);
 
-		if (managedMongoDbLifecycleManager != null) {
-			managedMongoDbLifecycleManager.startEngine();
-		}
+        mongoClient.close();
 
-	}
+    }
 
-	public ManagedMongoDbLifecycleManager getServerByPortAndState(int port, boolean state) {
-		if(state) {
-			return replicaSetGroup.getStartedServer(port);			
-		} else {
-			return replicaSetGroup.getStoppedServer(port);
-		}
-	}
-	
-	@Override
-	protected void before() throws Throwable {
-		wakeUpServers();
-		replicaSetInitiate();
-		waitUntilConfigurationSpreadAcrossServersFromDefaultConnection();
-	}
+    private void waitingToBecomeStable(MongoClient mongoClient) {
+        if (replicaSetGroup.isAuthenticationSet()) {
+            this.mongoDbLowLevelOps.waitUntilReplicaSetBecomeStable(mongoClient, this.replicaSetGroup.numberOfStartedServers(), replicaSetGroup.getUsername(), replicaSetGroup.getPassword());
+        } else {
+            this.mongoDbLowLevelOps.waitUntilReplicaSetBecomeStable(mongoClient, this.replicaSetGroup.numberOfStartedServers());
+        }
+    }
 
-	public void startAllReplicaSet() throws Throwable {
-		this.before();
-	}
-	
-	private void waitUntilConfigurationSpreadAcrossServersFromDefaultConnection() throws UnknownHostException {
-		
-		MongoClient mongoClient = getDefaultMongoClient();
-		
-		waitingToBecomeStable(mongoClient);
-		
-		mongoClient.close();
+    public void startupServer(int port) throws Throwable {
 
-	}
+        ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager = replicaSetGroup.getStoppedServer(port);
 
-	@Override
-	protected void after() {
-		shutdownServers();
-	}
+        if (managedMongoDbLifecycleManager != null) {
+            managedMongoDbLifecycleManager.startEngine();
+        }
 
-	public void stopAllReplicaSet() {
-		this.after();
-	}
-	
-	protected List<ManagedMongoDbLifecycleManager> getServers() {
-		return replicaSetGroup.getServers();
-	}
+    }
 
-	protected ConfigurationDocument getConfigurationDocument() {
-		return replicaSetGroup.getConfiguration();
-	}
+    public ManagedMongoDbLifecycleManager getServerByPortAndState(int port, boolean state) {
+        if (state) {
+            return replicaSetGroup.getStartedServer(port);
+        } else {
+            return replicaSetGroup.getStoppedServer(port);
+        }
+    }
 
-	private void replicaSetInitiate() throws UnknownHostException {
+    @Override
+    protected void before() throws Throwable {
+        wakeUpServers();
+        replicaSetInitiate();
+        waitUntilConfigurationSpreadAcrossServersFromDefaultConnection();
+    }
 
-		CommandResult commandResult = runCommandToAdmin(getConfigurationDocument());
+    public void startAllReplicaSet() throws Throwable {
+        this.before();
+    }
 
-		LOGGER.info("Command {} has returned {}", "replSetInitiaite",
-				commandResult.toString());
+    private void waitUntilConfigurationSpreadAcrossServersFromDefaultConnection() throws UnknownHostException {
 
-	}
+        MongoClient mongoClient = getDefaultMongoClient();
 
-	private CommandResult runCommandToAdmin(ConfigurationDocument cmd)
-			throws UnknownHostException {
-		
-		MongoClient mongoClient = getDefaultMongoClient();
+        waitingToBecomeStable(mongoClient);
 
-		CommandResult commandResult = MongoDbCommands.replicaSetInitiate(mongoClient, cmd);
+        mongoClient.close();
 
-		mongoClient.close();
-		return commandResult;
-	}
+    }
 
-	private void shutdownServers() {
-		
-		LOGGER.info("Stopping Replica Set servers");
-		
-		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
-				.getServers()) {
-			if(isServerStarted(managedMongoDbLifecycleManager)) {
-				managedMongoDbLifecycleManager.stopEngine();
-			}
-		}
-		
-		LOGGER.info("Stopped Replica Set servers");
-	}
+    @Override
+    protected void after() {
+        shutdownServers();
+    }
 
-	private void wakeUpServers() throws Throwable {
-		
-		LOGGER.info("Starting Replica Set servers");
-		
-		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
-				.getServers()) {
-			if (isServerStopped(managedMongoDbLifecycleManager)) {
-				managedMongoDbLifecycleManager.startEngine();
-			}
-		}
-		
-		LOGGER.info("Started Replica Set servers");
-	}
+    public void stopAllReplicaSet() {
+        this.after();
+    }
 
-	private boolean isServerStarted(ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager) {
-		return managedMongoDbLifecycleManager.isReady();
-	}
-	
-	private boolean isServerStopped(
-			ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager) {
-		return !managedMongoDbLifecycleManager.isReady();
-	}
+    protected List<ManagedMongoDbLifecycleManager> getServers() {
+        return replicaSetGroup.getServers();
+    }
 
-	private MongoClient getAvailableServersMongoClient()
-			throws UnknownHostException {
+    protected ConfigurationDocument getConfigurationDocument() {
+        return replicaSetGroup.getConfiguration();
+    }
 
-		List<ServerAddress> seeds = new ArrayList<ServerAddress>();
+    private void replicaSetInitiate() throws UnknownHostException {
 
-		for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
-				.getServers()) {
-			if (managedMongoDbLifecycleManager.isReady()) {
-				ServerAddress serverAddress = new ServerAddress(
-						managedMongoDbLifecycleManager.getHost(),
-						managedMongoDbLifecycleManager.getPort());
-				seeds.add(serverAddress);
-			}
-		}
+        Document commandResult = runCommandToAdmin(getConfigurationDocument());
 
-		return new MongoClient(seeds);
+        LOGGER.info("Command {} has returned {}", "replSetInitiaite",
+                commandResult.toString());
 
-	}
+    }
 
-	private MongoClient getDefaultMongoClient() throws UnknownHostException {
+    private Document runCommandToAdmin(ConfigurationDocument cmd)
+            throws UnknownHostException {
 
-		ManagedMongoDbLifecycleManager defaultConnection = replicaSetGroup
-				.getDefaultConnection();
-		if (this.replicaSetGroup.isAuthenticationSet()) {
-			MongoCredential credential = MongoCredential.createCredential(this.replicaSetGroup.getUsername(),
-					"admin",
-					this.replicaSetGroup.getPassword().toCharArray());
-			return new MongoClient(new ServerAddress(defaultConnection.getHost(), defaultConnection.getPort()), Arrays.asList(credential));
-		} else {
-			return new MongoClient(defaultConnection.getHost(),
-					defaultConnection.getPort());
-		}
+        MongoClient mongoClient = getDefaultMongoClient();
 
-	}
+        Document commandResult = MongoDbCommands.replicaSetInitiate(mongoClient, cmd);
+
+        mongoClient.close();
+        return commandResult;
+    }
+
+    private void shutdownServers() {
+
+        LOGGER.info("Stopping Replica Set servers");
+
+        for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
+                .getServers()) {
+            if (isServerStarted(managedMongoDbLifecycleManager)) {
+                managedMongoDbLifecycleManager.stopEngine();
+            }
+        }
+
+        LOGGER.info("Stopped Replica Set servers");
+    }
+
+    private void wakeUpServers() throws Throwable {
+
+        LOGGER.info("Starting Replica Set servers");
+
+        for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
+                .getServers()) {
+            if (isServerStopped(managedMongoDbLifecycleManager)) {
+                managedMongoDbLifecycleManager.startEngine();
+            }
+        }
+
+        LOGGER.info("Started Replica Set servers");
+    }
+
+    private boolean isServerStarted(ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager) {
+        return managedMongoDbLifecycleManager.isReady();
+    }
+
+    private boolean isServerStopped(
+            ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager) {
+        return !managedMongoDbLifecycleManager.isReady();
+    }
+
+    private MongoClient getAvailableServersMongoClient()
+            throws UnknownHostException {
+
+        List<ServerAddress> seeds = new ArrayList<ServerAddress>();
+
+        for (ManagedMongoDbLifecycleManager managedMongoDbLifecycleManager : replicaSetGroup
+                .getServers()) {
+            if (managedMongoDbLifecycleManager.isReady()) {
+                ServerAddress serverAddress = new ServerAddress(
+                        managedMongoDbLifecycleManager.getHost(),
+                        managedMongoDbLifecycleManager.getPort());
+                seeds.add(serverAddress);
+            }
+        }
+
+        return new MongoClient(seeds);
+
+    }
+
+    private MongoClient getDefaultMongoClient() throws UnknownHostException {
+
+        ManagedMongoDbLifecycleManager defaultConnection = replicaSetGroup
+                .getDefaultConnection();
+        if (this.replicaSetGroup.isAuthenticationSet()) {
+            MongoCredential credential = MongoCredential.createCredential(this.replicaSetGroup.getUsername(),
+                    "admin",
+                    this.replicaSetGroup.getPassword().toCharArray());
+            return new MongoClient(new ServerAddress(defaultConnection.getHost(), defaultConnection.getPort()), Arrays.asList(credential));
+        } else {
+            return new MongoClient(defaultConnection.getHost(),
+                    defaultConnection.getPort());
+        }
+
+    }
 
 }

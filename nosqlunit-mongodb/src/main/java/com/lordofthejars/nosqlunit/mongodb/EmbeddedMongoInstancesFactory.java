@@ -1,19 +1,19 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.util.EmbeddedInstances;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 
 public class EmbeddedMongoInstancesFactory {
 
-private static EmbeddedInstances<Mongo> embeddedInstances;
+	private static EmbeddedInstances<MongoClient> embeddedInstances;
 	
 	private EmbeddedMongoInstancesFactory() {
 		super();
 	}
 	
-	public synchronized static EmbeddedInstances<Mongo> getInstance() {
+	public synchronized static EmbeddedInstances<MongoClient> getInstance() {
 		if(embeddedInstances == null) {
-			embeddedInstances = new EmbeddedInstances<Mongo>();
+			embeddedInstances = new EmbeddedInstances<>();
 		}
 		
 		return embeddedInstances;

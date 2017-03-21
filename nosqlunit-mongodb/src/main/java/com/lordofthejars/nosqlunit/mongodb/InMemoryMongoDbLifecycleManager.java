@@ -2,7 +2,7 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import com.github.fakemongo.Fongo;
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 
 	}
 
-	private Mongo fongo(String targetPath) {
+	private MongoClient fongo(String targetPath) {
 		Fongo fongo = new Fongo(targetPath);
 		return fongo.getMongo();
 	}
