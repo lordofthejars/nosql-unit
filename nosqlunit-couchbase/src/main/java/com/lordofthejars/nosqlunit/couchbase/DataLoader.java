@@ -11,6 +11,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -34,7 +35,7 @@ public class DataLoader {
         for (final Map.Entry<String, Document> documentEntry : documentsIterator.entrySet()) {
             final Document document = documentEntry.getValue();
             final JsonDocument jsonDocument = JsonDocument.create(documentEntry.getKey(), document.getExpirationSecs(), document.getDocument());
-            bucket.upsert(jsonDocument);
+            bucket.upsert(jsonDocument, 15, TimeUnit.SECONDS);
         }
     }
 
