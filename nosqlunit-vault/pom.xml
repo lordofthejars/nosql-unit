@@ -3,7 +3,7 @@
   <parent>
     <artifactId>nosqlunit</artifactId>
     <groupId>com.lordofthejars</groupId>
-    <version>1.0.0-rc.3</version>
+    <version>1.0.0-rc.3-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>nosqlunit-vault</artifactId>
@@ -19,6 +19,12 @@
     <dependency>
       <groupId>com.bettercloud</groupId>
       <artifactId>vault-java-driver</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
     </dependency>
 
   </dependencies>

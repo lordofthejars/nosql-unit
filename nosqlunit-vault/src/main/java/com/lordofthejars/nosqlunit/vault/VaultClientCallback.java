@@ -1,9 +1,9 @@
 package com.lordofthejars.nosqlunit.vault;
 
-import com.bettercloud.vault.Vault;
+import com.bettercloud.vault.VaultConfig;
 
 public interface VaultClientCallback {
 
-    Vault createClient();
+    VaultConfig vaultConfiguration();
 
 }

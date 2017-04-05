@@ -5,12 +5,14 @@ import java.io.InputStream;
 
 public class DefaultVaultComparisionStrategy implements ComparisonStrategy<VaultClientCallback> {
 
-    @Override public boolean compare(VaultClientCallback connection, InputStream dataset)
+    @Override
+    public boolean compare(VaultClientCallback connection, InputStream dataset)
         throws  Throwable {
         return false;
     }
 
-    @Override public void setIgnoreProperties(String[] ignoreProperties) {
+    @Override
+    public void setIgnoreProperties(String[] ignoreProperties) {
 
     }
 }
