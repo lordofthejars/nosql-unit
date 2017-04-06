@@ -17,8 +17,6 @@ import java.util.stream.StreamSupport;
 
 public class DataLoader {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     private Bucket bucket;
 
     public DataLoader(Bucket bucket) {

@@ -1,0 +1,11 @@
+- tokens:
+  - uuid: c56a4180-65aa-42ec-a945-5fd21dec0538
+    numUses: 2
+    secrets:
+      - cubbyhole/temp:
+          permtoken: c56a4180-65aa-42ec-a945-5fd21dec0539
+  - uuid: c56a4180-65aa-42ec-a945-5fd21dec0539
+    secrets:
+      - secret/bar:
+          username: ada
+          password: alexandra

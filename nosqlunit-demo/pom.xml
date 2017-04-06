@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>nosqlunit</artifactId>
 		<groupId>com.lordofthejars</groupId>
-		<version>1.0.0-rc.3</version>
+		<version>1.0.0-rc.3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>nosqlunit-demo</artifactId>
@@ -86,6 +86,15 @@
 			<artifactId>nosqlunit-elasticsearch2</artifactId>
 			<groupId>com.lordofthejars</groupId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>nosqlunit-vault</artifactId>
+			<groupId>com.lordofthejars</groupId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bettercloud</groupId>
+			<artifactId>vault-java-driver</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>redis.clients</groupId>
