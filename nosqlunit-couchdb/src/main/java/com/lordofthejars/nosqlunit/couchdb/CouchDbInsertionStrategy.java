@@ -1,4 +1,4 @@
-	package com.lordofthejars.nosqlunit.couchdb;
+package com.lordofthejars.nosqlunit.couchdb;
 
 import com.lordofthejars.nosqlunit.core.InsertionStrategy;
 

@@ -4,6 +4,5 @@ import org.ektorp.CouchDbConnector;
 
 public interface CouchDbConnectionCallback {
 
-	CouchDbConnector couchDbConnector();
-	
+    CouchDbConnector couchDbConnector();
 }
