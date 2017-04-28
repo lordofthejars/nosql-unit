@@ -2,7 +2,7 @@ package com.lordofthejars.nosqlunit.infinispan;
 
 import java.util.Properties;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 
 import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
 

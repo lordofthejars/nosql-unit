@@ -3,6 +3,8 @@ package com.lordofthejars.nosqlunit.infinispan;
 import java.io.File;
 import java.io.IOException;
 
+import org.infinispan.configuration.cache.ConfigurationBuilder;
+import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.slf4j.Logger;
@@ -53,7 +55,9 @@ public class EmbeddedInfinispanLifecycleManager extends AbstractLifecycleManager
 
 	private EmbeddedCacheManager embeddedCacheManager() throws IOException {
 		if(configurationFile == null) {
-			return new DefaultCacheManager();
+			GlobalConfigurationBuilder global = new GlobalConfigurationBuilder();
+			global.globalJmxStatistics().allowDuplicateDomains(true);
+			return new DefaultCacheManager(global.build(), new ConfigurationBuilder().build());
 		} else {
 			return new DefaultCacheManager(configurationFile);
 		}

@@ -34,8 +34,8 @@ public class ManagedInfinispanLifecycleManager extends AbstractLifecycleManager 
 	protected static final String DEFAULT_INFINISPAN_TARGET_PATH = "target" + File.separatorChar + "infinispan-temp";
 	protected static final String INFINISPAN_BINARY_DIRECTORY = "bin";
 
-	protected static final String INFINISPAN_EXECUTABLE_X = "startServer.sh";
-	protected static final String INFINISPAN_EXECUTABLE_W = "startServer.bat";
+	protected static final String INFINISPAN_EXECUTABLE_X = "standalone.sh";
+	protected static final String INFINISPAN_EXECUTABLE_W = "standalone.bat";
 
 	protected static final String PORT_COMMAND_LINE_ARGUMENT_NAME = "--port";
 	protected static final String PROTOCOL_COMMAND_LINE_ARGUMENT_NAME = "--protocol";
@@ -133,8 +133,8 @@ public class ManagedInfinispanLifecycleManager extends AbstractLifecycleManager 
 		List<String> programAndArguments = new ArrayList<String>();
 
 		programAndArguments.add(getExecutablePath());
-		addPort(programAndArguments);
-		addProtocol(programAndArguments);
+//		addPort(programAndArguments);
+//		addProtocol(programAndArguments);
 		
 		addSingleArguments(programAndArguments);
 		addCommandArguments(programAndArguments);

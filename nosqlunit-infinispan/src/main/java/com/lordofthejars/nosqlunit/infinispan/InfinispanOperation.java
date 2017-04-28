@@ -2,7 +2,7 @@ package com.lordofthejars.nosqlunit.infinispan;
 
 import java.io.InputStream;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
