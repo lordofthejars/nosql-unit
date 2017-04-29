@@ -1,6 +1,6 @@
 package com.lordofthejars.nosqlunit.infinispan;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 import org.infinispan.manager.EmbeddedCacheManager;
 
 import com.lordofthejars.nosqlunit.core.FailureHandler;

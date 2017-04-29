@@ -2,7 +2,8 @@ package com.lordofthejars.nosqlunit.infinispan;
 
 import java.util.Properties;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.infinispan.commons.api.BasicCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 
 public class ManagedInfinispanConfigurationBuilder {
@@ -39,8 +40,11 @@ public class ManagedInfinispanConfigurationBuilder {
 	}
 	
 	public InfinispanConfiguration build() {
-		
-		RemoteCacheManager remoteCacheManager = this.infinispanConfiguration.getConfigurationProperties() == null ? new RemoteCacheManager() : new RemoteCacheManager(this.infinispanConfiguration.getConfigurationProperties());
+		ConfigurationBuilder builder = new ConfigurationBuilder();
+		if (this.infinispanConfiguration.getConfigurationProperties() != null)
+			builder.withProperties(this.infinispanConfiguration.getConfigurationProperties());
+
+		RemoteCacheManager remoteCacheManager = new RemoteCacheManager(builder.build());
 		
 		BasicCache<Object, Object> basicCache = this.infinispanConfiguration.getCacheName() == null ? remoteCacheManager.getCache() : remoteCacheManager.getCache(this.infinispanConfiguration.getCacheName());  
 		this.infinispanConfiguration.setCache(basicCache);

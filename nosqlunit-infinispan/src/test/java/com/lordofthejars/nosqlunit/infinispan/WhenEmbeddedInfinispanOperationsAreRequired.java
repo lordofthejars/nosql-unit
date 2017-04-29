@@ -7,7 +7,7 @@ import static org.junit.Assert.assertThat;
 import java.io.ByteArrayInputStream;
 
 import org.infinispan.Cache;
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.junit.After;
 import org.junit.ClassRule;

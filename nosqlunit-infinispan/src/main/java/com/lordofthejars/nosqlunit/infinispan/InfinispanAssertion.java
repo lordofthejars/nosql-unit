@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 
 import com.lordofthejars.nosqlunit.core.FailureHandler;
 

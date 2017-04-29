@@ -6,10 +6,9 @@ import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 
-import org.infinispan.api.BasicCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.commons.api.BasicCache;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -36,7 +35,7 @@ public class WhenManagedInfinispanOperationsAreRequired {
 			"}";
 	
 	@ClassRule
-	public static ManagedInfinispan managedInfinispan = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build(); 
+	public static ManagedInfinispan managedInfinispan = newManagedInfinispanRule().infinispanPath("/opt/infinispan-server").build();
 	
 	private RemoteCacheManager remoteCacheManager = new RemoteCacheManager();
 	

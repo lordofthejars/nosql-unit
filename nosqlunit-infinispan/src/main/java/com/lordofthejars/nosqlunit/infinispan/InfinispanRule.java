@@ -3,7 +3,7 @@ package com.lordofthejars.nosqlunit.infinispan;
 import static com.lordofthejars.nosqlunit.infinispan.EmbeddedInfinispanConfigurationBuilder.newEmbeddedInfinispanConfiguration;
 import static com.lordofthejars.nosqlunit.infinispan.ManagedInfinispanConfigurationBuilder.newManagedInfinispanConfiguration;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 
 import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
