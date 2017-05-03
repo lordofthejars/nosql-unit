@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.lordofthejars</groupId>
     <artifactId>nosqlunit</artifactId>
-    <version>1.0.0-rc.4</version>
+    <version>1.0.0-rc.5-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>nosqlunit-couchdb</artifactId>
