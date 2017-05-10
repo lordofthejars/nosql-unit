@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.lordofthejars</groupId>
 		<artifactId>nosqlunit</artifactId>
-		<version>1.0.0-rc.5-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>nosqlunit-elasticsearch2</artifactId>
 
