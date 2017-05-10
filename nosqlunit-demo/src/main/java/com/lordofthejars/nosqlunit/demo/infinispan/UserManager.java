@@ -1,6 +1,6 @@
 package com.lordofthejars.nosqlunit.demo.infinispan;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 
 public class UserManager {
 

@@ -7,7 +7,7 @@ import static com.lordofthejars.nosqlunit.infinispan.EmbeddedInfinispan.Embedded
 
 import javax.inject.Inject;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;

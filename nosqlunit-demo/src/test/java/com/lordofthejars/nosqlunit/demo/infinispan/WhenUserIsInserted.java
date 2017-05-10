@@ -5,7 +5,7 @@ import static com.lordofthejars.nosqlunit.infinispan.ManagedInfinispan.ManagedIn
 
 import javax.inject.Inject;
 
-import org.infinispan.api.BasicCache;
+import org.infinispan.commons.api.BasicCache;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,7 +20,7 @@ import com.lordofthejars.nosqlunit.infinispan.ManagedInfinispan;
 public class WhenUserIsInserted {
 
 	@ClassRule
-	public static final ManagedInfinispan MANAGED_INFINISPAN = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build();
+	public static final ManagedInfinispan MANAGED_INFINISPAN = newManagedInfinispanRule().infinispanPath("/opt/infinispan").build();
 	
 	@Rule
 	public final InfinispanRule infinispanRule = newInfinispanRule().defaultManagedInfinispan();
