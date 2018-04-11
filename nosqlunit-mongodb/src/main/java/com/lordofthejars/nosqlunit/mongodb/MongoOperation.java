@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 public final class MongoOperation extends AbstractCustomizableDatabaseOperation<MongoDbConnectionCallback, MongoClient> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MongoOptions.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(MongoOperation.class);
 
     private MongoClient mongo;
 
