@@ -29,6 +29,11 @@ public class SpringMongoDbRule extends MongoDbRule {
         return super.apply(base, method, testObject);
     }
 
+    @Override
+	public void close() {
+		// DO NOT CLOSE the connection (Spring will do it when destroying the context)
+	}
+    
     private MongoClient definedMongo(Object testObject) {
         ApplicationContext applicationContext = propertyGetter.propertyByType(testObject, ApplicationContext.class);
 
