@@ -366,6 +366,7 @@
         <module>nosqlunit-elasticsearch2</module>
         <module>nosqlunit-couchbase</module>
         <module>nosqlunit-vault</module>
+        <module>nosqlunit-dynamodb</module>
     </modules>
 
     <build>
@@ -393,21 +394,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>

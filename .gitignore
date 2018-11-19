@@ -1,8 +1,11 @@
 .classpath
 .project
 .settings/
+.factorypath
 target/
 *.iml
 gitflow/
 .idea/
 *.versionsBackup
+.DS_Store
+native-libs/
