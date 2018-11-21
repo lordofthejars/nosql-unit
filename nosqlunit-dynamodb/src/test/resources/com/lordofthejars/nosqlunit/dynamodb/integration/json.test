@@ -1,0 +1,12 @@
+{
+    "table1":
+            [
+                {"id": {"N": 1}, "code": {"S": "JSON dataset"} },
+                {"id": {"N": 2}, "code": {"S": "Another row"} }
+            ],
+    "table2":
+            [
+                {"id": {"N": 3}, "code": {"S": "JSON dataset 2"} },
+                {"id": {"N": 4}, "code": {"S": "Another row 2"} }
+            ]
+}

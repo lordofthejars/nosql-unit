@@ -1,0 +1,15 @@
+{
+    "table": [
+        {
+            "1": {
+                "S": "one"
+            },
+            "2": {
+                "S": "different"
+            },
+            "3": {
+                "S": "another different"
+            }
+        }
+    ]
+}
