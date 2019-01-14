@@ -2980,7 +2980,7 @@ Datasets must have next format:
 
 > Notice that if attributes value are integers, double quotes are not
   required. Also you can define as many *index* subdocuments as required, but only one *data* document which will be inserted into **Elasticsearch**.
-  Moreover property *indexId* is only mandatory if you want to use the inserted data to be validated with *@ShouldMatchDataSet*. Document index is used to run comparisions      faster than retrieving all data. If you are not planning to use the expectations capability of **NoSQLUnit** then you are not required to set *indexId* property and **Elasticsearch** will provide one for you.
+  Moreover property *indexId* is only mandatory if you want to use the inserted data to be validated with *@ShouldMatchDataSet*. Document index is used to run comparisons      faster than retrieving all data. If you are not planning to use the expectations capability of **NoSQLUnit** then you are not required to set *indexId* property and **Elasticsearch** will provide one for you.
 
 Getting Started
 ---------------
@@ -3189,7 +3189,7 @@ Apart of that, each engine has a default implementation Default\<engine\>Compari
 
 To register each strategy we must use *@CustomInsertionStrategy* and *@CustomComparisonStrategy* annotations.
 
-Let's see a very simple example where we are defining an alternative insertation strategy of *Redis* system by using properties file instead of json.
+Let's see a very simple example where we are defining an alternative insectation strategy of *Redis* system by using properties file instead of json.
 
 ~~~~ {.java}
 public class PropertiesCustomInsertion implements RedisInsertionStrategy {
@@ -3359,7 +3359,7 @@ To use **NoSQLUnit** with DynamoDb you only need to add next dependency:
 ~~~~
 
 Note that if you are plannig to use **in-memory** approach it is implemented using
-*DynamoDBLocal* . *DynamoDBLocal* is a proejct from Amazon which runs a local instance of DynamoDB. [DynamoDBLocal](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
+*DynamoDBLocal* . *DynamoDBLocal* is a project from Amazon which runs a local instance of DynamoDB. [DynamoDBLocal](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
 
 Dataset Format
 --------------
@@ -3778,7 +3778,7 @@ private Mongo mongo1;
 private Mongo mongo2;
 ~~~~
 
-There are some situations (mostly if using *Arquillian*) that you want to inject the value managed by container instead of the one managed by **NoSQLUnit**. To avoid an injection conflict **NoSQLUnit** provides an special annotation called *@ByContainer*. By using it, the injector processor will leave the field unttouched.
+There are some situations (mostly if using *Arquillian*) that you want to inject the value managed by container instead of the one managed by **NoSQLUnit**. To avoid an injection conflict **NoSQLUnit** provides an special annotation called *@ByContainer*. By using it, the injector processor will leave the field untouched.
 
 ~~~~ {.java}
 @Inject
