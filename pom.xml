@@ -65,6 +65,7 @@
         <couchbase-client.version>2.4.2</couchbase-client.version>
         <vault.java.version>2.0.0</vault.java.version>
         <snakeyaml.version>1.18</snakeyaml.version>
+        <marklogic-client-api.version>4.1.2</marklogic-client-api.version>
     </properties>
 
     <dependencyManagement>
@@ -198,6 +199,12 @@
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
                 <version>${xmlunit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.marklogic</groupId>
+                <artifactId>marklogic-client-api</artifactId>
+                <version>${marklogic-client-api.version}</version>
             </dependency>
 
             <dependency>
@@ -367,6 +374,7 @@
         <module>nosqlunit-couchbase</module>
         <module>nosqlunit-vault</module>
         <module>nosqlunit-dynamodb</module>
+        <module>nosqlunit-marklogic</module>
     </modules>
 
     <build>

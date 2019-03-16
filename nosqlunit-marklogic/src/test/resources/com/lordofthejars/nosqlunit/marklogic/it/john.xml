@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<person uri="/person/john.json" collections="nosqlunit,male">
+    <firstName>John</firstName>
+    <lastName>Doe</lastName>
+    <age>27</age>
+    <address>
+        <streetAddress>21 2nd Street</streetAddress>
+        <city>New York</city>
+        <state>NY</state>
+        <postalCode>10021</postalCode>
+    </address>
+    <phoneNumbers>
+        <phoneNumber>
+            <type>home</type>
+            <number>212 555-1234</number>
+        </phoneNumber>
+        <phoneNumber>
+            <type>mobile</type>
+            <number>212 555-9876</number>
+        </phoneNumber>
+    </phoneNumbers>
+</person>
