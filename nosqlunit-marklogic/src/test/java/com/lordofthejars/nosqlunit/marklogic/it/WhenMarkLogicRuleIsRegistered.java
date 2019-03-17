@@ -36,21 +36,23 @@ public class WhenMarkLogicRuleIsRegistered {
      */
     private static final int TEST_APP_PORT = 8000;
 
+    private static final Statement NO_OP_STATEMENT = new Statement() {
+        @Override
+        public void evaluate() throws Throwable {
+        }
+    };
+
     @ClassRule
-    public static ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().dockerContainer("marklogic").build();
+    public static ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
+
 
     @Test(expected = NoSqlAssertionError.class)
     public void should_fail_if_expected_data_is_non_strict_equal() throws Throwable {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        Statement noStatement = new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-            }
-        };
         FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_wrong");
-        Statement marklogicStatement = managedMarkLogicRule.apply(noStatement, frameworkMethod, new XmlTestClass());
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
         marklogicStatement.evaluate();
     }
 
@@ -59,14 +61,8 @@ public class WhenMarkLogicRuleIsRegistered {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        Statement noStatement = new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-            }
-        };
-
         FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_equal");
-        Statement marklogicStatement = managedMarkLogicRule.apply(noStatement, frameworkMethod, new XmlTestClass());
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
         marklogicStatement.evaluate();
     }
 
@@ -75,14 +71,8 @@ public class WhenMarkLogicRuleIsRegistered {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        Statement noStatement = new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-            }
-        };
-
         FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_delete");
-        Statement marklogicStatement = managedMarkLogicRule.apply(noStatement, frameworkMethod, new XmlTestClass());
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
         marklogicStatement.evaluate();
 
         Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
@@ -94,16 +84,9 @@ public class WhenMarkLogicRuleIsRegistered {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        Statement noStatement = new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-            }
-        };
-
-        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_insert");
-
         XmlTestClass testObject = new XmlTestClass();
-        Statement marklogicStatement = managedMarkLogicRule.apply(noStatement, frameworkMethod, testObject);
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_insert");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
         Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
@@ -115,7 +98,7 @@ public class WhenMarkLogicRuleIsRegistered {
 
         FrameworkMethod frameworkMethod2 = frameworkMethod(XmlTestClass.class, "two_insert");
 
-        Statement marklogicStatement2 = managedMarkLogicRule.apply(noStatement, frameworkMethod2, testObject);
+        Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
 
         Optional<ExtractedResult> previousData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
@@ -137,16 +120,10 @@ public class WhenMarkLogicRuleIsRegistered {
     public void should_clean_previous_data_and_insert_new_dataset_with_clean_insert_strategy() throws Throwable {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
-
-        Statement noStatement = new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-            }
-        };
         XmlTestClass testObject = new XmlTestClass();
 
         FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_equal");
-        Statement marklogicStatement = managedMarkLogicRule.apply(noStatement, frameworkMethod, testObject);
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
         Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Doe");
@@ -158,7 +135,7 @@ public class WhenMarkLogicRuleIsRegistered {
 
         FrameworkMethod frameworkMethod2 = frameworkMethod(XmlTestClass.class, "two_insert");
 
-        Statement marklogicStatement2 = managedMarkLogicRule.apply(noStatement, frameworkMethod2, testObject);
+        Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
 
         Optional<ExtractedResult> previousData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
@@ -242,22 +219,6 @@ class XmlTestClass {
     @UsingDataSet(locations = "test-one.xml", loadStrategy = CLEAN_INSERT)
     @ShouldMatchDataSet(location = "test-one-expected.xml")
     public void one_equal() {
-    }
-
-    @Test
-    @UsingDataSet(locations = "test-two.xml", loadStrategy = CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "test-two-expected.xml")
-    public void two_equal() {
-    }
-
-    @Test
-    @UsingDataSet(locations = "test-one.xml", loadStrategy = CLEAN_INSERT)
-    public void one_no_comparison() {
-    }
-
-    @Test
-    @UsingDataSet(locations = "test-two.xml", loadStrategy = CLEAN_INSERT)
-    public void two_no_comparison() {
     }
 
     @Test
