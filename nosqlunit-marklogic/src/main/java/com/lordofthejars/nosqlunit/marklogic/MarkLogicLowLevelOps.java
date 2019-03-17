@@ -23,7 +23,9 @@ public class MarkLogicLowLevelOps {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MarkLogicLowLevelOps.class);
 
-    private static final int WAIT_TIME_FACTOR = 2;
+    private static final int DELAY = 1;
+
+    private static final int DELAY_FACTOR = 2;
 
     private static final int MAX_RETRIES = 20;
 
@@ -52,10 +54,10 @@ public class MarkLogicLowLevelOps {
         AuthCache authCache = new BasicAuthCache();
         HttpClientContext localContext = HttpClientContext.create();
         localContext.setAuthCache(authCache);
-        int waitTime = 0;
+        int delay = DELAY;
         try (CloseableHttpClient client = custom().setDefaultCredentialsProvider(credsProvider).build()) {
             do {
-                SECONDS.sleep((waitTime++) * WAIT_TIME_FACTOR);
+                SECONDS.sleep(delay * DELAY_FACTOR);
                 try (CloseableHttpResponse response = client.execute(get, localContext)) {
                     statusReached = statusToWaitFor == response.getStatusLine().getStatusCode();
                     currentRetry--;

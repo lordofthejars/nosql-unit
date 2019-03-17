@@ -20,6 +20,7 @@ import java.util.*;
 import static com.lordofthejars.nosqlunit.core.FailureHandler.createFailure;
 import static com.lordofthejars.nosqlunit.marklogic.content.XmlContent.ATTR_COLLECTIONS;
 import static com.lordofthejars.nosqlunit.marklogic.content.XmlContent.ATTR_ID;
+import static com.marklogic.client.io.DOMHandle.newFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
@@ -30,12 +31,11 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
-    private ContentHandleFactory contentHandleFactory;
+    private ContentHandleFactory contentHandleFactory = newFactory();
 
     private Set<String> ignoreProperties;
 
-    XmlComparisonStrategy(ContentHandleFactory contentHandleFactory) {
-        this.contentHandleFactory = contentHandleFactory;
+    XmlComparisonStrategy() {
     }
 
     @Override
@@ -54,7 +54,9 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
         if (expectedData.size() != actualData.size()) {
             throw createFailure("Expected number of documents is: %s but actual number was: %s", expectedData.size(), actualData.size());
         }
-        compare(expectedData, actualData);
+        if (!compare(expectedData, actualData)) {
+            throw createFailure("Expected documents and actual document don't match exactly, see log warnings for details!");
+        }
         return true;
     }
 
@@ -81,14 +83,14 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
                     .withAttributeFilter(a ->
                             !(ATTR_ID.equalsIgnoreCase(a.getName()) || ATTR_COLLECTIONS.equalsIgnoreCase(a.getName()))
                     )
-                    .withNodeFilter(n -> !ignoreProperties.contains(n.getLocalName()))
+                    //.withNodeFilter(n -> !ignoreProperties.contains(n.getLocalName()))
                     .normalizeWhitespace()
                     .ignoreWhitespace()
                     .ignoreComments()
                     .build();
             if (diff.hasDifferences()) {
                 result = false;
-                LOGGER.trace("Expected and actual are not equal, differences:\n{}", diff.toString());
+                LOGGER.warn("Expected and actual are not equal, differences:\n{}", diff.toString());
             }
         }
         return result;

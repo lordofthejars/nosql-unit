@@ -23,7 +23,7 @@ public class WhenManagedMarkLogicRuleIsRegistered {
 
     @Test
     public void marklogic_server_should_start_and_stop_in_docker() throws Throwable {
-        ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().dockerContainer("ml-1").build();
+        ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().dockerContainer("marklogic").build();
         Statement noStatement = new Statement() {
             @Override
             public void evaluate() throws Throwable {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<person uri="/person/jane.json" collections="nosqlunit,female">
+<person uri="/person/jane.xml" collections="female">
     <firstName>Jane</firstName>
     <lastName>Doe</lastName>
     <age>25</age>

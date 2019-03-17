@@ -11,6 +11,8 @@ public abstract class Content<D> {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
+    private String localUri;
+
     private String uri;
 
     private Set<String> collections = new HashSet<>();
@@ -20,7 +22,16 @@ public abstract class Content<D> {
     }
 
     protected Content(Set<String> collections) {
-        collections.addAll(collections);
+        this();
+        this.collections.addAll(collections);
+    }
+
+    public String getLocalUri() {
+        return localUri;
+    }
+
+    public void setLocalUri(String localUri) {
+        this.localUri = localUri;
     }
 
     public String getUri() {

@@ -71,9 +71,9 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
     private String marklogicCommandPrefix;
 
     /**
-     * Admin port
+     * This is the administration port and not the application's one!
      */
-    private int adminPort = 8001;
+    private int port = 8001;
 
     private String adminUser = "admin";
 
@@ -95,11 +95,11 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
 
     @Override
     public int getPort() {
-        return adminPort;
+        return port;
     }
 
     public void setPort(int port) {
-        adminPort = port;
+        this.port = port;
     }
 
     public void setUsername(String username) {
@@ -300,8 +300,7 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
 
             try {
                 process.waitFor();
-                /*if (process.exitValue() != 0)*/
-                {
+                if (process.exitValue() != 0) {
                     LOGGER.warn(
                             "MarkLogic ["
                                     + buildOperationSystemProgramAndArguments()

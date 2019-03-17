@@ -1,8 +1,8 @@
 package com.lordofthejars.nosqlunit.marklogic.content;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 
 import static com.lordofthejars.nosqlunit.marklogic.content.XmlContent.ATTR_COLLECTIONS;
 import static com.lordofthejars.nosqlunit.marklogic.content.XmlContent.ATTR_ID;
-import static java.util.stream.IntStream.range;
+import static org.w3c.dom.Node.ELEMENT_NODE;
 
 public class XmlParser {
+
+    private static final String COLLECTIONS_SEPARATOR = ",";
 
     private DocumentBuilderFactory documentBuilderFactory;
 
@@ -34,14 +36,18 @@ public class XmlParser {
 
     public Set<Content> parse(InputStream is) throws IOException, ParserConfigurationException, SAXException {
         Set<Content> result = new HashSet<>();
-        DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
-        Document document = db.parse(is);
-        Node uriAttribute = document.getAttributes().getNamedItem(ATTR_ID);
-        if (uriAttribute != null) {
-            result.add(toContent(document));
-        } else {
-            NodeList children = document.getChildNodes();
-            range(0, children.getLength()).forEach(i -> result.add(toContent(children.item(i))));
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        Document document = documentBuilder.parse(is);
+        document.normalizeDocument();
+        Element root = document.getDocumentElement();
+        if (root.hasAttribute(ATTR_ID)) {
+            result.add(toContent(root));
+        } else { //skip the root element and iterate over children
+            for (Node child = root.getFirstChild(); child != null; child = child.getNextSibling()) {
+                if (ELEMENT_NODE == child.getNodeType()) {
+                    result.add(toContent(child));
+                }
+            }
         }
         return result;
     }
@@ -61,7 +67,7 @@ public class XmlParser {
     private Set<String> collections(Node node) {
         Node collectionAttribute = node.getAttributes().getNamedItem(ATTR_COLLECTIONS);
         if (collectionAttribute != null) {
-            String[] collections = collectionAttribute.getNodeValue().split(",");
+            String[] collections = collectionAttribute.getNodeValue().split(COLLECTIONS_SEPARATOR);
             return Arrays.asList(collections).stream().collect(Collectors.toSet());
         }
         return Collections.emptySet();

@@ -45,7 +45,7 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
                 }
             }, contentStream);
         } catch (Throwable e) {
-            throw new IllegalArgumentException("Unexpected error reading data set file.", e);
+            throw new IllegalArgumentException("Unexpected error inserting data set file.", e);
         }
     }
 
@@ -58,7 +58,7 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
         QueryManager queryManager = databaseClient.newQueryManager();
         DeleteQueryDefinition deleteQuery = queryManager.newDeleteDefinition();
         deleteQuery.setCollections(DEFAULT_COLLECTION);
-        queryManager.delete(deleteQuery);
+         queryManager.delete(deleteQuery);
     }
 
     @Override

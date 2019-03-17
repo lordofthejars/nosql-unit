@@ -3,7 +3,7 @@ package com.lordofthejars.nosqlunit.marklogic;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.DatabaseClientFactory.DigestAuthContext;
 import com.marklogic.client.DatabaseClientFactory.SecurityContext;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,31 +31,33 @@ public class MarkLogicConfigurationBuilder {
         return new MarkLogicConfigurationBuilder();
     }
 
-    private static SecurityContext securityContext(String username, String password) {
+    private static SSLContext sslContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        return SSLContexts.custom().loadTrustMaterial(null, new TrustAllStrategy()).build();
+    }
+
+    private SecurityContext securityContext(String username, String password) {
         SecurityContext result = new DigestAuthContext(username, password);
+        if (!marklogicConfiguration.isSecure()) {
+            return result;
+        }
         try {
             result.withSSLContext(sslContext(), null).withSSLHostnameVerifier(ANY);
         } catch (Exception e) {
-            LOGGER.warn("couldn't setup secure context!", e);
+            LOGGER.warn("couldn't setup TLS context!", e);
         }
         return result;
     }
 
-    private static SSLContext sslContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        return SSLContexts.custom()
-                .loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-    }
-
     public MarkLogicConfiguration build() {
-        DatabaseClient databaseClient;
-        if (!marklogicConfiguration.isSecure()) {
-            databaseClient = newClient(marklogicConfiguration.getHost(), marklogicConfiguration.getPort(),
-                    marklogicConfiguration.getDatabase(),
-                    securityContext(marklogicConfiguration.getUsername(), marklogicConfiguration.getPassword()),
-                    DatabaseClient.ConnectionType.DIRECT);
-        } else {
-            databaseClient = newClient(marklogicConfiguration.getHost(), marklogicConfiguration.getPort(), marklogicConfiguration.getDatabase());
-        }
+        DatabaseClient databaseClient = newClient(
+                marklogicConfiguration.getHost(),
+                marklogicConfiguration.getPort(),
+                marklogicConfiguration.getDatabase(),
+                securityContext(
+                        marklogicConfiguration.getUsername(),
+                        marklogicConfiguration.getPassword()
+                ),
+                DatabaseClient.ConnectionType.DIRECT);
         marklogicConfiguration.setDatabaseClient(databaseClient);
         return marklogicConfiguration;
     }
@@ -67,6 +69,11 @@ public class MarkLogicConfigurationBuilder {
 
     public MarkLogicConfigurationBuilder port(int port) {
         marklogicConfiguration.setPort(port);
+        return this;
+    }
+
+    public MarkLogicConfigurationBuilder adminPort(int port) {
+        marklogicConfiguration.setAdminPort(port);
         return this;
     }
 

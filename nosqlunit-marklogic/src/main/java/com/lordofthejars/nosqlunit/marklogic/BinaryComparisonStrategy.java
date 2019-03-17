@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.core.FailureHandler.createFailure;
+import static com.marklogic.client.io.InputStreamHandle.newFactory;
 import static org.apache.tika.io.IOUtils.contentEquals;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -22,10 +23,9 @@ class BinaryComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private static final Logger LOGGER = getLogger(BinaryComparisonStrategy.class);
 
-    private ContentHandleFactory contentHandleFactory;
+    private ContentHandleFactory contentHandleFactory = newFactory();
 
-    BinaryComparisonStrategy(ContentHandleFactory contentHandleFactory) {
-        this.contentHandleFactory = contentHandleFactory;
+    BinaryComparisonStrategy() {
     }
 
     @Override

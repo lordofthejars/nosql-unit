@@ -13,8 +13,8 @@ public class ManagedMarkLogicLifecycleManagerBuilder {
         return new ManagedMarkLogicLifecycleManagerBuilder();
     }
 
-    public ManagedMarkLogicLifecycleManagerBuilder marklogicPath(String marklogicPath) {
-        managedMarkLogicLifecycleManager.setMarklogicCommandPrefix(marklogicPath);
+    public ManagedMarkLogicLifecycleManagerBuilder marklogicPrefix(String marklogicPrefix) {
+        managedMarkLogicLifecycleManager.setMarklogicCommandPrefix(marklogicPrefix);
         return this;
     }
 

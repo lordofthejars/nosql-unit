@@ -1,18 +1,17 @@
 package com.lordofthejars.nosqlunit.marklogic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marklogic.client.io.marker.ContentHandleFactory;
-import org.apache.tika.detect.DefaultDetector;
-import org.apache.tika.metadata.Metadata;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import com.lordofthejars.nosqlunit.marklogic.content.MediaTypeDetector;
 import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-import static com.marklogic.client.io.InputStreamHandle.newFactory;
+import static com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET;
+import static com.fasterxml.jackson.core.JsonParser.Feature.AUTO_CLOSE_SOURCE;
 import static java.util.Optional.ofNullable;
 import static org.apache.tika.mime.MediaType.APPLICATION_XML;
 import static org.apache.tika.mime.MediaType.OCTET_STREAM;
@@ -24,44 +23,25 @@ public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private static final MediaType APPLICATION_JSON = MediaType.parse("application/json");
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .configure(AUTO_CLOSE_TARGET, false)
+            .configure(AUTO_CLOSE_SOURCE, false);
 
     private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    private static ContentHandleFactory contentHandleFactory = newFactory();
 
-    private static XmlComparisonStrategy xmlComparisonStrategy = new XmlComparisonStrategy(contentHandleFactory);
+    private static XmlComparisonStrategy xmlComparisonStrategy = new XmlComparisonStrategy();
 
-    private static JsonComparisonStrategy jsonComparisonStrategy = new JsonComparisonStrategy(MAPPER, contentHandleFactory);
+    private static JsonComparisonStrategy jsonComparisonStrategy = new JsonComparisonStrategy(MAPPER);
 
-    private static BinaryComparisonStrategy binaryComparisonStrategy = new BinaryComparisonStrategy(contentHandleFactory);
+    private static BinaryComparisonStrategy binaryComparisonStrategy = new BinaryComparisonStrategy();
 
-    private static boolean isValidJson(final InputStream is) {
-        boolean valid = true;
-        try {
-            MAPPER.readTree(is);
-        } catch (IOException e) {
-            valid = false;
-        }
-        return valid;
-    }
-
-    private static MediaType detectMediaType(InputStream dataSet) {
-        if (isValidJson(dataSet)) {
-            return APPLICATION_JSON;
-        }
-        try {
-            return new DefaultDetector().detect(dataSet, new Metadata());
-        } catch (IOException e) {
-            LOGGER.warn("Couldn't determine a media type of the data set, cause: " + e.getMessage() + ", returning binary", e);
-        }
-        return MediaType.OCTET_STREAM;
-    }
+    private static MediaTypeDetector mediaTypeDetector = new MediaTypeDetector(MAPPER);
 
     private static MarkLogicComparisonStrategy comparisonStrategy(InputStream dataSet) {
         MarkLogicComparisonStrategy result = null;
         try {
-            MediaType mediaType = detectMediaType(dataSet);
+            MediaType mediaType = mediaTypeDetector.detect(dataSet);
             if (APPLICATION_XML.equals(mediaType)) {
                 result = xmlComparisonStrategy;
             } else if (APPLICATION_JSON.equals(mediaType)) {
@@ -81,6 +61,8 @@ public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
         strategy.ifPresent(s -> {
                     try {
                         s.compare(connection, dataSet);
+                    } catch (NoSqlAssertionError e) {
+                        throw e;
                     } catch (Throwable e) {
                         throw new IllegalArgumentException(e.getMessage(), e);
                     }

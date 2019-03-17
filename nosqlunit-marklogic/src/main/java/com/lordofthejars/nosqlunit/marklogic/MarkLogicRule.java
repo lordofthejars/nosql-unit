@@ -48,7 +48,7 @@ public class MarkLogicRule extends AbstractNoSqlTestRule {
 
     @Override
     public void close() {
-        databaseOperation.connectionManager().release();
+        //databaseOperation.connectionManager().release();
     }
 
     public static class MarkLogicRuleBuilder {

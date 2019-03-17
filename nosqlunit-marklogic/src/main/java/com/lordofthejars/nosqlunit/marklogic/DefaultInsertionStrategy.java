@@ -1,18 +1,19 @@
 package com.lordofthejars.nosqlunit.marklogic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lordofthejars.nosqlunit.marklogic.content.MediaTypeDetector;
 import com.marklogic.client.io.marker.ContentHandleFactory;
-import org.apache.tika.detect.DefaultDetector;
-import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
+import static com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET;
+import static com.fasterxml.jackson.core.JsonParser.Feature.AUTO_CLOSE_SOURCE;
+import static com.lordofthejars.nosqlunit.marklogic.content.MediaTypeDetector.APPLICATION_JSON;
 import static com.marklogic.client.io.InputStreamHandle.newFactory;
 import static java.util.Optional.ofNullable;
 import static org.apache.tika.mime.MediaType.APPLICATION_XML;
@@ -24,9 +25,9 @@ public class DefaultInsertionStrategy implements MarkLogicInsertionStrategy {
 
     private static final Logger LOGGER = getLogger(DefaultInsertionStrategy.class);
 
-    private static final MediaType APPLICATION_JSON = MediaType.parse("application/json");
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+            .configure(AUTO_CLOSE_TARGET, false)
+            .configure(AUTO_CLOSE_SOURCE, false);
 
     private static final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -42,32 +43,12 @@ public class DefaultInsertionStrategy implements MarkLogicInsertionStrategy {
 
     private static BinaryInsertionStrategy binaryInsertionStrategy = new BinaryInsertionStrategy(contentHandleFactory);
 
-    private static boolean isValidJson(final InputStream is) {
-        boolean valid = true;
-        try {
-            MAPPER.readTree(is);
-        } catch (IOException e) {
-            valid = false;
-        }
-        return valid;
-    }
-
-    private static MediaType detectMediaType(InputStream dataSet) {
-        if (isValidJson(dataSet)) {
-            return APPLICATION_JSON;
-        }
-        try {
-            return new DefaultDetector().detect(dataSet, new Metadata());
-        } catch (IOException e) {
-            LOGGER.warn("Couldn't determine a media type of the data set, cause: " + e.getMessage() + ", returning binary", e);
-        }
-        return MediaType.OCTET_STREAM;
-    }
+    private static MediaTypeDetector mediaTypeDetector = new MediaTypeDetector(MAPPER);
 
     private static MarkLogicInsertionStrategy insertionStrategy(InputStream dataSet) {
         MarkLogicInsertionStrategy result = null;
         try {
-            MediaType mediaType = detectMediaType(dataSet);
+            MediaType mediaType = mediaTypeDetector.detect(dataSet);
             if (APPLICATION_XML.equals(mediaType)) {
                 result = xmlInsertionStrategy;
             } else if (APPLICATION_JSON.equals(mediaType)) {

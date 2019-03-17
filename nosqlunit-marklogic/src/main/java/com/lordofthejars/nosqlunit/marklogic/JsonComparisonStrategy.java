@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.*;
 
 import static com.lordofthejars.nosqlunit.core.FailureHandler.createFailure;
+import static com.marklogic.client.io.JacksonHandle.newFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
@@ -22,13 +23,12 @@ class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private ObjectMapper mapper;
 
-    private ContentHandleFactory contentHandleFactory;
+    private ContentHandleFactory contentHandleFactory = newFactory();
 
     private Set<String> ignoreProperties;
 
-    JsonComparisonStrategy(ObjectMapper mapper, ContentHandleFactory contentHandleFactory) {
+    JsonComparisonStrategy(ObjectMapper mapper) {
         this.mapper = mapper;
-        this.contentHandleFactory = contentHandleFactory;
     }
 
     @Override
