@@ -75,8 +75,8 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
                 LOGGER.warn("Expected not available in the actual data set:\n{}", expected);
                 continue;
             }
-            Node expectedNode = expected.data();
-            Node actualNode = actual.data();
+            Node expectedNode = expected.getData();
+            Node actualNode = actual.getData();
             Diff diff = DiffBuilder
                     .compare(expectedNode)
                     .withTest(actualNode)

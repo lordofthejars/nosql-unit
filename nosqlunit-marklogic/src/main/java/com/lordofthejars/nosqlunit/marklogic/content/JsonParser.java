@@ -1,7 +1,6 @@
 package com.lordofthejars.nosqlunit.marklogic.content;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
@@ -9,9 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_COLLECTION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class JsonParser {
@@ -23,18 +23,18 @@ public class JsonParser {
     }
 
     public Set<Content> parse(InputStream is) throws IOException {
-        Set<Content> result = new HashSet<>();
-        ObjectReader reader = jsonMapper.readerFor(JsonContent.class);
-        MappingIterator<JsonContent> iter = reader.readValues(is);
-        while (iter.hasNext()) {
-            result.add(iter.next());
-        }
-        return result;
+        ObjectReader reader = jsonMapper.readerFor(JsonContents.class);
+        JsonContents contents = reader.readValue(is);
+        contents.getContents().entrySet().forEach(e -> {
+            e.getValue().setUri(e.getKey());
+            e.getValue().addCollection(DEFAULT_COLLECTION);
+        });
+        return contents.getContents().values().stream().collect(Collectors.toSet());
     }
 
     public JsonNode node(JsonContent content) {
-        if (content.node() != null) {
-            return content.node();
+        if (content.getData() != null) {
+            return content.getData();
         }
         try (Reader reader = new InputStreamReader(content.content())) {
             return jsonMapper.readValue(reader, JsonNode.class);

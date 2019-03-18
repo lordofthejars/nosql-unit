@@ -39,7 +39,7 @@ class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
         final Map<String, JsonContent> actualData = new HashMap<>();
         try {
             expectedData = parser.parse(dataSet);
-            reader.read(expectedData, JsonNode.class).forEach((uri, contentHandle) -> actualData.put(uri, new JsonContent(contentHandle.get())));
+            reader.read(expectedData, JsonNode.class).forEach((uri, contentHandle) -> actualData.put(uri, new JsonContent(uri, contentHandle.get())));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new NoSqlAssertionError(e.getMessage());
@@ -47,7 +47,9 @@ class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
         if (expectedData.size() != actualData.size()) {
             throw createFailure("Expected number of documents is: %s but actual number was: %s", expectedData.size(), actualData.size());
         }
-        compare(expectedData, actualData, parser);
+        if (!compare(expectedData, actualData, parser)) {
+            throw createFailure("Expected documents and actual document don't match exactly, see log warnings for details!");
+        }
         return true;
     }
 
@@ -66,11 +68,11 @@ class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
                 LOGGER.warn("Expected not available in the actual data set:\n{}", expected);
                 continue;
             }
-            JsonNode expectedNode = parser.node((JsonContent) expected);
+            JsonNode expectedNode = parser.node(expected);
             JsonNode actualNode = parser.node(actual);
             if (!expectedNode.equals(actualNode)) {
                 result = false;
-                LOGGER.trace("Expected and actual are not equal:\n{}\n!=\n{}", expected, actual);
+                LOGGER.warn("Expected and actual are not equal:\n{}\n---\n{}", expectedNode, actualNode);
             }
         }
         return result;

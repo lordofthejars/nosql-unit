@@ -15,7 +15,7 @@ public class PassThroughContent extends Content<InputStream> {
     }
 
     @Override
-    public InputStream data() {
+    public InputStream getData() {
         return data;
     }
 }

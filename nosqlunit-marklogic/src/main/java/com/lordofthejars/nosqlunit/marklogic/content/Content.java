@@ -6,32 +6,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_COLLECTION;
+import static java.util.Arrays.asList;
 
 public abstract class Content<D> {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-    private String localUri;
-
     private String uri;
 
-    private Set<String> collections = new HashSet<>();
+    private Set<String> collections = new HashSet<>(asList(DEFAULT_COLLECTION));
 
     protected Content() {
-        collections.add(DEFAULT_COLLECTION);
     }
 
     protected Content(Set<String> collections) {
-        this();
         this.collections.addAll(collections);
-    }
-
-    public String getLocalUri() {
-        return localUri;
-    }
-
-    public void setLocalUri(String localUri) {
-        this.localUri = localUri;
     }
 
     public String getUri() {
@@ -46,9 +35,13 @@ public abstract class Content<D> {
         return collections.toArray(EMPTY_STRING_ARRAY);
     }
 
+    public void addCollection(String collection) {
+        collections.add(collection);
+    }
+
     public abstract InputStream content() throws IOException;
 
-    public abstract D data();
+    public abstract D getData();
 
     @Override
     public String toString() {

@@ -7,27 +7,30 @@ import java.io.InputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class JsonContent extends Content<String> {
+public class JsonContent extends Content<JsonNode> {
 
-    protected String data;
+    private JsonNode data;
 
-    private JsonNode node;
+    public JsonContent() {
+    }
 
     public JsonContent(JsonNode data) {
-        this.data = data.toString();
+        this.data = data;
+    }
+
+    public JsonContent(String uri, JsonNode data) {
+        this(data);
+        setUri(uri);
     }
 
     @Override
     public InputStream content() {
-        return new ByteArrayInputStream(data.getBytes(UTF_8));
+        return new ByteArrayInputStream(data.toString().getBytes(UTF_8));
     }
 
     @Override
-    public String data() {
+    public JsonNode getData() {
         return data;
     }
 
-    public JsonNode node() {
-        return node;
-    }
 }

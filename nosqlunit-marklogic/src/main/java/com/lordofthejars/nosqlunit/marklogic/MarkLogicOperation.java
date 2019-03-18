@@ -58,7 +58,7 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
         QueryManager queryManager = databaseClient.newQueryManager();
         DeleteQueryDefinition deleteQuery = queryManager.newDeleteDefinition();
         deleteQuery.setCollections(DEFAULT_COLLECTION);
-         queryManager.delete(deleteQuery);
+        queryManager.delete(deleteQuery);
     }
 
     @Override

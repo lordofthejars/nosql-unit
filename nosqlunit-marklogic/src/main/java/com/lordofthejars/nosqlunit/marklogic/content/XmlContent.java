@@ -48,7 +48,7 @@ public class XmlContent extends Content<Node> {
     }
 
     @Override
-    public Node data() {
+    public Node getData() {
         return data;
     }
 }

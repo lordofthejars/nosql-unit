@@ -22,7 +22,6 @@
       ]
     },
     "collections": [
-      "nosqlunit",
       "female"
     ]
   },
@@ -49,7 +48,6 @@
       ]
     },
     "collections": [
-      "nosqlunit",
       "male"
     ]
   }

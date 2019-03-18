@@ -24,7 +24,10 @@ import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilde
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
-public class WhenMarkLogicRuleIsRegistered {
+/**
+ * Tests XML content handling.
+ */
+public class WhenMarkLogicRuleIsRegisteredThenXml {
 
     /**
      * The application database available in the default installation.
