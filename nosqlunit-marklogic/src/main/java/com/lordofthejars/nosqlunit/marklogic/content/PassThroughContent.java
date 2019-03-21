@@ -10,8 +10,13 @@ public class PassThroughContent extends Content<InputStream> {
         this.data = data;
     }
 
+    public PassThroughContent(String uri, InputStream data) {
+        this(data);
+        setUri(uri);
+    }
+
     public InputStream content() {
-        return data;
+        return getData();
     }
 
     @Override

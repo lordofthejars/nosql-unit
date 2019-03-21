@@ -4,15 +4,19 @@ import com.lordofthejars.nosqlunit.core.AbstractNoSqlTestRule;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.MarkLogicServerException;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
 
 
 public class MarkLogicRule extends AbstractNoSqlTestRule {
 
-    private static final String EXTENSION = "xml";
+    public static final String EXPECTED_RESERVED_WORD = "-expected";
 
-    protected DatabaseOperation<DatabaseClient> databaseOperation;
+    private static final String DEFAULT_EXTENSION = "xml";
+
+    protected MarkLogicOperation databaseOperation;
 
     public MarkLogicRule(MarkLogicConfiguration marklogicConfiguration) {
         super(marklogicConfiguration.getConnectionIdentifier());
@@ -30,7 +34,7 @@ public class MarkLogicRule extends AbstractNoSqlTestRule {
         super(marklogicConfiguration.getConnectionIdentifier());
         try {
             setTarget(target);
-            databaseOperation = new MarkLogicOperation(marklogicConfiguration);
+            databaseOperation = new MarkLogicOperation(marklogicConfiguration, target);
         } catch (MarkLogicServerException e) {
             throw new IllegalArgumentException(e);
         }
@@ -43,7 +47,13 @@ public class MarkLogicRule extends AbstractNoSqlTestRule {
 
     @Override
     public String getWorkingExtension() {
-        return EXTENSION;
+        return DEFAULT_EXTENSION;
+    }
+
+    @Override
+    public Statement apply(Statement base, FrameworkMethod method, Object testObject) {
+        databaseOperation.setTarget(testObject);
+        return super.apply(base, method, testObject);
     }
 
     @Override
@@ -86,27 +96,11 @@ public class MarkLogicRule extends AbstractNoSqlTestRule {
             return new SpringMarkLogicRule(marklogic().database(database).build());
         }
 
-        /**
-         * We can use defaultManagedMarkLogic(String database).
-         *
-         * @param database
-         * @param target
-         * @return
-         */
-        @Deprecated
-        public MarkLogicRule defaultManagedMarkLogic(String database, Object target) {
-            return new MarkLogicRule(marklogic().database(database).build(), target);
-        }
-
         public MarkLogicRule build() {
-
             if (this.marklogicConfiguration == null) {
                 throw new IllegalArgumentException("Configuration object should be provided.");
             }
-
             return new MarkLogicRule(marklogicConfiguration, target);
         }
-
     }
-
 }

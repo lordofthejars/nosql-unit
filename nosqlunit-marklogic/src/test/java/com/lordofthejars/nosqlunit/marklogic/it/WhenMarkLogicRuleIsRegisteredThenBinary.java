@@ -25,9 +25,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 /**
- * Tests JSON content handling.
+ * Tests binary content handling.
  */
-public class WhenMarkLogicRuleIsRegisteredThenJson {
+public class WhenMarkLogicRuleIsRegisteredThenBinary {
 
     /**
      * The application database available in the default installation.
@@ -54,7 +54,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_wrong");
+        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_lorem_ipsum_wrong");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new BinaryTestClass());
         marklogicStatement.evaluate();
     }
@@ -64,7 +64,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_equal");
+        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_lorem_ipsum_equal");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new BinaryTestClass());
         marklogicStatement.evaluate();
     }
@@ -74,11 +74,11 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_delete");
+        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_lorem_ipsum_delete");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new BinaryTestClass());
         marklogicStatement.evaluate();
 
-        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Cum sociis");
         assertFalse(currentData.isPresent());
     }
 
@@ -88,7 +88,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         BinaryTestClass testObject = new BinaryTestClass();
-        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_insert");
+        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_lorem_ipsum_insert");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
@@ -99,7 +99,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         assertNotNull(currentItem);
         assertThat(currentItem.getAs(String.class), containsString("Jane"));
 
-        FrameworkMethod frameworkMethod2 = frameworkMethod(BinaryTestClass.class, "two_insert");
+        FrameworkMethod frameworkMethod2 = frameworkMethod(BinaryTestClass.class, "two_lorem_ipsum_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
@@ -125,7 +125,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
         BinaryTestClass testObject = new BinaryTestClass();
 
-        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_equal");
+        FrameworkMethod frameworkMethod = frameworkMethod(BinaryTestClass.class, "one_lorem_ipsum_equal");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
@@ -136,7 +136,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         assertNotNull(currentItem);
         assertThat(currentItem.getAs(String.class), containsString("Jane"));
 
-        FrameworkMethod frameworkMethod2 = frameworkMethod(BinaryTestClass.class, "two_insert");
+        FrameworkMethod frameworkMethod2 = frameworkMethod(BinaryTestClass.class, "two_lorem_ipsum_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
@@ -210,32 +210,32 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
     }
 }
 
-class JsonTestClass {
+class BinaryTestClass {
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "test-one-wrong.json")
-    public void one_wrong() {
+    @UsingDataSet(locations = "lorem/ipsum/wrong/lorem-ipsum.pdf", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "lorem/ipsum/wrong/lorem-ipsum-expected.pdf")
+    public void one_lorem_ipsum_wrong() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "test-one-expected.json")
-    public void one_equal() {
+    @UsingDataSet(locations = "lorem/ipsum/lorem-ipsum.pdf", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "lorem/ipsum/lorem-ipsum-expected.pdf")
+    public void one_lorem_ipsum_equal() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = DELETE_ALL)
-    public void one_delete() {
+    @UsingDataSet(locations = "lorem/ipsum/lorem-ipsum.pdf", loadStrategy = DELETE_ALL)
+    public void one_lorem_ipsum_delete() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = INSERT)
-    public void one_insert() {
+    @UsingDataSet(locations = "lorem/ipsum/lorem-ipsum.pdf", loadStrategy = INSERT)
+    public void one_lorem_ipsum_insert() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-two.json", loadStrategy = INSERT)
-    public void two_insert() {
+    @UsingDataSet(locations = "lorem/ipsum/lorem-ipsum.docx", loadStrategy = INSERT)
+    public void two_lorem_ipsum_insert() {
     }
 }

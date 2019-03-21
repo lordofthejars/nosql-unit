@@ -3,8 +3,8 @@ package com.lordofthejars.nosqlunit.marklogic;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.marklogic.content.Content;
 import com.lordofthejars.nosqlunit.marklogic.content.DataSetReader;
-import com.lordofthejars.nosqlunit.marklogic.content.PassThrough;
 import com.lordofthejars.nosqlunit.marklogic.content.PassThroughContent;
+import com.lordofthejars.nosqlunit.marklogic.content.PassThroughParser;
 import com.marklogic.client.io.marker.ContentHandleFactory;
 import org.slf4j.Logger;
 
@@ -25,12 +25,14 @@ class BinaryComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private ContentHandleFactory contentHandleFactory = newFactory();
 
+    private Object target;
+
     BinaryComparisonStrategy() {
     }
 
     @Override
     public boolean compare(MarkLogicConnectionCallback connection, InputStream dataSet) throws NoSqlAssertionError {
-        PassThrough parser = new PassThrough();
+        PassThroughParser parser = new PassThroughParser(target);
         DataSetReader reader = new DataSetReader(connection.databaseClient().newBinaryDocumentManager(), contentHandleFactory);
         Set<Content> expectedData;
         final Map<String, PassThroughContent> actualData = new HashMap<>();
@@ -50,6 +52,10 @@ class BinaryComparisonStrategy implements MarkLogicComparisonStrategy {
 
     @Override
     public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
+    void setTarget(Object target) {
+        this.target = target;
     }
 
     private boolean compare(Set<Content> expectedSet, Map<String, PassThroughContent> actualSet) {

@@ -21,14 +21,17 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
     private MarkLogicConfiguration marklogicConfiguration;
 
     public MarkLogicOperation(MarkLogicConfiguration marklogicConfiguration) {
-        this(marklogicConfiguration.getDatabaseClient(), marklogicConfiguration);
+        this(marklogicConfiguration.getDatabaseClient(), marklogicConfiguration, null);
+    }
+    public MarkLogicOperation(MarkLogicConfiguration marklogicConfiguration, Object target) {
+        this(marklogicConfiguration.getDatabaseClient(), marklogicConfiguration, target);
     }
 
-    protected MarkLogicOperation(DatabaseClient databaseClient, MarkLogicConfiguration marklogicConfiguration) {
+    protected MarkLogicOperation(DatabaseClient databaseClient, MarkLogicConfiguration marklogicConfiguration, Object target) {
         this.databaseClient = databaseClient;
         this.marklogicConfiguration = marklogicConfiguration;
-        setInsertionStrategy(new DefaultInsertionStrategy());
-        setComparisonStrategy(new DefaultComparisonStrategy());
+        setInsertionStrategy(new DefaultInsertionStrategy(target));
+        setComparisonStrategy(new DefaultComparisonStrategy(target));
     }
 
     @Override
@@ -52,6 +55,11 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
     @Override
     public void deleteAll() {
         deleteAllElements(databaseClient);
+    }
+
+    void setTarget(Object target){
+        ((DefaultInsertionStrategy)insertionStrategy).setTarget(target);
+        ((DefaultComparisonStrategy)comparisonStrategy).setTarget(target);
     }
 
     private void deleteAllElements(DatabaseClient databaseClient) {

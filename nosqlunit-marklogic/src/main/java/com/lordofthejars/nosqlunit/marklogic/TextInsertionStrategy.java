@@ -1,7 +1,7 @@
 package com.lordofthejars.nosqlunit.marklogic;
 
 import com.lordofthejars.nosqlunit.marklogic.content.DataSetWriter;
-import com.lordofthejars.nosqlunit.marklogic.content.PassThrough;
+import com.lordofthejars.nosqlunit.marklogic.content.PassThroughParser;
 import com.marklogic.client.Transaction;
 import com.marklogic.client.io.marker.ContentHandleFactory;
 import org.slf4j.Logger;
@@ -16,13 +16,15 @@ class TextInsertionStrategy implements MarkLogicInsertionStrategy {
 
     private ContentHandleFactory contentHandleFactory;
 
+    private Object target;
+
     TextInsertionStrategy(ContentHandleFactory contentHandleFactory) {
         this.contentHandleFactory = contentHandleFactory;
     }
 
     @Override
     public void insert(MarkLogicConnectionCallback connection, InputStream dataSet) {
-        PassThrough parser = new PassThrough();
+        PassThroughParser parser = new PassThroughParser(target);
         DataSetWriter writer = new DataSetWriter(connection.databaseClient().newTextDocumentManager(), contentHandleFactory);
         Transaction tx = connection.databaseClient().openTransaction();
         try {
@@ -33,5 +35,9 @@ class TextInsertionStrategy implements MarkLogicInsertionStrategy {
             tx.rollback();
             throw new IllegalArgumentException(e.getMessage(), e);
         }
+    }
+
+    void setTarget(Object target) {
+        this.target = target;
     }
 }

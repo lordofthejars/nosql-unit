@@ -14,12 +14,11 @@ import static com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET
 import static com.fasterxml.jackson.core.JsonParser.Feature.AUTO_CLOSE_SOURCE;
 import static java.util.Optional.ofNullable;
 import static org.apache.tika.mime.MediaType.APPLICATION_XML;
-import static org.apache.tika.mime.MediaType.OCTET_STREAM;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
 
-    private static final Logger LOGGER = getLogger(XmlInsertionStrategy.class);
+    private static final Logger LOGGER = getLogger(DefaultComparisonStrategy.class);
 
     private static final MediaType APPLICATION_JSON = MediaType.parse("application/json");
 
@@ -29,14 +28,17 @@ public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-
     private static XmlComparisonStrategy xmlComparisonStrategy = new XmlComparisonStrategy();
 
     private static JsonComparisonStrategy jsonComparisonStrategy = new JsonComparisonStrategy(MAPPER);
 
-    private static BinaryComparisonStrategy binaryComparisonStrategy = new BinaryComparisonStrategy();
-
     private static MediaTypeDetector mediaTypeDetector = new MediaTypeDetector(MAPPER);
+
+    private Object target;
+
+    DefaultComparisonStrategy(Object target) {
+        this.target = target;
+    }
 
     private static MarkLogicComparisonStrategy comparisonStrategy(InputStream dataSet) {
         MarkLogicComparisonStrategy result = null;
@@ -46,8 +48,8 @@ public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
                 result = xmlComparisonStrategy;
             } else if (APPLICATION_JSON.equals(mediaType)) {
                 result = jsonComparisonStrategy;
-            } else if (OCTET_STREAM.equals(mediaType)) {
-                result = binaryComparisonStrategy;
+            } else {
+                result = new BinaryComparisonStrategy();
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -59,6 +61,7 @@ public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
     public boolean compare(MarkLogicConnectionCallback connection, InputStream dataSet) {
         Optional<MarkLogicComparisonStrategy> strategy = ofNullable(comparisonStrategy(dataSet));
         strategy.ifPresent(s -> {
+                    prepare(s);
                     try {
                         s.compare(connection, dataSet);
                     } catch (NoSqlAssertionError e) {
@@ -73,5 +76,15 @@ public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
 
     @Override
     public void setIgnoreProperties(String[] ignoreProperties) {
+    }
+
+    void setTarget(Object target) {
+        this.target = target;
+    }
+
+    private void prepare(MarkLogicComparisonStrategy strategy) {
+        if (strategy instanceof BinaryComparisonStrategy) {
+            ((BinaryComparisonStrategy) strategy).setTarget(target);
+        }
     }
 }

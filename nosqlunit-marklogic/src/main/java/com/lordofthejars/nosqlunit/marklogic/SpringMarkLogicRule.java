@@ -25,7 +25,7 @@ public class SpringMarkLogicRule extends MarkLogicRule {
 
     @Override
     public Statement apply(Statement base, FrameworkMethod method, Object testObject) {
-        databaseOperation = new MarkLogicOperation(definedDatabaseClient(testObject), marklogicConfiguration);
+        databaseOperation = new MarkLogicOperation(definedDatabaseClient(testObject), marklogicConfiguration, testObject);
         return super.apply(base, method, testObject);
     }
 
