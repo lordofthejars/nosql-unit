@@ -7,9 +7,10 @@ import com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicRule;
 import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.io.SearchHandle;
-import com.marklogic.client.io.StringHandle;
-import com.marklogic.client.query.*;
+import com.marklogic.client.document.BinaryDocumentManager;
+import com.marklogic.client.document.DocumentDescriptor;
+import com.marklogic.client.query.ExtractedItem;
+import com.marklogic.client.query.ExtractedResult;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
@@ -78,7 +79,7 @@ public class WhenMarkLogicRuleIsRegisteredThenBinary {
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new BinaryTestClass());
         marklogicStatement.evaluate();
 
-        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Cum sociis");
+        Optional<DocumentDescriptor> currentData = findOptionalOneByUri(marklogicConfiguration.getDatabaseClient(), "/lorem/ipsum/lorem-ipsum.pdf");
         assertFalse(currentData.isPresent());
     }
 
@@ -92,31 +93,22 @@ public class WhenMarkLogicRuleIsRegisteredThenBinary {
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
-        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<DocumentDescriptor> currentData = findOptionalOneByUri(marklogicConfiguration.getDatabaseClient(), "/lorem/ipsum/lorem-ipsum.pdf");
         assertTrue(currentData.isPresent());
-        assertEquals(1, currentData.get().size());
-        ExtractedItem currentItem = currentData.get().next();
-        assertNotNull(currentItem);
-        assertThat(currentItem.getAs(String.class), containsString("Jane"));
+        assertEquals(52990, currentData.get().getByteLength());
 
         FrameworkMethod frameworkMethod2 = frameworkMethod(BinaryTestClass.class, "two_lorem_ipsum_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
 
-        Optional<ExtractedResult> previousData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<DocumentDescriptor> previousData = findOptionalOneByUri(marklogicConfiguration.getDatabaseClient(), "/lorem/ipsum/lorem-ipsum.pdf");
         assertTrue(previousData.isPresent());
-        assertEquals(1, previousData.get().size());
-        ExtractedItem previousItem = previousData.get().next();
-        assertNotNull(previousItem);
-        assertThat(previousItem.getAs(String.class), containsString("Jane"));
+        assertEquals(52990, previousData.get().getByteLength());
 
-        Optional<ExtractedResult> data = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "John");
+        Optional<DocumentDescriptor> data = findOptionalOneByUri(marklogicConfiguration.getDatabaseClient(), "/lorem/ipsum/lorem-ipsum.docx");
         assertTrue(data.isPresent());
-        assertEquals(1, data.get().size());
-        ExtractedItem item = data.get().next();
-        assertNotNull(item);
-        assertThat(item.getAs(String.class), containsString("John"));
+        assertEquals(14629, data.get().getByteLength());
     }
 
     @Test
@@ -129,73 +121,28 @@ public class WhenMarkLogicRuleIsRegisteredThenBinary {
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
-        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Doe");
+        Optional<DocumentDescriptor> currentData = findOptionalOneByUri(marklogicConfiguration.getDatabaseClient(), "/lorem/ipsum/lorem-ipsum.pdf");
         assertTrue(currentData.isPresent());
-        assertEquals(1, currentData.get().size());
-        ExtractedItem currentItem = currentData.get().next();
-        assertNotNull(currentItem);
-        assertThat(currentItem.getAs(String.class), containsString("Jane"));
+        assertEquals(52990, currentData.get().getByteLength());
 
         FrameworkMethod frameworkMethod2 = frameworkMethod(BinaryTestClass.class, "two_lorem_ipsum_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
 
-        Optional<ExtractedResult> previousData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<DocumentDescriptor> previousData = findOptionalOneByUri(marklogicConfiguration.getDatabaseClient(), "/lorem/ipsum/lorem-ipsum.pdf");
         assertTrue(previousData.isPresent());
-        assertEquals(1, previousData.get().size());
-        ExtractedItem previousItem = previousData.get().next();
-        assertNotNull(previousItem);
-        assertThat(previousItem.getAs(String.class), containsString("Jane"));
+        assertEquals(52990, previousData.get().getByteLength());
 
-        Optional<ExtractedResult> data = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "John");
+        Optional<DocumentDescriptor> data = findOptionalOneByUri(marklogicConfiguration.getDatabaseClient(), "/lorem/ipsum/lorem-ipsum.docx");
         assertTrue(data.isPresent());
-        assertEquals(1, data.get().size());
-        ExtractedItem item = data.get().next();
-        assertNotNull(item);
-        assertThat(item.getAs(String.class), containsString("John"));
+        assertEquals(14629, data.get().getByteLength());
     }
 
-    private long countByTerm(MarkLogicConfiguration marklogicConfiguration, String value) {
-        DatabaseClient client = marklogicConfiguration.getDatabaseClient();
-        QueryManager queryManager = client.newQueryManager();
-        StringQueryDefinition query = queryManager.newStringDefinition();
-        query.setDirectory("/");
-        query.setCriteria(value);
-        SearchHandle result = queryManager.search(query, new SearchHandle());
-        assertNotNull(result);
-        return result.getTotalResults();
-    }
-
-    private Optional<ExtractedResult> findOptionalOneByTerm(DatabaseClient client, String value) {
-        SearchHandle handle = findOneByTerm(client, value);
-        ExtractedResult result = null;
-        if (handle != null && handle.getMatchResults() != null && handle.getMatchResults().length > 0) {
-            result = handle.getMatchResults()[0].getExtracted();
-        }
+    private Optional<DocumentDescriptor> findOptionalOneByUri(DatabaseClient client, String uri) {
+        BinaryDocumentManager documentManager = client.newBinaryDocumentManager();
+        DocumentDescriptor result = documentManager.exists(uri);
         return Optional.ofNullable(result);
-    }
-
-    private SearchHandle findOneByTerm(DatabaseClient client, String value) {
-        QueryManager queryManager = client.newQueryManager();
-        queryManager.setPageLength(1);
-        RawCombinedQueryDefinition query = queryManager.newRawCombinedQueryDefinition(new StringHandle(
-                        "<search xmlns='http://marklogic.com/appservices/search'>" +
-                                "    <options>" +
-                                "        <extract-document-data selected='all'>" +
-                                "            <extract-path>/*</extract-path>" +
-                                "        </extract-document-data>" +
-                                "    </options>" +
-                                "    <query>" +
-                                "        <term-query>" +
-                                "            <text>" + value + "</text>" +
-                                "        </term-query>" +
-                                "    </query>" +
-                                "</search>"
-                )
-        );
-        query.setDirectory("/");
-        return queryManager.search(query, new SearchHandle());
     }
 
     private FrameworkMethod frameworkMethod(Class<?> testClass, String methodName) {

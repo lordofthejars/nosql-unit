@@ -6,12 +6,8 @@ public class PassThroughContent extends Content<InputStream> {
 
     protected InputStream data;
 
-    public PassThroughContent(InputStream data) {
-        this.data = data;
-    }
-
     public PassThroughContent(String uri, InputStream data) {
-        this(data);
+        this.data = data;
         setUri(uri);
     }
 

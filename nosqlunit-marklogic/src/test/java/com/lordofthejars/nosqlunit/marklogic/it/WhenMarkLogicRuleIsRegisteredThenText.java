@@ -25,9 +25,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 /**
- * Tests JSON content handling.
+ * Tests plain text content handling.
  */
-public class WhenMarkLogicRuleIsRegisteredThenJson {
+public class WhenMarkLogicRuleIsRegisteredThenText {
 
     /**
      * The application database available in the default installation.
@@ -210,32 +210,32 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
     }
 }
 
-class JsonTestClass {
+class TextTestClass {
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "test-one-wrong.json")
+    @UsingDataSet(locations = "person/wrong/test-one.txt", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "person/wrong/test-one-expected.txt")
     public void one_wrong() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "test-one-expected.json")
+    @UsingDataSet(locations = "person/test-one.txt", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "person/test-one-expected.txt")
     public void one_equal() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = DELETE_ALL)
+    @UsingDataSet(locations = "person/test-one.txt", loadStrategy = DELETE_ALL)
     public void one_delete() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = INSERT)
+    @UsingDataSet(locations = "person/test-one.txt", loadStrategy = INSERT)
     public void one_insert() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-two.json", loadStrategy = INSERT)
+    @UsingDataSet(locations = "person/test-two.txt", loadStrategy = INSERT)
     public void two_insert() {
     }
 }

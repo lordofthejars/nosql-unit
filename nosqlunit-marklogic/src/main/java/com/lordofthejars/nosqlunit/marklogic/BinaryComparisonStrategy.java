@@ -38,7 +38,7 @@ class BinaryComparisonStrategy implements MarkLogicComparisonStrategy {
         final Map<String, PassThroughContent> actualData = new HashMap<>();
         try {
             expectedData = parser.parse(dataSet);
-            reader.read(expectedData, InputStream.class).forEach((uri, contentHandle) -> actualData.put(uri, new PassThroughContent(contentHandle.get())));
+            reader.read(expectedData, InputStream.class).forEach((uri, contentHandle) -> actualData.put(uri, new PassThroughContent(uri, contentHandle.get())));
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new NoSqlAssertionError(e.getMessage());
@@ -46,7 +46,9 @@ class BinaryComparisonStrategy implements MarkLogicComparisonStrategy {
         if (expectedData.size() != actualData.size()) {
             throw createFailure("Expected number of documents is: %s but actual number was: %s", expectedData.size(), actualData.size());
         }
-        compare(expectedData, actualData);
+        if (!compare(expectedData, actualData)) {
+            throw createFailure("Expected binary documents:\n%s\ndon't match the actual ones:\n%s", expectedData, actualData);
+        }
         return true;
     }
 
@@ -72,7 +74,7 @@ class BinaryComparisonStrategy implements MarkLogicComparisonStrategy {
                  InputStream actualStream = actual.content();) {
                 if (!contentEquals(expectedStream, actualStream)) {
                     result = false;
-                    LOGGER.trace("Expected and actual are not equal:\n{}\n!=\n{}", expected, actual);
+                    LOGGER.warn("Expected and actual are not equal:\n{}\n!=\n{}", expected, actual);
                 }
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);

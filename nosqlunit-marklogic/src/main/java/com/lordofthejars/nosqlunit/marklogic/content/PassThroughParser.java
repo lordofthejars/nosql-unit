@@ -15,11 +15,14 @@ import static com.lordofthejars.nosqlunit.marklogic.MarkLogicRule.EXPECTED_RESER
 /**
  * Implements the logic required to handle unstructured documents, like binaries and
  * plain-text docs which should not be touched by the test framework and have no possibility to
- * add the database-specific  content.
+ * add the database-specific content. Unfortunately we don't have an access to the original resource
+ * location which we use to derive the document ID/URI so we apply some dirty tricks to calculate the ID required.
  */
 public class PassThroughParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PassThroughParser.class);
+
+    private static final String EMPTY_STRING = "";
 
     private Class<?> resourceBase;
 
@@ -29,27 +32,39 @@ public class PassThroughParser {
         }
     }
 
-    public Set<Content> parse(InputStream is) {
-        Set<Content> result = new HashSet<>();
-        result.add(new PassThroughContent(parseUri(is), is));
-        return result;
+    /**
+     * Cleans all windows-related stuff
+     *
+     * @param path to be tidied up
+     * @return clean ux-style path
+     */
+    private static String cleansePath(String path) {
+        return path == null ? path : path.replace("\\", "/").replaceAll(".*:/", "");
     }
 
-    private String parseUri(InputStream is) {
+    private static String parseUri(InputStream is, Class<?> resourceBase) {
         String result = null;
         if (is instanceof FilterInputStream) {
             Object in = Reflections.accessField(is.getClass(), is, "in");
             if (in instanceof FileInputStream) {
                 Object p = Reflections.accessField(in.getClass(), in, "path");
                 if (p != null && resourceBase != null) {
-                    String resourcesPath = p.toString().replace("\\", "/");
-                    String basePath = resourceBase.getResource(".").getPath();
-                    int startIndex = (basePath.startsWith("/") ? basePath.length() - 1 : basePath.length()) - 1;
-                    result = resourcesPath.substring(startIndex).replace(EXPECTED_RESERVED_WORD, "");
+                    result = cleansePath(p.toString());
+                    String basePath = cleansePath(resourceBase.getResource(".").getPath());
+                    if (result.contains(basePath)) {
+                        int startIndex = (basePath.startsWith("/") ? basePath.length() - 1 : basePath.length()) - 1;
+                        result = result.substring(startIndex).replace(EXPECTED_RESERVED_WORD, EMPTY_STRING);
+                    }
                 }
             }
         }
         LOGGER.info("URI: {}", result);
+        return result;
+    }
+
+    public Set<Content> parse(InputStream is) {
+        Set<Content> result = new HashSet<>();
+        result.add(new PassThroughContent(parseUri(is, resourceBase), is));
         return result;
     }
 
