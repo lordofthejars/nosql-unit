@@ -6,7 +6,6 @@ import com.lordofthejars.nosqlunit.marklogic.content.MediaTypeDetector;
 import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -26,35 +25,44 @@ public class DefaultComparisonStrategy implements MarkLogicComparisonStrategy {
             .configure(AUTO_CLOSE_TARGET, false)
             .configure(AUTO_CLOSE_SOURCE, false);
 
-    private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-
-    private static XmlComparisonStrategy xmlComparisonStrategy = new XmlComparisonStrategy();
-
-    private static JsonComparisonStrategy jsonComparisonStrategy = new JsonComparisonStrategy(MAPPER);
-
     private static MediaTypeDetector mediaTypeDetector = new MediaTypeDetector(MAPPER);
 
     private Object target;
+
+    DefaultComparisonStrategy() {
+    }
 
     DefaultComparisonStrategy(Object target) {
         this.target = target;
     }
 
-    private static MarkLogicComparisonStrategy comparisonStrategy(InputStream dataSet) {
+    private MarkLogicComparisonStrategy comparisonStrategy(InputStream dataSet) {
         MarkLogicComparisonStrategy result = null;
         try {
             MediaType mediaType = mediaTypeDetector.detect(dataSet);
             if (APPLICATION_XML.equals(mediaType)) {
-                result = xmlComparisonStrategy;
+                result = xmlComparisonStrategy();
             } else if (APPLICATION_JSON.equals(mediaType)) {
-                result = jsonComparisonStrategy;
+                result = jsonComparisonStrategy(MAPPER);
             } else {
-                result = new BinaryComparisonStrategy();
+                result = binaryComparisonStrategy();
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
         return result;
+    }
+
+    protected XmlComparisonStrategy xmlComparisonStrategy() {
+        return new XmlComparisonStrategy();
+    }
+
+    protected JsonComparisonStrategy jsonComparisonStrategy(ObjectMapper mapper) {
+        return new JsonComparisonStrategy(mapper);
+    }
+
+    protected BinaryComparisonStrategy binaryComparisonStrategy() {
+        return new BinaryComparisonStrategy();
     }
 
     @Override

@@ -8,24 +8,32 @@ import com.lordofthejars.nosqlunit.marklogic.content.DataSetReader;
 import com.lordofthejars.nosqlunit.marklogic.content.JsonContent;
 import com.lordofthejars.nosqlunit.marklogic.content.JsonParser;
 import com.marklogic.client.io.marker.ContentHandleFactory;
+import net.javacrumbs.jsonunit.core.internal.Diff;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.core.FailureHandler.createFailure;
 import static com.marklogic.client.io.JacksonHandle.newFactory;
+import static net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths;
 import static org.slf4j.LoggerFactory.getLogger;
 
 class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private static final Logger LOGGER = getLogger(JsonComparisonStrategy.class);
 
+    private static final String FULL_JSON = "fullJson";
+
+    private static final String ROOT_PATH = "";
+
     private ObjectMapper mapper;
 
     private ContentHandleFactory contentHandleFactory = newFactory();
 
-    private Set<String> ignoreProperties;
+    private String[] ignoreProperties;
 
     JsonComparisonStrategy(ObjectMapper mapper) {
         this.mapper = mapper;
@@ -47,34 +55,34 @@ class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
         if (expectedData.size() != actualData.size()) {
             throw createFailure("Expected number of documents is: %s but actual number was: %s", expectedData.size(), actualData.size());
         }
-        if (!compare(expectedData, actualData, parser)) {
-            throw createFailure("Expected documents and actual document don't match exactly, see log warnings for details!");
+        try {
+            compare(expectedData, actualData, parser);
+        } catch (AssertionError error) {
+            throw createFailure(error.getMessage());
         }
         return true;
     }
 
     @Override
     public void setIgnoreProperties(String[] ignoreProperties) {
-        this.ignoreProperties = new HashSet(Arrays.asList(ignoreProperties));
+        this.ignoreProperties = ignoreProperties;
     }
 
-    private boolean compare(Set<Content> expectedSet, Map<String, JsonContent> actualSet, JsonParser parser) {
-        boolean result = true;
+    private void compare(Set<Content> expectedSet, Map<String, JsonContent> actualSet, JsonParser parser) {
         for (Content e : expectedSet) {
             JsonContent expected = (JsonContent) e;
             JsonContent actual = actualSet.get(expected.getUri());
             if (actual == null) {
-                result = false;
-                LOGGER.warn("Expected not available in the actual data set:\n{}", expected);
-                continue;
+                throw new AssertionError("Expected not available in the actual data set:\n" + expected);
             }
             JsonNode expectedNode = parser.node(expected);
             JsonNode actualNode = parser.node(actual);
-            if (!expectedNode.equals(actualNode)) {
-                result = false;
-                LOGGER.warn("Expected and actual are not equal:\n{}\n---\n{}", expectedNode, actualNode);
-            }
+            Diff.create(expectedNode,
+                    actualNode,
+                    FULL_JSON,
+                    ROOT_PATH,
+                    whenIgnoringPaths(ignoreProperties)
+            ).failIfDifferent();
         }
-        return result;
     }
 }

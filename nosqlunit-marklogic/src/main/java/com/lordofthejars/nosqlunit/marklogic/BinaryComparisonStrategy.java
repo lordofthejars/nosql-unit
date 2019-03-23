@@ -46,41 +46,34 @@ class BinaryComparisonStrategy implements MarkLogicComparisonStrategy {
         if (expectedData.size() != actualData.size()) {
             throw createFailure("Expected number of documents is: %s but actual number was: %s", expectedData.size(), actualData.size());
         }
-        if (!compare(expectedData, actualData)) {
-            throw createFailure("Expected binary documents:\n%s\ndon't match the actual ones:\n%s", expectedData, actualData);
+        try {
+            compare(expectedData, actualData);
+        } catch (AssertionError error) {
+            throw createFailure(error.getMessage());
         }
         return true;
-    }
-
-    @Override
-    public void setIgnoreProperties(String[] ignoreProperties) {
     }
 
     void setTarget(Object target) {
         this.target = target;
     }
 
-    private boolean compare(Set<Content> expectedSet, Map<String, PassThroughContent> actualSet) {
-        boolean result = true;
+    private void compare(Set<Content> expectedSet, Map<String, PassThroughContent> actualSet) {
         for (Content c : expectedSet) {
             PassThroughContent expected = (PassThroughContent) c;
             PassThroughContent actual = actualSet.get(expected.getUri());
             if (actual == null) {
-                result = false;
-                LOGGER.warn("Expected not available in the actual data set:\n{}", expected);
-                continue;
+                throw new AssertionError("Expected not available in the actual data set:\n" + expected);
             }
             try (InputStream expectedStream = expected.content();
                  InputStream actualStream = actual.content();) {
                 if (!contentEquals(expectedStream, actualStream)) {
-                    result = false;
-                    LOGGER.warn("Expected and actual are not equal:\n{}\n!=\n{}", expected, actual);
+                    throw new AssertionError("Expected and actual are not equal:\n" + expected + "\n!=\n" + actual);
                 }
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
-                result = false;
+                throw new AssertionError("Exception at\n" + expected + "\n and \n" + actual);
             }
         }
-        return result;
     }
 }

@@ -4,9 +4,10 @@ import com.lordofthejars.nosqlunit.annotation.Selective;
 
 import java.lang.annotation.Annotation;
 
-public class SelectiveAnnotationTest implements Annotation, com.lordofthejars.nosqlunit.annotation.Selective {
+public class SelectiveAnnotationTest implements Annotation, Selective {
 
     private String identifier;
+
     private String[] locations;
 
     public SelectiveAnnotationTest(String identifier, String[] locations) {

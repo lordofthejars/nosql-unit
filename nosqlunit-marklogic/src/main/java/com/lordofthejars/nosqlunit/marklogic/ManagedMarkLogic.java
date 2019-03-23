@@ -64,8 +64,8 @@ public class ManagedMarkLogic extends ExternalResource {
             return this;
         }
 
-        public MarkLogicServerRuleBuilder port(int port) {
-            managedMarkLogicLifecycleManager.setPort(port);
+        public MarkLogicServerRuleBuilder adminPort(int adminPort) {
+            managedMarkLogicLifecycleManager.setAdminPort(adminPort);
             return this;
         }
 

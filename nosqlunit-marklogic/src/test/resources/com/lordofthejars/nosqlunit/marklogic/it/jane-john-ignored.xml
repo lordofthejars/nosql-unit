@@ -3,8 +3,8 @@
     <person uri="/person/jane.xml" collections="female">
         <firstName>Jane</firstName>
         <lastName>Doe</lastName>
-        <age>25</age>
-        <address>
+        <age>34</age>
+        <address type="home">
             <streetAddress>21 2nd Street</streetAddress>
             <city>New York</city>
             <state>NY</state>
@@ -16,7 +16,7 @@
                 <number>212 555-1234</number>
             </phoneNumber>
             <phoneNumber>
-                <type>fax</type>
+                <type>mobile</type>
                 <number>646 555-4567</number>
             </phoneNumber>
         </phoneNumbers>
@@ -24,8 +24,8 @@
     <person uri="/person/john.xml" collections="male">
         <firstName>John</firstName>
         <lastName>Doe</lastName>
-        <age>27</age>
-        <address>
+        <age>42</age>
+        <address type="home">
             <streetAddress>21 2nd Street</streetAddress>
             <city>New York</city>
             <state>NY</state>
@@ -33,7 +33,7 @@
         </address>
         <phoneNumbers>
             <phoneNumber>
-                <type>home</type>
+                <type>business</type>
                 <number>212 555-1234</number>
             </phoneNumber>
             <phoneNumber>

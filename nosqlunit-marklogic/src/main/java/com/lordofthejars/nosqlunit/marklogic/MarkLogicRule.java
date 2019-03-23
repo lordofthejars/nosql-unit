@@ -84,16 +84,12 @@ public class MarkLogicRule extends AbstractNoSqlTestRule {
             return this;
         }
 
-        public MarkLogicRule defaultManagedMarkLogic(String database) {
-            return new MarkLogicRule(marklogic().database(database).build());
-        }
-
         public MarkLogicRule defaultManagedMarkLogic(String database, int port) {
             return new MarkLogicRule(marklogic().database(database).port(port).build());
         }
 
-        public MarkLogicRule defaultSpringMarkLogic(String database) {
-            return new SpringMarkLogicRule(marklogic().database(database).build());
+        public MarkLogicRule defaultSpringMarkLogic(String database, int port) {
+            return new SpringMarkLogicRule(marklogic().database(database).port(port).build());
         }
 
         public MarkLogicRule build() {

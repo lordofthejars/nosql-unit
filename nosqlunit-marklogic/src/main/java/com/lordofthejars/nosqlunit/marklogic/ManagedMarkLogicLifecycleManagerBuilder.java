@@ -29,7 +29,7 @@ public class ManagedMarkLogicLifecycleManagerBuilder {
     }
 
     public ManagedMarkLogicLifecycleManagerBuilder adminPort(int port) {
-        managedMarkLogicLifecycleManager.setPort(port);
+        managedMarkLogicLifecycleManager.setAdminPort(port);
         return this;
     }
 

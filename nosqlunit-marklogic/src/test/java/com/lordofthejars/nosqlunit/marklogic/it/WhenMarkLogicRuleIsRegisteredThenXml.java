@@ -6,10 +6,8 @@ import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicRule;
-import com.marklogic.client.DatabaseClient;
-import com.marklogic.client.io.SearchHandle;
-import com.marklogic.client.io.StringHandle;
-import com.marklogic.client.query.*;
+import com.marklogic.client.query.ExtractedItem;
+import com.marklogic.client.query.ExtractedResult;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
@@ -21,6 +19,7 @@ import java.util.Optional;
 import static com.lordofthejars.nosqlunit.core.LoadStrategyEnum.*;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
+import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicQuery.findOneByTerm;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
@@ -78,7 +77,7 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
         marklogicStatement.evaluate();
 
-        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<ExtractedResult> currentData = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
         assertFalse(currentData.isPresent());
     }
 
@@ -92,7 +91,7 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
-        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<ExtractedResult> currentData = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
         assertTrue(currentData.isPresent());
         assertEquals(1, currentData.get().size());
         ExtractedItem currentItem = currentData.get().next();
@@ -104,14 +103,14 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
 
-        Optional<ExtractedResult> previousData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<ExtractedResult> previousData = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
         assertTrue(previousData.isPresent());
         assertEquals(1, previousData.get().size());
         ExtractedItem previousItem = previousData.get().next();
         assertNotNull(previousItem);
         assertThat(previousItem.getAs(String.class), containsString("Jane"));
 
-        Optional<ExtractedResult> data = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "John");
+        Optional<ExtractedResult> data = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "John");
         assertTrue(data.isPresent());
         assertEquals(1, data.get().size());
         ExtractedItem item = data.get().next();
@@ -129,7 +128,7 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
-        Optional<ExtractedResult> currentData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Doe");
+        Optional<ExtractedResult> currentData = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "Doe");
         assertTrue(currentData.isPresent());
         assertEquals(1, currentData.get().size());
         ExtractedItem currentItem = currentData.get().next();
@@ -141,14 +140,14 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
 
-        Optional<ExtractedResult> previousData = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
+        Optional<ExtractedResult> previousData = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
         assertTrue(previousData.isPresent());
         assertEquals(1, previousData.get().size());
         ExtractedItem previousItem = previousData.get().next();
         assertNotNull(previousItem);
         assertThat(previousItem.getAs(String.class), containsString("Jane"));
 
-        Optional<ExtractedResult> data = findOptionalOneByTerm(marklogicConfiguration.getDatabaseClient(), "John");
+        Optional<ExtractedResult> data = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "John");
         assertTrue(data.isPresent());
         assertEquals(1, data.get().size());
         ExtractedItem item = data.get().next();
@@ -156,55 +155,11 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
         assertThat(item.getAs(String.class), containsString("John"));
     }
 
-    private long countByTerm(MarkLogicConfiguration marklogicConfiguration, String value) {
-        DatabaseClient client = marklogicConfiguration.getDatabaseClient();
-        QueryManager queryManager = client.newQueryManager();
-        StringQueryDefinition query = queryManager.newStringDefinition();
-        query.setDirectory("/");
-        query.setCriteria(value);
-        SearchHandle result = queryManager.search(query, new SearchHandle());
-        assertNotNull(result);
-        return result.getTotalResults();
-    }
-
-    private Optional<ExtractedResult> findOptionalOneByTerm(DatabaseClient client, String value) {
-        SearchHandle handle = findOneByTerm(client, value);
-        ExtractedResult result = null;
-        if (handle != null && handle.getMatchResults() != null && handle.getMatchResults().length > 0) {
-            result = handle.getMatchResults()[0].getExtracted();
-        }
-        return Optional.ofNullable(result);
-    }
-
-    private SearchHandle findOneByTerm(DatabaseClient client, String value) {
-        QueryManager queryManager = client.newQueryManager();
-        queryManager.setPageLength(1);
-        RawCombinedQueryDefinition query = queryManager.newRawCombinedQueryDefinition(new StringHandle(
-                        "<search xmlns='http://marklogic.com/appservices/search'>" +
-                                "    <options>" +
-                                "        <extract-document-data selected='all'>" +
-                                "            <extract-path>/*</extract-path>" +
-                                "        </extract-document-data>" +
-                                "    </options>" +
-                                "    <query>" +
-                                "        <term-query>" +
-                                "            <text>" + value + "</text>" +
-                                "        </term-query>" +
-                                "    </query>" +
-                                "</search>"
-                )
-        );
-        query.setDirectory("/");
-        return queryManager.search(query, new SearchHandle());
-    }
-
     private FrameworkMethod frameworkMethod(Class<?> testClass, String methodName) {
         try {
             Method method = testClass.getMethod(methodName);
             return new FrameworkMethod(method);
-        } catch (SecurityException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }

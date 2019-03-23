@@ -72,11 +72,6 @@ public class MarkLogicConfigurationBuilder {
         return this;
     }
 
-    public MarkLogicConfigurationBuilder adminPort(int port) {
-        marklogicConfiguration.setAdminPort(port);
-        return this;
-    }
-
     public MarkLogicConfigurationBuilder secure() {
         marklogicConfiguration.setSecure(true);
         return this;

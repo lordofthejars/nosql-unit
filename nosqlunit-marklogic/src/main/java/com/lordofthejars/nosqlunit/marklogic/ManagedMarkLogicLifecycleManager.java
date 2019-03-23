@@ -73,7 +73,7 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
     /**
      * This is the administration port and not the application's one!
      */
-    private int port = 8001;
+    private int adminPort = 8001;
 
     private String adminUser = "admin";
 
@@ -95,11 +95,11 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
 
     @Override
     public int getPort() {
-        return port;
+        return adminPort;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setAdminPort(int adminPort) {
+        this.adminPort = adminPort;
     }
 
     public void setUsername(String username) {

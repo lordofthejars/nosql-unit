@@ -33,7 +33,7 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private ContentHandleFactory contentHandleFactory = newFactory();
 
-    private Set<String> ignoreProperties;
+    private Set<String> ignoreProperties = new HashSet<>();
 
     XmlComparisonStrategy() {
     }
@@ -54,8 +54,10 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
         if (expectedData.size() != actualData.size()) {
             throw createFailure("Expected number of documents is: %s but actual number was: %s", expectedData.size(), actualData.size());
         }
-        if (!compare(expectedData, actualData)) {
-            throw createFailure("Expected documents and actual document don't match exactly, see log warnings for details!");
+        try {
+            compare(expectedData, actualData);
+        } catch (AssertionError error) {
+            throw createFailure(error.getMessage());
         }
         return true;
     }
@@ -65,15 +67,12 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
         this.ignoreProperties = new HashSet(Arrays.asList(ignoreProperties));
     }
 
-    private boolean compare(Set<Content> expectedSet, Map<String, XmlContent> actualSet) {
-        boolean result = true;
+    private void compare(Set<Content> expectedSet, Map<String, XmlContent> actualSet) {
         for (Content e : expectedSet) {
             XmlContent expected = (XmlContent) e;
             XmlContent actual = actualSet.get(expected.getUri());
             if (actual == null) {
-                result = false;
-                LOGGER.warn("Expected not available in the actual data set:\n{}", expected);
-                continue;
+                throw new AssertionError("Expected not available in the actual data set:\n" + expected);
             }
             Node expectedNode = expected.getData();
             Node actualNode = actual.getData();
@@ -82,17 +81,16 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
                     .withTest(actualNode)
                     .withAttributeFilter(a ->
                             !(ATTR_ID.equalsIgnoreCase(a.getName()) || ATTR_COLLECTIONS.equalsIgnoreCase(a.getName()))
+                                    && !ignoreProperties.contains(a.getName())
                     )
-                    //.withNodeFilter(n -> !ignoreProperties.contains(n.getLocalName()))
+                    .withNodeFilter(n -> !ignoreProperties.contains(n.getLocalName()))
                     .normalizeWhitespace()
                     .ignoreWhitespace()
                     .ignoreComments()
                     .build();
             if (diff.hasDifferences()) {
-                result = false;
-                LOGGER.warn("Expected and actual are not equal, differences:\n{}", diff.toString());
+                throw new AssertionError("Expected and actual are not equal, differences:\n " + diff.toString());
             }
         }
-        return result;
     }
 }

@@ -9,8 +9,6 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
 
     private static final String DEFAULT_HOST = "localhost";
 
-    private static final int DEFAULT_ADMIN_PORT = 8001;
-
     private static final String DEFAULT_USERNAME = "admin";
 
     private static final String DEFAULT_PASSWORD = "admin";
@@ -24,11 +22,6 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
      * The port, the REST server listens on
      */
     private int port;
-
-    /**
-     * The port, the admin server listens on
-     */
-    private int adminPort = DEFAULT_ADMIN_PORT;
 
     /**
      * Should the secure connection to the REST server be established?
@@ -108,14 +101,6 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
 
     public void setHost(String host) {
         this.host = host;
-    }
-
-    public int getAdminPort() {
-        return adminPort;
-    }
-
-    public void setAdminPort(int adminPort) {
-        this.adminPort = adminPort;
     }
 
     public boolean isSecure() {
