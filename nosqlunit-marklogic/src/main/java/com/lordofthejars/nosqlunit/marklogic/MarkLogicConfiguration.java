@@ -5,9 +5,19 @@ import com.marklogic.client.DatabaseClient;
 
 public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
 
+    /**
+     * @see: <a href="https://docs.marklogic.com/guide/java/intro#id_69370">MarkLogic Server comes with a suitable REST API instance attached to the Documents database, listening on port 8000.</a>
+     */
+    public static final int DEFAULT_APP_PORT = 8000;
+
+    /**
+     * @see: <a href="https://docs.marklogic.com/guide/java/intro#id_69370">MarkLogic Server comes with a suitable REST API instance attached to the Documents database, listening on port 8000.</a>
+     */
+    public static final String DEFAULT_CONTENT_DATABASE = "Documents";
+
     public static final String DEFAULT_COLLECTION = "nosqlunit";
 
-    private static final String DEFAULT_HOST = "localhost";
+    public static final String DEFAULT_HOST = "localhost";
 
     private static final String DEFAULT_USERNAME = "admin";
 
@@ -16,7 +26,7 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
     /**
      * The host where the REST server resides
      */
-    private String host = DEFAULT_HOST;
+    private String host;
 
     /**
      * The port, the REST server listens on
@@ -27,6 +37,11 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
      * Should the secure connection to the REST server be established?
      */
     private boolean secure;
+
+    /**
+     * Whether a an LB or an other sort of gateway, for clustered setup.
+     */
+    private boolean useGateway;
 
     private String username = DEFAULT_USERNAME;
 
@@ -109,6 +124,14 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
 
     public void setSecure(boolean secure) {
         this.secure = secure;
+    }
+
+    public boolean isUseGateway() {
+        return useGateway;
+    }
+
+    public void setUseGateway(boolean useGateway) {
+        this.useGateway = useGateway;
     }
 
     public DatabaseClient getDatabaseClient() {

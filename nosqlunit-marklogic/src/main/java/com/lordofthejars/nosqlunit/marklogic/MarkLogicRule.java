@@ -7,7 +7,7 @@ import com.marklogic.client.MarkLogicServerException;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
 
 
 public class MarkLogicRule extends AbstractNoSqlTestRule {

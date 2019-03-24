@@ -13,29 +13,27 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
+import static com.marklogic.client.DatabaseClient.ConnectionType.DIRECT;
+import static com.marklogic.client.DatabaseClient.ConnectionType.GATEWAY;
 import static com.marklogic.client.DatabaseClientFactory.SSLHostnameVerifier.ANY;
 import static com.marklogic.client.DatabaseClientFactory.newClient;
 
 
-public class MarkLogicConfigurationBuilder {
+public abstract class MarkLogicConfigurationBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MarkLogicConfigurationBuilder.class);
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final MarkLogicConfiguration marklogicConfiguration;
+    protected final MarkLogicConfiguration marklogicConfiguration;
 
-    private MarkLogicConfigurationBuilder() {
+    protected MarkLogicConfigurationBuilder() {
         marklogicConfiguration = new MarkLogicConfiguration();
     }
 
-    public static MarkLogicConfigurationBuilder marklogic() {
-        return new MarkLogicConfigurationBuilder();
-    }
-
-    private static SSLContext sslContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+    protected static SSLContext sslContext() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         return SSLContexts.custom().loadTrustMaterial(null, new TrustAllStrategy()).build();
     }
 
-    private SecurityContext securityContext(String username, String password) {
+    protected SecurityContext securityContext(String username, String password) {
         SecurityContext result = new DigestAuthContext(username, password);
         if (!marklogicConfiguration.isSecure()) {
             return result;
@@ -43,7 +41,7 @@ public class MarkLogicConfigurationBuilder {
         try {
             result.withSSLContext(sslContext(), null).withSSLHostnameVerifier(ANY);
         } catch (Exception e) {
-            LOGGER.warn("couldn't setup TLS context!", e);
+            log.warn("couldn't setup TLS context!", e);
         }
         return result;
     }
@@ -57,7 +55,7 @@ public class MarkLogicConfigurationBuilder {
                         marklogicConfiguration.getUsername(),
                         marklogicConfiguration.getPassword()
                 ),
-                DatabaseClient.ConnectionType.DIRECT);
+                marklogicConfiguration.isUseGateway() ? GATEWAY : DIRECT);
         marklogicConfiguration.setDatabaseClient(databaseClient);
         return marklogicConfiguration;
     }
@@ -73,6 +71,11 @@ public class MarkLogicConfigurationBuilder {
     }
 
     public MarkLogicConfigurationBuilder secure() {
+        marklogicConfiguration.setSecure(true);
+        return this;
+    }
+
+    public MarkLogicConfigurationBuilder useGateway() {
         marklogicConfiguration.setSecure(true);
         return this;
     }

@@ -1,4 +1,4 @@
-package com.lordofthejars.nosqlunit.marklogic.it;
+package com.lordofthejars.nosqlunit.marklogic.integration;
 
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -6,7 +6,6 @@ import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicRule;
-import com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic;
 import com.marklogic.client.query.ExtractedItem;
 import com.marklogic.client.query.ExtractedResult;
 import org.junit.ClassRule;
@@ -19,7 +18,7 @@ import java.util.Optional;
 
 import static com.lordofthejars.nosqlunit.core.LoadStrategyEnum.*;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
 import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
 import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicQuery.findOneByTerm;
 import static org.hamcrest.CoreMatchers.containsString;

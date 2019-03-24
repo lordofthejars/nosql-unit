@@ -1,4 +1,4 @@
-package com.lordofthejars.nosqlunit.marklogic.it;
+package com.lordofthejars.nosqlunit.marklogic.integration;
 
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -18,25 +18,16 @@ import java.util.Optional;
 
 import static com.lordofthejars.nosqlunit.core.LoadStrategyEnum.*;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
+import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
 import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicQuery.findOneByTerm;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 /**
- * Tests JSON content handling.
+ * Tests XML content handling.
  */
-public class WhenMarkLogicRuleIsRegisteredThenJson {
-
-    /**
-     * The application database available in the default installation.
-     */
-    private static final String TEST_DATABASE = "Documents";
-
-    /**
-     * The application port available in the default installation.
-     */
-    private static final int TEST_APP_PORT = 8000;
+public class WhenMarkLogicRuleIsRegisteredThenXml {
 
     private static final Statement NO_OP_STATEMENT = new Statement() {
         @Override
@@ -50,31 +41,31 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
 
     @Test(expected = NoSqlAssertionError.class)
     public void should_fail_if_expected_data_is_non_strict_equal() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_wrong");
-        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new JsonTestClass());
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_wrong");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
         marklogicStatement.evaluate();
     }
 
     @Test
     public void should_assert_if_expected_data_is_strict_equal() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_equal");
-        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new JsonTestClass());
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_equal");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
         marklogicStatement.evaluate();
     }
 
     @Test
     public void should_clean_dataset_with_delete_all_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_delete");
-        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new JsonTestClass());
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_delete");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
         marklogicStatement.evaluate();
 
         Optional<ExtractedResult> currentData = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
@@ -83,11 +74,11 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
 
     @Test
     public void should_insert_new_dataset_with_insert_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        JsonTestClass testObject = new JsonTestClass();
-        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_insert");
+        XmlTestClass testObject = new XmlTestClass();
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_insert");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
@@ -98,7 +89,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         assertNotNull(currentItem);
         assertThat(currentItem.getAs(String.class), containsString("Jane"));
 
-        FrameworkMethod frameworkMethod2 = frameworkMethod(JsonTestClass.class, "two_insert");
+        FrameworkMethod frameworkMethod2 = frameworkMethod(XmlTestClass.class, "two_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
@@ -120,11 +111,11 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
 
     @Test
     public void should_clean_previous_data_and_insert_new_dataset_with_clean_insert_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
-        JsonTestClass testObject = new JsonTestClass();
+        XmlTestClass testObject = new XmlTestClass();
 
-        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_equal");
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_equal");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
@@ -135,7 +126,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         assertNotNull(currentItem);
         assertThat(currentItem.getAs(String.class), containsString("Jane"));
 
-        FrameworkMethod frameworkMethod2 = frameworkMethod(JsonTestClass.class, "two_insert");
+        FrameworkMethod frameworkMethod2 = frameworkMethod(XmlTestClass.class, "two_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
@@ -165,32 +156,32 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
     }
 }
 
-class JsonTestClass {
+class XmlTestClass {
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "test-one-wrong.json")
+    @UsingDataSet(locations = "test-one.xml", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "test-one-wrong.xml")
     public void one_wrong() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "test-one-expected.json")
+    @UsingDataSet(locations = "test-one.xml", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "test-one-expected.xml")
     public void one_equal() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = DELETE_ALL)
+    @UsingDataSet(locations = "test-one.xml", loadStrategy = DELETE_ALL)
     public void one_delete() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-one.json", loadStrategy = INSERT)
+    @UsingDataSet(locations = "test-one.xml", loadStrategy = INSERT)
     public void one_insert() {
     }
 
     @Test
-    @UsingDataSet(locations = "test-two.json", loadStrategy = INSERT)
+    @UsingDataSet(locations = "test-two.xml", loadStrategy = INSERT)
     public void two_insert() {
     }
 }

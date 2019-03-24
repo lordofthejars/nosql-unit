@@ -2,11 +2,11 @@ package com.lordofthejars.nosqlunit.marklogic;
 
 import org.junit.Test;
 
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class WhenMarkLogicConfigurationIsCreated {
+public class WhenManagedMarkLogicConfigurationIsCreated {
 
     @Test
     public void managed_parameter_values_should_contain_default_values() {

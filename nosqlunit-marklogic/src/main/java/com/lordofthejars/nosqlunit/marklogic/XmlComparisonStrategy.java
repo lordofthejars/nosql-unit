@@ -10,7 +10,8 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.*;
+import org.xmlunit.xpath.JAXPXPathEngine;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -22,6 +23,9 @@ import static com.lordofthejars.nosqlunit.marklogic.content.XmlContent.ATTR_COLL
 import static com.lordofthejars.nosqlunit.marklogic.content.XmlContent.ATTR_ID;
 import static com.marklogic.client.io.DOMHandle.newFactory;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.w3c.dom.Node.TEXT_NODE;
+import static org.xmlunit.diff.ComparisonResult.DIFFERENT;
+import static org.xmlunit.diff.ComparisonResult.SIMILAR;
 
 class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
 
@@ -76,21 +80,66 @@ class XmlComparisonStrategy implements MarkLogicComparisonStrategy {
             }
             Node expectedNode = expected.getData();
             Node actualNode = actual.getData();
-            Diff diff = DiffBuilder
+            //compares for equality by default
+            DiffBuilder diffBuilder = DiffBuilder
                     .compare(expectedNode)
                     .withTest(actualNode)
+                    //always ignore control attributes used for document identification
                     .withAttributeFilter(a ->
                             !(ATTR_ID.equalsIgnoreCase(a.getName()) || ATTR_COLLECTIONS.equalsIgnoreCase(a.getName()))
-                                    && !ignoreProperties.contains(a.getName())
                     )
-                    .withNodeFilter(n -> !ignoreProperties.contains(n.getLocalName()))
                     .normalizeWhitespace()
                     .ignoreWhitespace()
-                    .ignoreComments()
-                    .build();
+                    .ignoreComments();
+            //check for similarity if there are properties to ignore
+            if (ignoreProperties != null && !ignoreProperties.isEmpty()) {
+                DifferenceEvaluator chainedEvaluator = DifferenceEvaluators.chain(
+                        DifferenceEvaluators.Default, new IgnoreDifferenceByXPath(ignoreProperties));
+                diffBuilder.withDifferenceEvaluator(chainedEvaluator).checkForSimilar();
+            }
+            Diff diff = diffBuilder.build();
             if (diff.hasDifferences()) {
                 throw new AssertionError("Expected and actual are not equal, differences:\n " + diff.toString());
             }
+        }
+    }
+
+    private static class IgnoreDifferenceByXPath implements DifferenceEvaluator {
+
+        private Set<String> xPathsToIgnore = new HashSet<>();
+
+        private JAXPXPathEngine xpathEngine = new JAXPXPathEngine();
+
+        private IgnoreDifferenceByXPath(final Set<String> xPathsToIgnore) {
+            this.xPathsToIgnore = xPathsToIgnore;
+        }
+
+        @Override
+        public ComparisonResult evaluate(final Comparison comparison, final ComparisonResult outcome) {
+            //do some guarding at the beginning
+            if (comparison.getControlDetails().getTarget() == null || outcome != DIFFERENT || xPathsToIgnore.isEmpty()) {
+                return outcome;
+            }
+            //go ahead otherwise
+            ComparisonResult result = DIFFERENT;
+            Comparison.Detail detail = comparison.getTestDetails();
+            Node test = detail.getTarget();
+            //move one level up for test nodes
+            if (TEXT_NODE == test.getNodeType()) {
+                test = test.getParentNode();
+            }
+            final Node searchContext = test.getOwnerDocument().getDocumentElement();
+            for (String xpath : xPathsToIgnore) {
+                Iterable<Node> i = xpathEngine.selectNodes(xpath, searchContext);
+                for (Iterator<Node> it = i.iterator(); it.hasNext(); ) {
+                    if (it.next() == test) {
+                        LOGGER.debug("{} ({}) ignored by: {}", test.getLocalName(), detail.getXPath(), xpath);
+                        result = SIMILAR;
+                        break;
+                    }
+                }
+            }
+            return result;
         }
     }
 }

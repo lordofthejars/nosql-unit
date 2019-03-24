@@ -1,4 +1,4 @@
-package com.lordofthejars.nosqlunit.marklogic.it;
+package com.lordofthejars.nosqlunit.marklogic.integration;
 
 import com.lordofthejars.nosqlunit.marklogic.DockerTest;
 import com.lordofthejars.nosqlunit.marklogic.DockerTestRunner;

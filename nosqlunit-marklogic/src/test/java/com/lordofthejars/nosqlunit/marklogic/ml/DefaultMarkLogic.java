@@ -27,8 +27,29 @@ public abstract class DefaultMarkLogic {
     private DefaultMarkLogic() {
     }
 
+    /**
+     * Connects to the default database of the specified app server
+     *
+     * @param host of the app server
+     * @param port of the app server
+     * @return connected database client
+     */
     public static DatabaseClient newClient(String host, int port) {
-        return newClient(host, port, PROPERTIES.contentDatabase, PROPERTIES.adminUser, PROPERTIES.adminPassword, PROPERTIES.useTls);
+        return newClient(host, port, null);
+    }
+
+    /**
+     * Connects to the specific database ff specified app server.
+     * Special permissions might be required if the database is not NULL and
+     * is not the default database of the given app server.
+     *
+     * @param host     of the app server
+     * @param port     of the app server
+     * @param database a specific databse to connect to
+     * @return connected database client
+     */
+    public static DatabaseClient newClient(String host, int port, String database) {
+        return newClient(host, port, database, PROPERTIES.adminUser, PROPERTIES.adminPassword, PROPERTIES.useTls);
     }
 
     public static DatabaseClient newClient(String host, int port, String database, String user, String password, boolean secure) {

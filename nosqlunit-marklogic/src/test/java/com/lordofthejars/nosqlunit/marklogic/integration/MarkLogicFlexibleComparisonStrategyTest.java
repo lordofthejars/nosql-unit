@@ -1,4 +1,4 @@
-package com.lordofthejars.nosqlunit.marklogic.it;
+package com.lordofthejars.nosqlunit.marklogic.integration;
 
 import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
 import com.lordofthejars.nosqlunit.annotation.IgnorePropertyValue;
@@ -15,6 +15,10 @@ import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicSe
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicRule.MarkLogicRuleBuilder.newMarkLogicRule;
 import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
 
+/**
+ * Tests flexible comparison by ignoring some properties in the actual result sets
+ * (e.g. for 'similar' equality).
+ */
 @CustomComparisonStrategy(comparisonStrategy = MarkLogicFlexibleComparisonStrategy.class)
 public class MarkLogicFlexibleComparisonStrategyTest {
 
@@ -27,7 +31,7 @@ public class MarkLogicFlexibleComparisonStrategyTest {
     @Test
     @UsingDataSet(locations = "jane-john.xml")
     @ShouldMatchDataSet(location = "jane-john-ignored.xml")
-    @IgnorePropertyValue(properties = {"age", "type"})
+    @IgnorePropertyValue(properties = {"//phoneNumber/type", "/person/age", "//address/@type"})
     public void shouldIgnoreXmlPropertiesInFlexibleStrategy() {
     }
 

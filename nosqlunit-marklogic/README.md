@@ -1,1 +1,0 @@
-https://developer.marklogic.com/download/binaries/9.0/MarkLogic-9.0-8.2-amd64.msi
