@@ -6,10 +6,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicAuthCache;
@@ -21,10 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicLowLevelOpsFactory.getSingletonInstance;
 import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
-import static java.lang.String.format;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.apache.http.impl.client.HttpClients.custom;
@@ -88,7 +84,8 @@ public abstract class MarkLogicREST {
     public static void deleteRESTServerWithDB(String adminHost, int mgmtPort, String user, String password, String serverName) throws IOException {
         HttpDelete delete = new HttpDelete("http://" + adminHost + ":" + mgmtPort + "/v1/rest-apis/" + serverName + "?include=content&include=modules");
         String response = authNExec(adminHost, mgmtPort, user, password, delete);
-        log.info("Deleted REST app server: {}, response: {}", serverName, response);
+        log.info("Deleted REST app server: {}, response: {}, waiting for restart...", serverName, response);
+        waitForServerAvailable(PROPERTIES.adminHost, PROPERTIES.adminPort, PROPERTIES.adminUser, PROPERTIES.adminPassword);
     }
 
     private static String authNExec(String host, int port, String user, String password, HttpRequestBase request) throws IOException {
@@ -122,19 +119,29 @@ public abstract class MarkLogicREST {
     /**
      * MarkLogic does restart after it's sent 'accepted' response
      */
-    public static void waitForServerAvailable() {
-        try {
-            getSingletonInstance().assertThatConnectionIsPossible(
-                    PROPERTIES.adminHost,
-                    PROPERTIES.adminPort,
-                    format(ALIVE_URL,
-                            PROPERTIES.adminHost,
-                            PROPERTIES.adminPort
-                    ),
-                    PROPERTIES.adminUser, PROPERTIES.adminPassword
-            );
-        } catch (Exception e) {
-            log.warn(e.getMessage(), e);
-        }
+    private static void waitForServerAvailable(String host, int port, String user, String password) {
+        // /admin/v1/timestamp
+        long start = System.currentTimeMillis();
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(new AuthScope(host, port), new UsernamePasswordCredentials(user, password));
+        // Create AuthCache instance
+        AuthCache authCache = new BasicAuthCache();
+        HttpClientContext localContext = HttpClientContext.create();
+        localContext.setAuthCache(authCache);
+        int attempts = 20;
+        int responseCode = SC_UNAUTHORIZED;
+        HttpGet get = new HttpGet(String.format(ALIVE_URL, host, port));
+        do {
+            try (CloseableHttpClient client = custom().setDefaultCredentialsProvider(credentialsProvider).build();
+                 CloseableHttpResponse response = client.execute(get, localContext)) {
+                Thread.sleep(3000);
+                responseCode = response.getStatusLine().getStatusCode();
+
+            } catch (Exception e) {
+                log.trace(e.getMessage(), e);
+            }
+
+        } while (--attempts > 0 && responseCode != SC_OK);
+        log.debug("waited for server restart for: {} secs", (System.currentTimeMillis() - start) / 1000.0);
     }
 }

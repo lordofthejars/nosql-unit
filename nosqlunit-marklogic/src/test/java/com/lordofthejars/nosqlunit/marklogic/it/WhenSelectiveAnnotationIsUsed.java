@@ -20,7 +20,8 @@ import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicSe
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
 import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.*;
 import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicQuery.*;
-import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicREST.*;
+import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicREST.createRESTServerWithDB;
+import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicREST.deleteRESTServerWithDB;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
@@ -31,9 +32,9 @@ import static org.junit.Assert.*;
  */
 public class WhenSelectiveAnnotationIsUsed {
 
-    private static final int TEST_PORT_1 = 8041;
+    private static final int TEST_PORT_1 = 9001;
 
-    private static final int TEST_PORT_2 = 8042;
+    private static final int TEST_PORT_2 = 9002;
 
     @ClassRule
     public static ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
@@ -55,9 +56,7 @@ public class WhenSelectiveAnnotationIsUsed {
     @AfterClass
     public static void deleteDatabases() throws IOException {
         deleteRESTServerWithDB("test-one");
-        //waitForServerAvailable();
         deleteRESTServerWithDB("test-two");
-        //waitForServerAvailable();
     }
 
     @Test

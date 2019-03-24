@@ -33,7 +33,7 @@ class JsonComparisonStrategy implements MarkLogicComparisonStrategy {
 
     private ContentHandleFactory contentHandleFactory = newFactory();
 
-    private String[] ignoreProperties;
+    private String[] ignoreProperties = new String[0];
 
     JsonComparisonStrategy(ObjectMapper mapper) {
         this.mapper = mapper;

@@ -53,8 +53,8 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_wrong");
-        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new TextTestClass());
+        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_wrong");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new JsonTestClass());
         marklogicStatement.evaluate();
     }
 
@@ -63,8 +63,8 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_equal");
-        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new TextTestClass());
+        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_equal");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new JsonTestClass());
         marklogicStatement.evaluate();
     }
 
@@ -73,8 +73,8 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_delete");
-        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new TextTestClass());
+        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_delete");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new JsonTestClass());
         marklogicStatement.evaluate();
 
         Optional<ExtractedResult> currentData = findOneByTerm(marklogicConfiguration.getDatabaseClient(), "Jane");
@@ -86,8 +86,8 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
-        TextTestClass testObject = new TextTestClass();
-        FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_insert");
+        JsonTestClass testObject = new JsonTestClass();
+        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_insert");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
@@ -98,7 +98,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         assertNotNull(currentItem);
         assertThat(currentItem.getAs(String.class), containsString("Jane"));
 
-        FrameworkMethod frameworkMethod2 = frameworkMethod(TextTestClass.class, "two_insert");
+        FrameworkMethod frameworkMethod2 = frameworkMethod(JsonTestClass.class, "two_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();
@@ -122,9 +122,9 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
     public void should_clean_previous_data_and_insert_new_dataset_with_clean_insert_strategy() throws Throwable {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
-        TextTestClass testObject = new TextTestClass();
+        JsonTestClass testObject = new JsonTestClass();
 
-        FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_equal");
+        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "one_equal");
         Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, testObject);
         marklogicStatement.evaluate();
 
@@ -135,7 +135,7 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
         assertNotNull(currentItem);
         assertThat(currentItem.getAs(String.class), containsString("Jane"));
 
-        FrameworkMethod frameworkMethod2 = frameworkMethod(TextTestClass.class, "two_insert");
+        FrameworkMethod frameworkMethod2 = frameworkMethod(JsonTestClass.class, "two_insert");
 
         Statement marklogicStatement2 = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod2, testObject);
         marklogicStatement2.evaluate();

@@ -6,6 +6,7 @@ import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicRule;
+import com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic;
 import com.marklogic.client.query.ExtractedItem;
 import com.marklogic.client.query.ExtractedResult;
 import org.junit.ClassRule;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import static com.lordofthejars.nosqlunit.core.LoadStrategyEnum.*;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfigurationBuilder.marklogic;
+import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
 import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicQuery.findOneByTerm;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
@@ -27,16 +29,6 @@ import static org.junit.Assert.*;
  * Tests plain text content handling.
  */
 public class WhenMarkLogicRuleIsRegisteredThenText {
-
-    /**
-     * The application database available in the default installation.
-     */
-    private static final String TEST_DATABASE = "Documents";
-
-    /**
-     * The application port available in the default installation.
-     */
-    private static final int TEST_APP_PORT = 8000;
 
     private static final Statement NO_OP_STATEMENT = new Statement() {
         @Override
@@ -50,7 +42,7 @@ public class WhenMarkLogicRuleIsRegisteredThenText {
 
     @Test(expected = NoSqlAssertionError.class)
     public void should_fail_if_expected_data_is_non_strict_equal() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_wrong");
@@ -60,7 +52,7 @@ public class WhenMarkLogicRuleIsRegisteredThenText {
 
     @Test
     public void should_assert_if_expected_data_is_strict_equal() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_equal");
@@ -70,7 +62,7 @@ public class WhenMarkLogicRuleIsRegisteredThenText {
 
     @Test
     public void should_clean_dataset_with_delete_all_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         FrameworkMethod frameworkMethod = frameworkMethod(TextTestClass.class, "one_delete");
@@ -83,7 +75,7 @@ public class WhenMarkLogicRuleIsRegisteredThenText {
 
     @Test
     public void should_insert_new_dataset_with_insert_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         TextTestClass testObject = new TextTestClass();
@@ -120,7 +112,7 @@ public class WhenMarkLogicRuleIsRegisteredThenText {
 
     @Test
     public void should_clean_previous_data_and_insert_new_dataset_with_clean_insert_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
         TextTestClass testObject = new TextTestClass();
 

@@ -52,7 +52,7 @@ public class PassThroughParser {
                     result = cleansePath(p.toString());
                     String basePath = cleansePath(resourceBase.getResource(".").getPath());
                     if (result.contains(basePath)) {
-                        int startIndex = (basePath.startsWith("/") ? basePath.length() - 1 : basePath.length()) - 1;
+                        int startIndex = (basePath.startsWith("/") ? basePath.length() : basePath.length()) - 1;
                         result = result.substring(startIndex).replace(EXPECTED_RESERVED_WORD, EMPTY_STRING);
                     }
                 }
