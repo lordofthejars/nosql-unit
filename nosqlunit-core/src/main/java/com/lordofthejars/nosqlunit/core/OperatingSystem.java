@@ -13,6 +13,7 @@ public enum OperatingSystem {
     WINDOWS_2000 ("Windows 2000",WINDOWS),
     WINDOWS_XP ("Windows XP",WINDOWS),
     WINDOWS_7 ("Windows 7",WINDOWS),
+    WINDOWS_10 ("Windows 10",WINDOWS),
     WINDOWS_2003 ("Windows 2003",WINDOWS),
     WINDOWS_2008 ("Windows 2008",WINDOWS),
     SUN_OS ("Sun OS ",UNIX),
