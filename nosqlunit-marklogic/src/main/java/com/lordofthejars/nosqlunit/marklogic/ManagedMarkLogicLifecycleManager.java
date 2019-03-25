@@ -58,7 +58,7 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
 
     private OperatingSystemResolver operatingSystemResolver = new OsNameSystemPropertyOperatingSystemResolver();
 
-    private MarkLogicLowLevelOps markLogicLowLevelOps = MarkLogicLowLevelOpsFactory.getSingletonInstance();
+    private MarkLogicLowLevelOps markLogicLowLevelOps = MarkLogicLowLevelOpsFactory.getInstance();
 
     private ProcessRunnable processRunnable;
 

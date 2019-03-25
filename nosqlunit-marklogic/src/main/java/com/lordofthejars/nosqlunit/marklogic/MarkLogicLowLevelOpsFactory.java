@@ -4,7 +4,7 @@ public class MarkLogicLowLevelOpsFactory {
 
     private static MarkLogicLowLevelOps marklogicLowLevelOps = null;
 
-    public static final MarkLogicLowLevelOps getSingletonInstance() {
+    public static final MarkLogicLowLevelOps getInstance() {
         if (marklogicLowLevelOps == null) {
             marklogicLowLevelOps = new MarkLogicLowLevelOps();
         }

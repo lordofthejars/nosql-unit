@@ -1,5 +1,6 @@
 package com.lordofthejars.nosqlunit.marklogic;
 
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -14,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ConnectException;
+import java.net.SocketException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.http.impl.client.HttpClients.custom;
@@ -23,28 +24,29 @@ public class MarkLogicLowLevelOps {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MarkLogicLowLevelOps.class);
 
+    /**
+     * Seconds
+     */
     private static final int DELAY = 1;
-
-    private static final int DELAY_FACTOR = 2;
 
     private static final int MAX_RETRIES = 20;
 
     MarkLogicLowLevelOps() {
     }
 
-    public boolean assertThatConnectionIsPossible(String host, int port, String url, String user, String password) throws IOException, InterruptedException {
+    public boolean assertThatConnectionIsPossible(String host, int port, String url, String user, String password) throws IOException {
         return waitForStatus(host, port, url, user, password, 200);
     }
 
-    public boolean assertThatConnectionIsNotPossible(String host, int port, String url, String user, String password) throws IOException, InterruptedException {
+    public boolean assertThatConnectionIsNotPossible(String host, int port, String url, String user, String password) throws IOException {
         try {
             return waitForStatus(host, port, url, user, password, 404);
-        } catch (ConnectException e) {
+        } catch (NoHttpResponseException | SocketException e) {
             return true;
         }
     }
 
-    public boolean waitForStatus(String host, int port, String url, String user, String password, int statusToWaitFor) throws IOException, InterruptedException {
+    public boolean waitForStatus(String host, int port, String url, String user, String password, int statusToWaitFor) throws IOException {
         int currentRetry = MAX_RETRIES;
         boolean statusReached = false;
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -54,13 +56,22 @@ public class MarkLogicLowLevelOps {
         AuthCache authCache = new BasicAuthCache();
         HttpClientContext localContext = HttpClientContext.create();
         localContext.setAuthCache(authCache);
-        int delay = DELAY;
         try (CloseableHttpClient client = custom().setDefaultCredentialsProvider(credsProvider).build()) {
             do {
-                SECONDS.sleep(delay * DELAY_FACTOR);
+                try {
+                    SECONDS.sleep(DELAY);
+                } catch (InterruptedException e) {
+                    LOGGER.trace("caught while sleeping", e);
+                }
                 try (CloseableHttpResponse response = client.execute(get, localContext)) {
                     statusReached = statusToWaitFor == response.getStatusLine().getStatusCode();
                     currentRetry--;
+                } catch (NoHttpResponseException | SocketException e) {
+                    if (statusToWaitFor > 300) {
+                        throw e;
+                    } else {
+                        LOGGER.trace("keep on trying, caught: " + e.getMessage(), e);
+                    }
                 }
             } while (!statusReached && currentRetry > 0);
         }
