@@ -265,13 +265,11 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
         }
     }
 
-    private boolean assertThatConnectionToMarkLogicIsPossible()
-            throws InterruptedException, IOException {
+    private boolean assertThatConnectionToMarkLogicIsPossible() throws IOException {
         return markLogicLowLevelOps.assertThatConnectionIsPossible(getHost(), getPort(), format(ALIVE_URL, getHost(), getPort()), adminUser, adminPassword);
     }
 
-    private boolean assertThatConnectionToMarkLogicIsNotPossible()
-            throws InterruptedException, IOException {
+    private boolean assertThatConnectionToMarkLogicIsNotPossible() throws IOException {
         return markLogicLowLevelOps.assertThatConnectionIsNotPossible(getHost(), getPort(), format(ALIVE_URL, getHost(), getPort()), adminUser, adminPassword);
     }
 
@@ -301,11 +299,10 @@ public class ManagedMarkLogicLifecycleManager extends AbstractLifecycleManager {
             try {
                 process.waitFor();
                 if (process.exitValue() != 0) {
-                    LOGGER.warn(
-                            "MarkLogic ["
-                                    + buildOperationSystemProgramAndArguments()
-                                    + "] console output is: "
-                                    + consoleOutput);
+                    throw new IllegalStateException("MarkLogic ["
+                            + buildOperationSystemProgramAndArguments()
+                            + "] console output is: "
+                            + consoleOutput);
                 }
             } catch (InterruptedException ie) {
                 throw prepareException(ie);

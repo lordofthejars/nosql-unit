@@ -2,7 +2,6 @@ package com.lordofthejars.nosqlunit.marklogic.ml;
 
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicLowLevelOpsFactory;
 import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
 import static java.lang.String.format;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.apache.http.impl.client.HttpClients.custom;
 
@@ -89,7 +87,7 @@ public abstract class MarkLogicREST {
         HttpDelete delete = new HttpDelete("http://" + adminHost + ":" + mgmtPort + "/v1/rest-apis/" + serverName + "?include=content&include=modules");
         String response = authNExec(adminHost, mgmtPort, user, password, delete);
         log.info("Deleted REST app server: {}, response: {}, waiting for restart...", serverName, response);
-        //MarkLogic does restart after it's sent the 'accepted' response
+        //MarkLogic does restart after it's responded with the 'accepted'
         MarkLogicLowLevelOpsFactory.getInstance().assertThatConnectionIsPossible(
                 PROPERTIES.adminHost,
                 PROPERTIES.adminPort,
@@ -103,30 +101,23 @@ public abstract class MarkLogicREST {
     }
 
     private static String authNExec(String host, int port, String user, String password, HttpRequestBase request) throws IOException {
-        String result = null;
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(new AuthScope(host, port), new UsernamePasswordCredentials(user, password));
         // Create AuthCache instance
         AuthCache authCache = new BasicAuthCache();
         HttpClientContext localContext = HttpClientContext.create();
         localContext.setAuthCache(authCache);
-        int responseCode = SC_UNAUTHORIZED;
-        try (CloseableHttpClient client = custom().setDefaultCredentialsProvider(credentialsProvider).build()) {
-            //we need 2 request for the digest authentication
-            int attempts = 2;
-            while (attempts-- > 0 && responseCode == SC_UNAUTHORIZED) {
-                try (CloseableHttpResponse response = client.execute(request, localContext)) {
-                    StatusLine statusLine = response.getStatusLine();
-                    responseCode = statusLine.getStatusCode();
-                    HttpEntity responseEntity = response.getEntity();
-                    log.trace("status: {}", statusLine);
-                    //read the response fully before the stream is closed
-                    if (responseEntity != null) {
-                        result = EntityUtils.toString(responseEntity);
-                    }
+        try (CloseableHttpClient client = custom()
+                .setDefaultCredentialsProvider(credentialsProvider)
+                .build()) {
+            try (CloseableHttpResponse response = client.execute(request, localContext)) {
+                HttpEntity responseEntity = response.getEntity();
+                //read the response fully before the stream is closed
+                if (responseEntity != null) {
+                    return EntityUtils.toString(responseEntity);
                 }
             }
         }
-        return result;
+        return null;
     }
 }

@@ -1,16 +1,18 @@
 package com.lordofthejars.nosqlunit.marklogic;
 
-import org.apache.http.NoHttpResponseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,16 +24,18 @@ import static org.apache.http.impl.client.HttpClients.custom;
 
 public class MarkLogicLowLevelOps {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MarkLogicLowLevelOps.class);
+    private static final Logger log = LoggerFactory.getLogger(MarkLogicLowLevelOps.class);
 
-    /**
-     * Seconds
-     */
-    private static final int DELAY = 1;
-
-    private static final int MAX_RETRIES = 20;
+    private static final int MAX_ATTEMPTS = 30;
 
     MarkLogicLowLevelOps() {
+    }
+
+    private static void waitASec() {
+        try {
+            SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+        }
     }
 
     public boolean assertThatConnectionIsPossible(String host, int port, String url, String user, String password) throws IOException {
@@ -41,40 +45,46 @@ public class MarkLogicLowLevelOps {
     public boolean assertThatConnectionIsNotPossible(String host, int port, String url, String user, String password) throws IOException {
         try {
             return waitForStatus(host, port, url, user, password, 404);
-        } catch (NoHttpResponseException | SocketException e) {
+        } catch (SocketException e) {
             return true;
         }
     }
 
-    public boolean waitForStatus(String host, int port, String url, String user, String password, int statusToWaitFor) throws IOException {
-        int currentRetry = MAX_RETRIES;
-        boolean statusReached = false;
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(new AuthScope(host, port), new UsernamePasswordCredentials(user, password));
+    public boolean waitForStatus(String host, int port, String url, String user, String password, final int statusToWaitFor) throws IOException {
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(new AuthScope(host, port), new UsernamePasswordCredentials(user, password));
         HttpGet get = new HttpGet(url);
         // Create AuthCache instance
         AuthCache authCache = new BasicAuthCache();
         HttpClientContext localContext = HttpClientContext.create();
         localContext.setAuthCache(authCache);
-        try (CloseableHttpClient client = custom().setDefaultCredentialsProvider(credsProvider).build()) {
-            do {
-                try {
-                    SECONDS.sleep(DELAY);
-                } catch (InterruptedException e) {
-                    LOGGER.trace("caught while sleeping", e);
+        HttpRequestRetryHandler retryHandler = new DefaultHttpRequestRetryHandler(MAX_ATTEMPTS, false) {
+            @Override
+            public boolean retryRequest(final IOException exception, final int executionCount, final HttpContext context) {
+                if (executionCount > getRetryCount()) {
+                    return false;
                 }
+                //roughly reached the desired state in case we are waiting for the connection zo be broken
+                if (statusToWaitFor > 300 && exception instanceof SocketException) {
+                    return false;
+                }
+                waitASec();
+                return super.retryRequest(exception, executionCount, context);
+            }
+        };
+        int currentStatus = -1;
+        int attempts = MAX_ATTEMPTS;
+        try (CloseableHttpClient client = custom()
+                .setDefaultCredentialsProvider(credentialsProvider)
+                .setRetryHandler(retryHandler)
+                .build()) {
+            while (currentStatus != statusToWaitFor && attempts-- > 0) {
+                waitASec();
                 try (CloseableHttpResponse response = client.execute(get, localContext)) {
-                    statusReached = statusToWaitFor == response.getStatusLine().getStatusCode();
-                    currentRetry--;
-                } catch (NoHttpResponseException | SocketException e) {
-                    if (statusToWaitFor > 300) {
-                        throw e;
-                    } else {
-                        LOGGER.trace("keep on trying, caught: " + e.getMessage(), e);
-                    }
+                    currentStatus = response.getStatusLine().getStatusCode();
                 }
-            } while (!statusReached && currentRetry > 0);
+            }
         }
-        return statusReached;
+        return currentStatus == statusToWaitFor;
     }
 }
