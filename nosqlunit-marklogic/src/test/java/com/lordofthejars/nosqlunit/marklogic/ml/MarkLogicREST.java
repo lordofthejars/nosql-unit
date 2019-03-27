@@ -37,6 +37,8 @@ public abstract class MarkLogicREST {
 
     private static final String ALIVE_URL = "http://%s:%d/admin/v1/timestamp";
 
+    private static final String DELETE_APP_SERVER_URL = "http://%s:%d/v1/rest-apis/%s?include=content&include=modules";
+
     private MarkLogicREST() {
     }
 
@@ -84,7 +86,7 @@ public abstract class MarkLogicREST {
      * Deletes an application server along with attached content and module databases
      */
     public static void deleteRESTServerWithDB(String adminHost, int mgmtPort, String user, String password, String serverName) throws IOException {
-        HttpDelete delete = new HttpDelete("http://" + adminHost + ":" + mgmtPort + "/v1/rest-apis/" + serverName + "?include=content&include=modules");
+        HttpDelete delete = new HttpDelete(format(DELETE_APP_SERVER_URL, adminHost, mgmtPort, serverName));
         String response = authNExec(adminHost, mgmtPort, user, password, delete);
         log.info("Deleted REST app server: {}, response: {}, waiting for restart...", serverName, response);
         //MarkLogic does restart after it's responded with the 'accepted'
