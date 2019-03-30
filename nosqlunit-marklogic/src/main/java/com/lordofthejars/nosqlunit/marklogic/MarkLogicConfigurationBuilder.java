@@ -76,7 +76,7 @@ public abstract class MarkLogicConfigurationBuilder {
     }
 
     public MarkLogicConfigurationBuilder useGateway() {
-        marklogicConfiguration.setSecure(true);
+        marklogicConfiguration.setUseGateway(true);
         return this;
     }
 
@@ -92,6 +92,28 @@ public abstract class MarkLogicConfigurationBuilder {
 
     public MarkLogicConfigurationBuilder database(String database) {
         marklogicConfiguration.setDatabase(database);
+        return this;
+    }
+
+    /**
+     * Defines the directory to manage during clean-up, default: all
+     *
+     * @param directory to be cleaned
+     * @return this builder
+     */
+    public MarkLogicConfigurationBuilder cleanDirectory(String directory) {
+        marklogicConfiguration.setCleanDirectory(directory);
+        return this;
+    }
+
+    /**
+     * Defines collections to manage during clean-up, default: all
+     *
+     * @param collections to be cleaned
+     * @return this builder
+     */
+    public MarkLogicConfigurationBuilder cleanCollections(String... collections) {
+        marklogicConfiguration.setCleanCollections(collections);
         return this;
     }
 

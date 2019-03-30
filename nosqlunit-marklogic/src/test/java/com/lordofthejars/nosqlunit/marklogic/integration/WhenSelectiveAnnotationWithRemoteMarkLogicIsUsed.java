@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 /**
  * Uses a remote MarkLogic instance for testing (which is dockerized, having container name 'marklogic').
  * Tests rules with two different MarkLogic databases.
- * To be able to run this tests with docker, please make sure the corresponding ports
+ * To be able to run this tests with docker, please make sure the corresponding container ports
  * (TEST_PORT_1 and TEST_PORT_2) are mapped to the host's ones.
  */
 @RunWith(DockerTestRunner.class)

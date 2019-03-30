@@ -45,6 +45,10 @@ public abstract class MarkLogicQuery {
     }
 
     public static Optional<SearchHandle> findByTerm(DatabaseClient client, long pageLength, String value) {
+        return findByTerm(client, pageLength, value, DEFAULT_OPTIONS.directory);
+    }
+
+    public static Optional<SearchHandle> findByTerm(DatabaseClient client, long pageLength, String value, String directory) {
         QueryManager queryManager = client.newQueryManager();
         queryManager.setPageLength(pageLength);
         RawCombinedQueryDefinition query = queryManager.newRawCombinedQueryDefinition(new StringHandle(
@@ -62,7 +66,7 @@ public abstract class MarkLogicQuery {
                                 "</search>"
                 )
         );
-        query.setDirectory(DEFAULT_OPTIONS.directory);
+        query.setDirectory(directory);
         return ofNullable(queryManager.search(query, new SearchHandle()));
     }
 

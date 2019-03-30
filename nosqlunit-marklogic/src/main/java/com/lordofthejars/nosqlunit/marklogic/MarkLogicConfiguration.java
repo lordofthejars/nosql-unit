@@ -3,6 +3,11 @@ package com.lordofthejars.nosqlunit.marklogic;
 import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
 import com.marklogic.client.DatabaseClient;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
+
 public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
 
     /**
@@ -51,6 +56,16 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
      * The database to access (default: configured database for the REST server)
      */
     private String database;
+
+    /**
+     * Collections to be managed
+     */
+    private Set<String> cleanCollections = new HashSet<>();
+
+    /**
+     * The optional cleanDirectory to be managed
+     */
+    private String cleanDirectory;
 
     private DatabaseClient databaseClient;
 
@@ -140,5 +155,21 @@ public final class MarkLogicConfiguration extends AbstractJsr330Configuration {
 
     public void setDatabaseClient(DatabaseClient databaseClient) {
         this.databaseClient = databaseClient;
+    }
+
+    public String[] getCleanCollections() {
+        return cleanCollections.toArray(new String[0]);
+    }
+
+    public void setCleanCollections(String... cleanCollections) {
+        this.cleanCollections = new HashSet<>(asList(cleanCollections));
+    }
+
+    public String getCleanDirectory() {
+        return cleanDirectory;
+    }
+
+    public void setCleanDirectory(String cleanDirectory) {
+        this.cleanDirectory = cleanDirectory;
     }
 }

@@ -6,6 +6,7 @@ import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration;
 import com.lordofthejars.nosqlunit.marklogic.MarkLogicRule;
+import com.marklogic.client.io.SearchHandle;
 import com.marklogic.client.query.ExtractedItem;
 import com.marklogic.client.query.ExtractedResult;
 import org.junit.ClassRule;
@@ -19,7 +20,7 @@ import java.util.Optional;
 import static com.lordofthejars.nosqlunit.core.LoadStrategyEnum.*;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
-import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
+import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicQuery.findByTerm;
 import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicQuery.findOneByTerm;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
@@ -41,7 +42,7 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
 
     @Test(expected = NoSqlAssertionError.class)
     public void should_fail_if_expected_data_is_non_strict_equal() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_wrong");
@@ -51,7 +52,7 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
 
     @Test
     public void should_assert_if_expected_data_is_strict_equal() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_equal");
@@ -61,7 +62,7 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
 
     @Test
     public void should_clean_dataset_with_delete_all_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_delete");
@@ -73,8 +74,36 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
     }
 
     @Test
+    public void should_clean_dataset_with_delete_all_strategy_when_directory_is_set() throws Throwable {
+        MarkLogicConfiguration marklogicConfiguration = marklogic().cleanDirectory("/alpha/").build();
+        MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
+
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_delete_directory");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
+        marklogicStatement.evaluate();
+
+        Optional<SearchHandle> searchHandle = findByTerm(marklogicConfiguration.getDatabaseClient(), 2, "Jane", "/alpha/");
+        assertTrue(searchHandle.isPresent());
+        assertEquals(0, searchHandle.get().getMatchResults().length);
+    }
+
+    @Test
+    public void should_clean_dataset_with_delete_all_strategy_when_collections_are_set() throws Throwable {
+        MarkLogicConfiguration marklogicConfiguration = marklogic().cleanCollections("alpha").build();
+        MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
+
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "one_delete_collection");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
+        marklogicStatement.evaluate();
+
+        Optional<SearchHandle> searchHandle = findByTerm(marklogicConfiguration.getDatabaseClient(), 2, "Jane", "/alpha/");
+        assertTrue(searchHandle.isPresent());
+        assertEquals(0, searchHandle.get().getMatchResults().length);
+    }
+
+    @Test
     public void should_insert_new_dataset_with_insert_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
 
         XmlTestClass testObject = new XmlTestClass();
@@ -111,7 +140,7 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
 
     @Test
     public void should_clean_previous_data_and_insert_new_dataset_with_clean_insert_strategy() throws Throwable {
-        MarkLogicConfiguration marklogicConfiguration = marklogic().port(PROPERTIES.appPort).database(PROPERTIES.contentDatabase).build();
+        MarkLogicConfiguration marklogicConfiguration = marklogic().build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
         XmlTestClass testObject = new XmlTestClass();
 
@@ -173,6 +202,16 @@ class XmlTestClass {
     @Test
     @UsingDataSet(locations = "test-one.xml", loadStrategy = DELETE_ALL)
     public void one_delete() {
+    }
+
+    @Test
+    @UsingDataSet(locations = {"test-one-dir-alpha.xml", "test-one-dir-bravo.xml"}, loadStrategy = DELETE_ALL)
+    public void one_delete_directory() {
+    }
+
+    @Test
+    @UsingDataSet(locations = {"test-one-col-alpha.xml", "test-one-col-bravo.xml"}, loadStrategy = DELETE_ALL)
+    public void one_delete_collection() {
     }
 
     @Test

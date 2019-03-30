@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicRule.MarkLogicRuleBuilder.newMarkLogicRule;
-import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.PROPERTIES;
 
 /**
  * Tests flexible comparison by ignoring some properties in the actual result sets
@@ -26,7 +25,7 @@ public class MarkLogicFlexibleComparisonStrategyTest {
     public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
 
     @Rule
-    public MarkLogicRule MarkLogicDbRule = newMarkLogicRule().defaultManagedMarkLogic(PROPERTIES.contentDatabase, PROPERTIES.appPort);
+    public MarkLogicRule MarkLogicDbRule = newMarkLogicRule().defaultManagedMarkLogic();
 
     @Test
     @UsingDataSet(locations = "jane-john.xml")

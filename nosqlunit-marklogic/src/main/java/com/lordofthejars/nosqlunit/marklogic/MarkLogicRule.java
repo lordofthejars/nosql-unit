@@ -8,7 +8,6 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_APP_PORT;
 
 
 public class MarkLogicRule extends AbstractNoSqlTestRule {
@@ -85,17 +84,13 @@ public class MarkLogicRule extends AbstractNoSqlTestRule {
             return this;
         }
 
-        public MarkLogicRule defaultManagedMarkLogic(String host, int port) {
-            return new MarkLogicRule(marklogic().database(host).port(port).build());
-        }
-
-        public MarkLogicRule defaultManagedMarkLogic(String host, int port, String database) {
-            return new MarkLogicRule(marklogic().database(host).port(port).database(database).build());
+        public MarkLogicRule defaultManagedMarkLogic() {
+            return new MarkLogicRule(marklogic().build());
         }
 
         public MarkLogicRule defaultSpringMarkLogic() {
             //the port is just a fake since we'll use another client in apply
-            return new SpringMarkLogicRule(marklogic().port(DEFAULT_APP_PORT).build());
+            return new SpringMarkLogicRule(marklogic().build());
         }
 
         public MarkLogicRule build() {

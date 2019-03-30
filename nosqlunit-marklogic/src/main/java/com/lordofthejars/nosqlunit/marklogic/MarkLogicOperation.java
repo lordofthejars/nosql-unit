@@ -9,8 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_COLLECTION;
+import static java.util.Arrays.asList;
 
 public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperation<MarkLogicConnectionCallback, DatabaseClient> {
 
@@ -23,6 +26,7 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
     public MarkLogicOperation(MarkLogicConfiguration marklogicConfiguration) {
         this(marklogicConfiguration.getDatabaseClient(), marklogicConfiguration, null);
     }
+
     public MarkLogicOperation(MarkLogicConfiguration marklogicConfiguration, Object target) {
         this(marklogicConfiguration.getDatabaseClient(), marklogicConfiguration, target);
     }
@@ -57,16 +61,30 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
         deleteAllElements(databaseClient);
     }
 
-    void setTarget(Object target){
-        ((DefaultInsertionStrategy)insertionStrategy).setTarget(target);
-        ((DefaultComparisonStrategy)comparisonStrategy).setTarget(target);
+    void setTarget(Object target) {
+        ((DefaultInsertionStrategy) insertionStrategy).setTarget(target);
+        ((DefaultComparisonStrategy) comparisonStrategy).setTarget(target);
     }
 
     private void deleteAllElements(DatabaseClient databaseClient) {
+        String directory = marklogicConfiguration.getCleanDirectory();
         QueryManager queryManager = databaseClient.newQueryManager();
-        DeleteQueryDefinition deleteQuery = queryManager.newDeleteDefinition();
-        deleteQuery.setCollections(DEFAULT_COLLECTION);
-        queryManager.delete(deleteQuery);
+        //delete data seeded by framework in any case
+        Set<String> collections = new HashSet<>(asList(marklogicConfiguration.getCleanCollections()));
+        if (!collections.isEmpty()) {
+            collections.add(DEFAULT_COLLECTION);
+            //see: https://stackoverflow.com/questions/53523500/failed-to-delete-multiple-collections
+            collections.forEach(c -> {
+                DeleteQueryDefinition deleteQuery = queryManager.newDeleteDefinition();
+                deleteQuery.setDirectory(directory);
+                deleteQuery.setCollections(c);
+                queryManager.delete(deleteQuery);
+            });
+        } else {
+            DeleteQueryDefinition deleteQuery = queryManager.newDeleteDefinition();
+            deleteQuery.setDirectory(directory);
+            queryManager.delete(deleteQuery);
+        }
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.lordofthejars.nosqlunit.marklogic;
 
 
+import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_APP_PORT;
+
 public class RemoteMarkLogicConfigurationBuilder extends MarkLogicConfigurationBuilder {
 
-    private static final int DEFAULT_PORT = MarkLogicConfiguration.DEFAULT_APP_PORT;
-
     private RemoteMarkLogicConfigurationBuilder() {
-        marklogicConfiguration.setPort(DEFAULT_PORT);
+        marklogicConfiguration.setPort(DEFAULT_APP_PORT);
     }
 
     public static RemoteMarkLogicConfigurationBuilder remoteMarkLogic() {
