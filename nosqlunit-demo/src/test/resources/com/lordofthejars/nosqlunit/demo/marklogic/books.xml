@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+    </book>
+    <book uri="/books/The Silmarillion the Myths and Legends of Middle Earth.xml">
+        <title>The Silmarillion the Myths and Legends of Middle Earth</title>
+        <numberOfPages>365</numberOfPages>
+    </book>
+    <book uri="/books/The Lord of the Rings.xml" collections="bestsellers">
+        <title>The Lord of the Rings</title>
+        <numberOfPages>1216</numberOfPages>
+    </book>
+</root>

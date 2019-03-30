@@ -1,0 +1,26 @@
+{
+  "/books/The Hobbit.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  },
+  "/books/The Lord of the Rings.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Lord of the Rings",
+      "numberOfPages": 1216
+    }
+  }
+}

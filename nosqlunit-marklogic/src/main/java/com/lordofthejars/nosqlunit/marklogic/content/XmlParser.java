@@ -2,6 +2,7 @@ package com.lordofthejars.nosqlunit.marklogic.content;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -53,13 +54,18 @@ public class XmlParser {
     }
 
     private XmlContent toContent(Node node) {
-        Node uriAttribute = node.getAttributes().getNamedItem(ATTR_ID);
-        if (uriAttribute != null) {
-            XmlContent single = new XmlContent(transformerFactory, node, collections(node));
-            single.setUri(uriAttribute.getNodeValue());
-            node.getAttributes().removeNamedItem(ATTR_ID);
-            node.getAttributes().removeNamedItem(ATTR_COLLECTIONS);
-            return single;
+        NamedNodeMap attributes = node.getAttributes();
+        if (attributes != null && attributes.getLength() > 0) {
+            Node uriAttribute = attributes.getNamedItem(ATTR_ID);
+            if (uriAttribute != null) {
+                XmlContent single = new XmlContent(transformerFactory, node, collections(node));
+                single.setUri(uriAttribute.getNodeValue());
+                attributes.removeNamedItem(ATTR_ID);
+                if (attributes.getNamedItem(ATTR_COLLECTIONS) != null) {
+                    attributes.removeNamedItem(ATTR_COLLECTIONS);
+                }
+                return single;
+            }
         }
         return null;
     }
