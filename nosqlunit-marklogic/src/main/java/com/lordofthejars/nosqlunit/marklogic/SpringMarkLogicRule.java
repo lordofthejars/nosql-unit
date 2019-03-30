@@ -39,7 +39,7 @@ public class SpringMarkLogicRule extends MarkLogicRule {
         DatabaseClient databaseClient = SpringUtils.getBeanOfType(applicationContext, DatabaseClient.class);
         if (databaseClient == null) {
             throw new IllegalArgumentException(
-                    "At least one DatabaseClient instance should be defined into Spring Application Context.");
+                    "At least one DatabaseClient instance should be defined in the Spring Application Context.");
         }
         return databaseClient;
     }
