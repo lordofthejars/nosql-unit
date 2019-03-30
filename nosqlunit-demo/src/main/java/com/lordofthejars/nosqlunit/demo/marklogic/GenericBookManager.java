@@ -3,7 +3,7 @@ package com.lordofthejars.nosqlunit.demo.marklogic;
 import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.DocumentManager;
 import com.marklogic.client.document.DocumentPage;
-import com.marklogic.client.document.DocumentUriTemplate;
+import com.marklogic.client.document.DocumentWriteSet;
 import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.marker.ContentHandle;
@@ -26,13 +26,11 @@ public abstract class GenericBookManager {
 
     public void create(Book book) {
         DocumentManager documentManager = documentManager();
-        DocumentUriTemplate template = documentManager
-                .newDocumentUriTemplate(book.getTitle() + extension())
-                .withDirectory(BOOKS_DIRECTORY)
-                .withFormat(format());
+        DocumentWriteSet writeSet = documentManager.newWriteSet();
         ContentHandle<Book> contentHandle = contentHandleFactory().newHandle(Book.class);
         contentHandle.set(book);
-        documentManager.create(template, contentHandle);
+        writeSet.add(BOOKS_DIRECTORY + book.getTitle() + extension(), contentHandle);
+        documentManager.write(writeSet);
     }
 
     public Book findBookById(String id) {

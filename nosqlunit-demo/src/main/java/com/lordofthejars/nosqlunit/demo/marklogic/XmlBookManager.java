@@ -14,8 +14,6 @@ public class XmlBookManager extends GenericBookManager {
 
     private final ContentHandleFactory contentHandleFactory;
 
-    private DatabaseClient client;
-
     public XmlBookManager(DatabaseClient client) {
         super(client);
         try {

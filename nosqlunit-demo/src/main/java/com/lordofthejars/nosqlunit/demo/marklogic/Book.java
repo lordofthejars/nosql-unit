@@ -1,9 +1,11 @@
 package com.lordofthejars.nosqlunit.demo.marklogic;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.Objects;
 
 @XmlRootElement
+@XmlType(propOrder = {"title", "numberOfPages"})
 public class Book {
 
     private String title;

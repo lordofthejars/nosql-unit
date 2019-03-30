@@ -1,8 +1,5 @@
 {
   "/books/The Hobbit.json": {
-    "collections": [
-      "bestsellers"
-    ],
     "data": {
       "title": "The Hobbit",
       "numberOfPages": 293
@@ -15,12 +12,15 @@
     }
   },
   "/books/The Lord Of The Rings.json": {
-    "collections": [
-      "bestsellers"
-    ],
     "data": {
       "title": "The Lord Of The Rings",
       "numberOfPages": 1299
+    }
+  },
+  "/books/The Road Goes Ever On.json": {
+    "data": {
+      "title": "The Road Goes Ever On",
+      "numberOfPages": 96
     }
   }
 }

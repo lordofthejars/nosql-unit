@@ -69,6 +69,16 @@ public class WhenMarkLogicRuleIsRegisteredThenJson {
     }
 
     @Test
+    public void should_assert_if_expected_multi_data_is_strict_equal() throws Throwable {
+        MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
+        MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
+
+        FrameworkMethod frameworkMethod = frameworkMethod(JsonTestClass.class, "two_equal");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new JsonTestClass());
+        marklogicStatement.evaluate();
+    }
+
+    @Test
     public void should_clean_dataset_with_delete_all_strategy() throws Throwable {
         MarkLogicConfiguration marklogicConfiguration = marklogic().port(TEST_APP_PORT).database(TEST_DATABASE).build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
@@ -177,6 +187,12 @@ class JsonTestClass {
     @UsingDataSet(locations = "test-one.json", loadStrategy = CLEAN_INSERT)
     @ShouldMatchDataSet(location = "test-one-expected.json")
     public void one_equal() {
+    }
+
+    @Test
+    @UsingDataSet(locations = "test-two.json", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "test-two-expected.json")
+    public void two_equal() {
     }
 
     @Test

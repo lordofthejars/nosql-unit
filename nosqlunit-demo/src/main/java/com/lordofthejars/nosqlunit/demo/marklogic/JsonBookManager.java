@@ -12,8 +12,6 @@ public class JsonBookManager extends GenericBookManager {
 
     private final ContentHandleFactory contentHandleFactory;
 
-    private DatabaseClient client;
-
     public JsonBookManager(DatabaseClient client) {
         super(client);
         contentHandleFactory = JacksonDatabindHandle.newFactory(Book.class);

@@ -61,6 +61,16 @@ public class WhenMarkLogicRuleIsRegisteredThenXml {
     }
 
     @Test
+    public void should_assert_if_expected_multi_data_is_strict_equal() throws Throwable {
+        MarkLogicConfiguration marklogicConfiguration = marklogic().build();
+        MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
+
+        FrameworkMethod frameworkMethod = frameworkMethod(XmlTestClass.class, "two_equal");
+        Statement marklogicStatement = managedMarkLogicRule.apply(NO_OP_STATEMENT, frameworkMethod, new XmlTestClass());
+        marklogicStatement.evaluate();
+    }
+
+    @Test
     public void should_clean_dataset_with_delete_all_strategy() throws Throwable {
         MarkLogicConfiguration marklogicConfiguration = marklogic().build();
         MarkLogicRule managedMarkLogicRule = new MarkLogicRule(marklogicConfiguration);
@@ -197,6 +207,12 @@ class XmlTestClass {
     @UsingDataSet(locations = "test-one.xml", loadStrategy = CLEAN_INSERT)
     @ShouldMatchDataSet(location = "test-one-expected.xml")
     public void one_equal() {
+    }
+
+    @Test
+    @UsingDataSet(locations = "test-two.xml", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "test-two-expected.xml")
+    public void two_equal() {
     }
 
     @Test

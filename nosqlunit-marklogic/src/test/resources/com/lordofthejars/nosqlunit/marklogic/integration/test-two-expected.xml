@@ -21,7 +21,7 @@
             </phoneNumber>
         </phoneNumbers>
     </person>
-    <person uri="/person/john.json" collections="male">
+    <person uri="/person/john.xml" collections="male">
         <firstName>John</firstName>
         <lastName>Doe</lastName>
         <age>27</age>

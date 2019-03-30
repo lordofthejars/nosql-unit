@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+    <book uri="/books/The Hobbit.xml">
         <title>The Hobbit</title>
         <numberOfPages>293</numberOfPages>
     </book>
@@ -8,8 +8,12 @@
         <title>The Silmarillion the Myths and Legends of Middle Earth</title>
         <numberOfPages>365</numberOfPages>
     </book>
-    <book uri="/books/The Lord Of The Rings.xml" collections="bestsellers">
+    <book uri="/books/The Lord Of The Rings.xml">
         <title>The Lord Of The Rings</title>
         <numberOfPages>1299</numberOfPages>
+    </book>
+    <book uri="/books/The Road Goes Ever On.xml">
+        <title>The Road Goes Ever On</title>
+        <numberOfPages>96</numberOfPages>
     </book>
 </root>
