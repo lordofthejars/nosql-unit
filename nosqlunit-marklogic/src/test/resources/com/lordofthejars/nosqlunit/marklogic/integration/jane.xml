@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<person uri="/person/jane.xml" collections="female">
+    <firstName>Jane</firstName>
+    <lastName>Doe</lastName>
+    <age>25</age>
+    <address>
+        <streetAddress>21 2nd Street</streetAddress>
+        <city>New York</city>
+        <state>NY</state>
+        <postalCode>10021</postalCode>
+    </address>
+    <phoneNumbers>
+        <phoneNumber>
+            <type>home</type>
+            <number>212 555-1234</number>
+        </phoneNumber>
+        <phoneNumber>
+            <type>fax</type>
+            <number>646 555-4567</number>
+        </phoneNumber>
+    </phoneNumbers>
+</person>
