@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="marklogic" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+    <title>MarkLogic Engine</title>
+    <section>
+        <title>MarkLogic</title>
+        <para>
+            <application>MarkLogic</application>
+            is a commercial,
+            <emphasis>NoSQL</emphasis>
+            database with support for different document formats, like XML, JSON and unstructured content.
+        </para>
+        <para>
+            <emphasis role="bold">NoSQLUnit</emphasis>
+            supports
+            <emphasis>MarkLogic</emphasis>
+            by using next classes:
+        </para>
+        <para>
+            <table border="1">
+                <caption>Lifecycle Management Rules</caption>
+                <tr>
+                    <td>Managed</td>
+                    <td>
+                        <classname>com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic</classname>
+                    </td>
+                </tr>
+            </table>
+        </para>
+        <para>
+            <table border="1">
+                <caption>Manager Rule</caption>
+                <tr>
+                    <td>NoSQLUnit Management</td>
+                    <td>
+                        <classname>com.lordofthejars.nosqlunit.marklogic.MarkLogicRule</classname>
+                    </td>
+                </tr>
+            </table>
+        </para>
+        <section>
+            <title>Maven Setup</title>
+            <para>
+                To use
+                <emphasis role="bold">NoSQLUnit</emphasis>
+                with
+                <application>MarkLogic</application>
+                you need to add following dependencies and repository.
+                Please consult
+                <application>
+                    <link xlink:href="https://developer.marklogic.com/products/java">MarkLogic Java API</link>
+                </application>
+                for further details.
+                :
+            </para>
+            <example xml:id="conf.nosqlunit_marklogic_dep">
+                <title>NoSqlUnit MarkLogic Maven Dependencies and Repository</title>
+                <programlisting language="xml"><![CDATA[<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-marklogic</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+<dependency>
+    <groupId>com.marklogic</groupId>
+    <artifactId>marklogic-client-api</artifactId>
+    <version>${version.marklogic-client-api}</version>
+</dependency>
+<repositories>
+    <repository>
+        <id>jcenter</id>
+        <url>http://jcenter.bintray.com</url>
+    </repository>
+</repositories>]]></programlisting>
+            </example>
+        </section>
+        <section>
+            <title>Data Set Formats</title>
+            <para>
+                Default data set file format in
+                <emphasis>MarkLogic</emphasis>
+                module is XML. JSON and binary formats are also supported.
+            </para>
+            <para>
+                XML data sets must have next
+                <link linkend="ex.marklogic_xml_dataset_single">
+                    format for a single document
+                </link>
+                and the
+                <link linkend="ex.marklogic_xml_dataset_multi">
+                    next one for seeding of multiple documents at once
+                </link>
+                :
+            </para>
+            <example xml:id="ex.marklogic_xml_dataset_single">
+                <title>A single data set is the actual XML file with additional control attributes</title>
+                <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+</book>]]></programlisting>
+            </example>
+            <example xml:id="ex.marklogic_xml_dataset_multi">
+                <title>A data set containing multiple XML documents must be wrapped in a root element</title>
+                <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+    </book>
+    <book uri="/books/The Silmarillion the Myths and Legends of Middle Earth.xml">
+        <title>The Silmarillion the Myths and Legends of Middle Earth</title>
+        <numberOfPages>365</numberOfPages>
+    </book>
+    <book uri="/books/The Lord Of The Rings.xml" collections="bestsellers">
+        <title>The Lord Of The Rings</title>
+        <numberOfPages>1299</numberOfPages>
+    </book>
+</root>]]></programlisting>
+            </example>
+            <para>
+                JSON data sets must have next
+                <link linkend="ex.marklogic_json_dataset">
+                    format
+                </link>
+                :
+            </para>
+            <example xml:id="ex.marklogic_json_dataset">
+                <title>Example of MarkLogic JSON Data Set</title>
+                <programlisting language="json"><![CDATA[{
+{
+  "/books/The Hobbit.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  }
+    ....
+}]]></programlisting>
+            </example>
+            <para>Notice that if attributes value are integers, double quotes are
+                not required.
+            </para>
+            <para>
+                where:
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>uri</emphasis>
+                            : the ID (or URI) of the document in the MarkLogic database.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>data</emphasis>
+                            : the actual content of the document in the MarkLogic database.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>collections</emphasis>
+                            : the list of MarkLogic collections the document can be added to, comma separated, optional.
+                            NoSQL will assign all documents seeded to the default collection <emphasis>nosqlunit
+                        </emphasis> for convenience.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+            <para>
+                Binary and text data sets have a different handling
+                <link linkend="ex.marklogic_binary_dataset">
+                    format
+                </link>
+                :
+            </para>
+            <example xml:id="ex.marklogic_json_dataset">
+                <title>Example of MarkLogic Binary Data Set</title>
+                <programlisting language="shell"><![CDATA[{
+<current-test-class-path>/
+                         |
+                          books/The Hobbit.txt
+                          books/The Silmarillion the Myths and Legends of Middle Earth.docx
+                          books/The Lord Of The Rings.pdf
+                          authors/J. R. R. Tolkien.jpg
+}]]></programlisting>
+            </example>
+            <para>Notice that the path of the document, relative to the base test class' one
+                determines the document ID (URI) in the MarkLogic database.
+                A collection assignment is not supported.
+                For more advanced uses cases for ingesting binary contents into MarkLogic database
+                (not supported by NoSQLUnit) refer to
+                <link xlink:href="https://docs.marklogic.com/guide/cpf.pdf">Content Processing Framework</link>
+                .
+            </para>
+        </section>
+        <section>
+            <title>Getting Started</title>
+            <section>
+                <title>Lifecycle Management Strategy</title>
+                <para>
+                    First step is defining which lifecycle management strategy is
+                    required for your tests. Depending on kind of test you are
+                    implementing (unit test, integration test, deployment test, ...)
+                    you will require a managed or remote approach.
+                    <emphasis>There is no support for embedded approach since no embedded version is provided by the
+                        vendor.
+                    </emphasis>
+                    Additionally, NoSQLUnit provides an adapter for Docker in a managed mode.
+                </para>
+                <section>
+                    <title>Managed Lifecycle</title>
+                    <para>To configure the managed way, two possible approaches can be
+                        used:
+                    </para>
+                    <para>
+                        The first one is using a
+                        <emphasis role="bold">docker container</emphasis>
+                        .
+                        This is a way to have a great flexibility with different database version
+                        or while evaluating a product. For details see this
+                        <link xlink:href="https://www.marklogic.com/blog/building-a-marklogic-docker-container/">blog
+                            entry
+                        </link>
+                        :
+                    </para>
+                    <example xml:id="program.marklogic_docker_conf">
+                        <title>Managed MarkLogic in Docker</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+@ClassRule
+public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().dockerCommand("/sbin/docker").dockerContainer("marklogic").build();
+]]></programlisting>
+                    </example>
+                    <para>Notice that you can define either a
+                        container name or container ID directly as supported by Docker.
+                    </para>
+                    <para>
+                        By default managed
+                        <emphasis>MarkLogic</emphasis>
+                        in Docker uses next
+                        default values, but can be configured
+                        programmatically as shown in previous
+                        <link linkend="program.marklogic_docker_conf">example</link>
+                        :
+                    </para>
+                    <table>
+                        <caption>Default Docker Values</caption>
+                        <tr>
+                            <td>
+                                Docker Command
+                            </td>
+                            <td>
+                                The executable Docker binary is
+                                <constant>docker</constant>
+                                .
+                            </td>
+                        </tr>
+                    </table>
+                    <para>
+                        The second strategy is
+                        <emphasis role="bold">starting and stopping an already installed
+                            server
+                        </emphasis>
+                        on executing machine, by triggering start and stop on the MarkLogic Service.
+                        Next
+                        <link linkend="program.marklogic_managed_conf">rule</link>
+                        should be registered:
+                    </para>
+                    <example xml:id="program.marklogic_managed_conf">
+                        <title>Managed MarkLogic</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+
+@ClassRule
+public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
+]]></programlisting>
+                    </example>
+                    <para>
+                        By default managed
+                        <emphasis>MarkLogic</emphasis>
+                        rule uses next
+                        default values, but can be configured
+                        programmatically as shown in previous
+                        <link linkend="program.marklogic_managed_conf">example</link>
+                        :
+                    </para>
+                    <table border="1">
+                        <caption>Default Managed Values</caption>
+                        <tr>
+                            <td>
+                                Target path
+                            </td>
+                            <td>
+                                This is the directory where the starting process will be executed.
+                                Usually you don't have to modify it.
+                                By default is
+                                <constant>target/marklogic-temp</constant>
+                                .
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Admin Port
+                            </td>
+                            <td>
+                                Where server is listening for administration commands and used for 'heartbeats' is 8001.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                MarkLogic Service prefix
+                            </td>
+                            <td>
+                                Determines the service command and is either one of:
+                                <ul>
+                                    <li>
+                                        <emphasis>Windows</emphasis>
+                                        : %ProgramFiles%\MarkLogic\
+                                    </li>
+                                    <li>
+                                        <emphasis>Mac OS</emphasis>
+                                        : ~/Library/StartupItems/
+                                    </li>
+                                    <li>
+                                        <emphasis>Unix</emphasis>
+                                        : /sbin/service
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                User name
+                            </td>
+                            <td>
+                                <emphasis>MarkLogic</emphasis>
+                                administrator having permissions to access administrative interfaces.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Password
+                            </td>
+                            <td>
+                                <emphasis>MarkLogic</emphasis>
+                                administrator's password.
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+                <section>
+                    <title>Remote Lifecycle</title>
+                    <para>
+                        Configuring
+                        <emphasis role="bold">remote</emphasis>
+                        approach
+                        does not require any special rule because you (or System
+                        like
+                        <application>Maven</application>
+                        ) is the responsible of starting and
+                        stopping the server. This mode
+                        is used in deployment tests where you
+                        are testing your application
+                        on real environment.
+                    </para>
+                </section>
+            </section>
+            <section>
+                <title>Configuring MarkLogic Connection</title>
+                <para>
+                    Next step is configuring
+                    <emphasis role="bold">MarkLogic</emphasis>
+                    rule in charge of maintaining
+                    documents into known state by inserting and deleting defined
+                    datasets.
+                    You must register
+                    <classname>MarkLogicRule</classname>
+                    <emphasis>JUnit</emphasis>
+                    rule class, which
+                    requires a configuration parameter with
+                    information like host, port, application user and password, etc.
+                </para>
+                <para>To make developer's life easier and code more readable, a
+                    fluent
+                    interface can be used to create these configuration objects.
+                    There are two different kinds of configuration builders:
+                    <link linkend="program.marklogic_managed_conf">Managed</link>
+                    and
+                    <link linkend="program.marklogic_remote_conf">Remote</link>
+                    .
+                </para>
+                <section>
+                    <title>Managed/Remote Connections</title>
+                    <para>
+                        The configuration of a connection to a local or remote
+                        <emphasis>MarkLogic</emphasis>
+                        server is pretty much the same,
+                        the only differences between the local and remote connections
+                        is that the remote host has no predefined value.
+                        Default values are:
+                    </para>
+                    <table border="1">
+                        <caption>Default Connection Values</caption>
+                        <tr>
+                            <td>Host</td>
+                            <td>localhost</td>
+                        </tr>
+                        <tr>
+                            <td>Port</td>
+                            <td>8000</td>
+                        </tr>
+                        <tr>
+                            <td>Credentials</td>
+                            <td>No authentication parameters.</td>
+                        </tr>
+                        <tr>
+                            <td>Secure (whether to use TLS)</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td>Use Gateway (whether a MarkLogic Cluster Gateway is in use)</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td>Database</td>
+                            <td>Documents</td>
+                        </tr>
+                        <tr>
+                            <td>Clean Directory (during the <emphasis>Delete</emphasis> test phase controls which
+                                directory should be erased)
+                            </td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>Clean Collections (during the <emphasis>Delete</emphasis> test phase controls which
+                                collections should be erased)
+                            </td>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                    <example xml:id="program.managed_marklogic_connection_parameters">
+                        <title>MarkLogic with managed configuration</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
+
+@Rule
+public MarkLogicRule markLogicRule = new MarkLogicRule(marklogic().build());
+]]></programlisting>
+                    </example>
+                    <example xml:id="program.remote_marklogic_connection_parameters">
+                        <title>MarkLogic with remote configuration</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.RemoteMarkLogicConfigurationBuilder.remoteMarkLogic;
+
+@Rule
+public MarkLogicRule markLogicRule = new MarkLogicRule(remoteMarkLogic().host("localhost").port(9001).secure().useGateway().database("some-db").build());
+]]></programlisting>
+                    </example>
+                </section>
+            </section>
+            <!--//
+            TODO
+            |
+            |
+            V
+            //-->
+
+            <section>
+                <title>Verifying Graph</title>
+                <para>
+                    <classname>@ShouldMatchDataSet</classname>
+                    is also supported for
+                    <emphasis>Neo4j</emphasis>
+                    graphs but we should keep in mind some considerations.
+                </para>
+                <para>
+                    To compare two graphs, stored graph is exported into
+                    <link linkend="ex.marklogic_dataset">GraphML</link>
+                    format
+                    and then is compared with expected
+                    <emphasis>GraphML</emphasis>
+                    using
+                    <emphasis>XmlUnit</emphasis>
+                    framework.
+                    This approach implies two aspects to be considered, the
+                    first one
+                    is that although your graph does not contains any
+                    connection to
+                    reference node, reference node will
+                    appear too with the
+                    form (
+                    <![CDATA[<node id="0"></node>]]>
+                    ). The other aspect is that id's are
+                    <emphasis>Neo4j's</emphasis>
+                    internal id, so when
+                    you write the expected file, remember to follow
+                    the same id
+                    strategy followed by
+                    <emphasis>Neo4j</emphasis>
+                    so id attribute of each node could be
+                    matched correctly with
+                    generated output. Inserted nodes' id starts from 1 (0 is reserved
+                    for reference node), meanwhile edges starts from 0.
+                </para>
+                <para>
+                    This way to compare graphs may change in future (although this
+                    strategy
+                    will be always supported).
+                </para>
+                <para>
+                    As I have noted in
+                    <link linkend="verifying_database">verification section</link>
+                    I find that using
+                    <classname>@ShouldMatchDataSet</classname>
+                    is a bad approach during testing because test
+                    readibility is
+                    affected negatively. So as general guide, my advice
+                    is to try to
+                    avoid using @ShouldMatchDataSet in your tests as much as possible.
+                </para>
+            </section>
+            <section>
+                <title>Full Example</title>
+                <para>
+                    To show how to use
+                    <emphasis role="bold">NoSQLUnit</emphasis>
+                    with
+                    <emphasis>Neo4j</emphasis>
+                    ,
+                    we are going to create a
+                    very simple application that counts Neo's
+                    friends.
+                </para>
+                <para>
+                    <link linkend="program.matrix_marklogic_manager">MatrixManager</link>
+                    is the business class responsible of inserting new friends and
+                    counting the number of Neo's friends.
+                </para>
+                <example xml:id="program.matrix_marklogic_manager">
+                    <title>Neo4j with managed configuration</title>
+                    <programlisting language="java"><![CDATA[public class MatrixManager {
+
+	public enum RelTypes implements RelationshipType {
+		NEO_NODE, KNOWS, CODED_BY
+	}
+
+	private GraphDatabaseService graphDb;
+
+	public MatrixManager(GraphDatabaseService graphDatabaseService) {
+		this.graphDb = graphDatabaseService;
+	}
+
+	public int countNeoFriends() {
+
+		Node neoNode = getNeoNode();
+		Traverser friendsTraverser = getFriends(neoNode);
+
+		return friendsTraverser.getAllNodes().size();
+
+	}
+
+	public void addNeoFriend(String name, int age) {
+		Transaction tx = this.graphDb.beginTx();
+		try {
+			Node friend = this.graphDb.createNode();
+			friend.setProperty("name", name);
+			Relationship relationship = getNeoNode().createRelationshipTo(friend, RelTypes.KNOWS);
+			relationship.setProperty("age", age);
+			tx.success();
+		} finally {
+			tx.finish();
+		}
+	}
+
+	private static Traverser getFriends(final Node person) {
+		return person.traverse(Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, ReturnableEvaluator.ALL_BUT_START_NODE,
+				RelTypes.KNOWS, Direction.OUTGOING);
+	}
+
+	private Node getNeoNode() {
+		return graphDb.getReferenceNode().getSingleRelationship(RelTypes.NEO_NODE, Direction.OUTGOING).getEndNode();
+	}
+
+}]]></programlisting>
+                </example>
+                <para>
+                    And now one unit test and one integration test is written:
+                </para>
+                <para>
+                    For
+                    <link linkend="program.matrix_marklogic_unit">unit</link>
+                    test we are going to use embedded approach:
+                </para>
+                <example xml:id="program.matrix_marklogic_unit">
+                    <title>Neo4j with managed configuration</title>
+                    <programlisting language="java"><![CDATA[import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static com.lordofthejars.nosqlunit.marklogic.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
+import static com.lordofthejars.nosqlunit.marklogic.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
+
+import javax.inject.Inject;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.marklogic.graphdb.GraphDatabaseService;
+
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import com.lordofthejars.nosqlunit.marklogic.EmbeddedNeo4j;
+import com.lordofthejars.nosqlunit.marklogic.Neo4jRule;
+
+public class WhenNeoFriendsAreRequired {
+
+	@ClassRule
+	public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();
+	
+	@Rule
+	public Neo4jRule marklogicRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().build(), this);
+	
+	@Inject
+	private GraphDatabaseService graphDatabaseService;
+	
+	@Test
+	@UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	public void all_direct_and_inderectly_friends_should_be_counted() {
+		MatrixManager matrixManager = new MatrixManager(graphDatabaseService);
+		int countNeoFriends = matrixManager.countNeoFriends();
+		assertThat(countNeoFriends, is(3));
+	}
+	
+}]]></programlisting>
+                </example>
+                <para>
+                    And as
+                    <link linkend="program.matrix_marklogic_integration">integration test</link>
+                    , the managed one:
+                </para>
+                <example xml:id="program.matrix_marklogic_integration">
+                    <title>Neo4j with managed configuration</title>
+                    <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedWrappingNeoServer.ManagedWrappingNeoServerRuleBuilder.newWrappingNeoServerNeo4jRule;
+import static com.lordofthejars.nosqlunit.marklogic.ManagedNeoServerConfigurationBuilder.newManagedNeoServerConfiguration;
+
+import javax.inject.Inject;
+
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.marklogic.graphdb.GraphDatabaseService;
+
+import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import com.lordofthejars.nosqlunit.marklogic.ManagedWrappingNeoServer;
+import com.lordofthejars.nosqlunit.marklogic.Neo4jRule;
+
+public class WhenNeoMeetsANewFriend {
+
+	@ClassRule
+	public static ManagedWrappingNeoServer managedWrappingNeoServer = newWrappingNeoServerNeo4jRule().build();
+	
+	@Rule
+	public Neo4jRule marklogicRule = new Neo4jRule(newManagedNeoServerConfiguration().build(), this);
+	
+	@Inject
+	private GraphDatabaseService graphDatabaseService;
+	
+	@Test
+	@UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+	@ShouldMatchDataSet(location="expected-matrix.xml")
+	public void friend_should_be_related_into_neo_graph() {
+		
+		MatrixManager matrixManager = new MatrixManager(graphDatabaseService);
+		matrixManager.addNeoFriend("The Oracle", 4);
+	}
+	
+}]]></programlisting>
+                </example>
+                <para>Note that in both cases we are using the same dataset as
+                    initial state, which looks like:
+                </para>
+                <example xml:id="program.expected_marklogic_file">
+                    <title>matrix.xml Neo4j file</title>
+                    <programlisting language="xml"><![CDATA[<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+    <key id="name" for="node" attr.name="name" attr.type="string"/>
+    <key id="age" for="edge" attr.name="age" attr.type="int"/>
+    <graph id="G" edgedefault="directed">
+        <node id="1">
+            <data key="name">Thomas Anderson</data>
+        </node>
+        <node id="2">
+            <data key="name">Trinity</data>
+        </node>
+        <node id="3">
+            <data key="name">Morpheus</data>
+        </node>
+        <node id="4">
+            <data key="name">Agent Smith</data>
+        </node>
+        <node id="5">
+            <data key="name">The Architect</data>
+        </node>
+        <edge id="1" source="0" target="1" label="NEO_NODE">
+        </edge>
+        <edge id="2" source="1" target="2" label="KNOWS">
+            <data key="age">3</data>
+        </edge>
+        <edge id="3" source="1" target="3" label="KNOWS">
+            <data key="age">5</data>
+        </edge>
+        <edge id="4" source="2" target="3" label="KNOWS">
+            <data key="age">18</data>
+        </edge>
+        <edge id="5" source="3" target="4" label="KNOWS">
+            <data key="age">20</data>
+        </edge>
+        <edge id="6" source="4" target="5" label="CODED_BY">
+            <data key="age">20</data>
+        </edge>
+    </graph>
+</graphml>]]></programlisting>
+                </example>
+            </section>
+        </section>
+    </section>
+</chapter>
