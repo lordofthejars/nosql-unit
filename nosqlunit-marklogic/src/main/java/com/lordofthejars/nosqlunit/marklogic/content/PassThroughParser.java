@@ -58,7 +58,7 @@ public class PassThroughParser {
                 }
             }
         }
-        LOGGER.info("URI: {}", result);
+        LOGGER.debug("URI: {}", result);
         return result;
     }
 

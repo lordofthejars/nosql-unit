@@ -30,7 +30,7 @@ public class WhenYouFindBooksById {
 
     @Test
     @UsingDataSet(locations = "books.xml", loadStrategy = CLEAN_INSERT)
-    public void xml_books_with_properties_should_be_returned() {
+    public void xml_book_with_properties_should_be_returned() {
         GenericBookManager bookManager = new XmlBookManager(client);
         Book book = bookManager.findBookById("The Hobbit");
         assertThat(book, is(notNullValue()));
@@ -39,10 +39,23 @@ public class WhenYouFindBooksById {
 
     @Test
     @UsingDataSet(locations = "books.json", loadStrategy = CLEAN_INSERT)
-    public void json_books_with_properties_should_be_returned() {
+    public void json_book_with_properties_should_be_returned() {
         GenericBookManager bookManager = new JsonBookManager(client);
         Book book = bookManager.findBookById("The Hobbit");
         assertThat(book, is(notNullValue()));
         assertThat(book.getTitle(), is("The Hobbit"));
+    }
+
+    @Test
+    @UsingDataSet(locations = {
+            "books/Lorem Ipsum.pdf"
+            , "books/Lorem Ipsum.docx"
+            , "books/Lorem Ipsum.txt"
+    }, loadStrategy = CLEAN_INSERT)
+    public void binary_book_with_id_should_be_returned() {
+        GenericBookManager bookManager = new BinaryBookManager(client);
+        Book book = bookManager.findBookById("/books/Lorem Ipsum.txt");
+        assertThat(book, is(notNullValue()));
+        assertThat(book.getTitle(), is("/books/Lorem Ipsum.txt"));
     }
 }

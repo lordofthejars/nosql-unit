@@ -4,7 +4,6 @@ import com.marklogic.client.DatabaseClient;
 import com.marklogic.client.document.DocumentManager;
 import com.marklogic.client.document.DocumentPage;
 import com.marklogic.client.document.DocumentWriteSet;
-import com.marklogic.client.document.XMLDocumentManager;
 import com.marklogic.client.io.Format;
 import com.marklogic.client.io.marker.ContentHandle;
 import com.marklogic.client.io.marker.ContentHandleFactory;
@@ -48,8 +47,7 @@ public abstract class GenericBookManager {
 
     public List<Book> search(QueryDefinition query, long start) {
         List<Book> result = new ArrayList<Book>();
-        XMLDocumentManager documentManager = client.newXMLDocumentManager();
-        DocumentPage documentPage = documentManager.search(
+        DocumentPage documentPage = documentManager().search(
                 query,
                 start
         );
@@ -67,7 +65,7 @@ public abstract class GenericBookManager {
 
     protected abstract ContentHandleFactory contentHandleFactory();
 
-    private String extension() {
+    protected String extension() {
         return "." + format().name().toLowerCase();
     }
 }
