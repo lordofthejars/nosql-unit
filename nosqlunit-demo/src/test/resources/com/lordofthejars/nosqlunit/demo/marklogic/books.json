@@ -1,6 +1,7 @@
 {
   "/books/The Hobbit.json": {
     "collections": [
+      "books",
       "bestsellers"
     ],
     "data": {

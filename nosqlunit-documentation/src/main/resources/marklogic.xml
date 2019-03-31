@@ -13,9 +13,9 @@
         </para>
         <para>
             <emphasis role="bold">NoSQLUnit</emphasis>
-            supports
-            <emphasis>MarkLogic</emphasis>
-            by using next classes:
+            targets
+            <link xlink:href="https://www.marklogic.com/">MarkLogic</link>
+            by utilizing following classes:
         </para>
         <para>
             <table border="1">
@@ -51,8 +51,7 @@
                 <application>
                     <link xlink:href="https://developer.marklogic.com/products/java">MarkLogic Java API</link>
                 </application>
-                for further details.
-                :
+                for further details:
             </para>
             <example xml:id="conf.nosqlunit_marklogic_dep">
                 <title>NoSqlUnit MarkLogic Maven Dependencies and Repository</title>
@@ -83,16 +82,16 @@
             </para>
             <para>
                 XML data sets must have next
-                <link linkend="ex.marklogic_xml_dataset_single">
+                <link linkend="ex.marklogic_xml_data set_single">
                     format for a single document
                 </link>
                 and the
-                <link linkend="ex.marklogic_xml_dataset_multi">
+                <link linkend="ex.marklogic_xml_data set_multi">
                     next one for seeding of multiple documents at once
                 </link>
                 :
             </para>
-            <example xml:id="ex.marklogic_xml_dataset_single">
+            <example xml:id="ex.marklogic_xml_data set_single">
                 <title>A single data set is the actual XML file with additional control attributes</title>
                 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <book uri="/books/The Hobbit.xml" collections="bestsellers">
@@ -100,7 +99,7 @@
         <numberOfPages>293</numberOfPages>
 </book>]]></programlisting>
             </example>
-            <example xml:id="ex.marklogic_xml_dataset_multi">
+            <example xml:id="ex.marklogic_xml_data set_multi">
                 <title>A data set containing multiple XML documents must be wrapped in a root element</title>
                 <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <root>
@@ -120,16 +119,17 @@
             </example>
             <para>
                 JSON data sets must have next
-                <link linkend="ex.marklogic_json_dataset">
+                <link linkend="ex.marklogic_json_data set">
                     format
                 </link>
                 :
             </para>
-            <example xml:id="ex.marklogic_json_dataset">
-                <title>Example of MarkLogic JSON Data Set</title>
+            <example xml:id="ex.marklogic_json_data set">
+                <title>Example of MarkLogic JSON data set</title>
                 <programlisting language="json"><![CDATA[{
   "/books/The Hobbit.json": {
     "collections": [
+      "books",
       "bestsellers"
     ],
     "data": {
@@ -146,12 +146,12 @@
     ....
 }]]></programlisting>
             </example>
-            <para>Notice that if attributes value are integers, double quotes are
+            <para>Note that if attributes value are integers, double quotes are
                 not required.
             </para>
             <para>
                 where:
-                <itemizedlist>
+                <itemizedlist xml:id="attr.marklogic_data set_controls">
                     <listitem>
                         <para>
                             <emphasis>uri</emphasis>
@@ -175,13 +175,13 @@
                 </itemizedlist>
             </para>
             <para>
-                Binary and text data sets have a different handling
-                <link linkend="ex.marklogic_binary_dataset">
+                Binary and text data sets have a different
+                <link linkend="ex.marklogic_binary_data set">
                     format
                 </link>
-                :
+                handling:
             </para>
-            <example xml:id="ex.marklogic_binary_dataset">
+            <example xml:id="ex.marklogic_binary_data set">
                 <title>Example of MarkLogic Binary Data Set</title>
                 <programlisting language="shell"><![CDATA[
 <current-test-class-path>/
@@ -192,9 +192,9 @@
                           authors/J. R. R. Tolkien.jpg
 ]]></programlisting>
             </example>
-            <para>Notice that the path of the document, relative to the base test class' one
+            <para>Note that the path of the document, relative to the base test class' one
                 determines the document ID (URI) in the MarkLogic database.
-                A collection assignment is not supported.
+                A collections assignment is not supported.
                 For more advanced uses cases for ingesting binary contents into MarkLogic database
                 (not supported by NoSQLUnit) refer to
                 <link xlink:href="https://docs.marklogic.com/guide/cpf.pdf">Content Processing Framework</link>
@@ -222,14 +222,12 @@
                     </para>
                     <para>
                         The first one is using a
-                        <emphasis role="bold">docker container</emphasis>
-                        .
+                        <emphasis role="bold">docker container</emphasis>.
                         This is a way to have a great flexibility with different database version
                         or while evaluating a product. For details see this
                         <link xlink:href="https://www.marklogic.com/blog/building-a-marklogic-docker-container/">blog
                             entry
-                        </link>
-                        :
+                        </link>:
                     </para>
                     <example xml:id="program.marklogic_docker_conf">
                         <title>Managed MarkLogic in Docker</title>
@@ -239,19 +237,18 @@
 public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().dockerCommand("/sbin/docker").dockerContainer("marklogic").build();
 ]]></programlisting>
                     </example>
-                    <para>Notice that you can define either a
+                    <para>Note that you can define either a
                         container name or container ID directly as supported by Docker.
                     </para>
                     <para>
                         By default managed
                         <emphasis>MarkLogic</emphasis>
-                        in Docker uses next
-                        default values, but can be configured
+                        in Docker uses default values, but can be configured
                         programmatically as shown in previous
                         <link linkend="program.marklogic_docker_conf">example</link>
                         :
                     </para>
-                    <table>
+                    <table border="1">
                         <caption>Default Docker Values</caption>
                         <tr>
                             <td>
@@ -270,7 +267,7 @@ public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule(
                             server
                         </emphasis>
                         on executing machine, by triggering start and stop on the MarkLogic Service.
-                        Next
+                        The class-level
                         <link linkend="program.marklogic_managed_conf">rule</link>
                         should be registered:
                     </para>
@@ -285,9 +282,8 @@ public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule(
                     <para>
                         By default managed
                         <emphasis>MarkLogic</emphasis>
-                        rule uses next
-                        default values, but can be configured
-                        programmatically as shown in previous
+                        rule uses a set of default values, but can be configured
+                        programmatically as shown in the previous
                         <link linkend="program.marklogic_managed_conf">example</link>
                         :
                     </para>
@@ -300,9 +296,8 @@ public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule(
                             <td>
                                 This is the directory where the starting process will be executed.
                                 Usually you don't have to modify it.
-                                By default is
+                                By default it is:
                                 <constant>target/marklogic-temp</constant>
-                                .
                             </td>
                         </tr>
                         <tr>
@@ -310,12 +305,15 @@ public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule(
                                 Admin Port
                             </td>
                             <td>
-                                Where server is listening for administration commands and used for 'heartbeats' is 8001.
+                                Configures the port the server is listening on for administration commands and used for
+                                'heartbeats'. Default is 8001.
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                MarkLogic Service prefix
+                                <link xlink:href="https://docs.marklogic.com/guide/installation/procedures#id_92457">
+                                    MarkLogic Service prefix
+                                </link>
                             </td>
                             <td>
                                 Determines the service command and is either one of:
@@ -367,7 +365,7 @@ public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule(
                         Configuring
                         <emphasis role="bold">remote</emphasis>
                         approach
-                        does not require any special rule because you (or System
+                        does not require any special rule because you (or a system
                         like
                         <application>Maven</application>
                         ) is the responsible of starting and
@@ -385,7 +383,7 @@ public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule(
                     <emphasis role="bold">MarkLogic</emphasis>
                     rule in charge of maintaining
                     documents into known state by inserting and deleting defined
-                    datasets.
+                    data sets.
                     You must register
                     <classname>MarkLogicRule</classname>
                     <emphasis>JUnit</emphasis>
@@ -407,9 +405,7 @@ public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule(
                     <para>
                         The configuration of a connection to a local or remote
                         <emphasis>MarkLogic</emphasis>
-                        server is pretty much the same,
-                        the only differences between the local and remote connections
-                        is that the remote host has no predefined value.
+                        server is pretty much the same.
                         Default values are:
                     </para>
                     <table border="1">
@@ -467,67 +463,66 @@ public MarkLogicRule markLogicRule = new MarkLogicRule(marklogic().build());
 public MarkLogicRule markLogicRule = new MarkLogicRule(remoteMarkLogic().host("localhost").port(9001).secure().useGateway().database("some-db").build());
 ]]></programlisting>
                     </example>
+                    <para>
+                        Note that the only differences between the local and remote connections
+                        is that the remote host has no predefined value.
+                    </para>
                 </section>
             </section>
-            <!--//
-            TODO
-            |
-            |
-            V
-            //-->
             <section>
-                <title>Verifying Graph</title>
+                <title>Verifying Content</title>
                 <para>
                     <classname>@ShouldMatchDataSet</classname>
                     is also supported for
-                    <emphasis>Neo4j</emphasis>
-                    graphs but we should keep in mind some considerations.
+                    <emphasis>MarkLogic</emphasis>
+                    content but we should keep in mind some considerations.
                 </para>
                 <para>
-                    To compare two graphs, stored graph is exported into
-                    <link linkend="ex.marklogic_dataset">GraphML</link>
-                    format
-                    and then is compared with expected
-                    <emphasis>GraphML</emphasis>
+                    To compare two XML documents, the stored content is exported as DOM
+                    and then compared with expected
+                    <emphasis>XML</emphasis>
                     using
-                    <emphasis>XmlUnit</emphasis>
+                    <link xlink:href="https://www.xmlunit.org/">XmlUnit</link>
                     framework.
-                    This approach implies two aspects to be considered, the
-                    first one
-                    is that although your graph does not contains any
-                    connection to
-                    reference node, reference node will
-                    appear too with the
-                    form (
-                    <![CDATA[<node id="0"></node>]]>
-                    ). The other aspect is that id's are
-                    <emphasis>Neo4j's</emphasis>
-                    internal id, so when
-                    you write the expected file, remember to follow
-                    the same id
-                    strategy followed by
-                    <emphasis>Neo4j</emphasis>
-                    so id attribute of each node could be
-                    matched correctly with
-                    generated output. Inserted nodes' id starts from 1 (0 is reserved
-                    for reference node), meanwhile edges starts from 0.
+                    Whereas the comparison of
+                    <emphasis>JSON</emphasis>
+                    documents uses
+                    <link xlink:href="https://github.com/lukas-krecan/JsonUnit">JsonUnit</link>
+                    framework.
+                    The
+                    <link linkend="attr.marklogic_data set_controls">control attributes</link>
+                    in the expected file are ignored since they don't appear in the database document.
+                    Furthermore the ignore option is supported by either using
+                    <link linkend="ex.marklogic_flexible_comparison">XPath expressions or a bean-property style with
+                        JSON
+                    </link>
+                    .
+                    Note that neither ignore styles are possible with unstructured documents
+                    (like binary or text).
+                    Unstructured documents will be compared byte-by-byte.
                 </para>
-                <para>
-                    This way to compare graphs may change in future (although this
-                    strategy
-                    will be always supported).
-                </para>
-                <para>
-                    As I have noted in
-                    <link linkend="verifying_database">verification section</link>
-                    I find that using
-                    <classname>@ShouldMatchDataSet</classname>
-                    is a bad approach during testing because test
-                    readibility is
-                    affected negatively. So as general guide, my advice
-                    is to try to
-                    avoid using @ShouldMatchDataSet in your tests as much as possible.
-                </para>
+                <example xml:id="ex.marklogic_flexible_comparison">
+                    <title>MarkLogic NoSQLUnit with Flexible Comparison</title>
+                    <programlisting language="java"><![CDATA[@CustomComparisonStrategy(comparisonStrategy = MarkLogicFlexibleComparisonStrategy.class)
+public class MarkLogicFlexibleComparisonStrategyTest {
+
+...............
+
+    @Test
+    @UsingDataSet(locations = "jane-john.xml")
+    @ShouldMatchDataSet(location = "jane-john-ignored.xml")
+    @IgnorePropertyValue(properties = {"//phoneNumber/type", "/person/age", "//address/@type"})
+    public void shouldIgnoreXmlPropertiesInFlexibleStrategy() {
+    }
+
+    @Test
+    @UsingDataSet(locations = "jane-john.json")
+    @ShouldMatchDataSet(location = "jane-john-ignored.json")
+    @IgnorePropertyValue(properties = {"phoneNumbers[*].type", "age"})
+    public void shouldIgnoreJsonPropertiesInFlexibleStrategy() {
+    }
+}]]></programlisting>
+                </example>
             </section>
             <section>
                 <title>Full Example</title>
@@ -535,205 +530,252 @@ public MarkLogicRule markLogicRule = new MarkLogicRule(remoteMarkLogic().host("l
                     To show how to use
                     <emphasis role="bold">NoSQLUnit</emphasis>
                     with
-                    <emphasis>Neo4j</emphasis>
-                    ,
-                    we are going to create a
-                    very simple application that counts Neo's
-                    friends.
+                    <emphasis>MarkLogic</emphasis>, we are going to create a
+                    very simple application which searches for books stored in the database.
                 </para>
                 <para>
-                    <link linkend="program.matrix_marklogic_manager">MatrixManager</link>
-                    is the business class responsible of inserting new friends and
-                    counting the number of Neo's friends.
+                    <link linkend="program.books_marklogic_manager">Generic-, Xml -and JsonBookManager</link>
+                    are the business classes responsible of inserting new books and
+                    querying for them either using a book title or listing all books.
                 </para>
-                <example xml:id="program.matrix_marklogic_manager">
-                    <title>Neo4j with managed configuration</title>
-                    <programlisting language="java"><![CDATA[public class MatrixManager {
+                <example xml:id="program.books_marklogic_manager">
+                    <title>Sample Business Application</title>
+                    <programlisting language="java"><![CDATA[public abstract class GenericBookManager {
 
-	public enum RelTypes implements RelationshipType {
-		NEO_NODE, KNOWS, CODED_BY
-	}
+    protected static final String BOOKS_DIRECTORY = "/books/";
 
-	private GraphDatabaseService graphDb;
+    protected DatabaseClient client;
 
-	public MatrixManager(GraphDatabaseService graphDatabaseService) {
-		this.graphDb = graphDatabaseService;
-	}
+    public GenericBookManager(DatabaseClient client) {
+        this.client = client;
+    }
 
-	public int countNeoFriends() {
+    public void create(Book book) {
+        DocumentManager documentManager = documentManager();
+        DocumentWriteSet writeSet = documentManager.newWriteSet();
+        ContentHandle<Book> contentHandle = contentHandleFactory().newHandle(Book.class);
+        contentHandle.set(book);
+        writeSet.add(BOOKS_DIRECTORY + book.getTitle() + extension(), contentHandle);
+        documentManager.write(writeSet);
+    }
 
-		Node neoNode = getNeoNode();
-		Traverser friendsTraverser = getFriends(neoNode);
+    public Book findBookById(String id) {
+        List<Book> result = search(new StructuredQueryBuilder().document(BOOKS_DIRECTORY + id + extension()), 1);
+        return result.isEmpty() ? null : result.get(0);
+    }
 
-		return friendsTraverser.getAllNodes().size();
+    public List<Book> findAllBooksInCollection(String... collections) {
+        return search(new StructuredQueryBuilder().collection(collections), 1);
+    }
 
-	}
+    public List<Book> findAllBooks() {
+        return search(new StructuredQueryBuilder().directory(true, BOOKS_DIRECTORY), 1);
+    }
 
-	public void addNeoFriend(String name, int age) {
-		Transaction tx = this.graphDb.beginTx();
-		try {
-			Node friend = this.graphDb.createNode();
-			friend.setProperty("name", name);
-			Relationship relationship = getNeoNode().createRelationshipTo(friend, RelTypes.KNOWS);
-			relationship.setProperty("age", age);
-			tx.success();
-		} finally {
-			tx.finish();
-		}
-	}
+    public List<Book> search(QueryDefinition query, long start) {
+        List<Book> result = new ArrayList<Book>();
+        DocumentPage documentPage = documentManager().search(
+                query,
+                start
+        );
+        while (documentPage.hasNext()) {
+            ContentHandle<Book> handle = contentHandleFactory().newHandle(Book.class);
+            handle = documentPage.nextContent(handle);
+            result.add(handle.get());
+        }
+        return result;
+    }
 
-	private static Traverser getFriends(final Node person) {
-		return person.traverse(Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, ReturnableEvaluator.ALL_BUT_START_NODE,
-				RelTypes.KNOWS, Direction.OUTGOING);
-	}
+    protected abstract DocumentManager documentManager();
 
-	private Node getNeoNode() {
-		return graphDb.getReferenceNode().getSingleRelationship(RelTypes.NEO_NODE, Direction.OUTGOING).getEndNode();
-	}
+    protected abstract Format format();
 
+    protected abstract ContentHandleFactory contentHandleFactory();
+
+    protected String extension() {
+        return "." + format().name().toLowerCase();
+    }
+}
+
+....................
+
+public class XmlBookManager extends GenericBookManager {
+
+    private final ContentHandleFactory contentHandleFactory;
+
+    public XmlBookManager(DatabaseClient client) {
+        super(client);
+        try {
+            contentHandleFactory = JAXBHandle.newFactory(Book.class);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException("Couldn't instantiate the JAXB factory", e);
+        }
+    }
+
+    @Override
+    protected DocumentManager documentManager() {
+        return client.newXMLDocumentManager();
+    }
+
+    @Override
+    protected Format format() {
+        return XML;
+    }
+
+    @Override
+    protected ContentHandleFactory contentHandleFactory() {
+        return contentHandleFactory;
+    }
+}
+
+................
+
+public class JsonBookManager extends GenericBookManager {
+
+    private final ContentHandleFactory contentHandleFactory;
+
+    public JsonBookManager(DatabaseClient client) {
+        super(client);
+        contentHandleFactory = JacksonDatabindHandle.newFactory(Book.class);
+    }
+
+    @Override
+    protected DocumentManager documentManager() {
+        return client.newJSONDocumentManager();
+    }
+
+    @Override
+    protected Format format() {
+        return JSON;
+    }
+
+    @Override
+    protected ContentHandleFactory contentHandleFactory() {
+        return contentHandleFactory;
+    }
 }]]></programlisting>
                 </example>
                 <para>
-                    And now one unit test and one integration test is written:
+                    And now we get started with <link linkend="program.books_marklogic_integration">integration
+                    tests</link>.
                 </para>
-                <para>
-                    For
-                    <link linkend="program.matrix_marklogic_unit">unit</link>
-                    test we are going to use embedded approach:
-                </para>
-                <example xml:id="program.matrix_marklogic_unit">
-                    <title>Neo4j with managed configuration</title>
-                    <programlisting language="java"><![CDATA[import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
-import static com.lordofthejars.nosqlunit.marklogic.EmbeddedNeo4j.EmbeddedNeo4jRuleBuilder.newEmbeddedNeo4jRule;
-import static com.lordofthejars.nosqlunit.marklogic.EmbeddedNeoServerConfigurationBuilder.newEmbeddedNeoServerConfiguration;
+                <example xml:id="program.books_marklogic_integration">
+                    <title>NoSQL integrations tests</title>
+                    <programlisting language="java"><![CDATA[
+...................
 
-import javax.inject.Inject;
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+import static com.lordofthejars.nosqlunit.marklogic.MarkLogicRule.MarkLogicRuleBuilder.newMarkLogicRule;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.marklogic.graphdb.GraphDatabaseService;
+public class WhenANewBookIsCreated {
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.marklogic.EmbeddedNeo4j;
-import com.lordofthejars.nosqlunit.marklogic.Neo4jRule;
+    @ClassRule
+    public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
 
-public class WhenNeoFriendsAreRequired {
+    @Rule
+    public MarkLogicRule managedMarkLogicRule = newMarkLogicRule().defaultManagedMarkLogic();
 
-	@ClassRule
-	public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();
-	
-	@Rule
-	public Neo4jRule marklogicRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().build(), this);
-	
-	@Inject
-	private GraphDatabaseService graphDatabaseService;
-	
-	@Test
-	@UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	public void all_direct_and_inderectly_friends_should_be_counted() {
-		MatrixManager matrixManager = new MatrixManager(graphDatabaseService);
-		int countNeoFriends = matrixManager.countNeoFriends();
-		assertThat(countNeoFriends, is(3));
-	}
-	
+    @Inject
+    private DatabaseClient client;
+
+    @Test
+    @UsingDataSet(locations = "books.xml", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books-expected.xml")
+    public void xml_book_should_be_inserted_into_database() {
+        GenericBookManager bookManager = new XmlBookManager(client);
+        Book book = new Book("The Road Goes Ever On", 96);
+        bookManager.create(book);
+    }
+
+    @Test
+    @UsingDataSet(locations = "books.json", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books-expected.json")
+    public void json_book_should_be_inserted_into_database() {
+        GenericBookManager bookManager = new JsonBookManager(client);
+        Book book = new Book("The Road Goes Ever On", 96);
+        bookManager.create(book);
+    }
+
+    @Test
+    @UsingDataSet(locations = {"books/Lorem Ipsum.docx", "books/Lorem Ipsum.txt"}, loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books/Lorem Ipsum-expected.pdf")
+    public void pdf_book_should_be_inserted_into_database() throws IOException, URISyntaxException {
+        GenericBookManager bookManager = new BinaryBookManager(client);
+        byte[] content = Files.readAllBytes(
+                Paths.get(getClass().getResource("books/Lorem Ipsum.pdf").toURI())
+        );
+        BinaryBook book = new BinaryBook("/books/Lorem Ipsum.pdf", content);
+        bookManager.create(book);
+    }
 }]]></programlisting>
                 </example>
-                <para>
-                    And as
-                    <link linkend="program.matrix_marklogic_integration">integration test</link>
-                    , the managed one:
+                <para>Note that in both cases we are using similar data sets as
+                    initial state, which look like:
                 </para>
-                <example xml:id="program.matrix_marklogic_integration">
-                    <title>Neo4j with managed configuration</title>
-                    <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedWrappingNeoServer.ManagedWrappingNeoServerRuleBuilder.newWrappingNeoServerNeo4jRule;
-import static com.lordofthejars.nosqlunit.marklogic.ManagedNeoServerConfigurationBuilder.newManagedNeoServerConfiguration;
-
-import javax.inject.Inject;
-
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.marklogic.graphdb.GraphDatabaseService;
-
-import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.marklogic.ManagedWrappingNeoServer;
-import com.lordofthejars.nosqlunit.marklogic.Neo4jRule;
-
-public class WhenNeoMeetsANewFriend {
-
-	@ClassRule
-	public static ManagedWrappingNeoServer managedWrappingNeoServer = newWrappingNeoServerNeo4jRule().build();
-	
-	@Rule
-	public Neo4jRule marklogicRule = new Neo4jRule(newManagedNeoServerConfiguration().build(), this);
-	
-	@Inject
-	private GraphDatabaseService graphDatabaseService;
-	
-	@Test
-	@UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	@ShouldMatchDataSet(location="expected-matrix.xml")
-	public void friend_should_be_related_into_neo_graph() {
-		
-		MatrixManager matrixManager = new MatrixManager(graphDatabaseService);
-		matrixManager.addNeoFriend("The Oracle", 4);
-	}
-	
-}]]></programlisting>
+                <example xml:id="program.xml_marklogic_file">
+                    <title>books.xml file</title>
+                    <programlisting language="xml"><![CDATA[<root>
+    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+    </book>
+    <book uri="/books/The Silmarillion the Myths and Legends of Middle Earth.xml">
+        <title>The Silmarillion the Myths and Legends of Middle Earth</title>
+        <numberOfPages>365</numberOfPages>
+    </book>
+    <book uri="/books/The Lord Of The Rings.xml" collections="bestsellers">
+        <title>The Lord Of The Rings</title>
+        <numberOfPages>1299</numberOfPages>
+    </book>
+</root>]]></programlisting>
                 </example>
-                <para>Note that in both cases we are using the same dataset as
-                    initial state, which looks like:
-                </para>
-                <example xml:id="program.expected_marklogic_file">
-                    <title>matrix.xml Neo4j file</title>
-                    <programlisting language="xml"><![CDATA[<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
-        http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
-    <key id="name" for="node" attr.name="name" attr.type="string"/>
-    <key id="age" for="edge" attr.name="age" attr.type="int"/>
-    <graph id="G" edgedefault="directed">
-        <node id="1">
-            <data key="name">Thomas Anderson</data>
-        </node>
-        <node id="2">
-            <data key="name">Trinity</data>
-        </node>
-        <node id="3">
-            <data key="name">Morpheus</data>
-        </node>
-        <node id="4">
-            <data key="name">Agent Smith</data>
-        </node>
-        <node id="5">
-            <data key="name">The Architect</data>
-        </node>
-        <edge id="1" source="0" target="1" label="NEO_NODE">
-        </edge>
-        <edge id="2" source="1" target="2" label="KNOWS">
-            <data key="age">3</data>
-        </edge>
-        <edge id="3" source="1" target="3" label="KNOWS">
-            <data key="age">5</data>
-        </edge>
-        <edge id="4" source="2" target="3" label="KNOWS">
-            <data key="age">18</data>
-        </edge>
-        <edge id="5" source="3" target="4" label="KNOWS">
-            <data key="age">20</data>
-        </edge>
-        <edge id="6" source="4" target="5" label="CODED_BY">
-            <data key="age">20</data>
-        </edge>
-    </graph>
-</graphml>]]></programlisting>
+                And, for JSON:
+                <example xml:id="program.json_marklogic_file">
+                    <title>books.json file</title>
+                    <programlisting language="xml"><![CDATA[{
+  "/books/The Hobbit.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  },
+  "/books/The Lord Of The Rings.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Lord Of The Rings",
+      "numberOfPages": 1299
+    }
+  }
+}]]></programlisting>
                 </example>
             </section>
+        </section>
+        <section>
+            <title>Current Limitations</title>
+            <para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Semantic searches are not supported</para>
+                    </listitem>
+                    <listitem>
+                        <para>Currently there is no way to define a control data set for binary documents containing <emphasis>
+                            multiple
+                        </emphasis> entries
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
         </section>
     </section>
 </chapter>
