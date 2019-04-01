@@ -3582,22 +3582,9 @@ You can see unit tests at
 [github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-dynamodb/src/test/java/com/lordofthejars/nosqlunit/dynamodb/integration/WhenDynamoDbRuleIsRegistered.java)
 .
 
--   [MarkLogic Engine](#marklogic)
--   MarkLogic
-    -   Maven Setup
-    -   Data Set Formats
-    -   Getting Started
-        -   Lifecycle Management Strategy
-        -   Configuring MarkLogic Connection
-        -   Verifying Content
-        -   Full Example
-    -   Current Limitations
+# MarkLogic Engine
 
-MarkLogic Engine {#marklogic}
-================
-
-MarkLogic
-=========
+# MarkLogic
 
 MarkLogic is a commercial, *NoSQL* database with support for different
 document formats, like XML, JSON and unstructured content.
@@ -3605,26 +3592,25 @@ document formats, like XML, JSON and unstructured content.
 **NoSQLUnit** targets [MarkLogic](https://www.marklogic.com/) by
 utilizing following classes:
 
-  --------- ----------------------------------------------------------
-  Managed   `com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic`
-  --------- ----------------------------------------------------------
+|         |                                                          |
+| ------- | -------------------------------------------------------- |
+| Managed | `com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic` |
 
-  : Lifecycle Management Rules
+Lifecycle Management Rules
 
-  ---------------------- -------------------------------------------------------
-  NoSQLUnit Management   `com.lordofthejars.nosqlunit.marklogic.MarkLogicRule`
-  ---------------------- -------------------------------------------------------
+|                      |                                                       |
+| -------------------- | ----------------------------------------------------- |
+| NoSQLUnit Management | `com.lordofthejars.nosqlunit.marklogic.MarkLogicRule` |
 
-  : Manager Rule
+Manager Rule
 
-Maven Setup
------------
+## Maven Setup
 
 To use **NoSQLUnit** with MarkLogic you need to add following
 dependencies and repository. Please consult [MarkLogic Java
 API](https://developer.marklogic.com/products/java) for further details:
 
-``` {.xml}
+``` xml
 <dependency>
     <groupId>com.lordofthejars</groupId>
     <artifactId>nosqlunit-marklogic</artifactId>
@@ -3643,18 +3629,17 @@ API](https://developer.marklogic.com/products/java) for further details:
 </repositories>
 ```
 
-Data Set Formats
-----------------
+## Data Set Formats
 
 Default data set file format in *MarkLogic* module is XML. JSON and
 binary formats are also supported.
 
 XML data sets must have next [format for a single
-document](#ex.marklogic_xml_data set_single) and the [next one for
-seeding of multiple documents at once](#ex.marklogic_xml_data set_multi)
-:
+document](#ex.marklogic_xml_data%20set_single) and the [next one for
+seeding of multiple documents at
+once](#ex.marklogic_xml_data%20set_multi) :
 
-``` {.xml}
+``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <book uri="/books/The Hobbit.xml" collections="bestsellers">
         <title>The Hobbit</title>
@@ -3662,7 +3647,7 @@ seeding of multiple documents at once](#ex.marklogic_xml_data set_multi)
 </book>
 ```
 
-``` {.xml}
+``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
     <book uri="/books/The Hobbit.xml" collections="bestsellers">
@@ -3680,9 +3665,9 @@ seeding of multiple documents at once](#ex.marklogic_xml_data set_multi)
 </root>
 ```
 
-JSON data sets must have next [format](#ex.marklogic_json_data set) :
+JSON data sets must have next [format](#ex.marklogic_json_data%20set) :
 
-``` {.json}
+``` json
 {
   "/books/The Hobbit.json": {
     "collections": [
@@ -3709,20 +3694,20 @@ required.
 
 where:
 
--   *uri* : the ID (or URI) of the document in the MarkLogic database.
+  - *uri* : the ID (or URI) of the document in the MarkLogic database.
 
--   *data* : the actual content of the document in the MarkLogic
+  - *data* : the actual content of the document in the MarkLogic
     database.
 
--   *collections* : the list of MarkLogic collections the document can
+  - *collections* : the list of MarkLogic collections the document can
     be added to, comma separated, optional. NoSQL will assign all
     documents seeded to the default collection *nosqlunit* for
     convenience.
 
 Binary and text data sets have a different
-[format](#ex.marklogic_binary_data set) handling:
+[format](#ex.marklogic_binary_data%20set) handling:
 
-``` {.shell}
+``` shell
 <current-test-class-path>/
                          |
                           books/The Hobbit.txt
@@ -3731,24 +3716,23 @@ Binary and text data sets have a different
                           authors/J. R. R. Tolkien.jpg
 ```
 
-Note that the path of the document, relative to the base test class\'
-one determines the document ID (URI) in the MarkLogic database. A
+Note that the path of the document, relative to the base test class' one
+determines the document ID (URI) in the MarkLogic database. A
 collections assignment is not supported. For more advanced uses cases
 for ingesting binary contents into MarkLogic database (not supported by
 NoSQLUnit) refer to [Content Processing
 Framework](https://docs.marklogic.com/guide/cpf.pdf) .
 
-Getting Started
----------------
+## Getting Started
 
 ### Lifecycle Management Strategy
 
 First step is defining which lifecycle management strategy is required
 for your tests. Depending on kind of test you are implementing (unit
-test, integration test, deployment test, \...) you will require a
-managed or remote approach. *There is no support for embedded approach
-since no embedded version is provided by the vendor.* Additionally,
-NoSQLUnit provides an adapter for Docker in a managed mode.
+test, integration test, deployment test, ...) you will require a managed
+or remote approach. *There is no support for embedded approach since no
+embedded version is provided by the vendor.* Additionally, NoSQLUnit
+provides an adapter for Docker in a managed mode.
 
 #### Managed Lifecycle
 
@@ -3759,7 +3743,7 @@ great flexibility with different database version or while evaluating a
 product. For details see this [blog
 entry](https://www.marklogic.com/blog/building-a-marklogic-docker-container/):
 
-``` {.java}
+``` java
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
 
 @ClassRule
@@ -3773,18 +3757,18 @@ By default managed *MarkLogic* in Docker uses default values, but can be
 configured programmatically as shown in previous
 [example](#program.marklogic_docker_conf) :
 
-  ---------------- --------------------------------------------
-  Docker Command   The executable Docker binary is `docker` .
-  ---------------- --------------------------------------------
+|                |                                            |
+| -------------- | ------------------------------------------ |
+| Docker Command | The executable Docker binary is `docker` . |
 
-  : Default Docker Values
+Default Docker Values
 
 The second strategy is **starting and stopping an already installed
 server** on executing machine, by triggering start and stop on the
 MarkLogic Service. The class-level
 [rule](#program.marklogic_managed_conf) should be registered:
 
-``` {.java}
+``` java
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
 
 @ClassRule
@@ -3795,38 +3779,36 @@ By default managed *MarkLogic* rule uses a set of default values, but
 can be configured programmatically as shown in the previous
 [example](#program.marklogic_managed_conf) :
 
-+-----------------------------------+-----------------------------------+
-| Target path                       | This is the directory where the   |
-|                                   | starting process will be          |
-|                                   | executed. Usually you don\'t have |
-|                                   | to modify it. By default it is:   |
-|                                   | `target/marklogic-temp`           |
-+-----------------------------------+-----------------------------------+
-| Admin Port                        | Configures the port the server is |
-|                                   | listening on for administration   |
-|                                   | commands and used for             |
-|                                   | \'heartbeats\'. Default is 8001.  |
-+-----------------------------------+-----------------------------------+
-| [MarkLogic Service                | Determines the service command    |
-| prefix](https://docs.marklogic.co | and is either one of:             |
-| m/guide/installation/procedures#i |                                   |
-| d_92457)                          | -   *Windows* :                   |
-|                                   |     %ProgramFiles%\\MarkLogic\\   |
-|                                   |                                   |
-|                                   | -   *OSX* :                       |
-|                                   |     \~/Library/StartupItems/      |
-|                                   |                                   |
-|                                   | -   *Unix* : /sbin/service        |
-+-----------------------------------+-----------------------------------+
-| User name                         | *MarkLogic* administrator having  |
-|                                   | permissions to access             |
-|                                   | administrative interfaces.        |
-+-----------------------------------+-----------------------------------+
-| Password                          | *MarkLogic* administrator\'s      |
-|                                   | password.                         |
-+-----------------------------------+-----------------------------------+
-
-: Default Managed Values
+<table>
+<caption>Default Managed Values</caption>
+<tbody>
+<tr class="odd">
+<td>Target path</td>
+<td>This is the directory where the starting process will be executed. Usually you don't have to modify it. By default it is: <code>target/marklogic-temp</code></td>
+</tr>
+<tr class="even">
+<td>Admin Port</td>
+<td>Configures the port the server is listening on for administration commands and used for 'heartbeats'. Default is 8001.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://docs.marklogic.com/guide/installation/procedures#id_92457">MarkLogic Service prefix</a></td>
+<td>Determines the service command and is either one of:
+<ul>
+<li><p><em>Windows</em> : %ProgramFiles%\MarkLogic\</p></li>
+<li><p><em>OSX</em> : ~/Library/StartupItems/</p></li>
+<li><p><em>Unix</em> : /sbin/service</p></li>
+</ul></td>
+</tr>
+<tr class="even">
+<td>User name</td>
+<td><em>MarkLogic</em> administrator having permissions to access administrative interfaces.</td>
+</tr>
+<tr class="odd">
+<td>Password</td>
+<td><em>MarkLogic</em> administrator's password.</td>
+</tr>
+</tbody>
+</table>
 
 #### Remote Lifecycle
 
@@ -3843,7 +3825,7 @@ You must register `MarkLogicRule` *JUnit* rule class, which requires a
 configuration parameter with information like host, port, application
 user and password, etc.
 
-To make developer\'s life easier and code more readable, a fluent
+To make developer's life easier and code more readable, a fluent
 interface can be used to create these configuration objects. There are
 two different kinds of configuration builders:
 [Managed](#program.managed_marklogic_connection_parameters) and
@@ -3854,27 +3836,27 @@ two different kinds of configuration builders:
 The configuration of a connection to a local or remote *MarkLogic*
 server is pretty much the same. Default values are:
 
-  ------------------------------------------------------------------------------------------------ -------------------------------
-  Host                                                                                             localhost
-  Port                                                                                             8000
-  Credentials                                                                                      No authentication parameters.
-  Secure (whether to use TLS)                                                                      false
-  Use Gateway (whether a MarkLogic Cluster Gateway is in use)                                      false
-  Database                                                                                         Documents
-  Clean Directory (during the *Delete* test phase controls which directory should be erased)       None
-  Clean Collections (during the *Delete* test phase controls which collections should be erased)   None
-  ------------------------------------------------------------------------------------------------ -------------------------------
+|                                                                                                |                               |
+| ---------------------------------------------------------------------------------------------- | ----------------------------- |
+| Host                                                                                           | localhost                     |
+| Port                                                                                           | 8000                          |
+| Credentials                                                                                    | No authentication parameters. |
+| Secure (whether to use TLS)                                                                    | false                         |
+| Use Gateway (whether a MarkLogic Cluster Gateway is in use)                                    | false                         |
+| Database                                                                                       | Documents                     |
+| Clean Directory (during the *Delete* test phase controls which directory should be erased)     | None                          |
+| Clean Collections (during the *Delete* test phase controls which collections should be erased) | None                          |
 
-  : Default Connection Values
+Default Connection Values
 
-``` {.java}
+``` java
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
 
 @Rule
 public MarkLogicRule markLogicRule = new MarkLogicRule(marklogic().build());
 ```
 
-``` {.java}
+``` java
 import static com.lordofthejars.nosqlunit.marklogic.RemoteMarkLogicConfigurationBuilder.remoteMarkLogic;
 
 @Rule
@@ -3894,15 +3876,15 @@ then compared with expected *XML* using
 [XmlUnit](https://www.xmlunit.org/) framework. Whereas the comparison of
 *JSON* documents uses
 [JsonUnit](https://github.com/lukas-krecan/JsonUnit) framework. The
-[control attributes](#attr.marklogic_data set_controls) in the expected
-file are ignored since they don\'t appear in the database document.
-Furthermore the ignore option is supported by either using [XPath
-expressions or a bean-property style with
+[control attributes](#attr.marklogic_data%20set_controls) in the
+expected file are ignored since they don't appear in the database
+document. Furthermore the ignore option is supported by either using
+[XPath expressions or a bean-property style with
 JSON](#ex.marklogic_flexible_comparison) . Note that neither ignore
 styles are possible with unstructured documents (like binary or text).
 Unstructured documents will be compared byte-by-byte.
 
-``` {.java}
+``` java
 @CustomComparisonStrategy(comparisonStrategy = MarkLogicFlexibleComparisonStrategy.class)
 public class MarkLogicFlexibleComparisonStrategyTest {
 
@@ -3934,7 +3916,7 @@ database.
 are the business classes responsible of inserting new books and querying
 for them either using a book title or listing all books.
 
-``` {.java}
+``` java
 public abstract class GenericBookManager {
 
     protected static final String BOOKS_DIRECTORY = "/books/";
@@ -4054,7 +4036,7 @@ public class JsonBookManager extends GenericBookManager {
 And now we get started with [integration
 tests](#program.books_marklogic_integration).
 
-``` {.java}
+``` java
 ...................
 
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
@@ -4106,7 +4088,7 @@ public class WhenANewBookIsCreated {
 Note that in both cases we are using similar data sets as initial state,
 which look like:
 
-``` {.xml}
+``` xml
 <root>
     <book uri="/books/The Hobbit.xml" collections="bestsellers">
         <title>The Hobbit</title>
@@ -4125,7 +4107,7 @@ which look like:
 
 And, for JSON:
 
-``` {.xml}
+``` xml
 {
   "/books/The Hobbit.json": {
     "collections": [
@@ -4154,13 +4136,13 @@ And, for JSON:
 }
 ```
 
-Current Limitations
--------------------
+## Current Limitations
 
--   Semantic searches are not supported
+  - Semantic searches are not supported
 
--   Currently there is no way to define a control data set for binary
+  - Currently there is no way to define a control data set for binary
     documents containing *multiple* entries
+
 
 Managing lifecycle of multiple instances
 ========================================
