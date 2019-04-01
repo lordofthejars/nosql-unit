@@ -3582,6 +3582,586 @@ You can see unit tests at
 [github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-dynamodb/src/test/java/com/lordofthejars/nosqlunit/dynamodb/integration/WhenDynamoDbRuleIsRegistered.java)
 .
 
+-   [MarkLogic Engine](#marklogic)
+-   MarkLogic
+    -   Maven Setup
+    -   Data Set Formats
+    -   Getting Started
+        -   Lifecycle Management Strategy
+        -   Configuring MarkLogic Connection
+        -   Verifying Content
+        -   Full Example
+    -   Current Limitations
+
+MarkLogic Engine {#marklogic}
+================
+
+MarkLogic
+=========
+
+MarkLogic is a commercial, *NoSQL* database with support for different
+document formats, like XML, JSON and unstructured content.
+
+**NoSQLUnit** targets [MarkLogic](https://www.marklogic.com/) by
+utilizing following classes:
+
+  --------- ----------------------------------------------------------
+  Managed   `com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic`
+  --------- ----------------------------------------------------------
+
+  : Lifecycle Management Rules
+
+  ---------------------- -------------------------------------------------------
+  NoSQLUnit Management   `com.lordofthejars.nosqlunit.marklogic.MarkLogicRule`
+  ---------------------- -------------------------------------------------------
+
+  : Manager Rule
+
+Maven Setup
+-----------
+
+To use **NoSQLUnit** with MarkLogic you need to add following
+dependencies and repository. Please consult [MarkLogic Java
+API](https://developer.marklogic.com/products/java) for further details:
+
+``` {.xml}
+<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-marklogic</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+<dependency>
+    <groupId>com.marklogic</groupId>
+    <artifactId>marklogic-client-api</artifactId>
+    <version>${version.marklogic-client-api}</version>
+</dependency>
+<repositories>
+    <repository>
+        <id>jcenter</id>
+        <url>http://jcenter.bintray.com</url>
+    </repository>
+</repositories>
+```
+
+Data Set Formats
+----------------
+
+Default data set file format in *MarkLogic* module is XML. JSON and
+binary formats are also supported.
+
+XML data sets must have next [format for a single
+document](#ex.marklogic_xml_data set_single) and the [next one for
+seeding of multiple documents at once](#ex.marklogic_xml_data set_multi)
+:
+
+``` {.xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+</book>
+```
+
+``` {.xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+    </book>
+    <book uri="/books/The Silmarillion the Myths and Legends of Middle Earth.xml">
+        <title>The Silmarillion the Myths and Legends of Middle Earth</title>
+        <numberOfPages>365</numberOfPages>
+    </book>
+    <book uri="/books/The Lord Of The Rings.xml" collections="bestsellers">
+        <title>The Lord Of The Rings</title>
+        <numberOfPages>1299</numberOfPages>
+    </book>
+</root>
+```
+
+JSON data sets must have next [format](#ex.marklogic_json_data set) :
+
+``` {.json}
+{
+  "/books/The Hobbit.json": {
+    "collections": [
+      "books",
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  }
+    ....
+}
+```
+
+Note that if attributes value are integers, double quotes are not
+required.
+
+where:
+
+-   *uri* : the ID (or URI) of the document in the MarkLogic database.
+
+-   *data* : the actual content of the document in the MarkLogic
+    database.
+
+-   *collections* : the list of MarkLogic collections the document can
+    be added to, comma separated, optional. NoSQL will assign all
+    documents seeded to the default collection *nosqlunit* for
+    convenience.
+
+Binary and text data sets have a different
+[format](#ex.marklogic_binary_data set) handling:
+
+``` {.shell}
+<current-test-class-path>/
+                         |
+                          books/The Hobbit.txt
+                          books/The Silmarillion the Myths and Legends of Middle Earth.docx
+                          books/The Lord Of The Rings.pdf
+                          authors/J. R. R. Tolkien.jpg
+```
+
+Note that the path of the document, relative to the base test class\'
+one determines the document ID (URI) in the MarkLogic database. A
+collections assignment is not supported. For more advanced uses cases
+for ingesting binary contents into MarkLogic database (not supported by
+NoSQLUnit) refer to [Content Processing
+Framework](https://docs.marklogic.com/guide/cpf.pdf) .
+
+Getting Started
+---------------
+
+### Lifecycle Management Strategy
+
+First step is defining which lifecycle management strategy is required
+for your tests. Depending on kind of test you are implementing (unit
+test, integration test, deployment test, \...) you will require a
+managed or remote approach. *There is no support for embedded approach
+since no embedded version is provided by the vendor.* Additionally,
+NoSQLUnit provides an adapter for Docker in a managed mode.
+
+#### Managed Lifecycle
+
+To configure the managed way, two possible approaches can be used:
+
+The first one is using a **docker container**. This is a way to have a
+great flexibility with different database version or while evaluating a
+product. For details see this [blog
+entry](https://www.marklogic.com/blog/building-a-marklogic-docker-container/):
+
+``` {.java}
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+
+@ClassRule
+public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().dockerCommand("/sbin/docker").dockerContainer("marklogic").build();
+```
+
+Note that you can define either a container name or container ID
+directly as supported by Docker.
+
+By default managed *MarkLogic* in Docker uses default values, but can be
+configured programmatically as shown in previous
+[example](#program.marklogic_docker_conf) :
+
+  ---------------- --------------------------------------------
+  Docker Command   The executable Docker binary is `docker` .
+  ---------------- --------------------------------------------
+
+  : Default Docker Values
+
+The second strategy is **starting and stopping an already installed
+server** on executing machine, by triggering start and stop on the
+MarkLogic Service. The class-level
+[rule](#program.marklogic_managed_conf) should be registered:
+
+``` {.java}
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+
+@ClassRule
+public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
+```
+
+By default managed *MarkLogic* rule uses a set of default values, but
+can be configured programmatically as shown in the previous
+[example](#program.marklogic_managed_conf) :
+
++-----------------------------------+-----------------------------------+
+| Target path                       | This is the directory where the   |
+|                                   | starting process will be          |
+|                                   | executed. Usually you don\'t have |
+|                                   | to modify it. By default it is:   |
+|                                   | `target/marklogic-temp`           |
++-----------------------------------+-----------------------------------+
+| Admin Port                        | Configures the port the server is |
+|                                   | listening on for administration   |
+|                                   | commands and used for             |
+|                                   | \'heartbeats\'. Default is 8001.  |
++-----------------------------------+-----------------------------------+
+| [MarkLogic Service                | Determines the service command    |
+| prefix](https://docs.marklogic.co | and is either one of:             |
+| m/guide/installation/procedures#i |                                   |
+| d_92457)                          | -   *Windows* :                   |
+|                                   |     %ProgramFiles%\\MarkLogic\\   |
+|                                   |                                   |
+|                                   | -   *OSX* :                       |
+|                                   |     \~/Library/StartupItems/      |
+|                                   |                                   |
+|                                   | -   *Unix* : /sbin/service        |
++-----------------------------------+-----------------------------------+
+| User name                         | *MarkLogic* administrator having  |
+|                                   | permissions to access             |
+|                                   | administrative interfaces.        |
++-----------------------------------+-----------------------------------+
+| Password                          | *MarkLogic* administrator\'s      |
+|                                   | password.                         |
++-----------------------------------+-----------------------------------+
+
+: Default Managed Values
+
+#### Remote Lifecycle
+
+Configuring **remote** approach does not require any special rule
+because you (or a system like Maven ) is the responsible of starting and
+stopping the server. This mode is used in deployment tests where you are
+testing your application on real environment.
+
+### Configuring MarkLogic Connection
+
+Next step is configuring **MarkLogic** rule in charge of maintaining
+documents into known state by inserting and deleting defined data sets.
+You must register `MarkLogicRule` *JUnit* rule class, which requires a
+configuration parameter with information like host, port, application
+user and password, etc.
+
+To make developer\'s life easier and code more readable, a fluent
+interface can be used to create these configuration objects. There are
+two different kinds of configuration builders:
+[Managed](#program.managed_marklogic_connection_parameters) and
+[Remote](#program.remote_marklogic_connection_parameters) .
+
+#### Managed/Remote Connections
+
+The configuration of a connection to a local or remote *MarkLogic*
+server is pretty much the same. Default values are:
+
+  ------------------------------------------------------------------------------------------------ -------------------------------
+  Host                                                                                             localhost
+  Port                                                                                             8000
+  Credentials                                                                                      No authentication parameters.
+  Secure (whether to use TLS)                                                                      false
+  Use Gateway (whether a MarkLogic Cluster Gateway is in use)                                      false
+  Database                                                                                         Documents
+  Clean Directory (during the *Delete* test phase controls which directory should be erased)       None
+  Clean Collections (during the *Delete* test phase controls which collections should be erased)   None
+  ------------------------------------------------------------------------------------------------ -------------------------------
+
+  : Default Connection Values
+
+``` {.java}
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
+
+@Rule
+public MarkLogicRule markLogicRule = new MarkLogicRule(marklogic().build());
+```
+
+``` {.java}
+import static com.lordofthejars.nosqlunit.marklogic.RemoteMarkLogicConfigurationBuilder.remoteMarkLogic;
+
+@Rule
+public MarkLogicRule markLogicRule = new MarkLogicRule(remoteMarkLogic().host("localhost").port(9001).secure().useGateway().database("some-db").build());
+```
+
+Note that the only differences between the local and remote connections
+is that the remote host has no predefined value.
+
+### Verifying Content
+
+`@ShouldMatchDataSet` is also supported for *MarkLogic* content but we
+should keep in mind some considerations.
+
+To compare two XML documents, the stored content is exported as DOM and
+then compared with expected *XML* using
+[XmlUnit](https://www.xmlunit.org/) framework. Whereas the comparison of
+*JSON* documents uses
+[JsonUnit](https://github.com/lukas-krecan/JsonUnit) framework. The
+[control attributes](#attr.marklogic_data set_controls) in the expected
+file are ignored since they don\'t appear in the database document.
+Furthermore the ignore option is supported by either using [XPath
+expressions or a bean-property style with
+JSON](#ex.marklogic_flexible_comparison) . Note that neither ignore
+styles are possible with unstructured documents (like binary or text).
+Unstructured documents will be compared byte-by-byte.
+
+``` {.java}
+@CustomComparisonStrategy(comparisonStrategy = MarkLogicFlexibleComparisonStrategy.class)
+public class MarkLogicFlexibleComparisonStrategyTest {
+
+...............
+
+    @Test
+    @UsingDataSet(locations = "jane-john.xml")
+    @ShouldMatchDataSet(location = "jane-john-ignored.xml")
+    @IgnorePropertyValue(properties = {"//phoneNumber/type", "/person/age", "//address/@type"})
+    public void shouldIgnoreXmlPropertiesInFlexibleStrategy() {
+    }
+
+    @Test
+    @UsingDataSet(locations = "jane-john.json")
+    @ShouldMatchDataSet(location = "jane-john-ignored.json")
+    @IgnorePropertyValue(properties = {"phoneNumbers[*].type", "age"})
+    public void shouldIgnoreJsonPropertiesInFlexibleStrategy() {
+    }
+}
+```
+
+### Full Example
+
+To show how to use **NoSQLUnit** with *MarkLogic*, we are going to
+create a very simple application which searches for books stored in the
+database.
+
+[Generic-, Xml -and JsonBookManager](#program.books_marklogic_manager)
+are the business classes responsible of inserting new books and querying
+for them either using a book title or listing all books.
+
+``` {.java}
+public abstract class GenericBookManager {
+
+    protected static final String BOOKS_DIRECTORY = "/books/";
+
+    protected DatabaseClient client;
+
+    public GenericBookManager(DatabaseClient client) {
+        this.client = client;
+    }
+
+    public void create(Book book) {
+        DocumentManager documentManager = documentManager();
+        DocumentWriteSet writeSet = documentManager.newWriteSet();
+        ContentHandle<Book> contentHandle = contentHandleFactory().newHandle(Book.class);
+        contentHandle.set(book);
+        writeSet.add(BOOKS_DIRECTORY + book.getTitle() + extension(), contentHandle);
+        documentManager.write(writeSet);
+    }
+
+    public Book findBookById(String id) {
+        List<Book> result = search(new StructuredQueryBuilder().document(BOOKS_DIRECTORY + id + extension()), 1);
+        return result.isEmpty() ? null : result.get(0);
+    }
+
+    public List<Book> findAllBooksInCollection(String... collections) {
+        return search(new StructuredQueryBuilder().collection(collections), 1);
+    }
+
+    public List<Book> findAllBooks() {
+        return search(new StructuredQueryBuilder().directory(true, BOOKS_DIRECTORY), 1);
+    }
+
+    public List<Book> search(QueryDefinition query, long start) {
+        List<Book> result = new ArrayList<Book>();
+        DocumentPage documentPage = documentManager().search(
+                query,
+                start
+        );
+        while (documentPage.hasNext()) {
+            ContentHandle<Book> handle = contentHandleFactory().newHandle(Book.class);
+            handle = documentPage.nextContent(handle);
+            result.add(handle.get());
+        }
+        return result;
+    }
+
+    protected abstract DocumentManager documentManager();
+
+    protected abstract Format format();
+
+    protected abstract ContentHandleFactory contentHandleFactory();
+
+    protected String extension() {
+        return "." + format().name().toLowerCase();
+    }
+}
+
+....................
+
+public class XmlBookManager extends GenericBookManager {
+
+    private final ContentHandleFactory contentHandleFactory;
+
+    public XmlBookManager(DatabaseClient client) {
+        super(client);
+        try {
+            contentHandleFactory = JAXBHandle.newFactory(Book.class);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException("Couldn't instantiate the JAXB factory", e);
+        }
+    }
+
+    @Override
+    protected DocumentManager documentManager() {
+        return client.newXMLDocumentManager();
+    }
+
+    @Override
+    protected Format format() {
+        return XML;
+    }
+
+    @Override
+    protected ContentHandleFactory contentHandleFactory() {
+        return contentHandleFactory;
+    }
+}
+
+................
+
+public class JsonBookManager extends GenericBookManager {
+
+    private final ContentHandleFactory contentHandleFactory;
+
+    public JsonBookManager(DatabaseClient client) {
+        super(client);
+        contentHandleFactory = JacksonDatabindHandle.newFactory(Book.class);
+    }
+
+    @Override
+    protected DocumentManager documentManager() {
+        return client.newJSONDocumentManager();
+    }
+
+    @Override
+    protected Format format() {
+        return JSON;
+    }
+
+    @Override
+    protected ContentHandleFactory contentHandleFactory() {
+        return contentHandleFactory;
+    }
+}
+```
+
+And now we get started with [integration
+tests](#program.books_marklogic_integration).
+
+``` {.java}
+...................
+
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+import static com.lordofthejars.nosqlunit.marklogic.MarkLogicRule.MarkLogicRuleBuilder.newMarkLogicRule;
+
+public class WhenANewBookIsCreated {
+
+    @ClassRule
+    public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
+
+    @Rule
+    public MarkLogicRule managedMarkLogicRule = newMarkLogicRule().defaultManagedMarkLogic();
+
+    @Inject
+    private DatabaseClient client;
+
+    @Test
+    @UsingDataSet(locations = "books.xml", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books-expected.xml")
+    public void xml_book_should_be_inserted_into_database() {
+        GenericBookManager bookManager = new XmlBookManager(client);
+        Book book = new Book("The Road Goes Ever On", 96);
+        bookManager.create(book);
+    }
+
+    @Test
+    @UsingDataSet(locations = "books.json", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books-expected.json")
+    public void json_book_should_be_inserted_into_database() {
+        GenericBookManager bookManager = new JsonBookManager(client);
+        Book book = new Book("The Road Goes Ever On", 96);
+        bookManager.create(book);
+    }
+
+    @Test
+    @UsingDataSet(locations = {"books/Lorem Ipsum.docx", "books/Lorem Ipsum.txt"}, loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books/Lorem Ipsum-expected.pdf")
+    public void pdf_book_should_be_inserted_into_database() throws IOException, URISyntaxException {
+        GenericBookManager bookManager = new BinaryBookManager(client);
+        byte[] content = Files.readAllBytes(
+                Paths.get(getClass().getResource("books/Lorem Ipsum.pdf").toURI())
+        );
+        BinaryBook book = new BinaryBook("/books/Lorem Ipsum.pdf", content);
+        bookManager.create(book);
+    }
+}
+```
+
+Note that in both cases we are using similar data sets as initial state,
+which look like:
+
+``` {.xml}
+<root>
+    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+    </book>
+    <book uri="/books/The Silmarillion the Myths and Legends of Middle Earth.xml">
+        <title>The Silmarillion the Myths and Legends of Middle Earth</title>
+        <numberOfPages>365</numberOfPages>
+    </book>
+    <book uri="/books/The Lord Of The Rings.xml" collections="bestsellers">
+        <title>The Lord Of The Rings</title>
+        <numberOfPages>1299</numberOfPages>
+    </book>
+</root>
+```
+
+And, for JSON:
+
+``` {.xml}
+{
+  "/books/The Hobbit.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  },
+  "/books/The Lord Of The Rings.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Lord Of The Rings",
+      "numberOfPages": 1299
+    }
+  }
+}
+```
+
+Current Limitations
+-------------------
+
+-   Semantic searches are not supported
+
+-   Currently there is no way to define a control data set for binary
+    documents containing *multiple* entries
+
 Managing lifecycle of multiple instances
 ========================================
 
