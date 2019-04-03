@@ -3,6 +3,7 @@ package com.lordofthejars.nosqlunit.marklogic;
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.marklogic.client.DatabaseClient;
+import com.marklogic.client.MarkLogicIOException;
 import com.marklogic.client.query.DeleteQueryDefinition;
 import com.marklogic.client.query.QueryManager;
 import org.slf4j.Logger;
@@ -12,7 +13,6 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_COLLECTION;
 import static java.util.Arrays.asList;
 
 public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperation<MarkLogicConnectionCallback, DatabaseClient> {
@@ -58,7 +58,12 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
 
     @Override
     public void deleteAll() {
-        deleteAllElements(databaseClient);
+        try {
+            deleteAllElements(databaseClient);
+        } catch (MarkLogicIOException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        }
     }
 
     void setTarget(Object target) {
@@ -72,7 +77,6 @@ public final class MarkLogicOperation extends AbstractCustomizableDatabaseOperat
         //delete data seeded by framework in any case
         Set<String> collections = new HashSet<>(asList(marklogicConfiguration.getCleanCollections()));
         if (!collections.isEmpty()) {
-            collections.add(DEFAULT_COLLECTION);
             //see: https://stackoverflow.com/questions/53523500/failed-to-delete-multiple-collections
             collections.forEach(c -> {
                 DeleteQueryDefinition deleteQuery = queryManager.newDeleteDefinition();

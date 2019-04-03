@@ -11,7 +11,6 @@ import java.io.Reader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_COLLECTION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class JsonParser {
@@ -27,7 +26,6 @@ public class JsonParser {
         JsonContents contents = reader.readValue(is);
         contents.getContents().entrySet().forEach(e -> {
             e.getValue().setUri(e.getKey());
-            e.getValue().addCollection(DEFAULT_COLLECTION);
         });
         return contents.getContents().values().stream().collect(Collectors.toSet());
     }

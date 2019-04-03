@@ -5,16 +5,13 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.marklogic.MarkLogicConfiguration.DEFAULT_COLLECTION;
-import static java.util.Arrays.asList;
-
 public abstract class Content<D> {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private String uri;
 
-    private Set<String> collections = new HashSet<>(asList(DEFAULT_COLLECTION));
+    private Set<String> collections = new HashSet<>();
 
     protected Content() {
     }

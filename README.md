@@ -3700,9 +3700,7 @@ where:
     database.
 
   - *collections* : the list of MarkLogic collections the document can
-    be added to, comma separated, optional. NoSQL will assign all
-    documents seeded to the default collection *nosqlunit* for
-    convenience.
+    be added to, comma separated, optional.
 
 Binary and text data sets have a different
 [format](#ex.marklogic_binary_data%20set) handling:

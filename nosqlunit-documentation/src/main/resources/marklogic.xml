@@ -168,8 +168,6 @@
                         <para>
                             <emphasis>collections</emphasis>
                             : the list of MarkLogic collections the document can be added to, comma separated, optional.
-                            NoSQL will assign all documents seeded to the default collection <emphasis>nosqlunit
-                        </emphasis> for convenience.
                         </para>
                     </listitem>
                 </itemizedlist>
