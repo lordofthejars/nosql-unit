@@ -3,7 +3,7 @@
 
     <groupId>com.lordofthejars</groupId>
     <artifactId>nosqlunit</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>nosqlunit</name>
     <description>NoSQL is a JUnit extension targeted to nosql-driven projects.</description>
@@ -22,7 +22,7 @@
         <connection>scm:git:git@github.com:lordofthejars/nosql-unit.git</connection>
         <developerConnection>scm:git:git@github.com:lordofthejars/nosql-unit.git</developerConnection>
         <url>scm:git:git@github.com:lordofthejars/nosql-unit.git</url>
-      <tag>HEAD</tag>
+      <tag>1.0.0</tag>
   </scm>
 
     <developers>
