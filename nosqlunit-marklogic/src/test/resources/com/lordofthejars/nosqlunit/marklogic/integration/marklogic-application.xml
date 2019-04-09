@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean name="databaseClientFactory"
+          class="com.marklogic.client.DatabaseClientFactory.Bean">
+        <property name="host" value="localhost"/>
+        <property name="port" value="8000"/>
+        <property name="user" value="rest-writer-user"/>
+        <property name="password" value="rest-writer-password"/>
+        <property name="authenticationValue" value="digest"/>
+    </bean>
+    <bean id="primary" name="databaseClient"
+          class="com.marklogic.client.DatabaseClient"
+          factory-bean="databaseClientFactory"
+          factory-method="newClient"/>
+</beans>

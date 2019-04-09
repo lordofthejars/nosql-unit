@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="marklogic" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+    <title>MarkLogic Engine</title>
+    <section>
+        <title>MarkLogic</title>
+        <para>
+            <application>MarkLogic</application>
+            is a commercial,
+            <emphasis>NoSQL</emphasis>
+            database with support for different document formats, like XML, JSON and unstructured content.
+        </para>
+        <para>
+            <emphasis role="bold">NoSQLUnit</emphasis>
+            targets
+            <link xlink:href="https://www.marklogic.com/">MarkLogic</link>
+            by utilizing following classes:
+        </para>
+        <para>
+            <table border="1">
+                <caption>Lifecycle Management Rule</caption>
+                <tr>
+                    <td>Managed</td>
+                    <td>
+                        <classname>com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic</classname>
+                    </td>
+                </tr>
+            </table>
+        </para>
+        <para>
+            <table border="1">
+                <caption>Manager Rule</caption>
+                <tr>
+                    <td>NoSQLUnit Management</td>
+                    <td>
+                        <classname>com.lordofthejars.nosqlunit.marklogic.MarkLogicRule</classname>
+                    </td>
+                </tr>
+            </table>
+        </para>
+        <section>
+            <title>Maven Setup</title>
+            <para>
+                To use
+                <emphasis role="bold">NoSQLUnit</emphasis>
+                with
+                <application>MarkLogic</application>
+                you need to add following dependencies and repository.
+                Please consult
+                <application>
+                    <link xlink:href="https://developer.marklogic.com/products/java">MarkLogic Java API</link>
+                </application>
+                for further details:
+            </para>
+            <example xml:id="conf.nosqlunit_marklogic_dep">
+                <title>NoSqlUnit MarkLogic Maven Dependencies and Repository</title>
+                <programlisting language="xml"><![CDATA[<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-marklogic</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+<dependency>
+    <groupId>com.marklogic</groupId>
+    <artifactId>marklogic-client-api</artifactId>
+    <version>${version.marklogic-client-api}</version>
+</dependency>
+<repositories>
+    <repository>
+        <id>jcenter</id>
+        <url>http://jcenter.bintray.com</url>
+    </repository>
+</repositories>]]></programlisting>
+            </example>
+        </section>
+        <section>
+            <title>Data Set Formats</title>
+            <para>
+                Default data set file format in
+                <emphasis>MarkLogic</emphasis>
+                module is XML. JSON and binary formats are also supported.
+            </para>
+            <para>
+                XML data sets must have next
+                <link linkend="ex.marklogic_xml_data set_single">
+                    format for a single document
+                </link>
+                and the
+                <link linkend="ex.marklogic_xml_data set_multi">
+                    next one for seeding of multiple documents at once
+                </link>
+                :
+            </para>
+            <example xml:id="ex.marklogic_xml_data set_single">
+                <title>A single data set is the actual XML file with additional control attributes</title>
+                <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+</book>]]></programlisting>
+            </example>
+            <example xml:id="ex.marklogic_xml_data set_multi">
+                <title>A data set containing multiple XML documents must be wrapped in a root element</title>
+                <programlisting language="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+    </book>
+    <book uri="/books/The Silmarillion the Myths and Legends of Middle Earth.xml">
+        <title>The Silmarillion the Myths and Legends of Middle Earth</title>
+        <numberOfPages>365</numberOfPages>
+    </book>
+    <book uri="/books/The Lord Of The Rings.xml" collections="bestsellers">
+        <title>The Lord Of The Rings</title>
+        <numberOfPages>1299</numberOfPages>
+    </book>
+</root>]]></programlisting>
+            </example>
+            <para>
+                JSON data sets must have next
+                <link linkend="ex.marklogic_json_data set">
+                    format
+                </link>
+                :
+            </para>
+            <example xml:id="ex.marklogic_json_data set">
+                <title>Example of MarkLogic JSON data set</title>
+                <programlisting language="json"><![CDATA[{
+  "/books/The Hobbit.json": {
+    "collections": [
+      "books",
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  }
+    ....
+}]]></programlisting>
+            </example>
+            <para>Note that if attributes value are integers, double quotes are
+                not required.
+            </para>
+            <para>
+                where:
+                <itemizedlist xml:id="attr.marklogic_data set_controls">
+                    <listitem>
+                        <para>
+                            <emphasis>uri</emphasis>
+                            : the ID (or URI) of the document in the MarkLogic database.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>data</emphasis>
+                            : the actual content of the document in the MarkLogic database.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>collections</emphasis>
+                            : the list of MarkLogic collections the document can be added to, comma separated, optional.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+            <para>
+                Binary and text data sets have a different
+                <link linkend="ex.marklogic_binary_data set">
+                    format
+                </link>
+                handling:
+            </para>
+            <example xml:id="ex.marklogic_binary_data set">
+                <title>Example of MarkLogic Binary Data Set</title>
+                <programlisting language="shell"><![CDATA[
+<current-test-class-path>/
+                         |
+                          books/The Hobbit.txt
+                          books/The Silmarillion the Myths and Legends of Middle Earth.docx
+                          books/The Lord Of The Rings.pdf
+                          authors/J. R. R. Tolkien.jpg
+]]></programlisting>
+            </example>
+            <para>Note that the path of the document, relative to the base test class' one
+                determines the document ID (URI) in the MarkLogic database.
+                A collections assignment is not supported.
+                For more advanced uses cases for ingesting binary contents into MarkLogic database
+                (not supported by NoSQLUnit) refer to
+                <link xlink:href="https://docs.marklogic.com/guide/cpf.pdf">Content Processing Framework</link>
+                .
+            </para>
+        </section>
+        <section>
+            <title>Getting Started</title>
+            <section>
+                <title>Lifecycle Management Strategy</title>
+                <para>
+                    First step is defining which lifecycle management strategy is
+                    required for your tests. Depending on kind of test you are
+                    implementing (unit test, integration test, deployment test, ...)
+                    you will require a managed or remote approach.
+                    <emphasis>There is no support for embedded approach since no embedded version is provided by the
+                        vendor.
+                    </emphasis>
+                    Additionally, NoSQLUnit provides an adapter for Docker in a managed mode.
+                </para>
+                <section>
+                    <title>Managed Lifecycle</title>
+                    <para>To configure the managed way, two possible approaches can be
+                        used:
+                    </para>
+                    <para>
+                        The first one is using a
+                        <emphasis role="bold">docker container</emphasis>.
+                        This is a way to have a great flexibility with different database version
+                        or while evaluating a product. For details see this
+                        <link xlink:href="https://www.marklogic.com/blog/building-a-marklogic-docker-container/">blog
+                            entry
+                        </link>:
+                    </para>
+                    <example xml:id="program.marklogic_docker_conf">
+                        <title>Managed MarkLogic in Docker</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+
+@ClassRule
+public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().dockerCommand("/sbin/docker").dockerContainer("marklogic").build();
+]]></programlisting>
+                    </example>
+                    <para>Note that you can define either a
+                        container name or container ID directly as supported by Docker.
+                    </para>
+                    <para>
+                        By default managed
+                        <emphasis>MarkLogic</emphasis>
+                        in Docker uses default values, but can be configured
+                        programmatically as shown in previous
+                        <link linkend="program.marklogic_docker_conf">example</link>
+                        :
+                    </para>
+                    <table border="1">
+                        <caption>Default Docker Values</caption>
+                        <tr>
+                            <td>
+                                Docker Command
+                            </td>
+                            <td>
+                                The executable Docker binary is
+                                <constant>docker</constant>
+                                .
+                            </td>
+                        </tr>
+                    </table>
+                    <para>
+                        The second strategy is
+                        <emphasis role="bold">starting and stopping an already installed
+                            server
+                        </emphasis>
+                        on executing machine, by triggering start and stop on the MarkLogic Service.
+                        The class-level
+                        <link linkend="program.marklogic_managed_conf">rule</link>
+                        should be registered:
+                    </para>
+                    <example xml:id="program.marklogic_managed_conf">
+                        <title>Managed MarkLogic</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+
+@ClassRule
+public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
+]]></programlisting>
+                    </example>
+                    <para>
+                        By default managed
+                        <emphasis>MarkLogic</emphasis>
+                        rule uses a set of default values, but can be configured
+                        programmatically as shown in the previous
+                        <link linkend="program.marklogic_managed_conf">example</link>
+                        :
+                    </para>
+                    <table border="1">
+                        <caption>Default Managed Values</caption>
+                        <tr>
+                            <td>
+                                Target path
+                            </td>
+                            <td>
+                                This is the directory where the starting process will be executed.
+                                Usually you don't have to modify it.
+                                By default it is:
+                                <constant>target/marklogic-temp</constant>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Admin Port
+                            </td>
+                            <td>
+                                Configures the port the server is listening on for administration commands and used for
+                                'heartbeats'. Default is 8001.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <link xlink:href="https://docs.marklogic.com/guide/installation/procedures#id_92457">
+                                    MarkLogic Service prefix
+                                </link>
+                            </td>
+                            <td>
+                                Determines the service command and is either one of:
+                                <itemizedlist>
+                                    <listitem>
+                                        <para>
+                                            <emphasis>Windows</emphasis>
+                                            : %ProgramFiles%\MarkLogic\
+                                        </para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>
+                                            <emphasis>OSX</emphasis>
+                                            : ~/Library/StartupItems/
+                                        </para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>
+                                            <emphasis>Unix</emphasis>
+                                            : /sbin/service
+                                        </para>
+                                    </listitem>
+                                </itemizedlist>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                User name
+                            </td>
+                            <td>
+                                <emphasis>MarkLogic</emphasis>
+                                administrator having permissions to access administrative interfaces.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Password
+                            </td>
+                            <td>
+                                <emphasis>MarkLogic</emphasis>
+                                administrator's password.
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+                <section>
+                    <title>Remote Lifecycle</title>
+                    <para>
+                        Configuring
+                        <emphasis role="bold">remote</emphasis>
+                        approach
+                        does not require any special rule because you (or a system
+                        like
+                        <application>Maven</application>
+                        ) is the responsible of starting and
+                        stopping the server. This mode
+                        is used in deployment tests where you
+                        are testing your application
+                        on real environment.
+                    </para>
+                </section>
+            </section>
+            <section>
+                <title>Configuring MarkLogic Connection</title>
+                <para>
+                    Next step is configuring
+                    <emphasis role="bold">MarkLogic</emphasis>
+                    rule in charge of maintaining
+                    documents into known state by inserting and deleting defined
+                    data sets.
+                    You must register
+                    <classname>MarkLogicRule</classname>
+                    <emphasis>JUnit</emphasis>
+                    rule class, which
+                    requires a configuration parameter with
+                    information like host, port, application user and password, etc.
+                </para>
+                <para>To make developer's life easier and code more readable, a
+                    fluent
+                    interface can be used to create these configuration objects.
+                    There are two different kinds of configuration builders:
+                    <link linkend="program.managed_marklogic_connection_parameters">Managed</link>
+                    and
+                    <link linkend="program.remote_marklogic_connection_parameters">Remote</link>
+                    .
+                </para>
+                <section>
+                    <title>Managed/Remote Connections</title>
+                    <para>
+                        The configuration of a connection to a local or remote
+                        <emphasis>MarkLogic</emphasis>
+                        server is pretty much the same.
+                        Default values are:
+                    </para>
+                    <table border="1">
+                        <caption>Default Connection Values</caption>
+                        <tr>
+                            <td>Host</td>
+                            <td>localhost</td>
+                        </tr>
+                        <tr>
+                            <td>Port</td>
+                            <td>8000</td>
+                        </tr>
+                        <tr>
+                            <td>Credentials</td>
+                            <td>No authentication parameters.</td>
+                        </tr>
+                        <tr>
+                            <td>Secure (whether to use TLS)</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td>Use Gateway (whether a MarkLogic Cluster Gateway is in use)</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td>Database</td>
+                            <td>Documents</td>
+                        </tr>
+                        <tr>
+                            <td>Clean Directory (during the <emphasis>Delete</emphasis> test phase controls which
+                                directory should be erased)
+                            </td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>Clean Collections (during the <emphasis>Delete</emphasis> test phase controls which
+                                collections should be erased)
+                            </td>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                    <example xml:id="program.managed_marklogic_connection_parameters">
+                        <title>MarkLogic with managed configuration</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
+
+@Rule
+public MarkLogicRule markLogicRule = new MarkLogicRule(marklogic().build());
+]]></programlisting>
+                    </example>
+                    <example xml:id="program.remote_marklogic_connection_parameters">
+                        <title>MarkLogic with remote configuration</title>
+                        <programlisting language="java"><![CDATA[import static com.lordofthejars.nosqlunit.marklogic.RemoteMarkLogicConfigurationBuilder.remoteMarkLogic;
+
+@Rule
+public MarkLogicRule markLogicRule = new MarkLogicRule(remoteMarkLogic().host("localhost").port(9001).secure().useGateway().database("some-db").build());
+]]></programlisting>
+                    </example>
+                    <para>
+                        Note that the only differences between the local and remote connections
+                        is that the remote host has no predefined value.
+                    </para>
+                </section>
+            </section>
+            <section>
+                <title>Verifying Content</title>
+                <para>
+                    <classname>@ShouldMatchDataSet</classname>
+                    is also supported for
+                    <emphasis>MarkLogic</emphasis>
+                    content but we should keep in mind some considerations.
+                </para>
+                <para>
+                    To compare two XML documents, the stored content is exported as DOM
+                    and then compared with expected
+                    <emphasis>XML</emphasis>
+                    using
+                    <link xlink:href="https://www.xmlunit.org/">XmlUnit</link>
+                    framework.
+                    Whereas the comparison of
+                    <emphasis>JSON</emphasis>
+                    documents uses
+                    <link xlink:href="https://github.com/lukas-krecan/JsonUnit">JsonUnit</link>
+                    framework.
+                    The
+                    <link linkend="attr.marklogic_data set_controls">control attributes</link>
+                    in the expected file are ignored since they don't appear in the database document.
+                    Furthermore the ignore option is supported by either using
+                    <link linkend="ex.marklogic_flexible_comparison">XPath expressions or a bean-property style with
+                        JSON
+                    </link>
+                    .
+                    Note that neither ignore styles are possible with unstructured documents
+                    (like binary or text).
+                    Unstructured documents will be compared byte-by-byte.
+                </para>
+                <example xml:id="ex.marklogic_flexible_comparison">
+                    <title>MarkLogic NoSQLUnit with Flexible Comparison</title>
+                    <programlisting language="java"><![CDATA[@CustomComparisonStrategy(comparisonStrategy = MarkLogicFlexibleComparisonStrategy.class)
+public class MarkLogicFlexibleComparisonStrategyTest {
+
+...............
+
+    @Test
+    @UsingDataSet(locations = "jane-john.xml")
+    @ShouldMatchDataSet(location = "jane-john-ignored.xml")
+    @IgnorePropertyValue(properties = {"//phoneNumber/type", "/person/age", "//address/@type"})
+    public void shouldIgnoreXmlPropertiesInFlexibleStrategy() {
+    }
+
+    @Test
+    @UsingDataSet(locations = "jane-john.json")
+    @ShouldMatchDataSet(location = "jane-john-ignored.json")
+    @IgnorePropertyValue(properties = {"phoneNumbers[*].type", "age"})
+    public void shouldIgnoreJsonPropertiesInFlexibleStrategy() {
+    }
+}]]></programlisting>
+                </example>
+            </section>
+            <section>
+                <title>Full Example</title>
+                <para>
+                    To show how to use
+                    <emphasis role="bold">NoSQLUnit</emphasis>
+                    with
+                    <emphasis>MarkLogic</emphasis>, we are going to create a
+                    very simple application which searches for books stored in the database.
+                </para>
+                <para>
+                    <link linkend="program.books_marklogic_manager">Generic-, Xml -and JsonBookManager</link>
+                    are the business classes responsible of inserting new books and
+                    querying for them either using a book title or listing all books.
+                </para>
+                <example xml:id="program.books_marklogic_manager">
+                    <title>Sample Business Application</title>
+                    <programlisting language="java"><![CDATA[public abstract class GenericBookManager {
+
+    protected static final String BOOKS_DIRECTORY = "/books/";
+
+    protected DatabaseClient client;
+
+    public GenericBookManager(DatabaseClient client) {
+        this.client = client;
+    }
+
+    public void create(Book book) {
+        DocumentManager documentManager = documentManager();
+        DocumentWriteSet writeSet = documentManager.newWriteSet();
+        ContentHandle<Book> contentHandle = contentHandleFactory().newHandle(Book.class);
+        contentHandle.set(book);
+        writeSet.add(BOOKS_DIRECTORY + book.getTitle() + extension(), contentHandle);
+        documentManager.write(writeSet);
+    }
+
+    public Book findBookById(String id) {
+        List<Book> result = search(new StructuredQueryBuilder().document(BOOKS_DIRECTORY + id + extension()), 1);
+        return result.isEmpty() ? null : result.get(0);
+    }
+
+    public List<Book> findAllBooksInCollection(String... collections) {
+        return search(new StructuredQueryBuilder().collection(collections), 1);
+    }
+
+    public List<Book> findAllBooks() {
+        return search(new StructuredQueryBuilder().directory(true, BOOKS_DIRECTORY), 1);
+    }
+
+    public List<Book> search(QueryDefinition query, long start) {
+        List<Book> result = new ArrayList<Book>();
+        DocumentPage documentPage = documentManager().search(
+                query,
+                start
+        );
+        while (documentPage.hasNext()) {
+            ContentHandle<Book> handle = contentHandleFactory().newHandle(Book.class);
+            handle = documentPage.nextContent(handle);
+            result.add(handle.get());
+        }
+        return result;
+    }
+
+    protected abstract DocumentManager documentManager();
+
+    protected abstract Format format();
+
+    protected abstract ContentHandleFactory contentHandleFactory();
+
+    protected String extension() {
+        return "." + format().name().toLowerCase();
+    }
+}
+
+....................
+
+public class XmlBookManager extends GenericBookManager {
+
+    private final ContentHandleFactory contentHandleFactory;
+
+    public XmlBookManager(DatabaseClient client) {
+        super(client);
+        try {
+            contentHandleFactory = JAXBHandle.newFactory(Book.class);
+        } catch (JAXBException e) {
+            throw new IllegalArgumentException("Couldn't instantiate the JAXB factory", e);
+        }
+    }
+
+    @Override
+    protected DocumentManager documentManager() {
+        return client.newXMLDocumentManager();
+    }
+
+    @Override
+    protected Format format() {
+        return XML;
+    }
+
+    @Override
+    protected ContentHandleFactory contentHandleFactory() {
+        return contentHandleFactory;
+    }
+}
+
+................
+
+public class JsonBookManager extends GenericBookManager {
+
+    private final ContentHandleFactory contentHandleFactory;
+
+    public JsonBookManager(DatabaseClient client) {
+        super(client);
+        contentHandleFactory = JacksonDatabindHandle.newFactory(Book.class);
+    }
+
+    @Override
+    protected DocumentManager documentManager() {
+        return client.newJSONDocumentManager();
+    }
+
+    @Override
+    protected Format format() {
+        return JSON;
+    }
+
+    @Override
+    protected ContentHandleFactory contentHandleFactory() {
+        return contentHandleFactory;
+    }
+}]]></programlisting>
+                </example>
+                <para>
+                    And now we get started with <link linkend="program.books_marklogic_integration">integration
+                    tests</link>.
+                </para>
+                <example xml:id="program.books_marklogic_integration">
+                    <title>NoSQL integrations tests</title>
+                    <programlisting language="java"><![CDATA[
+...................
+
+import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
+import static com.lordofthejars.nosqlunit.marklogic.MarkLogicRule.MarkLogicRuleBuilder.newMarkLogicRule;
+
+public class WhenANewBookIsCreated {
+
+    @ClassRule
+    public static final ManagedMarkLogic managedMarkLogic = newManagedMarkLogicRule().build();
+
+    @Rule
+    public MarkLogicRule managedMarkLogicRule = newMarkLogicRule().defaultManagedMarkLogic();
+
+    @Inject
+    private DatabaseClient client;
+
+    @Test
+    @UsingDataSet(locations = "books.xml", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books-expected.xml")
+    public void xml_book_should_be_inserted_into_database() {
+        GenericBookManager bookManager = new XmlBookManager(client);
+        Book book = new Book("The Road Goes Ever On", 96);
+        bookManager.create(book);
+    }
+
+    @Test
+    @UsingDataSet(locations = "books.json", loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books-expected.json")
+    public void json_book_should_be_inserted_into_database() {
+        GenericBookManager bookManager = new JsonBookManager(client);
+        Book book = new Book("The Road Goes Ever On", 96);
+        bookManager.create(book);
+    }
+
+    @Test
+    @UsingDataSet(locations = {"books/Lorem Ipsum.docx", "books/Lorem Ipsum.txt"}, loadStrategy = CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "books/Lorem Ipsum-expected.pdf")
+    public void pdf_book_should_be_inserted_into_database() throws IOException, URISyntaxException {
+        GenericBookManager bookManager = new BinaryBookManager(client);
+        byte[] content = Files.readAllBytes(
+                Paths.get(getClass().getResource("books/Lorem Ipsum.pdf").toURI())
+        );
+        BinaryBook book = new BinaryBook("/books/Lorem Ipsum.pdf", content);
+        bookManager.create(book);
+    }
+}]]></programlisting>
+                </example>
+                <para>Note that in both cases we are using similar data sets as
+                    initial state, which look like:
+                </para>
+                <example xml:id="program.xml_marklogic_file">
+                    <title>books.xml file</title>
+                    <programlisting language="xml"><![CDATA[<root>
+    <book uri="/books/The Hobbit.xml" collections="bestsellers">
+        <title>The Hobbit</title>
+        <numberOfPages>293</numberOfPages>
+    </book>
+    <book uri="/books/The Silmarillion the Myths and Legends of Middle Earth.xml">
+        <title>The Silmarillion the Myths and Legends of Middle Earth</title>
+        <numberOfPages>365</numberOfPages>
+    </book>
+    <book uri="/books/The Lord Of The Rings.xml" collections="bestsellers">
+        <title>The Lord Of The Rings</title>
+        <numberOfPages>1299</numberOfPages>
+    </book>
+</root>]]></programlisting>
+                </example>
+                And, for JSON:
+                <example xml:id="program.json_marklogic_file">
+                    <title>books.json file</title>
+                    <programlisting language="xml"><![CDATA[{
+  "/books/The Hobbit.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  },
+  "/books/The Lord Of The Rings.json": {
+    "collections": [
+      "bestsellers"
+    ],
+    "data": {
+      "title": "The Lord Of The Rings",
+      "numberOfPages": 1299
+    }
+  }
+}]]></programlisting>
+                </example>
+            </section>
+        </section>
+        <section>
+            <title>Current Limitations</title>
+            <para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Semantic searches are not supported</para>
+                    </listitem>
+                    <listitem>
+                        <para>Currently there is no way to define a control data set for binary documents containing <emphasis>
+                            multiple
+                        </emphasis> entries
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+        </section>
+    </section>
+</chapter>

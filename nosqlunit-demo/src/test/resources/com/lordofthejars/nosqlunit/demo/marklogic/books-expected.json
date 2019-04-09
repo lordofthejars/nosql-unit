@@ -1,0 +1,26 @@
+{
+  "/books/The Hobbit.json": {
+    "data": {
+      "title": "The Hobbit",
+      "numberOfPages": 293
+    }
+  },
+  "/books/The Silmarillion the Myths and Legends of Middle Earth.json": {
+    "data": {
+      "title": "The Silmarillion the Myths and Legends of Middle Earth",
+      "numberOfPages": 365
+    }
+  },
+  "/books/The Lord Of The Rings.json": {
+    "data": {
+      "title": "The Lord Of The Rings",
+      "numberOfPages": 1299
+    }
+  },
+  "/books/The Road Goes Ever On.json": {
+    "data": {
+      "title": "The Road Goes Ever On",
+      "numberOfPages": 96
+    }
+  }
+}

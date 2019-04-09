@@ -93,6 +93,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<artifactId>nosqlunit-marklogic</artifactId>
+			<groupId>com.lordofthejars</groupId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.bettercloud</groupId>
 			<artifactId>vault-java-driver</artifactId>
 		</dependency>
@@ -127,6 +132,10 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-lucene-index</artifactId>
 			<version>${neo4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.marklogic</groupId>
+			<artifactId>marklogic-client-api</artifactId>
 		</dependency>
 	</dependencies>
 
