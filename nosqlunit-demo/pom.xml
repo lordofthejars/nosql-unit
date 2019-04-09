@@ -13,6 +13,13 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<excludes>
@@ -138,5 +145,12 @@
 			<artifactId>marklogic-client-api</artifactId>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jcenter</id>
+			<url>http://jcenter.bintray.com</url>
+		</repository>
+	</repositories>
 
 </project>
