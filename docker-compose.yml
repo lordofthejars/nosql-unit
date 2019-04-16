@@ -1,0 +1,51 @@
+version: '2.2'
+services:
+
+  nosqlunit-elasticsearch6.elasticsearch:
+    image: elasticsearch:6.7.1
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      nosqlunit-net:
+        aliases: 
+          - elasticsearch6
+  nosqlunit.maven:
+    image: maven:3.6.0-jdk-8-alpine
+    stop_signal: SIGKILL
+    stdin_open: true
+    tty: true
+    working_dir: $PWD
+    volumes:
+      - $PWD:$PWD
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Maven cache (optional)
+      - $HOME/.m2:/root/.m2
+    networks:
+      nosqlunit-net:
+        aliases: 
+          - maven
+  # helper to wait for all services to start before launching test
+  nosqlunit.wait:
+    image: waisbrot/wait
+    depends_on:
+      - nosqlunit.maven
+      - nosqlunit-elasticsearch6.elasticsearch
+
+
+    environment:
+      - TARGETS=elasticsearch6:9200
+    networks:
+      nosqlunit-net:
+        aliases: 
+          - wait
+networks:
+  nosqlunit-net:
