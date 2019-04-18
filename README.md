@@ -1,5 +1,4 @@
-[![Build Status](https://buildhive.cloudbees.com/job/lordofthejars/job/nosql-unit/badge/icon)](https://buildhive.cloudbees.com/job/lordofthejars/job/nosql-unit/)
-
+[![Build Status](https://travis-ci.org/tinesoft/nosql-unit.svg?branch=master)](https://travis-ci.org/lordofthejars/nosql-unit)
 
 Documentation
 =============
