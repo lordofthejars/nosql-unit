@@ -1,0 +1,13 @@
+{
+    "measurement1": [
+        {
+            "time": 1514764800000000000,
+            "precision": "NANOSECONDS",
+            "fields": {
+                "tag1": "value3",
+                "field1": "field value1",
+                "field2": "field value2"
+            }
+        }
+    ]
+}

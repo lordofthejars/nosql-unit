@@ -1,0 +1,39 @@
+{
+    "measurement1": [
+        {
+            "tags": {
+                "tag1": "value1"
+            },
+            "time": 1514764800000000000,
+            "precision": "NANOSECONDS",
+            "fields": {
+                "field1": "field value1",
+                "field2": "field value2"
+            }
+        },
+        {
+            "tags": {
+                "tag1": "value2"
+            },
+            "time": 1514764800000000001,
+            "precision": "NANOSECONDS",
+            "fields": {
+                "field1": "field value1",
+                "field2": "field value2"
+            }
+        }
+    ],
+    "another-measurement": [
+        {
+            "tags": {
+                "tag2": "value3"
+            },
+            "time": 1514764800000000002,
+            "precision": "NANOSECONDS",
+            "fields": {
+                "field1": "field value1",
+                "field2": "field value2"
+            }
+        }
+    ]
+}

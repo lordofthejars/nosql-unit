@@ -1,0 +1,12 @@
+{
+    "measurement1":
+            [
+                {"time":1514764800000000001,"precision":"NANOSECONDS","fields":{"code":"JSON dataset"}},
+                {"time":1514764800000000002,"precision":"NANOSECONDS","fields":{"code":"Another row"}}
+            ],
+    "measurement2":
+            [
+                {"time":1514764800000000003,"precision":"NANOSECONDS","fields":{"code":"JSON dataset 2"}},
+                {"time":1514764800000000004,"precision":"NANOSECONDS","fields":{"code":"Another row 2"}}
+            ]
+}

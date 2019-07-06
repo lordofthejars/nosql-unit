@@ -66,10 +66,24 @@
         <vault.java.version>2.0.0</vault.java.version>
         <snakeyaml.version>1.18</snakeyaml.version>
         <marklogic-client-api.version>4.2.0</marklogic-client-api.version>
+        <influxdb.driver.version>2.15</influxdb.driver.version>
+        <embedded.influxdb.version>develop-SNAPSHOT</embedded.influxdb.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.influxdb</groupId>
+                <artifactId>influxdb-java</artifactId>
+                <version>${influxdb.driver.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.APISENSE</groupId>
+                <artifactId>embed-influxDB</artifactId>
+                <version>${embedded.influxdb.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.github.fakemongo</groupId>
@@ -375,6 +389,7 @@
         <module>nosqlunit-vault</module>
         <module>nosqlunit-dynamodb</module>
         <module>nosqlunit-marklogic</module>
+        <module>nosqlunit-influxdb</module>
     </modules>
 
     <build>
@@ -439,56 +454,56 @@
         </repository>
     </distributionManagement>
     <profiles>
-    	<profile>
-    		<id>release</id>
-		   <build>
-		        <plugins>
-		            <plugin>
-		                <groupId>org.apache.maven.plugins</groupId>
-		                <artifactId>maven-source-plugin</artifactId>
-		                <version>2.1.2</version>
-		                <executions>
-		                    <execution>
-		                        <id>attach-sources</id>
-		                        <goals>
-		                            <goal>jar-no-fork</goal>
-		                        </goals>
-		                    </execution>
-		                </executions>
-		            </plugin>
-		            <plugin>
-		                <groupId>org.apache.maven.plugins</groupId>
-		                <artifactId>maven-gpg-plugin</artifactId>
-		                <version>1.1</version>
-		                <executions>
-		                    <execution>
-		                        <id>sign-artifacts</id>
-		                        <phase>verify</phase>
-		                        <goals>
-		                            <goal>sign</goal>
-		                        </goals>
-		                    </execution>
-		                </executions>
-		            </plugin>
-		            <plugin>
-		                <groupId>org.apache.maven.plugins</groupId>
-		                <artifactId>maven-javadoc-plugin</artifactId>
-		                <version>2.7</version>
-		                <executions>
-		                    <execution>
-		                        <id>attach-javadocs</id>
-		                        <goals>
-		                            <goal>jar</goal>
-		                        </goals>
-		                        <configuration>
-		                            <additionalparam>-Xdoclint:none</additionalparam>
-		                        </configuration>
-		                    </execution>
-		                </executions>
-		            </plugin>
-		        </plugins>
-    		</build>
-    	</profile>
+        <profile>
+            <id>release</id>
+           <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.2</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.7</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <additionalparam>-Xdoclint:none</additionalparam>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>integration-tests</id>
             <activation>
