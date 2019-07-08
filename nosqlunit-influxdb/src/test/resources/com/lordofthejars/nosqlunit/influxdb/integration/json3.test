@@ -1,0 +1,7 @@
+{
+    "measurement1":
+            [
+                {"time":1514764800000000001,"precision":"NANOSECONDS","fields":{"code":"JSON dataset"}},
+                {"time":1514764800000000009,"precision":"NANOSECONDS","fields":{"code":"Another row 9"}}
+            ]
+}

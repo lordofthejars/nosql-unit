@@ -103,7 +103,7 @@ loadStrategy .
 
 With locations attribute you can specify *classpath* datasets location.
 Locations are relative to test class location. Note that more than one
-dataset can be specified. 
+dataset can be specified.
 
 Also withSelectiveLocations attribute can be used to specify datasets location. See Advanced Usage chapter for more information.
 
@@ -148,7 +148,7 @@ Sometimes it might imply a huge amount of work asserting database state
 directly from testing code. By using *@ShouldMatchDataSet* on test
 method, *NoSQLUnit* will check if database contains expected entries
 after test execution. As with *@ShouldMatchDataSet* annotation you can
-define classpath file location, or using withSelectiveMatche, see Advanced Usage chapter for more information. 
+define classpath file location, or using withSelectiveMatche, see Advanced Usage chapter for more information.
 If it is not dataset supplied next convention is used:
 
 -   First searches for a file on classpath in same package of test class
@@ -416,7 +416,7 @@ If you are plannig to use **Spring Data MongoDB**, you may require to use the *M
 
 ~~~~ {.xml}
 <bean name="fongo" class="com.github.fakemongo.Fongo">
-	<constructor-arg value="InMemoryMongo" />
+    <constructor-arg value="InMemoryMongo" />
 </bean>
 <bean id="mongo" factory-bean="fongo" factory-method="getMongo" />
 ~~~~
@@ -426,7 +426,7 @@ In these cases you should use an special method which gets *Mongo* **Fongo** ins
 ~~~~ {.java}
 @Autowired
 private ApplicationContext applicationContext;
-	
+
 @Rule
 public MongoDbRule mongoDbRule = newMongoDbRule().defaultSpringMongoDb("test");
 ~~~~
@@ -482,7 +482,7 @@ public class BookManager {
     private static final MongoDbBookConverter MONGO_DB_BOOK_CONVERTER = new MongoDbBookConverter();
     private static final DbObjectBookConverter DB_OBJECT_BOOK_CONVERTER = new DbObjectBookConverter();
 
-            
+
     private DBCollection booksCollection;
 
     public BookManager(DBCollection booksCollection) {
@@ -561,8 +561,8 @@ Replica Set
 -----------
 ### Introduction
 
-Database replication in **MongoDB** adds redundancy and high availability of the data. 
-In case of **MongoDB** instead of having traditional master-slave pattern architecture, it implements _Replica Set_ architecture, 
+Database replication in **MongoDB** adds redundancy and high availability of the data.
+In case of **MongoDB** instead of having traditional master-slave pattern architecture, it implements _Replica Set_ architecture,
 which can be understood as more sophisticated master-slave replication. For more information about _Replica Set_ read
 [mongoDB](http://docs.mongodb.org/manual/core/replication/)
 
@@ -579,20 +579,20 @@ import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.r
 
 @ClassRule
 public static ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet(
-			"rs-test")
-			.eligible(
-					newManagedMongoDbLifecycle().port(27017)
-							.dbRelativePath("rs-0").logRelativePath("log-0")
-							.get())
-			.eligible(
-					newManagedMongoDbLifecycle().port(27018)
-							.dbRelativePath("rs-1").logRelativePath("log-1")
-							.get())
-			.arbiter(
-					newManagedMongoDbLifecycle().port(27019)
-							.dbRelativePath("rs-2").logRelativePath("log-2")
-							.get())
-			.get();
+            "rs-test")
+            .eligible(
+                    newManagedMongoDbLifecycle().port(27017)
+                            .dbRelativePath("rs-0").logRelativePath("log-0")
+                            .get())
+            .eligible(
+                    newManagedMongoDbLifecycle().port(27018)
+                            .dbRelativePath("rs-1").logRelativePath("log-1")
+                            .get())
+            .arbiter(
+                    newManagedMongoDbLifecycle().port(27019)
+                            .dbRelativePath("rs-2").logRelativePath("log-2")
+                            .get())
+            .get();
 ~~~~
 
 Notice that you must define different port for each server and also a different database path. Also note that *ReplicaSetManagedMongoDb* won't let start executing tests until all replica set becomes stable (this can take some minutes).
@@ -604,11 +604,11 @@ import static com.lordofthejars.nosqlunit.mongodb.ReplicationMongoDbConfiguratio
 
 @Rule
 public MongoDbRule mongoDbRule = newMongoDbRule().configure(
-						replicationMongoDbConfiguration().databaseName("test")
-							.seed("localhost", 27017)
-							.seed("localhost", 27018)
-							.configure())
-						.build();
+                        replicationMongoDbConfiguration().databaseName("test")
+                            .seed("localhost", 27017)
+                            .seed("localhost", 27018)
+                            .configure())
+                        .build();
 ~~~~
 
 Now we have configured and deployed a replica set and populated them with the dataset.
@@ -648,10 +648,10 @@ Sharding is another way of replication, but in this case we are scaling horizont
 To run sharding we must set up a sharded cluster. A sharded cluster is composed by next elements:
 
 -   shards which are _mongod_ instances that holds a portion of the database collections.
--   config servers which stores metadata about the clusters. 
+-   config servers which stores metadata about the clusters.
 -   mongos servers determine the location of required data from shards.
 
-Apart from setting up a sharding architecture, we also have to register each shard, enable sharding for database, enable sharding for each collection we want to partition,  and defining which element of the document is used to calculate the shard key. 
+Apart from setting up a sharding architecture, we also have to register each shard, enable sharding for database, enable sharding for each collection we want to partition,  and defining which element of the document is used to calculate the shard key.
 
 For more information about _Sharding_ read [mongoDB](http://docs.mongodb.org/manual/sharding/)
 
@@ -666,11 +666,11 @@ Let's see an example on how to set up and start a system with two shards, one co
 ~~~~ {.java}
 @ClassRule
 public static ShardedManagedMongoDb shardedManagedMongoDb = shardedGroup()
-								.shard(newManagedMongoDbLifecycle().port(27018).dbRelativePath("rs-1").logRelativePath("log-1").get())
-								.shard(newManagedMongoDbLifecycle().port(27019).dbRelativePath("rs-2").logRelativePath("log-2").get())
-								.config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
-								.mongos(newManagedMongosLifecycle().configServer(27020).get())
-							.get();
+                                .shard(newManagedMongoDbLifecycle().port(27018).dbRelativePath("rs-1").logRelativePath("log-1").get())
+                                .shard(newManagedMongoDbLifecycle().port(27019).dbRelativePath("rs-2").logRelativePath("log-2").get())
+                                .config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
+                                .mongos(newManagedMongosLifecycle().configServer(27020).get())
+                            .get();
 ~~~~
 
 Notice that you must define different port for each server and also a different database path. Also note that in case of _mongos_ you must set the config server port, and is not necessary to set up the database path.
@@ -680,24 +680,24 @@ And finally we only have to create a _MongoDbRule_ as usually which will populat
 ~~~~ {.java}
 @Rule
 public MongoDbRule mongoDbRule = newMongoDbRule().configure(
-								replicationMongoDbConfiguration().databaseName("test")
-			 					 				 .enableSharding()
-									 			 .seed("localhost", 27017)
-								 				 .configure())
-											.build(); 
+                                replicationMongoDbConfiguration().databaseName("test")
+                                                   .enableSharding()
+                                                  .seed("localhost", 27017)
+                                                  .configure())
+                                            .build();
 ~~~~
 
 And finally the dataset format is changed from the standard one to allow us define which attributes are used as shards. Let's see an example:
 
 ~~~~ {.json}
 {
-	"collection_name": {
-				"shard-key-pattern": ["attribute_1", "attribute_2"],
-				"data": 
-						[
-							{"attribute_1":"value_1","attribute_2":value_2, "attribute_3":"value_3"}
-						]
-			}
+    "collection_name": {
+                "shard-key-pattern": ["attribute_1", "attribute_2"],
+                "data":
+                        [
+                            {"attribute_1":"value_1","attribute_2":value_2, "attribute_3":"value_3"}
+                        ]
+            }
 }
 ~~~~
 
@@ -728,23 +728,23 @@ import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.r
 
 @ClassRule
 public static ShardedManagedMongoDb shardedManagedMongoDb = shardedGroup()
-									.replicaSet(replicaSet("rs-test-1")
-											.eligible(
-												   newManagedMongoDbLifecycle()
-													.port(27007).dbRelativePath("rs-0").logRelativePath("log-0")
-												    .get()
-												 )
-										   .get())
-									.replicaSet(replicaSet("rs-test-2")
-											.eligible(
-												newManagedMongoDbLifecycle()
-													.port(27009).dbRelativePath("rs-0").logRelativePath("log-0")
-												    .get()
-												 )
-										   .get())
-									.config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
-									.mongos(newManagedMongosLifecycle().configServer(27020).get())
-								.get();
+                                    .replicaSet(replicaSet("rs-test-1")
+                                            .eligible(
+                                                   newManagedMongoDbLifecycle()
+                                                    .port(27007).dbRelativePath("rs-0").logRelativePath("log-0")
+                                                    .get()
+                                                 )
+                                           .get())
+                                    .replicaSet(replicaSet("rs-test-2")
+                                            .eligible(
+                                                newManagedMongoDbLifecycle()
+                                                    .port(27009).dbRelativePath("rs-0").logRelativePath("log-0")
+                                                    .get()
+                                                 )
+                                           .get())
+                                    .config(newManagedMongoDbLifecycle().port(27020).dbRelativePath("rs-3").logRelativePath("log-3").get())
+                                    .mongos(newManagedMongosLifecycle().configServer(27020).get())
+                                .get();
 ~~~~
 
 Note that we are using the _replicaSet_ method of _shardedGroup_ to create a replica set inside a sharded, and then we use methods defined into *ReplicaSetBuilder* to configure the replica set.
@@ -754,24 +754,24 @@ And finally we only have to create a _MongoDbRule_ as usually which will populat
 ~~~~ {.java}
 @Rule
 public MongoDbRule mongoDbRule = newMongoDbRule().configure(
-								replicationMongoDbConfiguration().databaseName("test")
-			 					 				 .enableSharding()
-									 			 .seed("localhost", 27017)
-								 				 .configure())
-											.build(); 
+                                replicationMongoDbConfiguration().databaseName("test")
+                                                   .enableSharding()
+                                                  .seed("localhost", 27017)
+                                                  .configure())
+                                            .build();
 ~~~~
 
 and
 
 ~~~~ {.json}
 {
-	"collection_name": {
-				"shard-key-pattern": ["attribute_1", "attribute_2"],
-				"data": 
-						[
-							{"attribute_1":"value_1","attribute_2":value_2, "attribute_3":"value_3"}
-						]
-			}
+    "collection_name": {
+                "shard-key-pattern": ["attribute_1", "attribute_2"],
+                "data":
+                        [
+                            {"attribute_1":"value_1","attribute_2":value_2, "attribute_3":"value_3"}
+                        ]
+            }
 }
 ~~~~
 
@@ -870,12 +870,12 @@ where:
 
 -   *data* : the key/value data associated with a graph element. Data
     value will be validated against type defined in key element.
-    
--   *attr.autoindexName* : this attribute is optional and can only set in *key* element. 
+
+-   *attr.autoindexName* : this attribute is optional and can only set in *key* element.
     It creates an index with given name for properties of that type for all nodes or edges.
-    
--   *index* :  This tag is optional and creates an index with given name, key and value in 
-	the *node* or *edge* where it is declared.
+
+-   *index* :  This tag is optional and creates an index with given name, key and value in
+    the *node* or *edge* where it is declared.
 
 Getting Started
 ---------------
@@ -1060,7 +1060,7 @@ In these cases you should use an special method which gets *GraphDatabaseService
 ~~~~ {.java}
 @Autowired
 private ApplicationContext applicationContext;
-	
+
 @Rule
 public Neo4jRule neo4jRule = newNeo4jRule().defaultSpringGraphDatabaseServiceNeo4j();
 ~~~~
@@ -1176,13 +1176,13 @@ public class WhenNeoFriendsAreRequired {
 
     @ClassRule
     public static EmbeddedNeo4j embeddedNeo4j = newEmbeddedNeo4jRule().build();
-    
+
     @Rule
     public Neo4jRule neo4jRule = new Neo4jRule(newEmbeddedNeoServerConfiguration().build(), this);
-    
+
     @Inject
     private GraphDatabaseService graphDatabaseService;
-    
+
     @Test
     @UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
     public void all_direct_and_inderectly_friends_should_be_counted() {
@@ -1190,7 +1190,7 @@ public class WhenNeoFriendsAreRequired {
         int countNeoFriends = matrixManager.countNeoFriends();
         assertThat(countNeoFriends, is(3));
     }
-    
+
 }
 ~~~~
 
@@ -1218,22 +1218,22 @@ public class WhenNeoMeetsANewFriend {
 
     @ClassRule
     public static ManagedWrappingNeoServer managedWrappingNeoServer = newWrappingNeoServerNeo4jRule().build();
-    
+
     @Rule
     public Neo4jRule neo4jRule = new Neo4jRule(newManagedNeoServerConfiguration().build(), this);
-    
+
     @Inject
     private GraphDatabaseService graphDatabaseService;
-    
+
     @Test
     @UsingDataSet(locations="matrix.xml", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
     @ShouldMatchDataSet(location="expected-matrix.xml")
     public void friend_should_be_related_into_neo_graph() {
-        
+
         MatrixManager matrixManager = new MatrixManager(graphDatabaseService);
         matrixManager.addNeoFriend("The Oracle", 4);
     }
-    
+
 }
 ~~~~
 
@@ -1548,32 +1548,32 @@ responsible of getting and updating person's car.
 
 ~~~~ {.java}
 public class PersonManager {
-    
+
     private ColumnFamilyTemplate<String, String> template;
-    
+
     public PersonManager(String clusterName, String keyspaceName, String host) {
         Cluster cluster = HFactory.getOrCreateCluster(clusterName, host);
         Keyspace keyspace = HFactory.createKeyspace(keyspaceName, cluster);
-        
+
         template = new ThriftColumnFamilyTemplate<String, String>(keyspace,
-                "personFamilyName", 
-                                                               StringSerializer.get(),        
+                "personFamilyName",
+                                                               StringSerializer.get(),
                                                                StringSerializer.get());
-        
+
     }
-    
+
     public String getCarByPersonName(String name) {
         ColumnFamilyResult<String, String> queryColumns = template.queryColumns(name);
         return queryColumns.getString("car");
     }
-    
+
     public void updateCarByPersonName(String name, String car) {
         ColumnFamilyUpdater<String, String> createUpdater = template.createUpdater(name);
         createUpdater.setString("car", car);
-        
+
         template.update(createUpdater);
     }
-    
+
 }
 ~~~~
 
@@ -1602,22 +1602,22 @@ public class WhenPersonWantsToKnowItsCar {
 
     @ClassRule
     public static EmbeddedCassandra embeddedCassandraRule = newEmbeddedCassandraRule().build();
-    
+
     @Rule
     public CassandraRule cassandraRule = new CassandraRule(newEmbeddedCassandraConfiguration().clusterName("Test Cluster").build());
-    
-    
+
+
     @Test
     @UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
     public void car_should_be_returned() {
-        
+
         PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
         String car = personManager.getCarByPersonName("mary");
-        
+
         assertThat(car, is("ford"));
-        
+
     }
-    
+
 }
 ~~~~
 
@@ -1643,23 +1643,23 @@ public class WhenPersonWantsToUpdateItsCar {
     static {
         System.setProperty("CASSANDRA_HOME", "/opt/cassandra");
     }
-    
+
     @ClassRule
     public static ManagedCassandra managedCassandra = newManagedCassandraRule().build();
-    
+
     @Rule
     public CassandraRule cassandraRule = new CassandraRule(newManagedCassandraConfiguration().clusterName("Test Cluster").build());
-    
+
     @Test
     @UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
     @ShouldMatchDataSet(location="expected-persons.json")
     public void new_car_should_be_updated() {
-        
+
         PersonManager personManager = new PersonManager("Test Cluster", "persons", "localhost:9171");
         personManager.updateCarByPersonName("john", "opel");
-        
+
     }
-    
+
 }
 ~~~~
 
@@ -1749,7 +1749,7 @@ Datasets must have next [format](#ex.redis_dataset) :
 "data":[
             {"simple": [
                 {
-                    "key":"key1", 
+                    "key":"key1",
                     "value":"value1"
                 }
                 ]
@@ -1762,13 +1762,13 @@ Datasets must have next [format](#ex.redis_dataset) :
                         ]
                       }]
             },
-            
+
             {"sortset": [{
                      "key":"key4",
                      "values":[
                            {"score":2, "value":"value5" },{"score":3, "value":1 }, {"score":1, "value":"value6" }]
                  }]
-            }, 
+            },
             {"hash": [
                         {
                             "key":"user",
@@ -1874,10 +1874,10 @@ Configuring a connection to managed *Redis* .
 
 ~~~~ {.java}
 import static com.lordofthejars.nosqlunit.redis.ManagedRedisConfigurationBuilder.newManagedRedisConfiguration;
-                        
+
 @Rule
 public RedisRule redisRule = new RedisRule(newManagedRedisConfiguration().build());
-                        
+
 ~~~~
 
 Host and port parameters are already configured with default parameters
@@ -1946,33 +1946,33 @@ responsible of inserting new books and finding books by their title.
 
 ~~~~ {.java}
 public class BookManager {
-    
+
     private static final String TITLE_FIELD_NAME = "title";
     private static final String NUMBER_OF_PAGES = "numberOfPages";
-    
+
     private Jedis jedis;
-    
+
     public BookManager(Jedis jedis) {
         this.jedis = jedis;
     }
-    
+
     public void insertBook(Book book) {
-        
+
         Map<String, String> fields = new HashMap<String, String>();
-        
+
         fields.put(TITLE_FIELD_NAME, book.getTitle());
         fields.put(NUMBER_OF_PAGES, Integer.toString(book.getNumberOfPages()));
-        
+
         jedis.hmset(book.getTitle(), fields);
     }
 
     public Book findBookByTitle(String title) {
-        
+
         Map<String, String> fields = jedis.hgetAll(title);
         return new Book(fields.get(TITLE_FIELD_NAME), Integer.parseInt(fields.get(NUMBER_OF_PAGES)));
-        
+
     }
-    
+
 }
 ~~~~
 
@@ -2008,16 +2008,16 @@ public class WhenYouFindABook {
 
     @Rule
     public RedisRule redisRule = newRedisRule().defaultManagedRedis();
-    
+
     @Test
     @UsingDataSet(locations="book.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
     public void book_should_be_returned_if_title_is_in_database() {
-        
+
         BookManager bookManager = new BookManager(new Jedis("localhost"));
         Book findBook = bookManager.findBookByTitle("The Hobbit");
-        
+
         assertThat(findBook, is(new Book("The Hobbit", 293)));
-        
+
     }
 
 }
@@ -2027,7 +2027,7 @@ And dataset used is:
 
 ~~~~ {.json}
 {
-"data":[    
+"data":[
             {"hash": [
                         {
                             "key":"The Hobbit",
@@ -2272,19 +2272,19 @@ responsible of getting and updating person's car.
 public class PersonManager {
 
     private Configuration configuration;
-    
+
     public PersonManager(Configuration configuration) {
-        this.configuration = configuration;     
+        this.configuration = configuration;
     }
-    
+
     public String getCarByPersonName(String personName) throws IOException {
         HTable table = new HTable(configuration, "person");
         Get get = new Get("john".getBytes());
         Result result = table.get(get);
-        
+
         return new String(result.getValue(toByteArray().convert("personFamilyName"), toByteArray().convert("car")));
     }
-    
+
     private Converter<String, byte[]> toByteArray() {
         return new Converter<String, byte[]>() {
 
@@ -2294,7 +2294,7 @@ public class PersonManager {
             }
         };
     }
-    
+
 }
 ~~~~
 
@@ -2308,24 +2308,24 @@ public class WhenPersonWantsToKnowItsCar {
 
     @ClassRule
     public static EmbeddedHBase embeddedHBase = newEmbeddedHBaseRule().build();
-    
+
     @Rule
     public HBaseRule hBaseRule = newHBaseRule().defaultEmbeddedHBase(this);
-    
+
     @Inject
     private Configuration configuration;
-    
-    
+
+
     @Test
     @UsingDataSet(locations="persons.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
     public void car_should_be_returned() throws IOException {
 
         PersonManager personManager = new PersonManager(configuration);
         String car = personManager.getCarByPersonName("john");
-        
-        assertThat(car, is("toyota"));      
+
+        assertThat(car, is("toyota"));
     }
-    
+
 }
 ~~~~
 
@@ -2439,7 +2439,7 @@ parameters.
 import static com.lordofthejars.nosqlunit.couchdb.ManagedCouchDb.ManagedCouchDbRuleBuilder.newManagedCouchDbRule;
 
 @ClassRule
-public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build(); 
+public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build();
 ~~~~
 
 By default managed *CouchDB* rule uses next default values:
@@ -2531,11 +2531,11 @@ of managing access to *CouchDB* server:
 
 ~~~~ {.java}
 private CouchDbConnector connector;
-    
+
     public BookManager(CouchDbConnector connector)  {
         this.connector = connector;
     }
-    
+
     public void create(Book book) {
         connector.create(MapBookConverter.toMap(book));
     }
@@ -2554,26 +2554,26 @@ book is found into database.
 public class WhenYouFindBooksById {
 
     @ClassRule
-    public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build(); 
-    
+    public static ManagedCouchDb managedCouchDb = newManagedCouchDbRule().couchDbPath("/usr/local").build();
+
     @Rule
     public CouchDbRule couchDbRule = newCouchDbRule().defaultManagedCouchDb("books");
-    
+
     @Inject
     private CouchDbConnector couchDbConnector;
-    
+
     @Test
     @UsingDataSet(locations="books.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
     public void identified_book_should_be_returned() {
-        
+
         BookManager bookManager = new BookManager(couchDbConnector);
         Book book = bookManager.findBookById("1");
-        
+
         assertThat(book.getTitle(), is("The Hobbit"));
         assertThat(book.getNumberOfPages(), is(293));
-        
+
     }
-    
+
 }
 ~~~~
 
@@ -2629,36 +2629,36 @@ To use *NoSQLUnit* with HBase you only need to add next dependency:
 Dataset Format
 --------------
 
-Default dataset file format in *Infinispan* module is json. With this dataset you can define the key and the value that will be inserted into *Infinispan*. Value can be a simple types like Integer, String, ..., collection types, like set and list implementations or objects (using default Jackson rules (no annotations required). 
+Default dataset file format in *Infinispan* module is json. With this dataset you can define the key and the value that will be inserted into *Infinispan*. Value can be a simple types like Integer, String, ..., collection types, like set and list implementations or objects (using default Jackson rules (no annotations required).
 
 So as summary datasets must have next [format](#ex.infinispan_dataset) :
 
 ~~~~ {.json}
-{ 
-	"data": [
-				{
-					"key":"alex", 
-					"implementation":"com.lordofthejars.nosqlunit.demo.infinispan.User", 
-					"value": {
-								"name":"alex",
-								"age":32
-							 } 
-				},
-				{ 
-					"key":"key1", 
-					"value":1 
-				},
-				{ 
-					"key":"key2",  
-					"implementation":"java.util.HashSet", 
-					"value": [{"value":"a"},{"value":"b"}]
-				}
+{
+    "data": [
+                {
+                    "key":"alex",
+                    "implementation":"com.lordofthejars.nosqlunit.demo.infinispan.User",
+                    "value": {
+                                "name":"alex",
+                                "age":32
+                             }
+                },
+                {
+                    "key":"key1",
+                    "value":1
+                },
+                {
+                    "key":"key2",
+                    "implementation":"java.util.HashSet",
+                    "value": [{"value":"a"},{"value":"b"}]
+                }
 
-			] 
+            ]
 }
 ~~~~
 
-Note that first key is inserting an object. You should set its implementation, and set the object properties in json format so Jackson can create the required object. User object only contains getter and setters of properties. 
+Note that first key is inserting an object. You should set its implementation, and set the object properties in json format so Jackson can create the required object. User object only contains getter and setters of properties.
 The second key is a simple key, in this case an integer.
 The third one is a set of strings. See that we must provide the implementation of collection or an *ArrayList* will be used as default. Also you can define objects instead of simple types.
 
@@ -2679,7 +2679,7 @@ To configure *embedded* approach you should only instantiate next
 
 ~~~~ {.java}
 @ClassRule
-	public static final EmbeddedInfinispan EMBEDDED_INFINISPAN = newEmbeddedInfinispanRule().build();
+    public static final EmbeddedInfinispan EMBEDDED_INFINISPAN = newEmbeddedInfinispanRule().build();
 ~~~~
 
 By default embedded *Embedded* rule uses EmbeddedCacheManager with default
@@ -2687,7 +2687,7 @@ values:
 
   ------------------ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   Target path        This is the directory used for starting Embedded Infinispan and by default is target/infinispan-test-data/impermanent-db,  .
-  Configuration File Configuration file used by Infinispan for configuring the grid. By default no configuration file is provided and default *Infinispan* internal values are used. 
+  Configuration File Configuration file used by Infinispan for configuring the grid. By default no configuration file is provided and default *Infinispan* internal values are used.
   ------------------ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   : Default Embedded Values
@@ -2699,7 +2699,7 @@ To configure *managed* approach you should only instantiate next
 
 ~~~~ {.java}
 @ClassRule
-	public static ManagedInfinispan managedInfinispan = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build(); 
+    public static ManagedInfinispan managedInfinispan = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build();
 ~~~~
 
 By default managed *Infinispan* rule uses next default values but can be
@@ -2781,20 +2781,20 @@ responsible of getting and addinga user to the system.
 ~~~~ {.java}
 public class UserManager {
 
-	private BasicCache<String, User> cache;
-	
-	public UserManager(BasicCache<String, User> cache) {
-		this.cache = cache;
-	}
-	
-	public void addUser(User user) {
-		this.cache.put(user.getName(), user);
-	}
-	
-	public User getUser(String name) {
-		return this.cache.get(name);
-	}
-	
+    private BasicCache<String, User> cache;
+
+    public UserManager(BasicCache<String, User> cache) {
+        this.cache = cache;
+    }
+
+    public void addUser(User user) {
+        this.cache.put(user.getName(), user);
+    }
+
+    public User getUser(String name) {
+        return this.cache.get(name);
+    }
+
 }
 ~~~~
 
@@ -2806,43 +2806,43 @@ approach:
 ~~~~ {.java}
 public class WhenUserIsFoundByName {
 
-	@ClassRule
-	public static final EmbeddedInfinispan EMBEDDED_INFINISPAN = newEmbeddedInfinispanRule().build();
-	
-	@Rule
-	public final InfinispanRule infinispanRule = newInfinispanRule().defaultEmbeddedInfinispan();
-	
-	@Inject
-	private BasicCache<String, User> embeddedCache;
-	
-	@Test
-	@UsingDataSet(locations="user.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	public void user_should_be_returned() {
-		
-		UserManager userManager = new UserManager(embeddedCache);
-		User user = userManager.getUser("alex");
-		
-		assertThat(user, is(new User("alex", 32)));
-	}
-	
-	
+    @ClassRule
+    public static final EmbeddedInfinispan EMBEDDED_INFINISPAN = newEmbeddedInfinispanRule().build();
+
+    @Rule
+    public final InfinispanRule infinispanRule = newInfinispanRule().defaultEmbeddedInfinispan();
+
+    @Inject
+    private BasicCache<String, User> embeddedCache;
+
+    @Test
+    @UsingDataSet(locations="user.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+    public void user_should_be_returned() {
+
+        UserManager userManager = new UserManager(embeddedCache);
+        User user = userManager.getUser("alex");
+
+        assertThat(user, is(new User("alex", 32)));
+    }
+
+
 }
 ~~~~
 
 And dataset used is:
 
 ~~~~ {.json}
-{ 
-	"data": [
-				{
-					"key":"alex", 
-					"implementation":"com.lordofthejars.nosqlunit.demo.infinispan.User", 
-					"value": {
-								"name":"alex",
-								"age":32
-							 } 
-				}
-			] 
+{
+    "data": [
+                {
+                    "key":"alex",
+                    "implementation":"com.lordofthejars.nosqlunit.demo.infinispan.User",
+                    "value": {
+                                "name":"alex",
+                                "age":32
+                             }
+                }
+            ]
 }
 ~~~~
 
@@ -2854,23 +2854,23 @@ approach:
 ~~~~ {.java}
 public class WhenUserIsInserted {
 
-	@ClassRule
-	public static final ManagedInfinispan MANAGED_INFINISPAN = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build();
+    @ClassRule
+    public static final ManagedInfinispan MANAGED_INFINISPAN = newManagedInfinispanRule().infinispanPath("/opt/infinispan-5.1.6").build();
 
-	@Rule
-	public final InfinispanRule infinispanRule = newInfinispanRule().defaultManagedInfinispan();
+    @Rule
+    public final InfinispanRule infinispanRule = newInfinispanRule().defaultManagedInfinispan();
 
-	@Inject
-	private BasicCache<String, User> remoteCache;
+    @Inject
+    private BasicCache<String, User> remoteCache;
 
-	@UsingDataSet(loadStrategy=LoadStrategyEnum.DELETE_ALL)
-	@ShouldMatchDataSet(location="user.json")
-	@Test
-	public void user_should_be_available_in_cache() {
+    @UsingDataSet(loadStrategy=LoadStrategyEnum.DELETE_ALL)
+    @ShouldMatchDataSet(location="user.json")
+    @Test
+    public void user_should_be_available_in_cache() {
 
-		UserManager userManager = new UserManager(remoteCache);
-		userManager.addUser(new User("alex", 32));
-	}
+        UserManager userManager = new UserManager(remoteCache);
+        userManager.addUser(new User("alex", 32));
+    }
 
 }
 ~~~~
@@ -2957,7 +2957,7 @@ Datasets must have next format:
                   "indexId":"indexId1"
                }
             },
-	    {
+        {
                "index":{
                   "indexName":"indexName2",
                   "indexType":"indexType2",
@@ -3159,10 +3159,10 @@ private Client client;
 @UsingDataSet(locations="books.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
 public void all_books_should_be_returned() {
 
-	BookManager bookManager = new BookManager(client);
-	List<Book> books = bookManager.searchAllBooks();
+    BookManager bookManager = new BookManager(client);
+    List<Book> books = bookManager.searchAllBooks();
 
-	assertThat(books, hasItems(new Book("The Hobbit", 293)));
+    assertThat(books, hasItems(new Book("The Hobbit", 293)));
 
 }
 ~~~~
@@ -3173,9 +3173,9 @@ Advanced Usage
 Customizing Insertion and Comparation strategy
 ================================================
 
-**NoSQLUnit** provides a default dataset format, for example in case of *Neo4j* 
-we are providing a *GraphML* format, or in case of *Cassandra* we are offering *cassandra-unit* format. 
-But because you may have already written datasets in another format, or because you feel more comfortable with another format, 
+**NoSQLUnit** provides a default dataset format, for example in case of *Neo4j*
+we are providing a *GraphML* format, or in case of *Cassandra* we are offering *cassandra-unit* format.
+But because you may have already written datasets in another format, or because you feel more comfortable with another format,
 **NoSQLUnit** provides a way to extend the behaviour of insertion and comparation action.
 
 To create an extension, each engine offers two interfaces (one for insertion and one comparation). They are called with the form:
@@ -3193,22 +3193,22 @@ Let's see a very simple example where we are defining an alternative insectation
 ~~~~ {.java}
 public class PropertiesCustomInsertion implements RedisInsertionStrategy {
 
-	@Override
-	public void insert(RedisConnectionCallback connection, InputStream dataset) throws Throwable {
-		Properties properties = new Properties();
-		properties.load(dataset);
+    @Override
+    public void insert(RedisConnectionCallback connection, InputStream dataset) throws Throwable {
+        Properties properties = new Properties();
+        properties.load(dataset);
 
-		BinaryJedisCommands insertionJedis = connection.insertionJedis();
-		
-		Set<Entry<Object, Object>> entrySet = properties.entrySet();
-		
-		for (Entry<Object, Object> entry : entrySet) {
-			String key = (String) entry.getKey();
-			String value = (String) entry.getValue();
-			insertionJedis.set(key.getBytes(), value.getBytes());
-		}
-		
-	}
+        BinaryJedisCommands insertionJedis = connection.insertionJedis();
+
+        Set<Entry<Object, Object>> entrySet = properties.entrySet();
+
+        for (Entry<Object, Object> entry : entrySet) {
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            insertionJedis.set(key.getBytes(), value.getBytes());
+        }
+
+    }
 
 }
 ~~~~
@@ -3219,25 +3219,25 @@ And test:
 @CustomInsertionStrategy(insertionStrategy = PropertiesCustomInsertion.class)
 public class WhenPropertiesCustomInsertionStrategyIsRegistered {
 
-	@ClassRule
-	public static EmbeddedRedis embeddedRedis = newEmbeddedRedisRule().build();
+    @ClassRule
+    public static EmbeddedRedis embeddedRedis = newEmbeddedRedisRule().build();
 
-	@Rule
-	public RedisRule redisRule = newRedisRule().defaultEmbeddedRedis();
-	
-	@Inject
-	public Jedis jedis;
-	
-	@Test
-	@UsingDataSet(locations="data.properties", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	public void data_should_be_inserted_from_properties_file() {
-		String name = jedis.get("name");
-		String surname = jedis.get("surname");
-		
-		assertThat(name, is("alex"));
-		assertThat(surname, is("soto"));
-	}
-	
+    @Rule
+    public RedisRule redisRule = newRedisRule().defaultEmbeddedRedis();
+
+    @Inject
+    public Jedis jedis;
+
+    @Test
+    @UsingDataSet(locations="data.properties", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
+    public void data_should_be_inserted_from_properties_file() {
+        String name = jedis.get("name");
+        String surname = jedis.get("surname");
+
+        assertThat(name, is("alex"));
+        assertThat(surname, is("soto"));
+    }
+
 }
 ~~~~
 
@@ -3271,8 +3271,8 @@ instantiating manually, as described in next
 
 ~~~~ {.java}
 EmbeddedRedisBuilder embeddedRedisBuilder = new EmbeddedRedisBuilder();
-Jedis jedis = embeddedRedisBuilder.createEmbeddedJedis();   
-            
+Jedis jedis = embeddedRedisBuilder.createEmbeddedJedis();
+
 ~~~~
 
 Notice that Jedis class is the main class defined by Jedis project but
@@ -3436,7 +3436,7 @@ In these cases you should use an special method which gets *Dyanmo* instance, in
 ~~~~ {.java}
 @Autowired
 private ApplicationContext applicationContext;
-  
+
 @Rule
 public DynamoDbRule dynamoDbRule = newDynamoDbRule().defaultSpringDynamoDb();
 ~~~~
@@ -3579,6 +3579,125 @@ dataset called `expectedData.json` .
 
 You can see unit tests at
 [github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-dynamodb/src/test/java/com/lordofthejars/nosqlunit/dynamodb/integration/WhenDynamoDbRuleIsRegistered.java)
+.
+
+InfluxDB Engine
+==============
+
+InfluxDB
+=======
+
+InfluxDB is a time series database designed to handle high write and query loads.
+
+**NoSQLUnit** supports *DynamoDB* by using next classes:
+
+  ----------- -----------------------------------------------------
+  In Memory   com.lordofthejars.nosqlunit.influxdb.InMemoryInfluxDb
+  ----------- -----------------------------------------------------
+
+  : Lifecycle Management Rules
+
+  ---------------------- -------------------------------------------------
+  NoSQLUnit Management   com.lordofthejars.nosqlunit.influxdb.InfluxDbRule
+  ---------------------- -------------------------------------------------
+
+  : Manager Rule
+
+Maven Setup
+-----------
+
+To use **NoSQLUnit** with InfluxDb you only need to add next dependency:
+
+~~~~ {.xml}
+<dependency>
+    <groupId>com.lordofthejars</groupId>
+    <artifactId>nosqlunit-influxdb</artifactId>
+    <version>${version.nosqlunit}</version>
+</dependency>
+~~~~
+
+Note that if you are plannig to use **in-memory** approach it is implemented using
+*embed-influxDB* . *embed-influxDB* is a project which runs a local instance of InfluxDB. [embed-influxDB](https://github.com/APISENSE/embed-influxDB)
+
+Dataset Format
+--------------
+
+Default dataset file format in *InfluxDB* module is *json* .
+
+Datasets must have next [format](#ex.influxdb_dataset) :
+
+~~~~ {.json}
+{
+    "measurement1": [
+    {
+        "time": 1514764800000000000,
+        "precision": "NANOSECONDS",
+        "tags": { "tag_name": "tag_value" },
+        "fields": { "field_name": "field_value" }
+    },
+    {
+        "time": 1514764800000000000,
+        "precision": "NANOSECONDS",
+        "tags": { "tag_name": "tag_value" },
+        "fields": { "field_name": "field_value" }
+    }
+    ],
+    "measurement2": [
+        ...
+    ],
+    ....
+}
+~~~~
+
+Getting Started
+---------------
+
+### Lifecycle Management Strategy
+
+First step is defining which lifecycle management strategy is required
+for your tests. Right now only **in-memory** approach is supported.
+
+To configure **in-memory** approach you should only instantiate next
+[rule](#program.inmemory_conf) :
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.inluxdb.InMemoryInfluxDb.InMemoryInfluxRuleBuilder.newInMemoryInfluxDbRule;
+
+@ClassRule
+public static InMemoryInfluxDb inMemoryInfluxDb = newInMemoryInfluxDbRule().build();
+~~~~
+
+### Configuring InfluxDB Connection
+
+Next step is configuring ***InfluxDB*** rule in charge of maintaining
+*InfluxDB* database into known state by inserting and deleting defined
+datasets. You must register InfluxDbRule *JUnit* rule class.
+
+~~~~ {.java}
+import static com.lordofthejars.nosqlunit.influxdb.InfluxDbRule.InfluxDbRuleBuilder.newInfluxDbRule;
+
+@Rule
+public InfluxDbRule embeddedInfluxDbRule = newInfluxDbRule().defaultEmbeddedInfluxDb("test-db");
+~~~~
+
+But also we can define it to use Spring Data InfluxDB defined instance.
+
+If you are plannig to use **Spring Data InfluxDB**, you may require to use the *InfluxDB* instance defined within Spring Application Context, mostly because you are defining an embedded connection using **embed-influxDB**:
+
+In these cases you should use an special method which gets *InfluxDB* instance, instead of creating new one.
+
+~~~~ {.java}
+@Autowired
+private ApplicationContext applicationContext;
+
+@Rule
+public InfluxDbRule influxDbRule = newInfluxDbRule().defaultSpringInfluxDb();
+~~~~
+
+> Note that you need to autowire the application context, so **NoSQLUnit** can inject instance defined within application context into *InfluxDbRule*.
+
+You can see unit tests at
+[github](https://github.com/lordofthejars/nosql-unit/tree/master/nosqlunit-dynamodb/src/test/java/com/lordofthejars/nosqlunit/influxdb/integration/WhenInfluxDbRuleIsRegistered.java)
 .
 
 # MarkLogic Engine
@@ -4164,7 +4283,7 @@ public static ManagedRedis managedRedis80 = newManagedRedisRule().redisPath("/op
                                                                  .configurationPath(getAbsoluteFilePath("src/test/resources/redis_6380.conf"))
                                                                  .port(6380)
                                             .build();
-            
+
 ~~~~
 
 > **Warning**
@@ -4231,8 +4350,8 @@ using `withSelectiveLocations` attribute of `@UsingDataSet` annotation.
 You must set up the pair "named connection" / datasets.
 
 ~~~~ {.java}
-@UsingDataSet(withSelectiveLocations =                                              
-                { @Selective(identifier = "one", locations = "test3") }, 
+@UsingDataSet(withSelectiveLocations =
+                { @Selective(identifier = "one", locations = "test3") },
             loadStrategy = LoadStrategyEnum.REFRESH)
 ~~~~
 
@@ -4243,8 +4362,8 @@ located at *test3* file.
 Also works in expectations annotation:
 
 ~~~~ {.java}
-@ShouldMatchDataSet(withSelectiveMatcher = 
-                { @SelectiveMatcher(identifier = "one", location = "test3") 
+@ShouldMatchDataSet(withSelectiveMatcher =
+                { @SelectiveMatcher(identifier = "one", location = "test3")
                 })
 ~~~~
 
@@ -4282,7 +4401,7 @@ public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
 @Test
 @UsingDataSet(withSelectiveLocations = {
         @Selective(identifier = "one", locations = "json.test"),
-        @Selective(identifier = "two", locations = "json3.test") }, 
+        @Selective(identifier = "two", locations = "json3.test") },
     loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
 public void my_test() {...}
 ~~~~
@@ -4331,7 +4450,7 @@ public MongoDbRule remoteMongoDbRule2 = new MongoDbRule(mongoDb()
 @Named("one")
 @Inject
 private Mongo mongo1;
-    
+
 @Named("two")
 @Inject
 private Mongo mongo2;
@@ -4348,7 +4467,7 @@ private Mongo mongo2;
 Spring Data
 ===========
 
-With **NoSQLUnit** you can also write tests for `Spring Data` project. You can 
+With **NoSQLUnit** you can also write tests for `Spring Data` project. You can
 
 [Spring Data MongoDB](http://www.lordofthejars.com/2013/01/testing-spring-data-mongodb.html)
 
