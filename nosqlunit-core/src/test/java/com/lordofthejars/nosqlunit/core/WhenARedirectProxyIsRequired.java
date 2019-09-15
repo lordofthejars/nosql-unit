@@ -14,7 +14,7 @@ import com.lordofthejars.nosqlunit.proxy.RedirectProxy;
 public class WhenARedirectProxyIsRequired {
 
 	@Test
-	public void redirect_proxy_should_be_created_by_specifing_source_class_and_calling_destination_class() {
+	public void redirect_proxy_should_be_created_by_specifying_source_class_and_calling_destination_class() {
 		
 		ArrayList list = RedirectProxy.createProxy(ArrayList.class, new MyNewList());
 		assertThat(list.size(), is(2));
@@ -31,7 +31,7 @@ public class WhenARedirectProxyIsRequired {
 	
 	private class MyNewList {
 		
-		List<String> list = new ArrayList<String>();
+		private List<String> list = new ArrayList<String>();
 		
 		public void addString(String s) {
 			this.list.add(s);
