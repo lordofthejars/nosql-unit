@@ -531,7 +531,7 @@
                                         <exclude>**/*Test.java</exclude>
                                     </excludes>
                                     <includes>
-                                        <include>%regex[.*integration.When.*]</include>
+                                        <include>%regex[.*integration.When.*.class]</include>
                                     </includes>
                                 </configuration>
                             </execution>

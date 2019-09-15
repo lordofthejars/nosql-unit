@@ -4,12 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -73,6 +69,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MyGlobalAndSelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 		abstractNoSqlTestRule.setIdentifier("two");
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -103,6 +100,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MyGlobalAndSelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 		abstractNoSqlTestRule.setIdentifier("one");
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -135,6 +133,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MySelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 		abstractNoSqlTestRule.setIdentifier("two");
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -163,6 +162,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MySelectiveClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 		abstractNoSqlTestRule.setIdentifier("one");
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -196,6 +196,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MyTestClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
 		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
@@ -234,6 +235,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MyTestMethodClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -269,6 +271,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		
 		FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomComparisionStrategy.class, "my_unknown_test");
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 		
 		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 		doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -291,6 +294,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		
 		FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomInsertStrategy.class, "my_unknown_test");
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 		
 		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 		doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -314,6 +318,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MyTestMethodClass.class, "my_method_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -350,6 +355,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_method_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
@@ -385,6 +391,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_unknown_test_2");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
@@ -420,6 +427,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
 		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
@@ -455,6 +463,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(SelectiveDefaultClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
 		abstractNoSqlTestRule.setIdentifier("one");
@@ -485,6 +494,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(SelectiveDefaultClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
@@ -509,6 +519,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(SelectiveAndLocationClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
 		abstractNoSqlTestRule.setIdentifier("one");
@@ -539,6 +550,7 @@ public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 		FrameworkMethod frameworkMethod = frameworkMethod(MyUknownClass.class, "my_unknown_test");
 
 		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+		doNothing().when(abstractNoSqlTestRule).close();
 
 		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
 		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
