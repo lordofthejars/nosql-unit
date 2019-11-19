@@ -1,6 +1,7 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.FailureHandler;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
@@ -36,11 +37,17 @@ public class MongoDbAssertion {
         checkCollectionsName(collectionaNames, collectionNames);
 
         for (String collectionName : collectionaNames) {
+            List<Document> documents = getDocumentsFromCollection(expectedData, collectionName);
 
-            checkCollectionObjects(expectedData, mongoDb, collectionaNames,
-                    collectionName);
-
+            assertDocumentsStrict(documents, mongoDb, collectionName);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Document> getDocumentsFromCollection(Document expectedData, String collectionName) {
+        Object object = expectedData.get(collectionName);
+
+        return isDataDirectly(object) ? (List) object : ((Document) object).get(DATA, List.class);
     }
 
     private static void checkCollectionsName(
@@ -75,38 +82,33 @@ public class MongoDbAssertion {
         return !mongodbCollectionName.contains(SYSTEM_COLLECTIONS_PATTERN);
     }
 
-    private static void checkCollectionObjects(Document expectedData,
-                                               MongoDatabase mongoDb, Set<String> collectionaNames, String collectionName)
-            throws Error {
-        Object object = expectedData.get(collectionName);
-        List<Document> dataObjects = null;
-
-        if (isDataDirectly(object)) {
-            dataObjects = (List) object;
-        } else {
-            dataObjects = ((Document) object).get(DATA, List.class);
-        }
-
+    /**
+     * Check that given collection contains strictly the expected documents.
+     *
+     * @param expectedDocuments List of expected documents.
+     * @param mongoDb Mongo Database.
+     * @param collectionName Collection name.
+     * @throws NoSqlAssertionError when assertion fails.
+     */
+    public static void assertDocumentsStrict(List<Document> expectedDocuments, MongoDatabase mongoDb, String collectionName) {
         MongoCollection<Document> dbCollection = mongoDb.getCollection(collectionName);
 
-        int expectedDataObjectsCount = dataObjects.size();
+        int expectedDataObjectsCount = expectedDocuments.size();
         long insertedDataObjectsCount = dbCollection.count();
 
         if (expectedDataObjectsCount != insertedDataObjectsCount) {
-            throw FailureHandler.createFailure("Expected collection has %s elements but insert collection has %s", expectedDataObjectsCount, insertedDataObjectsCount);
+            throw FailureHandler.createFailure("Expected collection has %d elements but insert collection has %d",
+                    expectedDataObjectsCount, insertedDataObjectsCount);
         }
 
-        for (Document expectedDataObject : dataObjects) {
-
+        for (Document expectedDataObject : expectedDocuments) {
             Document foundObject = dbCollection.find(expectedDataObject).first();
 
-
             if (!exists(foundObject)) {
-                throw FailureHandler.createFailure("Object # %s # is not found into collection %s", expectedDataObject.toString(), collectionaNames);
+                throw FailureHandler.createFailure("Object # %s # was not found in collection %s", expectedDataObject.toString(), collectionName);
             }
 
             checkSameKeys(expectedDataObject, foundObject);
-
         }
     }
 
