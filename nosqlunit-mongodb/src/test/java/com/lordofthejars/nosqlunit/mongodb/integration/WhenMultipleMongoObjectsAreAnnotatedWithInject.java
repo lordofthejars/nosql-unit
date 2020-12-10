@@ -7,11 +7,11 @@ import static org.junit.Assert.assertThat;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.mongodb.client.MongoClient;
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
-import com.mongodb.Mongo;
 
 public class WhenMultipleMongoObjectsAreAnnotatedWithInject {
 
@@ -29,11 +29,11 @@ public class WhenMultipleMongoObjectsAreAnnotatedWithInject {
 	
 	@Named("one")
 	@Inject
-	private Mongo mongo1;
+	private MongoClient mongo1;
 	
 	@Named("two")
 	@Inject
-	private Mongo mongo2;
+	private MongoClient mongo2;
 	
 
 	@Test

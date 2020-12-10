@@ -1,10 +1,9 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
-import com.mongodb.util.JSON;
 import org.bson.Document;
 import org.junit.Before;
 import org.junit.Test;
@@ -178,8 +177,8 @@ public class WhenMongoDbOperationsAreRequired {
     /*@Test
      public void same_data_on_compare_operation_should_assert_expected_data_with_inserted() {
 
-     DBCollection collection1 = mock(DBCollection.class);
-     DBCollection collection2 = mock(DBCollection.class);
+     MongoCollection<Document> collection1 = mock(DBCollection.class);
+     MongoCollection<Document> collection2 = mock(DBCollection.class);
 
      BasicDBObject value = new BasicDBObject();
      when(collection1.findOne(anyObject())).thenReturn(eq(value));
@@ -199,8 +198,8 @@ public class WhenMongoDbOperationsAreRequired {
      @Test
      public void different_data_on_compare_operation_should_assert_expected_data_with_inserted() {
 
-     DBCollection collection1 = mock(DBCollection.class);
-     DBCollection collection2 = mock(DBCollection.class);
+     MongoCollection<Document> collection1 = mock(DBCollection.class);
+     MongoCollection<Document> collection2 = mock(DBCollection.class);
 
      when(db.getCollection("collection1")).thenReturn(collection1);
      when(db.getCollection("collection2")).thenReturn(collection2);
@@ -243,7 +242,7 @@ public class WhenMongoDbOperationsAreRequired {
 
         Document command = enableShardingCommandCaptor.getValue();
 
-        String commandDocument = JSON.serialize(command);
+        String commandDocument = command.toJson();
         assertThat(commandDocument, is(expectedCommand));
 
     }

@@ -90,7 +90,7 @@ public class MongoDbAssertion {
         MongoCollection<Document> dbCollection = mongoDb.getCollection(collectionName);
 
         int expectedDataObjectsCount = dataObjects.size();
-        long insertedDataObjectsCount = dbCollection.count();
+        long insertedDataObjectsCount = dbCollection.countDocuments();
 
         if (expectedDataObjectsCount != insertedDataObjectsCount) {
             throw FailureHandler.createFailure("Expected collection has %s elements but insert collection has %s", expectedDataObjectsCount, insertedDataObjectsCount);
@@ -281,8 +281,8 @@ public class MongoDbAssertion {
             Document filteredExpectedDataObject = filterProperties(expectedDataObject, propertiesToIgnore.get(collectionName));
             final Document foundObject = dbCollection.find(filteredExpectedDataObject).first();
 
-            if (dbCollection.count(filteredExpectedDataObject) > 1) {
-                logger.warn(String.format("There were found %d possible matches for this object # %s #. That could have been caused by ignoring too many properties.", dbCollection.count(filteredExpectedDataObject), expectedDataObject.toString()));
+            if (dbCollection.countDocuments(filteredExpectedDataObject) > 1) {
+                logger.warn(String.format("There were found %d possible matches for this object # %s #. That could have been caused by ignoring too many properties.", dbCollection.countDocuments(filteredExpectedDataObject), expectedDataObject.toString()));
             }
 
             if (!exists(foundObject)) {

@@ -1,6 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb;
 import com.lordofthejars.nosqlunit.core.FailureHandler;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 
 public class InMemoryMongoDbConfigurationBuilder {
 

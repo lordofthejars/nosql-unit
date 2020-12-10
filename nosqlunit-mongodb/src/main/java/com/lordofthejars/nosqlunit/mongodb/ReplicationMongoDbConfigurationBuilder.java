@@ -1,10 +1,13 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoClients;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ReplicationMongoDbConfigurationBuilder {
@@ -72,7 +75,11 @@ public class ReplicationMongoDbConfigurationBuilder {
         }
 
 
-        MongoClient mongoClient = new MongoClient(this.serverAddresses);
+        MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder()
+                        .applyToClusterSettings(builder ->
+                                builder.hosts(this.serverAddresses))
+                        .build());
 
         if (this.enableSharding) {
             enableSharding(mongoClient);

@@ -1,12 +1,23 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.github.fakemongo.Fongo;
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
-import com.mongodb.MongoClient;
+import com.lordofthejars.nosqlunit.util.EmbeddedInstances;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClients;
+import de.flapdoodle.embed.mongo.Command;
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.mongo.distribution.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 
@@ -34,13 +45,28 @@ public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 
 		LOGGER.info("Starting EmbeddedInMemory MongoDb instance.");
 		EmbeddedMongoInstancesFactory.getInstance().addEmbeddedInstance(fongo(targetPath), targetPath);
+		EmbeddedMongoInstancesFactory.getServerInstance().addEmbeddedInstance(embeddedMongo(), targetPath);
 		LOGGER.info("Started EmbeddedInMemory MongoDb instance.");
 
 	}
 
+	private MongodExecutable embeddedMongo(){
+
+		ImmutableMongodConfig mongodConfig = MongodConfig.builder()
+				.version(Version.V4_4_1)
+//				.net(new Net(host, port, Network.localhostIsIPv6()))
+				.build();
+
+		MongodStarter mongodStarter = MongodStarter.getDefaultInstance();
+		return mongodStarter.prepare(mongodConfig);
+	}
+
 	private MongoClient fongo(String targetPath) {
-		Fongo fongo = new Fongo(targetPath);
-		return fongo.getMongo();
+		MongoClientSettings clientSettings = MongoClientSettings.builder()
+				.applyConnectionString(new ConnectionString(targetPath))
+				.build();
+
+		return MongoClients.create(clientSettings);
 	}
 	
 	@Override
@@ -49,7 +75,10 @@ public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 		LOGGER.info("Stopping EmbeddedInMemory MongoDb instance.");
 		
 		EmbeddedMongoInstancesFactory.getInstance().removeEmbeddedInstance(targetPath);
-		
+		MongodExecutable embeddedByTargetPath = EmbeddedMongoInstancesFactory.getServerInstance().getEmbeddedByTargetPath(targetPath);
+		embeddedByTargetPath.stop();
+		EmbeddedMongoInstancesFactory.getServerInstance().removeEmbeddedInstance(targetPath);
+
 		LOGGER.info("Stopped EmbeddedInMemory MongoDb instance.");
 		
 	}

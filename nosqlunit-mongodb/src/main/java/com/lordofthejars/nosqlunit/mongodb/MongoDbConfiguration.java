@@ -1,7 +1,7 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractJsr330Configuration;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import com.mongodb.WriteConcern;
 
 public final class MongoDbConfiguration extends AbstractJsr330Configuration {
@@ -17,7 +17,7 @@ public final class MongoDbConfiguration extends AbstractJsr330Configuration {
 	
 	private MongoClient mongo;
 	
-	private WriteConcern writeConcern = WriteConcern.SAFE;
+	private WriteConcern writeConcern = WriteConcern.ACKNOWLEDGED;
 	
 	public MongoDbConfiguration() {
 		super();

@@ -11,7 +11,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
+import com.mongodb.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import org.bson.Document;
 import org.junit.AfterClass;
 import org.junit.ClassRule;
@@ -19,11 +23,6 @@ import org.junit.Test;
 
 import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
 import com.lordofthejars.nosqlunit.mongodb.shard.ShardedManagedMongoDb;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.CommandResult;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 
 public class WhenReplicaSetShardingIsRequired {
 
@@ -54,9 +53,12 @@ public class WhenReplicaSetShardingIsRequired {
 	
 	@Test
 	public void sharded_replica_set_should_be_started() throws UnknownHostException {
-		
-		MongoClient mongoClient = new MongoClient("localhost", 27017);
-		
+
+		MongoClient mongoClient = MongoClients.create(MongoClientSettings
+				.builder()
+				.applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress("localhost", 27017))))
+				.build());
+
 		Document listShards = MongoDbCommands.listShards(mongoClient);
 		
 		assertThat((String)listShards.get("serverUsed"), is("localhost/127.0.0.1:27017"));

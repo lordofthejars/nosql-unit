@@ -2,9 +2,8 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
 import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import com.mongodb.MongoException;
-import com.mongodb.MongoOptions;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
@@ -32,7 +31,8 @@ public final class MongoOperation extends AbstractCustomizableDatabaseOperation<
     public MongoOperation(MongoDbConfiguration mongoDbConfiguration) {
         try {
             this.mongo = mongoDbConfiguration.getMongo();
-            this.mongo.setWriteConcern(mongoDbConfiguration.getWriteConcern());
+            //TODO
+//            this.mongo.setWriteConcern(mongoDbConfiguration.getWriteConcern());
             this.mongoDbConfiguration = mongoDbConfiguration;
             this.setInsertionStrategy(new DefaultInsertionStrategy());
             this.setComparisonStrategy(new DefaultComparisonStrategy());

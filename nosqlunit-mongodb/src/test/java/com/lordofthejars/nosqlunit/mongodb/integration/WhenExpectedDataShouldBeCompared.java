@@ -13,6 +13,10 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.CreateCollectionOptions;
+import org.bson.Document;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -23,9 +27,6 @@ import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
 import com.lordofthejars.nosqlunit.mongodb.MongoOperation;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 
 public class WhenExpectedDataShouldBeCompared {
@@ -65,7 +66,7 @@ public class WhenExpectedDataShouldBeCompared {
 	
 	@Before
 	public void setUp() {
-		DB mongoDb = getMongoDB();
+		MongoDatabase mongoDb = getMongoDB();
 		dropDatabase(mongoDb);
 	}
 	
@@ -295,32 +296,35 @@ public class WhenExpectedDataShouldBeCompared {
 		
 	}
 	
-	private void createCollection(DB mongoDb, String collectionName) {
-		BasicDBObject options = new BasicDBObject("max", 1);
-		mongoDb.createCollection(collectionName, options);
+	private void createCollection(MongoDatabase mongoDb, String collectionName) {
+
+		CreateCollectionOptions collectionOptions = new CreateCollectionOptions();
+		collectionOptions.maxDocuments(1);
+
+		mongoDb.createCollection(collectionName, collectionOptions);
 	}
 	
-	private void addCollectionWithTwoData(DB mongoDb, String collectionName, String field, String value, String field2, String value2) {
-		DBCollection collection = mongoDb.getCollection(collectionName);
-		Map<String, String> documentParams = new HashMap<String, String>();
+	private void addCollectionWithTwoData(MongoDatabase mongoDb, String collectionName, String field, String value, String field2, String value2) {
+		MongoCollection<Document> collection = mongoDb.getCollection(collectionName);
+		Map<String, Object> documentParams = new HashMap<>();
 		documentParams.put(field, value);
 		documentParams.put(field2, value2);
-		DBObject dbObject = new BasicDBObject(documentParams);
-		collection.insert(dbObject);
+		Document dbObject = new Document(documentParams);
+		collection.insertOne(dbObject);
 	}
 	
-	private void addCollectionWithData(DB mongoDb, String collectionName, String field, String value) {
-		DBCollection collection = mongoDb.getCollection(collectionName);
-		DBObject dbObject = new BasicDBObject(field, value);
-		collection.insert(dbObject);
+	private void addCollectionWithData(MongoDatabase mongoDb, String collectionName, String field, String value) {
+		MongoCollection<Document> collection = mongoDb.getCollection(collectionName);
+		Document dbObject = new Document(field, value);
+		collection.insertOne(dbObject);
 	}
 	
-	private void dropDatabase(DB mongoDb) {
-		mongoDb.dropDatabase();
+	private void dropDatabase(MongoDatabase mongoDb) {
+		mongoDb.drop();
 	}
 	
-	private DB getMongoDB() {
-		return mongoOperation.connectionManager().getDB("test");
+	private MongoDatabase getMongoDB() {
+		return mongoOperation.connectionManager().getDatabase("test");
 	}
 	
 }

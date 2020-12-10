@@ -4,9 +4,11 @@ import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOpsFactory;
-import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClients;
 import org.bson.Document;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
@@ -201,7 +203,11 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
             }
         }
 
-        return new MongoClient(seeds);
+        return MongoClients.create(
+                MongoClientSettings.builder()
+                        .applyToClusterSettings(builder ->
+                                builder.hosts(seeds))
+                        .build());
 
     }
 
@@ -213,10 +219,25 @@ public class ReplicaSetManagedMongoDb extends ExternalResource {
             MongoCredential credential = MongoCredential.createCredential(this.replicaSetGroup.getUsername(),
                     "admin",
                     this.replicaSetGroup.getPassword().toCharArray());
-            return new MongoClient(new ServerAddress(defaultConnection.getHost(), defaultConnection.getPort()), Arrays.asList(credential));
+
+            return MongoClients.create(
+                    MongoClientSettings.builder()
+                            .credential(credential)
+                            .applyToClusterSettings(builder ->
+                                    builder.hosts(Arrays.asList(
+                                            new ServerAddress(defaultConnection.getHost(), defaultConnection.getPort())
+                                    )))
+                            .build());
         } else {
-            return new MongoClient(defaultConnection.getHost(),
-                    defaultConnection.getPort());
+
+            return MongoClients.create(
+                    MongoClientSettings.builder()
+                            .applyToClusterSettings(builder ->
+                                    builder.hosts(Arrays.asList(
+                                            new ServerAddress(defaultConnection.getHost(), defaultConnection.getPort())
+                                    )))
+                            .build());
+
         }
 
     }

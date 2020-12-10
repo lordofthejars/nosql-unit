@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClients;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,7 @@ import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 
 public class ShardedManagedMongoDb extends ExternalResource {
 
@@ -224,9 +226,26 @@ public class ShardedManagedMongoDb extends ExternalResource {
 			MongoCredential credential = MongoCredential.createCredential(this.shardedGroup.getUsername(),
 					"admin",
 					this.shardedGroup.getPassword().toCharArray());
-			return new MongoClient(new ServerAddress(firstMongosServer.getHost(), firstMongosServer.getPort()), Arrays.asList(credential));
+
+			return MongoClients.create(
+					MongoClientSettings.builder()
+							.credential(credential)
+							.applyToClusterSettings(builder ->
+									builder.hosts(Arrays.asList(
+											new ServerAddress(firstMongosServer.getHost(), firstMongosServer.getPort())
+											)))
+							.build());
 		} else {
-			return new MongoClient(firstMongosServer.getHost(), firstMongosServer.getPort());
+
+
+			return MongoClients.create(
+					MongoClientSettings.builder()
+							.applyToClusterSettings(builder ->
+									builder.hosts(Arrays.asList(
+											new ServerAddress(firstMongosServer.getHost(), firstMongosServer.getPort())
+									)))
+							.build());
+
 		}
 
 	}

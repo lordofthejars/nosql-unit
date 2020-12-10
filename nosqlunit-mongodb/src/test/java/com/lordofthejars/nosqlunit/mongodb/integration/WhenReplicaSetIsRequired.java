@@ -2,13 +2,17 @@ package com.lordofthejars.nosqlunit.mongodb.integration;
 
 import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetManagedMongoDb;
-import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import org.bson.Document;
 import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManagerBuilder.newManagedMongoDbLifecycle;
@@ -43,7 +47,10 @@ public class WhenReplicaSetIsRequired {
     @Test
     public void three_member_set_scenario_should_be_started() throws UnknownHostException, InterruptedException {
 
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        MongoClient mongoClient = MongoClients.create(MongoClientSettings
+                .builder()
+                .applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress("localhost", 27017))))
+                .build());
 
         Document replicaSetGetStatus = MongoDbCommands.replicaSetGetStatus(mongoClient);
         assertThat(countPrimary(replicaSetGetStatus), is(1));
@@ -59,7 +66,11 @@ public class WhenReplicaSetIsRequired {
         replicaSetManagedMongoDb.shutdownServer(27017);
         replicaSetManagedMongoDb.waitUntilReplicaSetBecomesStable();
 
-        MongoClient mongoClient = new MongoClient("localhost", 27018);
+        MongoClient mongoClient = MongoClients.create(MongoClientSettings
+                .builder()
+                .applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress("localhost", 27017))))
+                .build());
+
         Document replicaSetGetStatus = MongoDbCommands.replicaSetGetStatus(mongoClient);
 
         assertThat(countPrimary(replicaSetGetStatus), is(1));

@@ -35,7 +35,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mongo.version>3.2.2</mongo.version>
+        <mongo.version>3.4.2</mongo.version>
         <elasticsearch.version>1.1.1</elasticsearch.version>
         <elasticsearch2.version>2.0.2</elasticsearch2.version>
         <junit.version>4.12</junit.version>
@@ -60,7 +60,7 @@
         <ektorp.couchdb.version>1.4.4</ektorp.couchdb.version>
         <infinispan.version>9.0.0.Final</infinispan.version>
         <bool.version>0.9.0</bool.version>
-        <fongo.version>2.0.12</fongo.version>
+        <fongo.version>2.1.0</fongo.version>
         <awaitility.version>2.0.0</awaitility.version>
         <couchbase-client.version>2.4.2</couchbase-client.version>
         <vault.java.version>2.0.0</vault.java.version>

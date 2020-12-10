@@ -6,11 +6,17 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.mongodb.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,44 +55,57 @@ public class WhenSelectiveAnnotationIsUsed {
 			@Selective(identifier = "two", locations = "json3.test") }, 
 			loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
 	public void data_should_be_inserted_into_configured_backend() throws UnknownHostException, MongoException {
+
+		MongoClient mongo1 = MongoClients.create(MongoClientSettings
+				.builder()
+				.applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress("127.0.0.1", 27017))))
+				.build());
+
+		MongoClient mongo2 = MongoClients.create(MongoClientSettings
+				.builder()
+				.applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress("127.0.0.1", 27017+1))))
+				.build());
+
 		
-		MongoClient mongo1 = new MongoClient("127.0.0.1", 27017);
-    		MongoClient mongo2 = new MongoClient("127.0.0.1", 27017+1);
+		MongoDatabase db1 = mongo1.getDatabase("test");
+		MongoDatabase db2 = mongo2.getDatabase("test");
 		
-		DB db1 = mongo1.getDB("test");
-		DB db2 = mongo2.getDB("test");
+		MongoCollection<Document> collection1 = db1.getCollection("collection1");
 		
-		DBCollection collection1 = db1.getCollection("collection1");
-		
-		DBObject foundObject11 = collection1.findOne(buildDbObject("id", 1, "code", "JSON dataset"));
+		Document foundObject11 = collection1.find(buildDbObject("id", 1, "code", "JSON dataset"))
+				.first();
 		assertThat(foundObject11, notNullValue());
-		DBObject foundObject12 = collection1.findOne(buildDbObject("id", 2, "code", "Another row"));
+		Document foundObject12 = collection1.find(buildDbObject("id", 2, "code", "Another row"))
+				.first();
 		assertThat(foundObject12, notNullValue());
 		
-		DBCollection collection2 = db1.getCollection("collection2");
+		MongoCollection<Document> collection2 = db1.getCollection("collection2");
 		
-		DBObject foundObject21 = collection2.findOne(buildDbObject("id", 3, "code", "JSON dataset 2"));
+		Document foundObject21 = collection2.find(buildDbObject("id", 3, "code", "JSON dataset 2"))
+				.first();
 		assertThat(foundObject21, notNullValue());
 		
-		DBObject foundObject22 = collection2.findOne(buildDbObject("id", 4, "code", "Another row 2"));
+		Document foundObject22 = collection2.find(buildDbObject("id", 4, "code", "Another row 2")).first();
 		assertThat(foundObject22, notNullValue());
 		
-		DBCollection collection3 = db2.getCollection("collection1");
+		MongoCollection<Document> collection3 = db2.getCollection("collection1");
 		
-		DBObject foundObject31 = collection3.findOne(buildDbObject("id", 1, "code", "JSON dataset"));
+		Document foundObject31 = collection3.find(buildDbObject("id", 1, "code", "JSON dataset"))
+				.first();
 		assertThat(foundObject31, notNullValue());
 		
-		DBObject foundObject32 = collection3.findOne(buildDbObject("id", 9, "code", "Another row 9"));
+		Document foundObject32 = collection3.find(buildDbObject("id", 9, "code", "Another row 9"))
+				.first();
 		assertThat(foundObject32, notNullValue());
 	}
 
-	private DBObject buildDbObject(String idName, int id, String codeName, String code) {
+	private Document buildDbObject(String idName, int id, String codeName, String code) {
 		
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(idName, id);
 		params.put(codeName, code);
 		
-		DBObject dbObject = new BasicDBObject(params);
+		Document dbObject = new Document(params);
 		
 		return dbObject;
 	}

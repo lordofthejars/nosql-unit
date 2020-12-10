@@ -8,13 +8,14 @@ import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDbConfigurationBu
 
 import java.io.ByteArrayInputStream;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 
 public class WhenEmbeddedMongoDbOperationsArRequired {
 
@@ -31,8 +32,8 @@ public class WhenEmbeddedMongoDbOperationsArRequired {
 
     @After
     public void tearDown() {
-        Mongo defaultEmbeddedInstance = EmbeddedMongoInstancesFactory.getInstance().getDefaultEmbeddedInstance();
-        defaultEmbeddedInstance.getDB("test").getCollection("collection1").drop();
+        MongoClient defaultEmbeddedInstance = EmbeddedMongoInstancesFactory.getInstance().getDefaultEmbeddedInstance();
+        defaultEmbeddedInstance.getDatabase("test").getCollection("collection1").drop();
     }
 
     @Test
@@ -41,9 +42,9 @@ public class WhenEmbeddedMongoDbOperationsArRequired {
         MongoOperation mongoOperation = new MongoOperation(inMemoryMongoDb().databaseName("test").build());
         mongoOperation.insert(new ByteArrayInputStream(DATA.getBytes()));
 
-        Mongo mongo = mongoOperation.connectionManager();
-        DBCollection collection = mongo.getDB("test").getCollection("collection1");
-        DBObject object = collection.findOne();
+        MongoClient mongo = mongoOperation.connectionManager();
+        MongoCollection<Document> collection = mongo.getDatabase("test").getCollection("collection1");
+        Document object = collection.find().first();
 
         assertThat((Integer) object.get("id"), is(new Integer(1)));
         assertThat((String) object.get("code"), is("JSON dataset"));
@@ -56,9 +57,9 @@ public class WhenEmbeddedMongoDbOperationsArRequired {
         mongoOperation.insert(new ByteArrayInputStream(DATA.getBytes()));
         mongoOperation.deleteAll();
 
-        Mongo mongo = mongoOperation.connectionManager();
-        DBCollection collection = mongo.getDB("test").getCollection("collection1");
-        DBObject object = collection.findOne();
+        MongoClient mongo = mongoOperation.connectionManager();
+        MongoCollection<Document> collection = mongo.getDatabase("test").getCollection("collection1");
+        Document object = collection.find().first();
 
         assertThat(object, is(nullValue()));
     }

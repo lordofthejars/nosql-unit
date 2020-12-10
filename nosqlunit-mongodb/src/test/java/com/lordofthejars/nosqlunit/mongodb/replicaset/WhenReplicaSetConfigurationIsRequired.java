@@ -1,7 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
-import com.mongodb.util.JSON;
 import org.bson.Document;
 import org.junit.Test;
 
@@ -26,7 +25,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs0").eligible(managedInstance).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
         assertThat(
                 serializedConfiguration,
                 is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\"}]}"));
@@ -42,7 +41,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs0").secondary(managedInstance).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
         assertThat(
                 serializedConfiguration,
                 is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\" , \"priority\" : 0}]}"));
@@ -58,7 +57,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs0").hidden(managedInstance).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
 
         assertThat(
                 serializedConfiguration,
@@ -75,7 +74,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs0").arbiter(managedInstance).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
 
         assertThat(
                 serializedConfiguration,
@@ -92,7 +91,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs0").noneVoter(managedInstance).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
 
         assertThat(
                 serializedConfiguration,
@@ -110,7 +109,7 @@ public class WhenReplicaSetConfigurationIsRequired {
                 TimeUnit.MINUTES).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
 
         assertThat(
                 serializedConfiguration,
@@ -128,7 +127,7 @@ public class WhenReplicaSetConfigurationIsRequired {
                 .buildIndexes().tags("prop1", "val1", "prop2", "val2").configure().get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
 
         assertThat(
                 serializedConfiguration,
@@ -145,7 +144,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs0", settings().getLastErrorModes("{\"DRSafe\":{\"region\":2}}").get()).eligible(managedInstance).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
 
         assertThat(
                 serializedConfiguration,
@@ -167,7 +166,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         ReplicaSetManagedMongoDb replicaSetManagedMongoDb = replicaSet("rs0").eligible(managedInstance1).secondary(managedInstance2).get();
 
         Document configuration = replicaSetManagedMongoDb.getConfigurationDocument().getConfiguration();
-        String serializedConfiguration = JSON.serialize(configuration);
+        String serializedConfiguration = configuration.toJson();
 
         assertThat(
                 serializedConfiguration,
