@@ -2,7 +2,10 @@ package com.lordofthejars.nosqlunit.mongodb.integration;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
-import com.mongodb.MongoClient;
+
+import com.mongodb.ConnectionString;
+import com.mongodb.client.*;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -12,14 +15,12 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bson.Document;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.Description;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
-import com.lordofthejars.nosqlunit.mongodb.integration.UsingDataSetAnnotationTest;
-import com.lordofthejars.nosqlunit.mongodb.integration.ShouldMatchDataSetAnnotationTest;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -28,11 +29,7 @@ import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
 public class WhenMongoDbRuleIsRegistered {
@@ -102,7 +99,7 @@ public class WhenMongoDbRuleIsRegistered {
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, frameworkMethod, new MyTestClass());
 		mongodbStatement.evaluate();
 
-		DBObject currentData = findOneDBOjectByParameter("collection1", "id", 1);
+		Document currentData = findOneDBOjectByParameter("collection1", "id", 1);
 		assertThat(currentData, nullValue());
 	}
 
@@ -126,7 +123,7 @@ public class WhenMongoDbRuleIsRegistered {
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, frameworkMethod, testObject);
 		mongodbStatement.evaluate();
 
-		DBObject currentData = findOneDBOjectByParameter("collection1", "id", 1);
+		Document currentData = findOneDBOjectByParameter("collection1", "id", 1);
 		assertThat((String) currentData.get("code"), is("JSON dataset"));
 
 		FrameworkMethod frameworkMethod2 = frameworkMethod(MyTestClass.class, "my_insert_test_2");
@@ -134,10 +131,10 @@ public class WhenMongoDbRuleIsRegistered {
 		Statement mongodbStatement2 = remoteMongoDbRule.apply(noStatement, frameworkMethod2, testObject);
 		mongodbStatement2.evaluate();
 
-		DBObject previousData = findOneDBOjectByParameter("collection1", "id", 1);
+		Document previousData = findOneDBOjectByParameter("collection1", "id", 1);
 		assertThat((String) previousData.get("code"), is("JSON dataset"));
 
-		DBObject data = findOneDBOjectByParameter("collection3", "id", 6);
+		Document data = findOneDBOjectByParameter("collection3", "id", 6);
 		assertThat((String) data.get("code"), is("Another row"));
 	}
 
@@ -162,7 +159,7 @@ public class WhenMongoDbRuleIsRegistered {
 		Statement mongodbStatement = remoteMongoDbRule.apply(noStatement, frameworkMethod, testObject);
 		mongodbStatement.evaluate();
 
-		DBObject currentData = findOneDBOjectByParameter("collection1", "id", 1);
+		Document currentData = findOneDBOjectByParameter("collection1", "id", 1);
 		assertThat((String) currentData.get("code"), is("JSON dataset"));
 
 		FrameworkMethod frameworkMethod2 = frameworkMethod(MyTestClass.class, "my_equal_test_2");
@@ -170,10 +167,10 @@ public class WhenMongoDbRuleIsRegistered {
 		Statement mongodbStatement2 = remoteMongoDbRule.apply(noStatement, frameworkMethod2, testObject);
 		mongodbStatement2.evaluate();
 
-		DBObject previousData = findOneDBOjectByParameter("collection1", "id", 1);
+		Document previousData = findOneDBOjectByParameter("collection1", "id", 1);
 		assertThat(previousData, nullValue());
 
-		DBObject data = findOneDBOjectByParameter("collection3", "id", 6);
+		Document data = findOneDBOjectByParameter("collection3", "id", 6);
 		assertThat((String) data.get("code"), is("Another row"));
 	}
 
@@ -181,31 +178,30 @@ public class WhenMongoDbRuleIsRegistered {
 	private int countDBObjectsByParameter(String collectionName, String parameterName, Object value)
 			throws UnknownHostException, MongoException {
 
-		MongoClient mongo = new MongoClient("localhost");
-		DB mongodb = mongo.getDB("test");
-		DBCollection collection = mongodb.getCollection(collectionName);
+		MongoClient mongo = MongoClients.create(new ConnectionString("localhost"));
+		MongoDatabase mongoDb = mongo.getDatabase("test");
+		MongoCollection<Document> collection = mongoDb.getCollection(collectionName);
 
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put(parameterName, value);
 
 		BasicDBObject basicDBObject = new BasicDBObject(parameters);
 
-		DBCursor cursor = collection.find(basicDBObject);
 
-		return cursor.count();
+		return (int) collection.countDocuments(basicDBObject);
 	}
 
-	private DBObject findOneDBOjectByParameter(String collectionName, String parameterName, Object value)
+	private Document findOneDBOjectByParameter(String collectionName, String parameterName, Object value)
 			throws UnknownHostException {
-		MongoClient mongo = new MongoClient("localhost");
-		DB mongodb = mongo.getDB("test");
-		DBCollection collection = mongodb.getCollection(collectionName);
+		MongoClient mongo = MongoClients.create(new ConnectionString("localhost"));
+		MongoDatabase mongodb = mongo.getDatabase("test");
+		MongoCollection<Document> collection = mongodb.getCollection(collectionName);
 
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put(parameterName, value);
 
 		BasicDBObject basicDBObject = new BasicDBObject(parameters);
-		DBObject data = collection.findOne(basicDBObject);
+		Document data = collection.find(basicDBObject).first();
 		return data;
 	}
 

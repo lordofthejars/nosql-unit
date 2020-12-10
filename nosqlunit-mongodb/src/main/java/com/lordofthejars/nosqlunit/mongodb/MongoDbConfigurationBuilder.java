@@ -1,8 +1,10 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClients;
 
 import java.util.Arrays;
 
@@ -25,9 +27,23 @@ public class MongoDbConfigurationBuilder {
 			MongoCredential credential = MongoCredential.createCredential(this.mongoDbConfiguration.getUsername(),
 					this.mongoDbConfiguration.getDatabaseName(),
 					this.mongoDbConfiguration.getPassword().toCharArray());
-			mongo = new MongoClient(new ServerAddress(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort()), Arrays.asList(credential));
+
+			MongoClientSettings settings = MongoClientSettings
+					.builder()
+					.credential(credential)
+					.applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort()))))
+					.build();
+
+			mongo = MongoClients.create(settings);
+
 		} else {
-			mongo = new MongoClient(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort());
+
+			MongoClientSettings settings = MongoClientSettings
+					.builder()
+					.applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress(this.mongoDbConfiguration.getHost(), this.mongoDbConfiguration.getPort()))))
+					.build();
+
+			mongo = MongoClients.create(settings);
 		}
 		this.mongoDbConfiguration.setMongo(mongo);
 

@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 
 import javax.inject.Inject;
 
+import com.mongodb.client.MongoClient;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -19,7 +20,6 @@ import org.junit.runners.model.Statement;
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
-import com.mongodb.Mongo;
 
 public class WhenMongoObjectIsAnnotatedWithInject {
 
@@ -28,7 +28,7 @@ public class WhenMongoObjectIsAnnotatedWithInject {
 			.build();
 	
 	@Inject
-	private Mongo mongo;
+	private MongoClient mongo;
 	
 	@Before
 	public void setUp() {

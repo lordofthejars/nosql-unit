@@ -2,7 +2,7 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.PropertyGetter;
 import com.lordofthejars.nosqlunit.util.SpringUtils;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.springframework.context.ApplicationContext;

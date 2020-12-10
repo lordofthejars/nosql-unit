@@ -2,13 +2,15 @@ package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.mongodb.replicaset.ConfigurationDocument;
 import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoClient;
+import com.mongodb.MongoException;
 import org.bson.Document;
 
+import java.util.Arrays;
 import java.util.Set;
 
 public class MongoDbCommands {
@@ -80,11 +82,13 @@ public class MongoDbCommands {
     public static void shutdown(String host, int port) {
         MongoClient mongo = null;
         try {
-            mongo = new MongoClient(host, port);
-            DB db = mongo.getDB("admin");
-            CommandResult shutdownResult = db.command(new BasicDBObject(
+            mongo = MongoClients.create(MongoClientSettings
+                    .builder()
+                    .applyToClusterSettings(b -> b.hosts(Arrays.asList(new ServerAddress(host, port))))
+                    .build());
+            MongoDatabase db = mongo.getDatabase("admin");
+            Document shutdownResult = db.runCommand(new BasicDBObject(
                     "shutdown", 1));
-            shutdownResult.throwOnError();
         } catch (MongoException e) {
             //It is ok because response could not be returned because network connection is closed.
         } catch (Throwable e) {

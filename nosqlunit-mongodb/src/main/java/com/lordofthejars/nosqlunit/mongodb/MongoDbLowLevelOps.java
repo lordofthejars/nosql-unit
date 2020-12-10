@@ -1,12 +1,15 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
-import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
 import com.mongodb.MongoException;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.util.JSON;
 import org.bson.Document;
 
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +69,7 @@ public class MongoDbLowLevelOps {
                         "After "
                                 + (WAIT_TIME * MAX_RETRIES)
                                 + " seconds replica set scenario could not be started and configured. Last status message was: "
-                                + JSON.serialize(status));
+                                + status.toJson());
             }
 
         }
@@ -126,7 +129,14 @@ public class MongoDbLowLevelOps {
         try {
             do {
                 TimeUnit.SECONDS.sleep(WAIT_TIME);
-                server = new MongoClient(host, port);
+
+                server = MongoClients.create(
+                        MongoClientSettings.builder()
+                                .applyToClusterSettings(builder ->
+                                        builder.hosts(Arrays.asList(
+                                                new ServerAddress(host, port))))
+                                .build());
+
                 MongoDatabase db = server.getDatabase("admin");
                 try {
                     db.runCommand(Document.parse("{ dbStats: 1, scale: 1 }"));

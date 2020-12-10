@@ -1,6 +1,6 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -9,13 +9,14 @@ import java.io.File;
 
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
-import com.mongodb.CommandResult;
-import com.mongodb.DB;
 
 public class WhenManagedMongoDbRuleIsRegistered {
 
@@ -31,10 +32,11 @@ public class WhenManagedMongoDbRuleIsRegistered {
 
             @Override
             public void evaluate() throws Throwable {
-                MongoClient server = new MongoClient();
-                DB db = server.getDB("admin");
-                CommandResult stats = db.getStats();
-                assertThat(stats.ok(), is(true));
+                MongoClient server = MongoClients.create();
+                MongoDatabase db = server.getDatabase("admin");
+
+                Document stats = db.runCommand(new Document("dbStats", 1));
+                assertThat(stats!=null, is(true));
             }
         };
 
@@ -59,10 +61,10 @@ public class WhenManagedMongoDbRuleIsRegistered {
 
             @Override
             public void evaluate() throws Throwable {
-                MongoClient server = new MongoClient();
-                DB db = server.getDB("admin");
-                CommandResult stats = db.getStats();
-                assertThat(stats.ok(), is(true));
+                MongoClient server = MongoClients.create();
+                MongoDatabase db = server.getDatabase("admin");
+                Document stats = db.runCommand(new Document("dbStats", 1));
+                assertThat(stats!=null, is(true));
             }
         };
 
