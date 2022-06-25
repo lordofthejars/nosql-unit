@@ -9,7 +9,7 @@
     <artifactId>nosqlunit-mongodb</artifactId>
 
     <properties>
-        <spring.data.mongodb.version>1.4.3.RELEASE</spring.data.mongodb.version>
+        <spring.data.mongodb.version>3.3.5</spring.data.mongodb.version>
     </properties>
 
     <dependencies>
