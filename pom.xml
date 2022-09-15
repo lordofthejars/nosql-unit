@@ -64,7 +64,7 @@
         <awaitility.version>2.0.0</awaitility.version>
         <couchbase-client.version>2.4.2</couchbase-client.version>
         <vault.java.version>2.0.0</vault.java.version>
-        <snakeyaml.version>1.18</snakeyaml.version>
+        <snakeyaml.version>1.31</snakeyaml.version>
         <marklogic-client-api.version>4.2.0</marklogic-client-api.version>
         <influxdb.driver.version>2.15</influxdb.driver.version>
         <embedded.influxdb.version>develop-SNAPSHOT</embedded.influxdb.version>
